@@ -15,25 +15,19 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "miniature.h"
-#include <QApplication>
+#ifndef MINIATURE_H__
+#define MINIATURE_H__
 
-MiniatureWindow::MiniatureWindow()
-: QMainWindow()
+#include <QMainWindow>
+
+class MiniatureWindow
+: public QMainWindow
 {
-    setWindowTitle(tr("Miniature - The killer chess app for Maemo"));
-}
+    Q_OBJECT
 
-MiniatureWindow::~MiniatureWindow()
-{}
+public:
+    MiniatureWindow();
+    virtual ~MiniatureWindow();
+};
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
-
-    MiniatureWindow main;
-    main.show();
-
-    return app.exec();
-}
+#endif // MINIATURE_H__

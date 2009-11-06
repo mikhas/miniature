@@ -10,7 +10,9 @@ src_miniature_LDADD = $(QT_LIBS)
 bin_PROGRAMS = src/miniature
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \
+                        src/miniature.h \
+                        src/miniature.moc.cc \
                         src/miniature.cc
 
 # list moc files here, so that autrotroll can clean up
-# BUILT_SOURCES = 
+BUILT_SOURCES =  src/miniature.moc.cc
