@@ -18,3 +18,6 @@ src_miniature_SOURCES = \
 
 # list moc files here, so that autrotroll can clean up
 BUILT_SOURCES =  src/miniature.moc.cc data.qrc.cc
+
+desktopdir = $(datadir)/applications
+dist_desktop_DATA = miniature.desktop
