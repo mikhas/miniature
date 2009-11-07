@@ -12,7 +12,9 @@ bin_PROGRAMS = src/miniature
 src_miniature_SOURCES = \
                         src/miniature.h \
                         src/miniature.moc.cc \
-                        src/miniature.cc
+                        src/miniature.cc \
+                        data.qrc \
+                        data.qrc.cc
 
 # list moc files here, so that autrotroll can clean up
-BUILT_SOURCES =  src/miniature.moc.cc
+BUILT_SOURCES =  src/miniature.moc.cc data.qrc.cc
