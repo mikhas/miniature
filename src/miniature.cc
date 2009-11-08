@@ -17,7 +17,8 @@
 
 #include "config.h"
 #include "miniature.h"
-#include <QGraphicsSvgItem>
+#include "board.h"
+
 #include <QGraphicsTextItem>
 #include <QPixmap>
 #include <QApplication>
@@ -57,107 +58,6 @@ QString MiniatureWindow::formatTimerInfo(QString time_remaining, bool isWhite) c
                                                                       .arg(time_remaining);
 }
 
-void MiniatureWindow::drawChessPosition(QGraphicsPixmapItem* board, QString fen) const
-{
-    // TODO: Derive cell_size from "board size * .125"
-    const int cell_size = 45;
-
-    /* (x_pos, y_pos) always tells us where to draw the current figure (top
-     * left corner of a cell).
-     */
-    int x_pos = 0;
-    int y_pos = 0;
-
-    /* We count cells so we know when to stop reading the FEN string. A FEN
-     * string can contain comments and game state information which we do not need.
-     * That is why we stop after we have seen 64 cells.
-     */
-    int count_cells = 0;
-
-    for(int idx = 0; idx < fen.length() && 64 > count_cells; ++idx)
-    {
-        QChar curr = fen.at(idx);
-        QString file_name;
-
-        // scanned one row
-        if ('/' == curr)
-        {
-            y_pos += cell_size;
-            x_pos = 0;
-        }
-        else if (curr.isDigit())
-        {
-            /* This is the nice part about FEN: series of empty squares use a
-             * run-length-encoding. And that's stuff from the 19th century!
-             */
-            x_pos += curr.digitValue() * cell_size;
-            count_cells += curr.digitValue();
-        }
-        // check all black figures
-        else if ('r' == curr)
-        {
-            file_name = QString(":/figures/black/rook.svg");
-        }
-        else if ('n' == curr)
-        {
-            file_name = QString(":/figures/black/knight.svg");
-        }
-        else if ('b' == curr)
-        {
-            file_name = QString(":/figures/black/bishop.svg");
-        }
-        else if ('q' == curr)
-        {
-            file_name = QString(":/figures/black/queen.svg");
-        }
-        else if ('k' == curr)
-        {
-            file_name = QString(":/figures/black/king.svg");
-        }
-        else if ('p' == curr)
-        {
-            file_name = QString(":/figures/black/pawn.svg");
-        }
-        // check all white figures
-        else if ('R' == curr)
-        {
-            file_name = QString(":/figures/white/rook.svg");
-        }
-        else if ('N' == curr)
-        {
-            file_name = QString(":/figures/white/knight.svg");
-        }
-        else if ('B' == curr)
-        {
-            file_name = QString(":/figures/white/bishop.svg");
-        }
-        else if ('Q' == curr)
-        {
-            file_name = QString(":/figures/white/queen.svg");
-        }
-        else if ('K' == curr)
-        {
-            file_name = QString(":/figures/white/king.svg");
-        }
-        else if ('P' == curr)
-        {
-            file_name = QString(":/figures/white/pawn.svg");
-        }
-
-        // fetch the SVG file and add it to the board
-        if (!file_name.isEmpty())
-        {
-            // TODO: find out how to scale the figures! That they currently fit
-            // a cell is pure luck.
-            QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, board);
-            // The negative offset to y_pos tries to center the figure slightly.
-            figure->setPos(QPointF(x_pos, y_pos - 4));
-            x_pos += cell_size;
-            ++count_cells;
-        }
-    }
-}
-
 QGraphicsScene* MiniatureWindow::createScene() const
 {
     /* This scene graph creation features a lot of magic values, sadly. Maybe
@@ -168,10 +68,11 @@ QGraphicsScene* MiniatureWindow::createScene() const
     scene->setBackgroundBrush(Qt::black);
 
     // board
-    QGraphicsPixmapItem *board = scene->addPixmap(QPixmap(":boards/default.png"));
+    MiniatureBoard *board = new MiniatureBoard(QPixmap(":boards/default.png"));
+    scene->addItem(dynamic_cast<QGraphicsPixmapItem*>(board));
     board->setPos(QPointF(0,65));
     board->setZValue(0);
-    drawChessPosition(board, QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+    board->drawPosition(QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
 
     // white player card
     QGraphicsTextItem *white = new QGraphicsTextItem;
