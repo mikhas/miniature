@@ -19,6 +19,8 @@
 #define MINIATURE_H__
 
 #include <QMainWindow>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 class MiniatureWindow
 : public QMainWindow
@@ -28,6 +30,17 @@ class MiniatureWindow
 public:
     MiniatureWindow();
     virtual ~MiniatureWindow();
+    virtual void show();
+
+private:
+    // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
+    QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
+    QString formatTimerInfo(QString time_remaining, bool isWhite) const;
+    void drawChessPosition(QGraphicsPixmapItem* board, QString fen) const;
+
+    QGraphicsScene* createScene() const;
+
+    QGraphicsView scene_view;
 };
 
 #endif // MINIATURE_H__
