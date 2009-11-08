@@ -41,8 +41,6 @@ private:
      * (player cards, timer, board).
      */
     QGraphicsScene* createScene() const;
-
-    QGraphicsView scene_view;
 };
 
 #endif // MINIATURE_H__
