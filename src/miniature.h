@@ -36,8 +36,18 @@ private:
     // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
     QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
+
+    /* Draws a chess position on a given board, using a FEN [1] representation.
+     * Each figure that is added becomes a child of the board. This method does not
+     * take ownership of the board object!
+     *
+     * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+     */
     void drawChessPosition(QGraphicsPixmapItem* board, QString fen) const;
 
+    /* Creates a scene graph containing all UI elements of the main view
+     * (player cards, timer, board).
+     */
     QGraphicsScene* createScene() const;
 
     QGraphicsView scene_view;

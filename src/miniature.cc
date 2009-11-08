@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <iostream>
 
 #include "config.h"
 #include "miniature.h"
@@ -37,6 +36,7 @@ MiniatureWindow::MiniatureWindow()
 MiniatureWindow::~MiniatureWindow()
 {}
 
+// TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
 QString MiniatureWindow::formatPlayerInfo(QString name, int rating, int turn, QString alignment) const
 {
     QString style = QString("font-size:12px; color:white;");
@@ -49,6 +49,7 @@ QString MiniatureWindow::formatPlayerInfo(QString name, int rating, int turn, QS
                                                                                      .arg(turn);
 }
 
+// TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
 QString MiniatureWindow::formatTimerInfo(QString time_remaining, bool isWhite) const
 {
     QString style = QString("font-size:12px; color:%1").arg(isWhite ? "white" : "black");
@@ -58,9 +59,19 @@ QString MiniatureWindow::formatTimerInfo(QString time_remaining, bool isWhite) c
 
 void MiniatureWindow::drawChessPosition(QGraphicsPixmapItem* board, QString fen) const
 {
+    // TODO: Derive cell_size from "board size * .125"
     const int cell_size = 45;
+
+    /* (x_pos, y_pos) always tells us where to draw the current figure (top
+     * left corner of a cell).
+     */
     int x_pos = 0;
     int y_pos = 0;
+
+    /* We count cells so we know when to stop reading the FEN string. A FEN
+     * string can contain comments and game state information which we do not need.
+     * That is why we stop after we have seen 64 cells.
+     */
     int count_cells = 0;
 
     for(int idx = 0; idx < fen.length() && 64 > count_cells; ++idx)
@@ -68,6 +79,7 @@ void MiniatureWindow::drawChessPosition(QGraphicsPixmapItem* board, QString fen)
         QChar curr = fen.at(idx);
         QString file_name;
 
+        // scanned one row
         if ('/' == curr)
         {
             y_pos += cell_size;
@@ -75,6 +87,9 @@ void MiniatureWindow::drawChessPosition(QGraphicsPixmapItem* board, QString fen)
         }
         else if (curr.isDigit())
         {
+            /* This is the nice part about FEN: series of empty squares use a
+             * run-length-encoding. And that's stuff from the 19th century!
+             */
             x_pos += curr.digitValue() * cell_size;
             count_cells += curr.digitValue();
         }
@@ -129,34 +144,43 @@ void MiniatureWindow::drawChessPosition(QGraphicsPixmapItem* board, QString fen)
             file_name = QString(":/figures/white/pawn.svg");
         }
 
+        // fetch the SVG file and add it to the board
         if (!file_name.isEmpty())
         {
-            std::cout << "x_pos: " << x_pos << ", y_pos: " << y_pos << std::endl;
+            // TODO: find out how to scale the figures! That they currently fit
+            // a cell is pure luck.
             QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, board);
+            // The negative offset to y_pos tries to center the figure slightly.
             figure->setPos(QPointF(x_pos, y_pos - 4));
             x_pos += cell_size;
             ++count_cells;
         }
-
     }
 }
 
 QGraphicsScene* MiniatureWindow::createScene() const
 {
+    /* This scene graph creation features a lot of magic values, sadly. Maybe
+     * that's what you get with pixel-based layouts.
+     */
+
     QGraphicsScene *scene = new QGraphicsScene;
     scene->setBackgroundBrush(Qt::black);
 
+    // board
     QGraphicsPixmapItem *board = scene->addPixmap(QPixmap(":boards/default.png"));
     board->setPos(QPointF(0,65));
     board->setZValue(0);
     drawChessPosition(board, QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
 
+    // white player card
     QGraphicsTextItem *white = new QGraphicsTextItem;
     white->setHtml(formatPlayerInfo("andybehr", 9999, 28, "left"));
     white->setPos(QPointF(10,0));
     white->setZValue(1);
     scene->addItem(white);
 
+    // timer for white player card
     QGraphicsPixmapItem *timer_bg = scene->addPixmap(QPixmap(":timer_background.gif"));
     timer_bg->setPos(QPointF(95,30));
     timer_bg->setZValue(1);
@@ -169,6 +193,7 @@ QGraphicsScene* MiniatureWindow::createScene() const
     timer_white->setZValue(2);
     scene->addItem(timer_white);
 
+    // black player card
     QGraphicsTextItem *timer_black = new QGraphicsTextItem;
     timer_black->setHtml(formatTimerInfo("00:32", true));
     //timer_black->setPlainText("00:32");
@@ -177,6 +202,7 @@ QGraphicsScene* MiniatureWindow::createScene() const
     timer_black->setZValue(2);
     scene->addItem(timer_black);
 
+    // timer for black player card
     QGraphicsTextItem *black = new QGraphicsTextItem;
     black->setHtml(formatPlayerInfo("mikhas", 9999, 28, "right"));
     black->setPos(QPointF(180,0));
@@ -193,6 +219,7 @@ void MiniatureWindow::show()
     view->setSizePolicy(policy);
     QGraphicsScene *scene = 0;
     view->setScene(scene = createScene());
+    // Adding a margin of 10 to the scene graph helps to remove the scrollbars from the view.
     view->resize(scene->width() + 10, scene->height() + 10);
 
     QMainWindow::show();
