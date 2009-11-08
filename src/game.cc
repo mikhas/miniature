@@ -52,7 +52,13 @@ void MiniatureGame::newGame()
 
 void MiniatureGame::nextMove()
 {
-    m_board->drawPosition(convertToFen(++m_half_move));
+    if (m_half_move < m_game.size())
+    {
+        m_board->drawPosition(convertToFen(++m_half_move));
+    }
+    else // Complain!
+    {
+    }
 }
 
 void MiniatureGame::prevMove()
