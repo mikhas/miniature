@@ -45,33 +45,18 @@ void MiniatureGame::newGame()
     m_view->setScene(scene = createScene());
     // Adding a margin of 10 to the scene graph helps to remove the scrollbars from the view.
     m_view->resize(scene->width() + 10, scene->height() + 10);
+
     m_board->drawPosition(getDefaultStartPosition());
+    m_half_move = 0;
 }
 
 void MiniatureGame::nextMove()
 {
-/*
-    // Keep a temporary pointer to the scene
-    QGraphicsScene *temp_scene = m_board->scene();
-
-    // Although this looks fatal, the doc says it's OK: removeItem only deletes
-    // the children of m_board, not m_board itself.
-    temp_scene->removeItem(m_board);
-    Q_CHECK_PTR(m_board); // But who knows when the impl changes again ;)
-    addBoardToSceneGraph(temp_scene);
-*/
     m_board->drawPosition(convertToFen(++m_half_move));
 }
 
 void MiniatureGame::prevMove()
 {
-    // Although this looks fatal, the doc says it's OK: removeItem only deletes
-    // the children of m_board, not m_board itself.
-/*
-    m_board->scene()->removeItem(m_board);
-    Q_CHECK_PTR(m_board); // But who knows when the impl changes again ;)
-    addBoardToSceneGraph(m_board->scene());
-*/
     if (m_half_move > 0)
     {
         m_board->drawPosition(convertToFen(--m_half_move));
