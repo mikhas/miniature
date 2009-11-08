@@ -18,9 +18,9 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
+#include "game.h"
+
 #include <QMainWindow>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 
 class MiniatureWindow
 : public QMainWindow
@@ -30,17 +30,13 @@ class MiniatureWindow
 public:
     MiniatureWindow();
     virtual ~MiniatureWindow();
-    virtual void show();
 
 private:
-    // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
-    QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
-    QString formatTimerInfo(QString time_remaining, bool isWhite) const;
+    /* Our internal game controller */
+    MiniatureGame m_game;
 
-    /* Creates a scene graph containing all UI elements of the main view
-     * (player cards, timer, board).
-     */
-    QGraphicsScene* createScene() const;
+    /* A reference to the internal scene view */
+    QGraphicsView* m_view;
 };
 
 #endif // MINIATURE_H__

@@ -13,13 +13,16 @@ src_miniature_SOURCES = \
                         src/miniature.h \
                         src/miniature.moc.cc \
                         src/miniature.cc \
+                        src/game.h \
+                        src/game.moc.cc \
+                        src/game.cc \
                         src/board.h \
                         src/board.cc \
                         data.qrc \
                         data.qrc.cc
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
-BUILT_SOURCES =  src/miniature.moc.cc data.qrc.cc
+BUILT_SOURCES =  src/miniature.moc.cc src/game.moc.cc data.qrc.cc
 
 desktopdir = $(datadir)/applications
 dist_desktop_DATA = miniature.desktop

@@ -19,14 +19,45 @@
 #include "miniature.h"
 #include "board.h"
 
+#include <QMenuBar>
+#include <QMenu>
+#include <QSizePolicy>
 #include <QGraphicsTextItem>
 #include <QPixmap>
 #include <QApplication>
 
 MiniatureWindow::MiniatureWindow()
-: QMainWindow()
+: QMainWindow(),
+  m_view(0)
 {
     setWindowTitle(tr("Miniature - The killer chess app for Maemo"));
+
+    QAction *new_game = new QAction(tr("New &game"), this);
+    // TODO: These shortcuts don't seem to work. Find out why.
+    new_game->setShortcut(tr("Ctrl+n"));
+
+    QAction *next_move = new QAction(tr("&Next move"), this);
+    // TODO: These shortcuts don't seem to work. Find out why.
+    next_move->setShortcut(QKeySequence::MoveToNextChar);
+
+    QAction *prev_move = new QAction(tr("&Previous move"), this);
+    // TODO: These shortcuts don't seem to work. Find out why.
+    prev_move->setShortcut(QKeySequence::MoveToPreviousChar);
+
+    QMenu *game_menu = menuBar()->addMenu(tr("&Game"));
+    game_menu->addAction(new_game);
+    game_menu->addAction(next_move);
+    game_menu->addAction(prev_move);
+
+    // setup the view and hand a pointer to it to the game controller
+    m_view = new QGraphicsView(this);
+    QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    m_view->setSizePolicy(policy);
+    m_game.setSceneView(m_view);
+
+    QObject::connect(new_game, SIGNAL(triggered()), &m_game, SLOT(newGame()));
+    QObject::connect(next_move, SIGNAL(triggered()), &m_game, SLOT(nextMove()));
+    QObject::connect(prev_move, SIGNAL(triggered()), &m_game, SLOT(prevMove()));
 
 // Setting portrait mode only works with git version of Qt4
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
@@ -36,95 +67,6 @@ MiniatureWindow::MiniatureWindow()
 
 MiniatureWindow::~MiniatureWindow()
 {}
-
-// TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
-QString MiniatureWindow::formatPlayerInfo(QString name, int rating, int turn, QString alignment) const
-{
-    QString style = QString("font-size:12px; color:white;");
-    // setHtml + CSS is nice for text formatting. However, the CSS support is
-    // limited. It does not support "text-align", so a td tag is used instead.
-    return QString("<td width='160' style='%1' align='%2'>%3<br />(%4)<br />%5</td>").arg(style)
-                                                                                     .arg(alignment)
-                                                                                     .arg(name)
-                                                                                     .arg(rating)
-                                                                                     .arg(turn);
-}
-
-// TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
-QString MiniatureWindow::formatTimerInfo(QString time_remaining, bool isWhite) const
-{
-    QString style = QString("font-size:12px; color:%1").arg(isWhite ? "white" : "black");
-    return QString("<td width='60' style='%1' align='center'>%2</td>").arg(style)
-                                                                      .arg(time_remaining);
-}
-
-QGraphicsScene* MiniatureWindow::createScene() const
-{
-    /* This scene graph creation features a lot of magic values, sadly. Maybe
-     * that's what you get with pixel-based layouts.
-     */
-
-    QGraphicsScene *scene = new QGraphicsScene;
-    scene->setBackgroundBrush(Qt::black);
-
-    // board
-    MiniatureBoard *board = new MiniatureBoard(QPixmap(":boards/default.png"));
-    scene->addItem(dynamic_cast<QGraphicsPixmapItem*>(board));
-    board->setPos(QPointF(0,65));
-    board->setZValue(0);
-    board->drawPosition(QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
-
-    // white player card
-    QGraphicsTextItem *white = new QGraphicsTextItem;
-    white->setHtml(formatPlayerInfo("andybehr", 9999, 28, "left"));
-    white->setPos(QPointF(10,0));
-    white->setZValue(1);
-    scene->addItem(white);
-
-    // timer for white player card
-    QGraphicsPixmapItem *timer_bg = scene->addPixmap(QPixmap(":timer_background.gif"));
-    timer_bg->setPos(QPointF(95,30));
-    timer_bg->setZValue(1);
-
-    QGraphicsTextItem *timer_white = new QGraphicsTextItem;
-    timer_white->setHtml(formatTimerInfo("00:17", false));
-    //timer_white->setPlainText("00:17");
-    timer_white->setDefaultTextColor(Qt::black);
-    timer_white->setPos(QPointF(95,32));
-    timer_white->setZValue(2);
-    scene->addItem(timer_white);
-
-    // black player card
-    QGraphicsTextItem *timer_black = new QGraphicsTextItem;
-    timer_black->setHtml(formatTimerInfo("00:32", true));
-    //timer_black->setPlainText("00:32");
-    timer_white->setDefaultTextColor(Qt::white);
-    timer_black->setPos(QPointF(185,32));
-    timer_black->setZValue(2);
-    scene->addItem(timer_black);
-
-    // timer for black player card
-    QGraphicsTextItem *black = new QGraphicsTextItem;
-    black->setHtml(formatPlayerInfo("mikhas", 9999, 28, "right"));
-    black->setPos(QPointF(180,0));
-    black->setZValue(1);
-    scene->addItem(black);
-
-    return scene;
-}
-
-void MiniatureWindow::show()
-{
-    QGraphicsView *view = new QGraphicsView(this);
-    QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    view->setSizePolicy(policy);
-    QGraphicsScene *scene = 0;
-    view->setScene(scene = createScene());
-    // Adding a margin of 10 to the scene graph helps to remove the scrollbars from the view.
-    view->resize(scene->width() + 10, scene->height() + 10);
-
-    QMainWindow::show();
-}
 
 int main(int argc, char **argv)
 {

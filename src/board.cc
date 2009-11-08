@@ -30,8 +30,29 @@ MiniatureBoard::MiniatureBoard(const QPixmap &pixmap, QGraphicsItem *parent)
 MiniatureBoard::~MiniatureBoard()
 {}
 
+void MiniatureBoard::clear()
+{
+    QList<QGraphicsItem*> children = childItems();
+    for(QList<QGraphicsItem*>::iterator iter = children.begin();
+        iter != children.end();
+        ++iter)
+    {
+        Q_CHECK_PTR(*iter); // This might be paranoid ...
+        delete (*iter);
+    }
+}
+
 void MiniatureBoard::drawPosition(QString fen)
 {
+    if (fen.isEmpty())
+    {
+        // We have to decide whether we want to treat this as error. Currently,
+        // it's not (calling this method with an empty string).
+        return;
+    }
+
+    clear();
+
     // TODO: Derive cell_size from "board size * .125"
     const int cell_size = 45;
 

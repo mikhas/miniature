@@ -38,6 +38,9 @@ public:
     explicit MiniatureBoard(const QPixmap &pixmap, QGraphicsItem *parent = 0);
     virtual ~MiniatureBoard();
 
+    /* Removes (= deletes) all figures from the board. */
+    void clear();
+
     /* Draws a chess position on this board, using a FEN [1] representation.
      * Each figure (= QGraphicsSvgItem) that is added becomes a child of the board.
      * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
