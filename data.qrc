@@ -15,4 +15,10 @@
   <file alias="queen.svg">data/figures/white/queen.svg</file>
   <file alias="rook.svg">data/figures/white/rook.svg</file>
 </qresource>
+<qresource prefix="/boards">
+  <file alias="default.png">data/boards/default.png</file>
+</qresource>
+<qresource>
+  <file alias="timer_background.gif">data/timer_background.gif</file>
+</qresource>
 </RCC>
