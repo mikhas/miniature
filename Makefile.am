@@ -2,7 +2,7 @@ include $(top_srcdir)/build/autotroll.mk
 
 ACLOCAL_AMFLAGS = -I build
 
-src_miniature_CXXFLAGS = $(QT_CXXFLAGS)
+src_miniature_CXXFLAGS = $(QT_CXXFLAGS) -Wall -Werror
 src_miniature_CPPFLAGS = $(QT_CPPFLAGS)
 src_miniature_LDFLAGS  = $(QT_LDFLAGS)
 src_miniature_LDADD = $(QT_LIBS)
