@@ -11,8 +11,8 @@ AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 AC_PROG_CXX
 AC_LANG([C++])
 AT_WITH_QT([core gui svg],[no_keywords])
-#activate special maemo5 features in Qt, like portrait mode
-AC_DEFINE([Q_WS_MAEMO_5], [1], [activate Maemo5 features])
+#NOT NEEDED! activate special maemo5 features in Qt, like portrait mode
+#AC_DEFINE([Q_WS_MAEMO_5], [1], [activate Maemo5 features])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

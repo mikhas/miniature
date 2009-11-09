@@ -26,6 +26,15 @@
 #include <QPixmap>
 #include <QApplication>
 
+// TODO: remove when replaced with clean solution in ctor, once new packages
+// are available.
+#ifdef Q_WS_HILDON
+//Includes for portrait mode support
+#  include <X11/Xlib.h>
+#  include <X11/Xatom.h>
+#  include <QtGui/QX11Info>
+#endif
+
 MiniatureWindow::MiniatureWindow()
 : QMainWindow(),
   m_view(0)
@@ -63,6 +72,15 @@ MiniatureWindow::MiniatureWindow()
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
 //    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 
+// TODO: replace with clean solution above, once new packages are available.
+// taken 99% verbatim from http://taschenorakel.de/michael/2009/11/09/miniature-it-moves/#c592, thanks again gnuton!
+#ifdef Q_WS_HILDON
+    Atom portraitSupport = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_SUPPORT", False);
+    Atom portraitRequest = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_REQUEST", False);
+//printf ("ps:%d pr:%d, wi=%d\n", (int)portraitSupport, (int)portraitRequest, (int)winId());
+    XChangeProperty(QX11Info::display(), winId(), portraitSupport, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
+    XChangeProperty(QX11Info::display(), winId(), portraitRequest, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
+#endif
 }
 
 MiniatureWindow::~MiniatureWindow()

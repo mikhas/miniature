@@ -141,11 +141,20 @@ void MiniatureBoard::drawPosition(QString fen)
         // fetch the SVG file and add it to the board
         if (!file_name.isEmpty())
         {
-            // TODO: find out how to scale the figures! That they currently fit
-            // a cell is pure luck.
             QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, this);
-            // The negative offset to y_pos tries to center the figure slightly.
-            figure->setPos(QPointF(x_pos, y_pos - 4));
+
+            // Make the SVG figure 90% of the size of a cell.
+            QRectF extent = figure->boundingRect();
+            qreal ratio = 1;
+            if (0 < extent.width())
+            {
+                ratio = cell_size / extent.width();
+            }
+            figure->scale(ratio * .9, ratio * .9);
+
+            // We have a 10% margin, from the scaling above. Now we center the
+            // figure.
+            figure->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
             x_pos += cell_size;
             ++count_cells;
         }
