@@ -75,6 +75,7 @@ MiniatureWindow::MiniatureWindow()
 // TODO: replace with clean solution above, once new packages are available.
 // taken 99% verbatim from http://taschenorakel.de/michael/2009/11/09/miniature-it-moves/#c592, thanks again gnuton!
 #ifdef Q_WS_HILDON
+    int value = 1;
     Atom portraitSupport = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_SUPPORT", False);
     Atom portraitRequest = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_REQUEST", False);
 //printf ("ps:%d pr:%d, wi=%d\n", (int)portraitSupport, (int)portraitRequest, (int)winId());
