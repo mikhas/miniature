@@ -19,15 +19,15 @@
 #include "miniature.h"
 #include "board.h"
 
-#include <QMenuBar>
-#include <QMenu>
-#include <QSizePolicy>
 #include <QGraphicsTextItem>
 #include <QPixmap>
 #include <QApplication>
 
 // TODO: remove when replaced with clean solution in ctor, once new packages
-// are available.
+// are available. With Qt4.6 for Maemo there is now higher level API, try it out!
+// Q_WS_HILDON is not valid for Qt4.6, so if you want to see portrait mode
+// there (warning: the WM wont like it), define the Q_WS_HILDON macro manually.
+
 #ifdef Q_WS_HILDON
 //Includes for portrait mode support
 #  include <X11/Xlib.h>
@@ -39,34 +39,13 @@ MiniatureWindow::MiniatureWindow()
 : QMainWindow(),
   m_view(0)
 {
-    setWindowTitle(tr("Miniature - The killer chess app for Maemo"));
+    m_ui.setupUi(this);
 
-    QAction *new_game = new QAction(tr("New &game"), this);
-    // TODO: These shortcuts don't seem to work. Find out why.
-    new_game->setShortcut(tr("Ctrl+n"));
+    m_game.setSceneView(m_ui.scene_view);
 
-    QAction *next_move = new QAction(tr("&Next move"), this);
-    // TODO: These shortcuts don't seem to work. Find out why.
-    next_move->setShortcut(QKeySequence::MoveToNextChar);
-
-    QAction *prev_move = new QAction(tr("&Previous move"), this);
-    // TODO: These shortcuts don't seem to work. Find out why.
-    prev_move->setShortcut(QKeySequence::MoveToPreviousChar);
-
-    QMenu *game_menu = menuBar()->addMenu(tr("&Game"));
-    game_menu->addAction(new_game);
-    game_menu->addAction(next_move);
-    game_menu->addAction(prev_move);
-
-    // setup the view and hand a pointer to it to the game controller
-    m_view = new QGraphicsView(this);
-    QSizePolicy policy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    m_view->setSizePolicy(policy);
-    m_game.setSceneView(m_view);
-
-    QObject::connect(new_game, SIGNAL(triggered()), &m_game, SLOT(newGame()));
-    QObject::connect(next_move, SIGNAL(triggered()), &m_game, SLOT(nextMove()));
-    QObject::connect(prev_move, SIGNAL(triggered()), &m_game, SLOT(prevMove()));
+    QObject::connect(m_ui.new_game, SIGNAL(triggered()), &m_game, SLOT(newGame()));
+    QObject::connect(m_ui.next_move, SIGNAL(triggered()), &m_game, SLOT(nextMove()));
+    QObject::connect(m_ui.prev_move, SIGNAL(triggered()), &m_game, SLOT(prevMove()));
 
 // Setting portrait mode only works with git version of Qt4
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);

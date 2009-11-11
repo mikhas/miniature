@@ -46,5 +46,8 @@ public:
      * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
      */
     void drawPosition(QString fen);
+
+private:
+    QString getFileNameForFigure(QChar fenFigure) const;
 };
 #endif

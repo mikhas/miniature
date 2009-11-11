@@ -54,7 +54,7 @@ void MiniatureBoard::drawPosition(QString fen)
     clear();
 
     // TODO: Derive cell_size from "board size * .125"
-    const int cell_size = 45;
+    const int cell_size = 60;
 
     /* (x_pos, y_pos) always tells us where to draw the current figure (top
      * left corner of a cell).
@@ -87,76 +87,88 @@ void MiniatureBoard::drawPosition(QString fen)
             x_pos += curr.digitValue() * cell_size;
             count_cells += curr.digitValue();
         }
-        // check all black figures
-        else if ('r' == curr)
+        else
         {
-            file_name = QString(":/figures/black/rook.svg");
-        }
-        else if ('n' == curr)
-        {
-            file_name = QString(":/figures/black/knight.svg");
-        }
-        else if ('b' == curr)
-        {
-            file_name = QString(":/figures/black/bishop.svg");
-        }
-        else if ('q' == curr)
-        {
-            file_name = QString(":/figures/black/queen.svg");
-        }
-        else if ('k' == curr)
-        {
-            file_name = QString(":/figures/black/king.svg");
-        }
-        else if ('p' == curr)
-        {
-            file_name = QString(":/figures/black/pawn.svg");
-        }
-        // check all white figures
-        else if ('R' == curr)
-        {
-            file_name = QString(":/figures/white/rook.svg");
-        }
-        else if ('N' == curr)
-        {
-            file_name = QString(":/figures/white/knight.svg");
-        }
-        else if ('B' == curr)
-        {
-            file_name = QString(":/figures/white/bishop.svg");
-        }
-        else if ('Q' == curr)
-        {
-            file_name = QString(":/figures/white/queen.svg");
-        }
-        else if ('K' == curr)
-        {
-            file_name = QString(":/figures/white/king.svg");
-        }
-        else if ('P' == curr)
-        {
-            file_name = QString(":/figures/white/pawn.svg");
-        }
-
-        // fetch the SVG file and add it to the board
-        if (!file_name.isEmpty())
-        {
-            QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, this);
-
-            // Make the SVG figure 90% of the size of a cell.
-            QRectF extent = figure->boundingRect();
-            qreal ratio = 1;
-            if (0 < extent.width())
+            // fetch the SVG file and add it to the board
+            file_name = getFileNameForFigure(curr);
+            if (!file_name.isEmpty())
             {
-                ratio = cell_size / extent.width();
-            }
-            figure->scale(ratio * .9, ratio * .9);
+                QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, this);
 
-            // We have a 10% margin, from the scaling above. Now we center the
-            // figure.
-            figure->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
-            x_pos += cell_size;
-            ++count_cells;
+                // Make the SVG figure 90% of the size of a cell.
+                QRectF extent = figure->boundingRect();
+                qreal ratio = 1;
+                if (0 < extent.width())
+                {
+                    ratio = cell_size / extent.width();
+                }
+                figure->scale(ratio * .9, ratio * .9);
+
+                // We have a 10% margin, from the scaling above. Now we center the
+                // figure.
+                figure->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
+                x_pos += cell_size;
+                ++count_cells;
+            }
         }
+
     }
+}
+
+QString MiniatureBoard::getFileNameForFigure(QChar fenFigure) const
+{
+    QString file_name;
+
+    // check all black figures
+    if ('r' == fenFigure)
+    {
+        file_name = QString(":/figures/black/rook.svg");
+    }
+    else if ('n' == fenFigure)
+    {
+        file_name = QString(":/figures/black/knight.svg");
+    }
+    else if ('b' == fenFigure)
+    {
+        file_name = QString(":/figures/black/bishop.svg");
+    }
+    else if ('q' == fenFigure)
+    {
+        file_name = QString(":/figures/black/queen.svg");
+    }
+    else if ('k' == fenFigure)
+    {
+        file_name = QString(":/figures/black/king.svg");
+    }
+    else if ('p' == fenFigure)
+    {
+        file_name = QString(":/figures/black/pawn.svg");
+    }
+    // check all white figures
+    else if ('R' == fenFigure)
+    {
+        file_name = QString(":/figures/white/rook.svg");
+    }
+    else if ('N' == fenFigure)
+    {
+        file_name = QString(":/figures/white/knight.svg");
+    }
+    else if ('B' == fenFigure)
+    {
+        file_name = QString(":/figures/white/bishop.svg");
+    }
+    else if ('Q' == fenFigure)
+    {
+        file_name = QString(":/figures/white/queen.svg");
+    }
+    else if ('K' == fenFigure)
+    {
+        file_name = QString(":/figures/white/king.svg");
+    }
+    else if ('P' == fenFigure)
+    {
+        file_name = QString(":/figures/white/pawn.svg");
+    }
+
+    return file_name;
 }

@@ -18,6 +18,7 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
+#include "miniature.ui.h"
 #include "game.h"
 
 #include <QMainWindow>
@@ -37,6 +38,8 @@ private:
 
     /* A reference to the internal scene view */
     QGraphicsView* m_view;
+
+    Ui::Miniature m_ui;
 };
 
 #endif // MINIATURE_H__
