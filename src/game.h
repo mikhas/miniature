@@ -18,7 +18,7 @@
 #ifndef GAME_H__
 #define GAME_H__
 
-#include "board.h"
+#include "board_view.h"
 
 #include <vector>
 #include <QGraphicsView>
@@ -26,20 +26,22 @@
 #include <QString>
 #include <QObject>
 
+namespace Miniature
+{
 /* This class represents the data structure for a single game. It communicates
  * with the various backends (fics, freechess, chess engines, ...) and is also
  * responsible for sending the current chess position to the board. Therefore,
  * this class needs to be able to convert an internal chess position into a FEN
  * string.
  */
-class MiniatureGame
+class MGame
 : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit MiniatureGame(QObject* parent = 0);
-    virtual ~MiniatureGame();
+    explicit MGame(QObject* parent = 0);
+    virtual ~MGame();
 
     /* Set the view where we draw our scene graph onto. The game class does not
      * take ownership of the view!
@@ -77,6 +79,8 @@ private:
     QGraphicsView* m_view;
 
     /* A reference to the board that is used by the internal scene graph. */
-    MiniatureBoard* m_board;
+    MBoardView* m_board;
 };
+
+}; // namespace Miniature
 #endif

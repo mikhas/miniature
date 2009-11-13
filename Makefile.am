@@ -16,8 +16,8 @@ src_miniature_SOURCES = \
                         src/game.h \
                         src/game.moc.cc \
                         src/game.cc \
-                        src/board.h \
-                        src/board.cc \
+                        src/board_view.h \
+                        src/board_view.cc \
                         data/data.qrc \
                         data/data.qrc.cc \
                         src/miniature.ui \

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Miniature</class>
- <widget class="QMainWindow" name="Miniature">
+ <class>MMainWindow</class>
+ <widget class="QMainWindow" name="MMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -26,17 +26,17 @@
      <height>800</height>
     </size>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <property name="leftMargin">
      <number>0</number>
     </property>
     <property name="rightMargin">
      <number>0</number>
     </property>
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <item row="0" column="0">
+    <item>
      <widget class="QGraphicsView" name="scene_view"/>
     </item>
    </layout>

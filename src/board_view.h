@@ -24,19 +24,22 @@
 #include <QGraphicsPixmapItem>
 
 
+namespace Miniature
+{
 /* This class represents a board, using QGraphicsItems. Each figure is added as
  * a child to the board itself. Also, the aim is to not extend the state of its
  * parent class, QGraphicsPixmapItem (read: no private member vars).
  */
-class MiniatureBoard
+// TODO: Dont derive from QGraphicsPixmapItem, derive from a view widget.
+class MBoardView
 : public QGraphicsPixmapItem
 {
 // Be careful, QGraphicsItems *do no* inherit from QObject.
 
 public:
-    explicit MiniatureBoard(QGraphicsItem *parent = 0);
-    explicit MiniatureBoard(const QPixmap &pixmap, QGraphicsItem *parent = 0);
-    virtual ~MiniatureBoard();
+    explicit MBoardView(QGraphicsItem *parent = 0);
+    explicit MBoardView(const QPixmap &pixmap, QGraphicsItem *parent = 0);
+    virtual ~MBoardView();
 
     /* Removes (= deletes) all figures from the board. */
     void clear();
@@ -48,6 +51,8 @@ public:
     void drawPosition(QString fen);
 
 private:
-    QString getFileNameForFigure(QChar fenFigure) const;
+    QString getFileNameForPiece(QChar fenFigure) const;
 };
+
+}; // namespace Miniature
 #endif

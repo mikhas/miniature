@@ -15,22 +15,24 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "board.h"
+#include "board_view.h"
 
 #include <QGraphicsSvgItem>
 
-MiniatureBoard::MiniatureBoard(QGraphicsItem *parent)
+using namespace Miniature;
+
+MBoardView::MBoardView(QGraphicsItem *parent)
 : QGraphicsPixmapItem(parent)
 {}
 
-MiniatureBoard::MiniatureBoard(const QPixmap &pixmap, QGraphicsItem *parent)
+MBoardView::MBoardView(const QPixmap &pixmap, QGraphicsItem *parent)
 : QGraphicsPixmapItem(pixmap, parent)
 {}
 
-MiniatureBoard::~MiniatureBoard()
+MBoardView::~MBoardView()
 {}
 
-void MiniatureBoard::clear()
+void MBoardView::clear()
 {
     QList<QGraphicsItem*> children = childItems();
     for(QList<QGraphicsItem*>::iterator iter = children.begin();
@@ -42,7 +44,7 @@ void MiniatureBoard::clear()
     }
 }
 
-void MiniatureBoard::drawPosition(QString fen)
+void MBoardView::drawPosition(QString fen)
 {
     if (fen.isEmpty())
     {
@@ -56,7 +58,7 @@ void MiniatureBoard::drawPosition(QString fen)
     // TODO: Derive cell_size from "board size * .125"
     const int cell_size = 60;
 
-    /* (x_pos, y_pos) always tells us where to draw the current figure (top
+    /* (x_pos, y_pos) always tells us where to draw the current piece (top
      * left corner of a cell).
      */
     int x_pos = 0;
@@ -90,23 +92,23 @@ void MiniatureBoard::drawPosition(QString fen)
         else
         {
             // fetch the SVG file and add it to the board
-            file_name = getFileNameForFigure(curr);
+            file_name = getFileNameForPiece(curr);
             if (!file_name.isEmpty())
             {
-                QGraphicsSvgItem *figure = new QGraphicsSvgItem(file_name, this);
+                QGraphicsSvgItem *piece = new QGraphicsSvgItem(file_name, this);
 
-                // Make the SVG figure 90% of the size of a cell.
-                QRectF extent = figure->boundingRect();
+                // Make the SVG piece 90% of the size of a cell.
+                QRectF extent = piece->boundingRect();
                 qreal ratio = 1;
                 if (0 < extent.width())
                 {
                     ratio = cell_size / extent.width();
                 }
-                figure->scale(ratio * .9, ratio * .9);
+                piece->scale(ratio * .9, ratio * .9);
 
                 // We have a 10% margin, from the scaling above. Now we center the
-                // figure.
-                figure->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
+                // piece.
+                piece->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
                 x_pos += cell_size;
                 ++count_cells;
             }
@@ -115,59 +117,59 @@ void MiniatureBoard::drawPosition(QString fen)
     }
 }
 
-QString MiniatureBoard::getFileNameForFigure(QChar fenFigure) const
+QString MBoardView::getFileNameForPiece(QChar fenPiece) const
 {
     QString file_name;
 
-    // check all black figures
-    if ('r' == fenFigure)
+    // check all black pieces
+    if ('r' == fenPiece)
     {
-        file_name = QString(":/figures/black/rook.svg");
+        file_name = QString(":/pieces/black/rook.svg");
     }
-    else if ('n' == fenFigure)
+    else if ('n' == fenPiece)
     {
-        file_name = QString(":/figures/black/knight.svg");
+        file_name = QString(":/pieces/black/knight.svg");
     }
-    else if ('b' == fenFigure)
+    else if ('b' == fenPiece)
     {
-        file_name = QString(":/figures/black/bishop.svg");
+        file_name = QString(":/pieces/black/bishop.svg");
     }
-    else if ('q' == fenFigure)
+    else if ('q' == fenPiece)
     {
-        file_name = QString(":/figures/black/queen.svg");
+        file_name = QString(":/pieces/black/queen.svg");
     }
-    else if ('k' == fenFigure)
+    else if ('k' == fenPiece)
     {
-        file_name = QString(":/figures/black/king.svg");
+        file_name = QString(":/pieces/black/king.svg");
     }
-    else if ('p' == fenFigure)
+    else if ('p' == fenPiece)
     {
-        file_name = QString(":/figures/black/pawn.svg");
+        file_name = QString(":/pieces/black/pawn.svg");
     }
-    // check all white figures
-    else if ('R' == fenFigure)
+    // check all white pieces
+    else if ('R' == fenPiece)
     {
-        file_name = QString(":/figures/white/rook.svg");
+        file_name = QString(":/pieces/white/rook.svg");
     }
-    else if ('N' == fenFigure)
+    else if ('N' == fenPiece)
     {
-        file_name = QString(":/figures/white/knight.svg");
+        file_name = QString(":/pieces/white/knight.svg");
     }
-    else if ('B' == fenFigure)
+    else if ('B' == fenPiece)
     {
-        file_name = QString(":/figures/white/bishop.svg");
+        file_name = QString(":/pieces/white/bishop.svg");
     }
-    else if ('Q' == fenFigure)
+    else if ('Q' == fenPiece)
     {
-        file_name = QString(":/figures/white/queen.svg");
+        file_name = QString(":/pieces/white/queen.svg");
     }
-    else if ('K' == fenFigure)
+    else if ('K' == fenPiece)
     {
-        file_name = QString(":/figures/white/king.svg");
+        file_name = QString(":/pieces/white/king.svg");
     }
-    else if ('P' == fenFigure)
+    else if ('P' == fenPiece)
     {
-        file_name = QString(":/figures/white/pawn.svg");
+        file_name = QString(":/pieces/white/pawn.svg");
     }
 
     return file_name;

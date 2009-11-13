@@ -19,24 +19,26 @@
 
 #include <QList>
 
-MiniatureGame::MiniatureGame(QObject *parent)
+using namespace Miniature;
+
+MGame::MGame(QObject *parent)
 : QObject(parent),
   m_game(createDummyGame()),
   m_view(0),
   m_board(0)
 {
-    m_board = new MiniatureBoard(QPixmap(":boards/default.png"));
+    m_board = new MBoardView(QPixmap(":boards/default.png"));
 }
 
-MiniatureGame::~MiniatureGame()
+MGame::~MGame()
 {}
 
-void MiniatureGame::setSceneView(QGraphicsView* view)
+void MGame::setSceneView(QGraphicsView* view)
 {
     m_view = view;
 }
 
-void MiniatureGame::newGame()
+void MGame::newGame()
 {
     Q_CHECK_PTR(m_view);
     Q_CHECK_PTR(m_board);
@@ -50,7 +52,7 @@ void MiniatureGame::newGame()
     m_half_move = 0;
 }
 
-void MiniatureGame::nextMove()
+void MGame::nextMove()
 {
     if (m_half_move < m_game.size())
     {
@@ -61,7 +63,7 @@ void MiniatureGame::nextMove()
     }
 }
 
-void MiniatureGame::prevMove()
+void MGame::prevMove()
 {
     if (m_half_move > 0)
     {
@@ -72,12 +74,12 @@ void MiniatureGame::prevMove()
     }
 }
 
-QString MiniatureGame::getDefaultStartPosition() const
+QString MGame::getDefaultStartPosition() const
 {
     return QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-QString MiniatureGame::convertToFen(unsigned int half_move) const
+QString MGame::convertToFen(unsigned int half_move) const
 {
     if (half_move < m_game.size())
     {
@@ -88,7 +90,7 @@ QString MiniatureGame::convertToFen(unsigned int half_move) const
 }
 
 // TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
-QString MiniatureGame::formatPlayerInfo(QString name, int rating, int turn, QString alignment) const
+QString MGame::formatPlayerInfo(QString name, int rating, int turn, QString alignment) const
 {
     QString style = QString("font-size:12px; color:white;");
     // setHtml + CSS is nice for text formatting. However, the CSS support is
@@ -101,14 +103,14 @@ QString MiniatureGame::formatPlayerInfo(QString name, int rating, int turn, QStr
 }
 
 // TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
-QString MiniatureGame::formatTimerInfo(QString time_remaining, bool isWhite) const
+QString MGame::formatTimerInfo(QString time_remaining, bool isWhite) const
 {
     QString style = QString("font-size:12px; color:%1").arg(isWhite ? "white" : "black");
     return QString("<td width='60' style='%1' align='center'>%2</td>").arg(style)
                                                                       .arg(time_remaining);
 }
 
-void MiniatureGame::addBoardToSceneGraph(QGraphicsScene *scene)
+void MGame::addBoardToSceneGraph(QGraphicsScene *scene)
 {
     Q_CHECK_PTR(scene);
 
@@ -117,7 +119,7 @@ void MiniatureGame::addBoardToSceneGraph(QGraphicsScene *scene)
     m_board->setZValue(0);
 }
 
-QGraphicsScene* MiniatureGame::createScene()
+QGraphicsScene* MGame::createScene()
 {
     Q_CHECK_PTR(m_board);
 
@@ -170,7 +172,7 @@ QGraphicsScene* MiniatureGame::createScene()
     return scene;
 }
 
-std::vector<QString> MiniatureGame::createDummyGame() const
+std::vector<QString> MGame::createDummyGame() const
 {
     std::vector<QString> game;
     game.push_back(QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));

@@ -23,23 +23,28 @@
 
 #include <QMainWindow>
 
-class MiniatureWindow
+namespace Miniature
+{
+
+class MMainWindow
 : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MiniatureWindow();
-    virtual ~MiniatureWindow();
+    MMainWindow();
+    virtual ~MMainWindow();
 
 private:
     /* Our internal game controller */
-    MiniatureGame m_game;
+    Miniature::MGame m_game;
 
     /* A reference to the internal scene view */
     QGraphicsView* m_view;
 
-    Ui::Miniature m_ui;
+    Ui::MMainWindow m_ui;
 };
+
+}; // namespace Miniature
 
 #endif // MINIATURE_H__

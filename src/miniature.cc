@@ -17,7 +17,7 @@
 
 #include "config.h"
 #include "miniature.h"
-#include "board.h"
+#include "board_view.h"
 
 #include <QGraphicsTextItem>
 #include <QPixmap>
@@ -35,7 +35,9 @@
 #  include <QtGui/QX11Info>
 #endif
 
-MiniatureWindow::MiniatureWindow()
+using namespace Miniature;
+
+MMainWindow::MMainWindow()
 : QMainWindow(),
   m_view(0)
 {
@@ -63,7 +65,7 @@ MiniatureWindow::MiniatureWindow()
 #endif
 }
 
-MiniatureWindow::~MiniatureWindow()
+MMainWindow::~MMainWindow()
 {}
 
 int main(int argc, char **argv)
@@ -71,7 +73,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
-    MiniatureWindow main;
+    MMainWindow main;
     main.show();
 
     return app.exec();
