@@ -38,12 +38,11 @@
 using namespace Miniature;
 
 MMainWindow::MMainWindow()
-: QMainWindow(),
-  m_view(0)
+: QMainWindow()
 {
     m_ui.setupUi(this);
-
-    m_game.setSceneView(m_ui.scene_view);
+    //m_game.set_board_view(qobject_cast<MBoardView*>(m_ui.board_view));
+    m_game.set_board_view(m_ui.board_view);
 
     QObject::connect(m_ui.new_game, SIGNAL(triggered()), &m_game, SLOT(newGame()));
     QObject::connect(m_ui.next_move, SIGNAL(triggered()), &m_game, SLOT(nextMove()));

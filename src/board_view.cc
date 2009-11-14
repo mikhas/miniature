@@ -18,23 +18,43 @@
 #include "board_view.h"
 
 #include <QGraphicsSvgItem>
+#include <QPixmap>
 
 using namespace Miniature;
 
-MBoardView::MBoardView(QGraphicsItem *parent)
-: QGraphicsPixmapItem(parent)
-{}
+MBoardView::MBoardView(QWidget *parent)
+: QGraphicsView(parent),
+  m_board_item(0)
+{
+  QGraphicsView::setScene(new QGraphicsScene(this));
+  setBoardBackground();
+}
 
-MBoardView::MBoardView(const QPixmap &pixmap, QGraphicsItem *parent)
-: QGraphicsPixmapItem(pixmap, parent)
-{}
+MBoardView::MBoardView(QGraphicsScene *scene, QWidget *parent)
+: QGraphicsView(scene, parent),
+  m_board_item(0)
+{
+  setBoardBackground();
+}
 
 MBoardView::~MBoardView()
 {}
 
+void MBoardView::setScene(QGraphicsScene *scene)
+{
+    QGraphicsView::setScene(scene);
+    setBoardBackground();
+
+}
+
+void MBoardView::setBoardBackground()
+{
+    m_board_item = scene()->addPixmap(QPixmap(":boards/default.png"));
+}
+
 void MBoardView::clear()
 {
-    QList<QGraphicsItem*> children = childItems();
+    QList<QGraphicsItem*> children = m_board_item->childItems();
     for(QList<QGraphicsItem*>::iterator iter = children.begin();
         iter != children.end();
         ++iter)
@@ -46,6 +66,8 @@ void MBoardView::clear()
 
 void MBoardView::drawPosition(MPosition &position)
 {
+    Q_CHECK_PTR(m_board_item);
+
     QString fen = position.convertToFen();
 
     if (fen.isEmpty())
@@ -97,7 +119,7 @@ void MBoardView::drawPosition(MPosition &position)
             file_name = getFileNameForPiece(curr);
             if (!file_name.isEmpty())
             {
-                QGraphicsSvgItem *piece = new QGraphicsSvgItem(file_name, this);
+                QGraphicsSvgItem *piece = new QGraphicsSvgItem(file_name, m_board_item);
 
                 // Make the SVG piece 90% of the size of a cell.
                 QRectF extent = piece->boundingRect();

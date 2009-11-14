@@ -40,7 +40,7 @@ private:
     Miniature::MGame m_game;
 
     /* A reference to the internal scene view */
-    QGraphicsView* m_view;
+    //QGraphicsView* m_view;
 
     Ui::MMainWindow m_ui;
 };

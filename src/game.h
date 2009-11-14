@@ -43,10 +43,7 @@ public:
     explicit MGame(QObject* parent = 0);
     virtual ~MGame();
 
-    /* Set the view where we draw our scene graph onto. The game class does not
-     * take ownership of the view!
-     */
-    void setSceneView(QGraphicsView* view);
+    void set_board_view(MBoardView* board_view);
 
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
@@ -63,19 +60,16 @@ private:
     /* Creates a scene graph containing all UI elements of the main view
      * (player cards, timer, board).
      */
-    QGraphicsScene* createScene();
+    //QGraphicsScene* createScene();
 
     std::vector<QString> createDummyGame() const;
 
     // To simplify things, our current internal model is just a list of FEN
     // strings, one for each position. I fully expect this to change in the future.
     std::vector<QString> m_game;
-    unsigned int m_half_move;
+    int m_half_move;
 
-    /* A reference to the view we are supposed to use. */
-    QGraphicsView* m_view;
-
-    /* A reference to the board that is used by the internal scene graph. */
+    /* Stores a reference to the board view. */
     MBoardView* m_board_view;
 };
 

@@ -21,9 +21,8 @@
 #include "position.h"
 
 #include <QString>
-#include <QPixmap>
-#include <QGraphicsItem>
-#include <QGraphicsPixmapItem>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 
 
 namespace Miniature
@@ -34,14 +33,16 @@ namespace Miniature
  */
 // TODO: Dont derive from QGraphicsPixmapItem, derive from a view widget.
 class MBoardView
-: public QGraphicsPixmapItem
+: public QGraphicsView
 {
 // Be careful, QGraphicsItems *do no* inherit from QObject.
 
 public:
-    explicit MBoardView(QGraphicsItem *parent = 0);
-    explicit MBoardView(const QPixmap &pixmap, QGraphicsItem *parent = 0);
+    explicit MBoardView(QWidget *parent = 0);
+    explicit MBoardView(QGraphicsScene *scene, QWidget *parent = 0);
     virtual ~MBoardView();
+
+    virtual void setScene(QGraphicsScene* scene);
 
     /* Removes (= deletes) all pieces from the board. */
     void clear();
@@ -55,7 +56,11 @@ public:
     void drawStartPosition();
 
 private:
+    void setBoardBackground();
     QString getFileNameForPiece(QChar fenFigure) const;
+
+    /* Store a reference to the board item in the scene graph. */
+    QGraphicsPixmapItem* m_board_item;
 };
 
 }; // namespace Miniature
