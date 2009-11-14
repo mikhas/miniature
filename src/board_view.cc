@@ -49,7 +49,9 @@ void MBoardView::setScene(QGraphicsScene *scene)
 
 void MBoardView::setBoardBackground()
 {
-    m_board_item = scene()->addPixmap(QPixmap(":boards/default.png"));
+    //m_board_item = scene()->addPixmap(QPixmap(":boards/default.png"));
+    m_board_item = new QGraphicsSvgItem(":boards/glossy.svg");
+    scene()->addItem(m_board_item);
 }
 
 void MBoardView::clear()

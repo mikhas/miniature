@@ -17,6 +17,7 @@
 </qresource>
 <qresource prefix="/boards">
   <file alias="default.png">boards/default.png</file>
+  <file alias="glossy.svg">boards/glossy.svg</file>
 </qresource>
 <qresource>
   <file alias="timer_background.gif">timer_background.gif</file>

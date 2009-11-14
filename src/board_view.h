@@ -60,7 +60,7 @@ private:
     QString getFileNameForPiece(QChar fenFigure) const;
 
     /* Store a reference to the board item in the scene graph. */
-    QGraphicsPixmapItem* m_board_item;
+    QGraphicsItem* m_board_item;
 };
 
 }; // namespace Miniature
