@@ -222,12 +222,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="white_turn">
+                 <widget class="QLabel" name="white_material">
                   <property name="lineWidth">
                    <number>0</number>
                   </property>
                   <property name="text">
-                   <string>&lt;turn&gt;</string>
+                   <string>&lt;material&gt;</string>
                   </property>
                   <property name="indent">
                    <number>10</number>
@@ -319,12 +319,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="black_turn">
+                 <widget class="QLabel" name="black_material">
                   <property name="lineWidth">
                    <number>0</number>
                   </property>
                   <property name="text">
-                   <string>&lt;turn&gt;</string>
+                   <string>&lt;material&gt;</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

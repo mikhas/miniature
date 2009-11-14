@@ -59,6 +59,17 @@ MMainWindow::MMainWindow()
     QObject::connect(m_ui.prev_move, SIGNAL(triggered()),
                      &m_game, SLOT(prevMove()));
 
+    // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
+    QFont big_font("helvetica", 16, QFont::Bold);
+    QFont normal_font("helvetica", 14, QFont::DemiBold);
+    m_ui.white_name->setFont(big_font);
+    m_ui.white_rating->setFont(normal_font);
+    m_ui.white_material->setFont(normal_font);
+
+    m_ui.black_name->setFont(big_font);
+    m_ui.black_rating->setFont(normal_font);
+    m_ui.black_material->setFont(normal_font);
+
 // Setting portrait mode only works with git version of Qt4
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
 //    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
@@ -83,12 +94,12 @@ void MMainWindow::updatePlayerInfo()
     MPlayerInfo info = m_game.getPlayerInfo();
 
     m_ui.white_name->setText(info.white_name);
-    m_ui.white_rating->setText(info.white_rating);
-    m_ui.white_turn->setText(info.white_turn);
+    m_ui.white_rating->setText(QString("(%1)").arg(info.white_rating));
+    m_ui.white_material->setText(QString("%1").arg(info.white_material));
 
     m_ui.black_name->setText(info.black_name);
-    m_ui.black_rating->setText(info.black_rating);
-    m_ui.black_turn->setText(info.black_turn);
+    m_ui.black_rating->setText(QString("(%1)").arg(info.black_rating));
+    m_ui.black_material->setText(QString("%1").arg(info.black_material));
 }
 
 int main(int argc, char **argv)

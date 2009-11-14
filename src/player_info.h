@@ -27,11 +27,11 @@ struct MPlayerInfo
 {
     QString white_name;
     QString white_rating;
-    QString white_turn;
+    int white_material;
 
     QString black_name;
     QString black_rating;
-    QString black_turn;
+    int black_material;
 };
 
 };

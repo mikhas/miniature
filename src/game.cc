@@ -30,12 +30,12 @@ MGame::MGame(QObject *parent)
   m_half_move(-1)
 {
     m_player_info.white_name = QString("andybehr");
-    m_player_info.white_rating = QString("(4321)");
-    m_player_info.white_turn = QString("1");
+    m_player_info.white_rating = QString("4321");
+    m_player_info.white_material = computeWhiteMaterial();
 
     m_player_info.black_name = QString("mikhas");
-    m_player_info.black_rating = QString("(1234)");
-    m_player_info.black_turn = QString("1");
+    m_player_info.black_rating = QString("1234");
+    m_player_info.black_material = computeBlackMaterial();
 }
 
 MGame::~MGame()
@@ -53,7 +53,7 @@ void MGame::newGame()
 
     m_half_move = -1;
 
-    updateTurnInfo();
+    updateMaterialInfo();
 }
 
 void MGame::nextMove()
@@ -65,7 +65,7 @@ void MGame::nextMove()
         MPosition pos = MPosition(m_game[m_half_move]);
         Q_EMIT positionChanged(pos);
 
-        updateTurnInfo();
+        updateMaterialInfo();
     }
     else // Complain!
     {
@@ -81,7 +81,7 @@ void MGame::prevMove()
         MPosition pos = MPosition(m_game[m_half_move]);
         Q_EMIT positionChanged(pos);
 
-        updateTurnInfo();
+        updateMaterialInfo();
     }
     else // Complain!
     {
@@ -89,15 +89,20 @@ void MGame::prevMove()
     }
 }
 
-int MGame::computeTurn() const
+int MGame::computeWhiteMaterial() const
 {
-    return floor(m_half_move * 0.5) + 1;
+    return 39;
 }
 
-void MGame::updateTurnInfo()
+int MGame::computeBlackMaterial() const
 {
-    m_player_info.white_turn = QString("%1").arg(computeTurn());
-    m_player_info.black_turn = QString("%1").arg(computeTurn());
+    return 39;
+}
+
+void MGame::updateMaterialInfo()
+{
+    m_player_info.white_material = computeWhiteMaterial();
+    m_player_info.black_material = computeBlackMaterial();
 
     Q_EMIT playerInfoChanged();
 }

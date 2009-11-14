@@ -62,9 +62,12 @@ private:
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
     void addBoardToSceneGraph(QGraphicsScene *scene);
 
-    // Computes current turn number from half turns.
-    int computeTurn() const;
-    void updateTurnInfo();
+    /* Computes material for each side, using [1]
+     * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system
+     */
+    int computeWhiteMaterial() const;
+    int computeBlackMaterial() const;
+    void updateMaterialInfo();
 
     /* Creates a scene graph containing all UI elements of the main view
      * (player cards, timer, board).
