@@ -1,0 +1,15 @@
+== Textual description ==
+[MMainWindow||slot updatePlayerInfo()]+1-1>[MBoardView||slot drawPosition()],
+[MMainWindow]++1-1>[Ui::MMainWindow||setupUi();signal new_game_triggered(), signal next_move_triggered(), signal prev_move_triggered()],
+[MMainWindow]+1-1>[MGame||signal playerInfoChanged();signal signal positionChanged();slot newGame();slot nextMove();slot prevMove()],
+[MGame]++1-1>[MPosition],
+[MGame]++1-1>[MPlayerInfo],
+[MBoardView]++1-1>[QGraphicsSceneGraph],
+[MBoardView]1-1>[MPosition],
+[MMainWindow]1-1>[MPlayerInfo]
+[QGraphicsView]^[MBoardView],
+[QMainWindow]^[MMainWindow],
+[QObject]^[MGame]
+
+== Link ==
+http://yuml.me/diagram/class/[MMainWindow||slot updatePlayerInfo()]+1-1>[MBoardView||slot drawPosition()], [MMainWindow]++1-1>[Ui::MMainWindow||setupUi();signal new_game_triggered(); signal next_move_triggered(); signal prev_move_triggered()], [MMainWindow]+1-1>[MGame||signal playerInfoChanged();signal signal positionChanged();slot newGame();slot nextMove();slot prevMove()], [MGame]++1-1>[MPosition], [MGame]++1-1>[MPlayerInfo], [MBoardView]++1-1>[QGraphicsSceneGraph], [MBoardView]1-1>[MPosition], [MMainWindow]1-1>[MPlayerInfo], [QGraphicsView]^[MBoardView], [QMainWindow]^[MMainWindow], [QObject]^[MGame].
