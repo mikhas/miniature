@@ -64,7 +64,7 @@ void MBoardView::clear()
     }
 }
 
-void MBoardView::drawPosition(MPosition &position)
+void MBoardView::drawPosition(const MPosition &position)
 {
     Q_CHECK_PTR(m_board_item);
 

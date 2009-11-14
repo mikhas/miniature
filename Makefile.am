@@ -19,13 +19,15 @@ src_miniature_SOURCES = \
                         src/position.h \
                         src/position.cc \
                         src/board_view.h \
+                        src/board_view.moc.cc \
                         src/board_view.cc \
+                        src/player_info.h \
                         data/data.qrc \
                         data/data.qrc.cc \
                         src/miniature.ui \
                         src/miniature.ui.h
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
-BUILT_SOURCES =  src/miniature.moc.cc src/game.moc.cc data/data.qrc.cc src/miniature.ui.h
+BUILT_SOURCES =  src/miniature.moc.cc src/game.moc.cc src/board_view.moc.cc data/data.qrc.cc src/miniature.ui.h
 desktopdir = $(datadir)/applications
 dist_desktop_DATA = miniature.desktop

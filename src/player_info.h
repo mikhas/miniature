@@ -15,40 +15,25 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MINIATURE_H__
-#define MINIATURE_H__
+#ifndef PLAYER_INFO_H__
+#define PLAYER_INFO_H__
 
-#include "miniature.ui.h"
-#include "game.h"
-#include "player_info.h"
-
-#include <QMainWindow>
+#include <QString>
 
 namespace Miniature
 {
 
-class MMainWindow
-: public QMainWindow
+struct MPlayerInfo
 {
-    Q_OBJECT
+    QString white_name;
+    QString white_rating;
+    QString white_turn;
 
-public:
-    MMainWindow();
-    virtual ~MMainWindow();
-
-public Q_SLOTS:
-    void updatePlayerInfo();
-
-private:
-    /* Our internal game controller */
-    Miniature::MGame m_game;
-
-    /* A reference to the internal scene view */
-    //QGraphicsView* m_view;
-
-    Ui::MMainWindow m_ui;
+    QString black_name;
+    QString black_rating;
+    QString black_turn;
 };
 
-}; // namespace Miniature
+};
 
-#endif // MINIATURE_H__
+#endif

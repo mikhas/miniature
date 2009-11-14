@@ -18,7 +18,8 @@
 #ifndef GAME_H__
 #define GAME_H__
 
-#include "board_view.h"
+#include "player_info.h"
+#include "position.h"
 
 #include <vector>
 #include <QGraphicsView>
@@ -43,7 +44,7 @@ public:
     explicit MGame(QObject* parent = 0);
     virtual ~MGame();
 
-    void set_board_view(MBoardView* board_view);
+    MPlayerInfo getPlayerInfo() const;
 
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
@@ -51,11 +52,19 @@ public Q_SLOTS:
     void nextMove();
     void prevMove();
 
+Q_SIGNALS:
+    void playerInfoChanged();
+    void positionChanged(const MPosition&);
+
 private:
     // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
     QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
     void addBoardToSceneGraph(QGraphicsScene *scene);
+
+    // Computes current turn number from half turns.
+    int computeTurn() const;
+    void updateTurnInfo();
 
     /* Creates a scene graph containing all UI elements of the main view
      * (player cards, timer, board).
@@ -69,8 +78,8 @@ private:
     std::vector<QString> m_game;
     int m_half_move;
 
-    /* Stores a reference to the board view. */
-    MBoardView* m_board_view;
+    /* Stores player info, to be shown by the main window. */
+    MPlayerInfo m_player_info;
 };
 
 }; // namespace Miniature

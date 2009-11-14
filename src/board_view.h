@@ -28,14 +28,13 @@
 namespace Miniature
 {
 /* This class represents a board, using QGraphicsItems. Each figure is added as
- * a child to the board itself. Also, the aim is to not extend the state of its
- * parent class, QGraphicsPixmapItem (read: no private member vars).
+ * a child to the board itself.
+ * The state of this class should not be extended if possible.
  */
-// TODO: Dont derive from QGraphicsPixmapItem, derive from a view widget.
 class MBoardView
 : public QGraphicsView
 {
-// Be careful, QGraphicsItems *do no* inherit from QObject.
+    Q_OBJECT
 
 public:
     explicit MBoardView(QWidget *parent = 0);
@@ -47,12 +46,13 @@ public:
     /* Removes (= deletes) all pieces from the board. */
     void clear();
 
+public Q_SLOTS:
     /* Draws a chess position on this board, by extracting the FEN [1]
      * representation from the given MPosition.
      * Each figure (= QGraphicsSvgItem) that is added becomes a child of the board.
      * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
      */
-    void drawPosition(MPosition &position);
+    void drawPosition(const MPosition &position);
     void drawStartPosition();
 
 private:

@@ -18,6 +18,8 @@
 #include "game.h"
 #include "position.h"
 
+#include <cmath>
+
 #include <QList>
 
 using namespace Miniature;
@@ -25,25 +27,33 @@ using namespace Miniature;
 MGame::MGame(QObject *parent)
 : QObject(parent),
   m_game(createDummyGame()),
-  m_half_move(-1),
-  m_board_view(0)
-{}
-
-void MGame::set_board_view(MBoardView* board_view)
+  m_half_move(-1)
 {
-    Q_CHECK_PTR(board_view);
-    m_board_view = board_view;
+    m_player_info.white_name = QString("andybehr");
+    m_player_info.white_rating = QString("(4321)");
+    m_player_info.white_turn = QString("1");
+
+    m_player_info.black_name = QString("mikhas");
+    m_player_info.black_rating = QString("(1234)");
+    m_player_info.black_turn = QString("1");
 }
 
 MGame::~MGame()
 {}
 
+MPlayerInfo MGame:: getPlayerInfo() const
+{
+    return m_player_info;
+}
+
 void MGame::newGame()
 {
-    Q_CHECK_PTR(m_board_view);
+    MPosition pos;
+    Q_EMIT positionChanged(pos);
 
-    m_board_view->drawStartPosition();
     m_half_move = -1;
+
+    updateTurnInfo();
 }
 
 void MGame::nextMove()
@@ -51,8 +61,11 @@ void MGame::nextMove()
     if (0 < m_game.size() && m_half_move < static_cast<int>(m_game.size()) - 1)
     {
         ++m_half_move;
+
         MPosition pos = MPosition(m_game[m_half_move]);
-        m_board_view->drawPosition(pos);
+        Q_EMIT positionChanged(pos);
+
+        updateTurnInfo();
     }
     else // Complain!
     {
@@ -64,8 +77,11 @@ void MGame::prevMove()
     if (m_half_move > 0)
     {
        --m_half_move;
+
         MPosition pos = MPosition(m_game[m_half_move]);
-        m_board_view->drawPosition(pos);
+        Q_EMIT positionChanged(pos);
+
+        updateTurnInfo();
     }
     else // Complain!
     {
@@ -73,56 +89,18 @@ void MGame::prevMove()
     }
 }
 
-/*
-QGraphicsScene* MGame::createScene()
+int MGame::computeTurn() const
 {
-    Q_CHECK_PTR(m_board);
-
-    QGraphicsScene *scene = new QGraphicsScene;
-    scene->setBackgroundBrush(Qt::black);
-
-    // board
-    addBoardToSceneGraph(scene);
-
-    // white player card
-    QGraphicsTextItem *white = new QGraphicsTextItem;
-    white->setHtml(formatPlayerInfo("andybehr", 9999, 28, "left"));
-    white->setPos(QPointF(10,0));
-    white->setZValue(1);
-    scene->addItem(white);
-
-    // timer for white player card
-    QGraphicsPixmapItem *timer_bg = scene->addPixmap(QPixmap(":timer_background.gif"));
-    timer_bg->setPos(QPointF(95,30));
-    timer_bg->setZValue(1);
-
-    QGraphicsTextItem *timer_white = new QGraphicsTextItem;
-    timer_white->setHtml(formatTimerInfo("00:17", false));
-    //timer_white->setPlainText("00:17");
-    timer_white->setDefaultTextColor(Qt::black);
-    timer_white->setPos(QPointF(95,32));
-    timer_white->setZValue(2);
-    scene->addItem(timer_white);
-
-    // black player card
-    QGraphicsTextItem *timer_black = new QGraphicsTextItem;
-    timer_black->setHtml(formatTimerInfo("00:32", true));
-    //timer_black->setPlainText("00:32");
-    timer_white->setDefaultTextColor(Qt::white);
-    timer_black->setPos(QPointF(185,32));
-    timer_black->setZValue(2);
-    scene->addItem(timer_black);
-
-    // timer for black player card
-    QGraphicsTextItem *black = new QGraphicsTextItem;
-    black->setHtml(formatPlayerInfo("mikhas", 9999, 28, "right"));
-    black->setPos(QPointF(180,0));
-    black->setZValue(1);
-    scene->addItem(black);
-
-    return scene;
+    return floor(m_half_move * 0.5) + 1;
 }
-*/
+
+void MGame::updateTurnInfo()
+{
+    m_player_info.white_turn = QString("%1").arg(computeTurn());
+    m_player_info.black_turn = QString("%1").arg(computeTurn());
+
+    Q_EMIT playerInfoChanged();
+}
 
 std::vector<QString> MGame::createDummyGame() const
 {

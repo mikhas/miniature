@@ -41,12 +41,23 @@ MMainWindow::MMainWindow()
 : QMainWindow()
 {
     m_ui.setupUi(this);
-    //m_game.set_board_view(qobject_cast<MBoardView*>(m_ui.board_view));
-    m_game.set_board_view(m_ui.board_view);
+    updatePlayerInfo();
 
-    QObject::connect(m_ui.new_game, SIGNAL(triggered()), &m_game, SLOT(newGame()));
-    QObject::connect(m_ui.next_move, SIGNAL(triggered()), &m_game, SLOT(nextMove()));
-    QObject::connect(m_ui.prev_move, SIGNAL(triggered()), &m_game, SLOT(prevMove()));
+    // Connect game logic w/ player info view.
+    QObject::connect(&m_game, SIGNAL(playerInfoChanged()),
+                     this, SLOT(updatePlayerInfo()));
+
+    // Connect game logic w/ board view.
+    QObject::connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
+                     m_ui.board_view, SLOT(drawPosition(const MPosition&)));
+
+    // Connect menu actions.
+    QObject::connect(m_ui.new_game, SIGNAL(triggered()),
+                     &m_game, SLOT(newGame()));
+    QObject::connect(m_ui.next_move, SIGNAL(triggered()),
+                     &m_game, SLOT(nextMove()));
+    QObject::connect(m_ui.prev_move, SIGNAL(triggered()),
+                     &m_game, SLOT(prevMove()));
 
 // Setting portrait mode only works with git version of Qt4
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
@@ -66,6 +77,19 @@ MMainWindow::MMainWindow()
 
 MMainWindow::~MMainWindow()
 {}
+
+void MMainWindow::updatePlayerInfo()
+{
+    MPlayerInfo info = m_game.getPlayerInfo();
+
+    m_ui.white_name->setText(info.white_name);
+    m_ui.white_rating->setText(info.white_rating);
+    m_ui.white_turn->setText(info.white_turn);
+
+    m_ui.black_name->setText(info.black_name);
+    m_ui.black_rating->setText(info.black_rating);
+    m_ui.black_turn->setText(info.black_turn);
+}
 
 int main(int argc, char **argv)
 {
