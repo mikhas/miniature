@@ -16,6 +16,7 @@
  */
 
 #include "game.h"
+#include "position.h"
 
 #include <QList>
 
@@ -25,9 +26,9 @@ MGame::MGame(QObject *parent)
 : QObject(parent),
   m_game(createDummyGame()),
   m_view(0),
-  m_board(0)
+  m_board_view(0)
 {
-    m_board = new MBoardView(QPixmap(":boards/default.png"));
+    m_board_view = new MBoardView(QPixmap(":boards/default.png"));
 }
 
 MGame::~MGame()
@@ -48,7 +49,7 @@ void MGame::newGame()
     // Adding a margin of 10 to the scene graph helps to remove the scrollbars from the view.
     m_view->resize(scene->width() + 10, scene->height() + 10);
 
-    m_board->drawPosition(getDefaultStartPosition());
+    m_board_view->drawStartPosition();
     m_half_move = 0;
 }
 
@@ -56,7 +57,8 @@ void MGame::nextMove()
 {
     if (m_half_move < m_game.size())
     {
-        m_board->drawPosition(convertToFen(++m_half_move));
+        MPosition pos = MPosition(m_game[++m_half_move]);
+        m_board_view->drawPosition(pos);
     }
     else // Complain!
     {
@@ -67,26 +69,12 @@ void MGame::prevMove()
 {
     if (m_half_move > 0)
     {
-        m_board->drawPosition(convertToFen(--m_half_move));
+        MPosition pos = MPosition(m_game[--m_half_move]);
+        m_board_view->drawPosition(pos);
     }
     else // Complain!
     {
     }
-}
-
-QString MGame::getDefaultStartPosition() const
-{
-    return QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-}
-
-QString MGame::convertToFen(unsigned int half_move) const
-{
-    if (half_move < m_game.size())
-    {
-        return m_game[half_move];
-    }
-
-    return QString();
 }
 
 // TODO: Find out how to properly render left/right aligned multi-line text without using this HTML hack.
@@ -114,9 +102,9 @@ void MGame::addBoardToSceneGraph(QGraphicsScene *scene)
 {
     Q_CHECK_PTR(scene);
 
-    scene->addItem(dynamic_cast<QGraphicsPixmapItem*>(m_board));
-    m_board->setPos(QPointF(0,65));
-    m_board->setZValue(0);
+    scene->addItem(dynamic_cast<QGraphicsPixmapItem*>(m_board_view));
+    m_board_view->setPos(QPointF(0,65));
+    m_board_view->setZValue(0);
 }
 
 QGraphicsScene* MGame::createScene()

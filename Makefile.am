@@ -16,6 +16,8 @@ src_miniature_SOURCES = \
                         src/game.h \
                         src/game.moc.cc \
                         src/game.cc \
+                        src/position.h \
+                        src/position.cc \
                         src/board_view.h \
                         src/board_view.cc \
                         data/data.qrc \

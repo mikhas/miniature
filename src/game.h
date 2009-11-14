@@ -48,9 +48,6 @@ public:
      */
     void setSceneView(QGraphicsView* view);
 
-    QString getDefaultStartPosition() const;
-    QString convertToFen(unsigned int half_move) const;
-
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
     void newGame();
@@ -79,7 +76,7 @@ private:
     QGraphicsView* m_view;
 
     /* A reference to the board that is used by the internal scene graph. */
-    MBoardView* m_board;
+    MBoardView* m_board_view;
 };
 
 }; // namespace Miniature

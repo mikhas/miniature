@@ -15,8 +15,10 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOARD_H__
-#define BOARD_H__
+#ifndef BOARD_VIEW_H__
+#define BOARD_VIEW_H__
+
+#include "position.h"
 
 #include <QString>
 #include <QPixmap>
@@ -41,14 +43,16 @@ public:
     explicit MBoardView(const QPixmap &pixmap, QGraphicsItem *parent = 0);
     virtual ~MBoardView();
 
-    /* Removes (= deletes) all figures from the board. */
+    /* Removes (= deletes) all pieces from the board. */
     void clear();
 
-    /* Draws a chess position on this board, using a FEN [1] representation.
+    /* Draws a chess position on this board, by extracting the FEN [1]
+     * representation from the given MPosition.
      * Each figure (= QGraphicsSvgItem) that is added becomes a child of the board.
      * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
      */
-    void drawPosition(QString fen);
+    void drawPosition(MPosition &position);
+    void drawStartPosition();
 
 private:
     QString getFileNameForPiece(QChar fenFigure) const;

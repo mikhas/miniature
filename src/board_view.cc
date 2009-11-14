@@ -44,8 +44,10 @@ void MBoardView::clear()
     }
 }
 
-void MBoardView::drawPosition(QString fen)
+void MBoardView::drawPosition(MPosition &position)
 {
+    QString fen = position.convertToFen();
+
     if (fen.isEmpty())
     {
         // We have to decide whether we want to treat this as error. Currently,
@@ -115,6 +117,12 @@ void MBoardView::drawPosition(QString fen)
         }
 
     }
+}
+
+void MBoardView::drawStartPosition()
+{
+    MPosition pos;
+    drawPosition(pos);
 }
 
 QString MBoardView::getFileNameForPiece(QChar fenPiece) const
