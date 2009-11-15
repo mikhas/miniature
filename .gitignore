@@ -1,20 +1,29 @@
+*.sw?
 *.moc.cc
+*.qrc.cc
+*.ui.h
 *.o
-*.in
 *~
 
 .deps
 .dirstamp
-/stamp-h1
-/config.h
-/config.log
-/config.status
-/configure
-/aclocal.m4
-/autom4te.cache
+
 /COPYING
 /INSTALL
 /Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache
+/config.*
+/configure
+/data/miniature.desktop
+/data/org.maemo.miniature.service
+/debian/*.substvars
+/debian/files
+/debian/miniature
+/debian/stamp-*
+/src/miniature
+/stamp-h1
 
 /build
 !build/autotroll.m4
