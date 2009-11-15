@@ -1,5 +1,8 @@
-/* Copyright 2009 Michael Hasselmann <michael@taschenorakel.de>
- * Part of the Miniature project.
+/* Miniature - A chess board that goes always with you, ready to let
+ * you play and learn wherever you go.
+ *
+ * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ *
  *
  * Miniature is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
