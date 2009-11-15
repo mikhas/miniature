@@ -15,38 +15,27 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PIECES_POOL_ITEM_H__
-#define PIECES_POOL_ITEM_H__
+#ifndef GRAPHICS_BOARD_ITEM_H__
+#define GRAPHICS_BOARD_ITEM_H__
 
-#include "chess_piece_item.h"
-
-#include <QList>
 #include <QGraphicsSvgItem>
+#include <QGraphicsSceneMouseEvent>
 
 namespace Miniature
 {
 
-class MPiecesPool
+class MGraphicsBoardItem
+: public QGraphicsSvgItem
 {
 public:
-     MPiecesPool();
-     ~MPiecesPool();
+    MGraphicsBoardItem(QGraphicsItem *parent = 0);
+    MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent = 0);
+    ~MGraphicsBoardItem();
 
-     /* Adds item ptr to array and takes ownership of item! */
-     void add(MGraphicsChessPieceItem* item);
-
-     /* Hands out a ptr to the current array item, but does not transfer ownership. */
-     // TODO: find better name, to indicate the no-ownership-transfer thing.
-     MGraphicsChessPieceItem* take();
-
-     /* Resets the internal counter, the next take() will get the first item of
-      * the array again. */
-     void release();
-
-private:
-     int m_counter;
-     typedef QList<MGraphicsChessPieceItem*> MGraphicsChessPieceItemArray;
-     MGraphicsChessPieceItemArray m_array;
+protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    int m_cell_size;
 };
 
 };

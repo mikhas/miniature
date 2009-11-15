@@ -51,7 +51,7 @@ MPiecesPoolManager::~MPiecesPoolManager()
     }
 }
 
-QGraphicsSvgItem* MPiecesPoolManager::take(MPosition::MPieceTypes type)
+MGraphicsChessPieceItem* MPiecesPoolManager::take(MPosition::MPieceTypes type)
 {
     MPiecesPool* pool = m_pieces_cache[type];
     if (!pool)
@@ -89,8 +89,8 @@ void MPiecesPoolManager::addToPool(MPosition::MPieceTypes type, int times)
     for (int idx = 0; idx < times; ++idx)
     {
         // pool takes ownership of svg item
-        QGraphicsSvgItem *piece = 0;
-        pool->add(piece = new QGraphicsSvgItem(file_name));
+        MGraphicsChessPieceItem *piece = 0;
+        pool->add(piece = new MGraphicsChessPieceItem(file_name));
 
         // scale the svg piece
         QRectF extent = piece->boundingRect();
@@ -100,6 +100,8 @@ void MPiecesPoolManager::addToPool(MPosition::MPieceTypes type, int times)
             ratio = m_piece_size / extent.width();
         }
         piece->scale(ratio, ratio);
+       //piece->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+       piece->setFlags(QGraphicsItem::ItemIsSelectable);
     }
 }
 

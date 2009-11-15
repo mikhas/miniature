@@ -23,6 +23,7 @@
 #include "player_info.h"
 
 #include <QMainWindow>
+#include <QPoint>
 
 namespace Miniature
 {
@@ -38,6 +39,7 @@ public:
 
 public Q_SLOTS:
     void updatePlayerInfo();
+    void updateLastMove(QPoint from, QPoint to);
 
 private:
     /* Our internal game controller */

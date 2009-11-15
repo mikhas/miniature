@@ -51,6 +51,10 @@ MMainWindow::MMainWindow()
     QObject::connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
                      m_ui.board_view, SLOT(drawPosition(const MPosition&)));
 
+    // Connect moves from board with main window.
+    QObject::connect(m_ui.board_view, SIGNAL(pieceMoved(QPoint, QPoint)),
+                     this, SLOT(updateLastMove(QPoint, QPoint)));
+
     // Connect menu actions.
     QObject::connect(m_ui.new_game, SIGNAL(triggered()),
                      &m_game, SLOT(newGame()));
@@ -100,6 +104,14 @@ void MMainWindow::updatePlayerInfo()
     m_ui.black_name->setText(info.black_name);
     m_ui.black_rating->setText(QString("(%1)").arg(info.black_rating));
     m_ui.black_material->setText(QString("%1").arg(info.black_material));
+}
+
+void MMainWindow::updateLastMove(QPoint from, QPoint to)
+{
+    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]")).arg(from.x())
+                                                                         .arg(from.y())
+                                                                         .arg(to.x())
+                                                                         .arg(to.y()));
 }
 
 int main(int argc, char **argv)

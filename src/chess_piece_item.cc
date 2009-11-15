@@ -15,43 +15,17 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "pieces_pool.h"
+#include "chess_piece_item.h"
 
 using namespace Miniature;
 
-MPiecesPool::MPiecesPool()
-: m_counter(0)
+MGraphicsChessPieceItem::MGraphicsChessPieceItem(QGraphicsItem *parent)
+: QGraphicsSvgItem(parent)
 {}
 
-MPiecesPool::~MPiecesPool()
-{
-    for(MGraphicsChessPieceItemArray::iterator iter = m_array.begin();
-        iter != m_array.end();
-        ++iter)
-    {
-        Q_CHECK_PTR(*iter);
-        delete *iter;
-        *iter = 0;
-    }
-}
+MGraphicsChessPieceItem::MGraphicsChessPieceItem(const QString &fileName, QGraphicsItem *parent)
+: QGraphicsSvgItem(fileName, parent)
+{}
 
-void MPiecesPool::add(MGraphicsChessPieceItem *item)
-{
-    m_array << item;
-}
-
-MGraphicsChessPieceItem* MPiecesPool::take()
-{
-    if(!(m_counter < m_array.size()))
-    {
-        MGraphicsChessPieceItem* empty = 0;
-        return empty;
-    }
-
-    return m_array.at(m_counter++);
-}
-
-void MPiecesPool::release()
-{
-    m_counter = 0;
-}
+MGraphicsChessPieceItem::~MGraphicsChessPieceItem()
+{}

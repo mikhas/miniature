@@ -20,6 +20,7 @@
 
 #include "position.h"
 #include "pieces_pool_manager.h"
+#include "graphics_board_item.h"
 
 #include <QString>
 #include <QGraphicsView>
@@ -44,6 +45,9 @@ public:
 
     virtual void setScene(QGraphicsScene* scene);
 
+    /* Allow scene graph items to emit a pieceMoved signal via the board view. */
+    void emitPieceMoved(QPoint from, QPoint to);
+
     /* Removes (= deletes) all pieces from the board. */
     void clear();
 
@@ -56,11 +60,14 @@ public Q_SLOTS:
     void drawPosition(const MPosition &position);
     void drawStartPosition();
 
+Q_SIGNALS:
+    void pieceMoved(QPoint from, QPoint to);
+
 private:
     void setBoardBackground();
 
     /* Store a reference to the board item in the scene graph. */
-    QGraphicsItem* m_board_item;
+    MGraphicsBoardItem* m_board_item;
 
     /* The pool manager is responsible for handing out the SVG items of our pieces. */
     MPiecesPoolManager m_pieces_pool_manager;

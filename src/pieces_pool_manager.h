@@ -20,9 +20,7 @@
 
 #include "position.h"
 #include "pieces_pool.h"
-
-#include <QGraphicsSvgItem>
-
+#include "chess_piece_item.h"
 
 namespace Miniature
 {
@@ -34,14 +32,14 @@ namespace Miniature
 class MPiecesPoolManager
 {
 public:
-    MPiecesPoolManager(int pieceSize = 54);
+    MPiecesPoolManager(int pieceSize = 60);
     ~MPiecesPoolManager();
 
     /** Foward method for MPiecesPool::take(), therefore "keeps" ownership of
       * returned pointer. If the returned pointer is 0 then the pool for that type
       * is exhausted.
       */
-    QGraphicsSvgItem* take(MPosition::MPieceTypes type);
+    MGraphicsChessPieceItem* take(MPosition::MPieceTypes type);
 
     /** Forward method for MPiecesPool::release()
       */

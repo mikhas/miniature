@@ -51,8 +51,13 @@ void MBoardView::setScene(QGraphicsScene *scene)
 void MBoardView::setBoardBackground()
 {
     //m_board_item = scene()->addPixmap(QPixmap(":boards/default.png"));
-    m_board_item = new QGraphicsSvgItem(":boards/glossy.svg");
+    m_board_item = new MGraphicsBoardItem(":boards/glossy.svg");
     scene()->addItem(m_board_item);
+}
+
+void MBoardView::emitPieceMoved(QPoint from, QPoint to)
+{
+    Q_EMIT pieceMoved(from, to);
 }
 
 void MBoardView::clear()
@@ -126,12 +131,10 @@ void MBoardView::drawPosition(const MPosition &position)
         else
         {
             // fetch the SVG file and add it to the board
-            QGraphicsSvgItem *piece = m_pieces_pool_manager.take(position.lookupPieceType(curr));
+            MGraphicsChessPieceItem *piece = m_pieces_pool_manager.take(position.lookupPieceType(curr));
             if (piece)
             {
-                // We have a 10% margin, since we scale the pieces to 90% of
-                // the cell size. Now we center the piece.
-                piece->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
+                piece->setPos(QPointF(x_pos, y_pos));
                 piece->show();
                 piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
                 x_pos += cell_size;

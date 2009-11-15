@@ -22,6 +22,10 @@ src_miniature_SOURCES = \
                         src/pieces_pool.cc \
                         src/pieces_pool_manager.h \
                         src/pieces_pool_manager.cc \
+                        src/chess_piece_item.h \
+                        src/chess_piece_item.cc \
+                        src/graphics_board_item.h \
+                        src/graphics_board_item.cc \
                         src/board_view.h \
                         src/board_view.moc.cc \
                         src/board_view.cc \
