@@ -1,0 +1,26 @@
+Source: miniature
+Section: games
+Priority: optional
+Maintainer: Michael Hasselmann <michael@taschenorakel.de>
+Uploaders: Mathias Hasselmann <mathias.hasselmann@maemo.org>
+Build-Depends: debhelper (>= 5.0.0), cdbs, libqt4-maemo5-dev (>= 4.6.0~git20091105),
+ osso-af-settings (>= 0.9.2)
+
+Package: miniature
+Section: games
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: A chess board that goes always with you, ready to let you play and
+ learn wherever you go.
+ .
+  * The main use case is playing online against other players at
+    http://freechess.org (FICS)
+  * Now imagine that you can also chat with the other player.
+  * Learning is important: watch games live, review stored games and also
+    process offline the lessons offered at FICS.
+  * Play P2P games against other players next to you or in your Contacts.
+  * And not only regular chess. See also Antichess, Chess960...
+ .
+ Miniature is based on Qt, targets Maemo as primary platform and plans to have
+ ports for Symbian, Windows Mobile and desktop OSs (Linux, Windows, Mac).
+
