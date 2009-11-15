@@ -16,6 +16,7 @@
  */
 
 #include "board_view.h"
+#include "pieces_pool_manager.h"
 
 #include <QGraphicsSvgItem>
 #include <QPixmap>
@@ -56,13 +57,21 @@ void MBoardView::setBoardBackground()
 
 void MBoardView::clear()
 {
+    /* Releasing the resources from the pieces pool, so that we can start to
+     * consume them again.
+     */
+    m_pieces_pool_manager.releaseAll();
+
+    /* We clear the board by simply hiding all pieces. We don't know whether we
+     * get the same pieces back from the pool manager, so having a hide/show
+     * transaction is a safe route. */
     QList<QGraphicsItem*> children = m_board_item->childItems();
     for(QList<QGraphicsItem*>::iterator iter = children.begin();
         iter != children.end();
         ++iter)
     {
         Q_CHECK_PTR(*iter); // This might be paranoid ...
-        delete (*iter);
+        (*iter)->hide();
     }
 }
 
@@ -99,7 +108,6 @@ void MBoardView::drawPosition(const MPosition &position)
     for(int idx = 0; idx < fen.length() && 64 > count_cells; ++idx)
     {
         QChar curr = fen.at(idx);
-        QString file_name;
 
         // scanned one row
         if ('/' == curr)
@@ -118,26 +126,19 @@ void MBoardView::drawPosition(const MPosition &position)
         else
         {
             // fetch the SVG file and add it to the board
-            file_name = getFileNameForPiece(curr);
-            if (!file_name.isEmpty())
+            QGraphicsSvgItem *piece = m_pieces_pool_manager.take(position.lookupPieceType(curr));
+            if (piece)
             {
-                QGraphicsSvgItem *piece = new QGraphicsSvgItem(file_name, m_board_item);
-
-                // Make the SVG piece 90% of the size of a cell.
-                QRectF extent = piece->boundingRect();
-                qreal ratio = 1;
-                if (0 < extent.width())
-                {
-                    ratio = cell_size / extent.width();
-                }
-                piece->scale(ratio * .9, ratio * .9);
-
-                // We have a 10% margin, from the scaling above. Now we center the
-                // piece.
+                // We have a 10% margin, since we scale the pieces to 90% of
+                // the cell size. Now we center the piece.
                 piece->setPos(QPointF(x_pos + (.05 * cell_size), y_pos + (.05 * cell_size)));
+                piece->show();
+                piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
                 x_pos += cell_size;
                 ++count_cells;
             }
+            else // Complain!
+            {}
         }
 
     }
@@ -147,62 +148,4 @@ void MBoardView::drawStartPosition()
 {
     MPosition pos;
     drawPosition(pos);
-}
-
-QString MBoardView::getFileNameForPiece(QChar fenPiece) const
-{
-    QString file_name;
-
-    // check all black pieces
-    if ('r' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/rook.svg");
-    }
-    else if ('n' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/knight.svg");
-    }
-    else if ('b' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/bishop.svg");
-    }
-    else if ('q' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/queen.svg");
-    }
-    else if ('k' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/king.svg");
-    }
-    else if ('p' == fenPiece)
-    {
-        file_name = QString(":/pieces/black/pawn.svg");
-    }
-    // check all white pieces
-    else if ('R' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/rook.svg");
-    }
-    else if ('N' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/knight.svg");
-    }
-    else if ('B' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/bishop.svg");
-    }
-    else if ('Q' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/queen.svg");
-    }
-    else if ('K' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/king.svg");
-    }
-    else if ('P' == fenPiece)
-    {
-        file_name = QString(":/pieces/white/pawn.svg");
-    }
-
-    return file_name;
 }

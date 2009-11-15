@@ -39,3 +39,23 @@ QString MPosition::convertToFen() const
 {
     return m_position;
 }
+
+MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
+{
+    if ('r' == fenPiece) return BROOK;
+    if ('n' == fenPiece) return BKNIGHT;
+    if ('b' == fenPiece) return BBISHOP;
+    if ('q' == fenPiece) return BQUEEN;
+    if ('k' == fenPiece) return BKING;
+    if ('p' == fenPiece) return BPAWN;
+
+    if ('R' == fenPiece) return WROOK;
+    if ('N' == fenPiece) return WKNIGHT;
+    if ('B' == fenPiece) return WBISHOP;
+    if ('Q' == fenPiece) return WQUEEN;
+    if ('K' == fenPiece) return WKING;
+    if ('P' == fenPiece) return WPAWN;
+
+    // Complain?
+    return UNKNOWN_PIECE;
+}

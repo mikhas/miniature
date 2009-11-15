@@ -19,6 +19,7 @@
 #define BOARD_VIEW_H__
 
 #include "position.h"
+#include "pieces_pool_manager.h"
 
 #include <QString>
 #include <QGraphicsView>
@@ -57,10 +58,12 @@ public Q_SLOTS:
 
 private:
     void setBoardBackground();
-    QString getFileNameForPiece(QChar fenFigure) const;
 
     /* Store a reference to the board item in the scene graph. */
     QGraphicsItem* m_board_item;
+
+    /* The pool manager is responsible for handing out the SVG items of our pieces. */
+    MPiecesPoolManager m_pieces_pool_manager;
 };
 
 }; // namespace Miniature

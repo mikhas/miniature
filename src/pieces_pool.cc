@@ -15,35 +15,43 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSITION_H__
-#define POSITION_H__
+#include "pieces_pool.h"
 
-#include <QString>
+using namespace Miniature;
 
-namespace Miniature
+MPiecesPool::MPiecesPool()
+: m_counter(0)
+{}
+
+MPiecesPool::~MPiecesPool()
 {
+    for(QGraphicsSvgItemArray::iterator iter = m_array.begin();
+        iter != m_array.end();
+        ++iter)
+    {
+        Q_CHECK_PTR(*iter);
+        delete *iter;
+        *iter = 0;
+    }
+}
 
-class MPosition
+void MPiecesPool::add(QGraphicsSvgItem *item)
 {
-public:
-    MPosition(); // construct the start position
-    explicit MPosition(QString fen);
-    ~MPosition();
+    m_array << item;
+}
 
-    enum MPieceTypes {BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BPAWN,
-                      WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WPAWN,
-                      UNKNOWN_PIECE};
+QGraphicsSvgItem* MPiecesPool::take()
+{
+    if(!(m_counter < m_array.size()))
+    {
+        QGraphicsSvgItem* empty = 0;
+        return empty;
+    }
 
-    QString convertToFen() const;
-    MPieceTypes lookupPieceType(QChar fenPiece) const;
+    return m_array.at(m_counter++);
+}
 
-private:
-    QString getDefaultStartPosition() const;
-    // TODO: replace with a 8x8 grid
-    QString m_position;
-};
-
-}; // namespace Miniature
-
-#endif
-
+void MPiecesPool::release()
+{
+    m_counter = 0;
+}

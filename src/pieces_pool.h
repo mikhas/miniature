@@ -15,35 +15,38 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSITION_H__
-#define POSITION_H__
+#ifndef PIECES_POOL_ITEM_H__
+#define PIECES_POOL_ITEM_H__
 
-#include <QString>
+#include <QList>
+#include <QGraphicsSvgItem>
 
 namespace Miniature
 {
 
-class MPosition
+class MPiecesPool
 {
 public:
-    MPosition(); // construct the start position
-    explicit MPosition(QString fen);
-    ~MPosition();
+     MPiecesPool();
+     ~MPiecesPool();
 
-    enum MPieceTypes {BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BPAWN,
-                      WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WPAWN,
-                      UNKNOWN_PIECE};
+     /* Adds item ptr to array and takes ownership of item! */
+     void add(QGraphicsSvgItem* item);
 
-    QString convertToFen() const;
-    MPieceTypes lookupPieceType(QChar fenPiece) const;
+     /* Hands out a ptr to the current array item, but does not transfer ownership. */
+     // TODO: find better name, to indicate the no-ownership-transfer thing.
+     QGraphicsSvgItem* take();
+
+     /* Resets the internal counter, the next take() will get the first item of
+      * the array again. */
+     void release();
 
 private:
-    QString getDefaultStartPosition() const;
-    // TODO: replace with a 8x8 grid
-    QString m_position;
+     int m_counter;
+     typedef QList<QGraphicsSvgItem*> QGraphicsSvgItemArray;
+     QGraphicsSvgItemArray m_array;
 };
 
-}; // namespace Miniature
+};
 
 #endif
-

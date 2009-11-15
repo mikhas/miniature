@@ -18,6 +18,10 @@ src_miniature_SOURCES = \
                         src/game.cc \
                         src/position.h \
                         src/position.cc \
+                        src/pieces_pool.h \
+                        src/pieces_pool.cc \
+                        src/pieces_pool_manager.h \
+                        src/pieces_pool_manager.cc \
                         src/board_view.h \
                         src/board_view.moc.cc \
                         src/board_view.cc \
