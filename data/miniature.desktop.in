@@ -4,6 +4,6 @@ Version=0.1
 Type=Application
 Name=Miniature
 Exec=@prefix@/games/miniature
-Categories=Games
+Categories=Game;BoardGame;Qt
 X-Osso-Service=org.maemo.miniature
 

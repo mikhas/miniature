@@ -9,10 +9,23 @@ AM_INIT_AUTOMAKE([1.8.5 no-define subdir-objects])
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
 
 AC_PROG_CXX
+PKG_PROG_PKG_CONFIG
+
 AC_LANG([C++])
 AT_WITH_QT([core gui svg],[no_keywords])
 #NOT NEEDED! activate special maemo5 features in Qt, like portrait mode
 #AC_DEFINE([Q_WS_MAEMO_5], [1], [activate Maemo5 features])
 
-AC_CONFIG_FILES([Makefile])
+PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
+
+AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
+AC_CHECK_FILE(["$desktopentrydir"],,[AC_MSG_ERROR([Cannot find desktop entry file folder])])
+
+AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
+AC_CHECK_FILE(["$dbusservicedir"],,[AC_MSG_ERROR([Cannot find D-Bus service file folder])])
+
+AC_CONFIG_FILES([Makefile
+                 data/miniature.desktop
+                 data/org.maemo.miniature.service])
+
 AC_OUTPUT
