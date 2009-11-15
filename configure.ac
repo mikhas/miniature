@@ -13,8 +13,6 @@ PKG_PROG_PKG_CONFIG
 
 AC_LANG([C++])
 AT_WITH_QT([core gui svg],[no_keywords])
-#NOT NEEDED! activate special maemo5 features in Qt, like portrait mode
-#AC_DEFINE([Q_WS_MAEMO_5], [1], [activate Maemo5 features])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
 

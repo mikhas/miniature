@@ -23,11 +23,6 @@
 #include <QPixmap>
 #include <QApplication>
 
-// TODO: remove when replaced with clean solution in ctor, once new packages
-// are available. With Qt4.6 for Maemo there is now higher level API, try it out!
-// Q_WS_HILDON is not valid for Qt4.6, so if you want to see portrait mode
-// there (warning: the WM wont like it), define the Q_WS_HILDON macro manually.
-
 #ifdef Q_WS_HILDON
 //Includes for portrait mode support
 #  include <X11/Xlib.h>
@@ -74,17 +69,16 @@ MMainWindow::MMainWindow()
     m_ui.black_rating->setFont(normal_font);
     m_ui.black_material->setFont(normal_font);
 
-// Setting portrait mode only works with git version of Qt4
-//    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
-//    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
+#ifdef Q_WS_MAEMO_5
+    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
+    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
+#endif
 
-// TODO: replace with clean solution above, once new packages are available.
 // taken 99% verbatim from http://taschenorakel.de/michael/2009/11/09/miniature-it-moves/#c592, thanks again gnuton!
 #ifdef Q_WS_HILDON
     int value = 1;
     Atom portraitSupport = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_SUPPORT", False);
     Atom portraitRequest = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_REQUEST", False);
-//printf ("ps:%d pr:%d, wi=%d\n", (int)portraitSupport, (int)portraitRequest, (int)winId());
     XChangeProperty(QX11Info::display(), winId(), portraitSupport, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
     XChangeProperty(QX11Info::display(), winId(), portraitRequest, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
 #endif
