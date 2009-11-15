@@ -111,7 +111,7 @@ void MBoardView::drawPosition(const MPosition &position)
         // scanned one row
         if ('/' == curr)
         {
-            y_pos += cell_size;
+            y_pos += m_board_item->getCellSize();
             x_pos = 0;
         }
         else if (curr.isDigit())
@@ -119,7 +119,7 @@ void MBoardView::drawPosition(const MPosition &position)
             /* This is the nice part about FEN: series of empty squares use a
              * run-length-encoding. And that's stuff from the 19th century!
              */
-            x_pos += curr.digitValue() * cell_size;
+            x_pos += curr.digitValue() * m_board_item->getCellSize();
             count_cells += curr.digitValue();
         }
         else
@@ -131,7 +131,7 @@ void MBoardView::drawPosition(const MPosition &position)
                 piece->setPos(QPointF(x_pos, y_pos));
                 piece->show();
                 piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
-                x_pos += cell_size;
+                x_pos += m_board_item->getCellSize();
                 ++count_cells;
             }
             else // Complain!

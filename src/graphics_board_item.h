@@ -34,13 +34,14 @@ public:
     MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
 
+    int getCellSize() const;
+
 Q_SIGNALS:
     void pieceMoved(QPoint from, QPoint to);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    int m_cell_size;
 };
 
 };

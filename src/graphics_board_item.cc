@@ -33,6 +33,11 @@ MGraphicsBoardItem::MGraphicsBoardItem(const QString &fileName, QGraphicsItem *p
 MGraphicsBoardItem::~MGraphicsBoardItem()
 {}
 
+int MGraphicsBoardItem::getCellSize() const
+{
+    return floor(boundingRect().height() / 8);
+}
+
 void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QList<QGraphicsItem*> selection = scene()->selectedItems();
@@ -48,7 +53,7 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MGraphicsBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    const int cell_size = floor(boundingRect().height() / 8);
+    const int cell_size = getCellSize();
 
     QList<QGraphicsItem*> selection = scene()->selectedItems();
     if(1 == selection.size())
