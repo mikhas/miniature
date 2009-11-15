@@ -45,9 +45,6 @@ public:
 
     virtual void setScene(QGraphicsScene* scene);
 
-    /* Allow scene graph items to emit a pieceMoved signal via the board view. */
-    void emitPieceMoved(QPoint from, QPoint to);
-
     /* Removes (= deletes) all pieces from the board. */
     void clear();
 
@@ -71,6 +68,9 @@ private:
 
     /* The pool manager is responsible for handing out the SVG items of our pieces. */
     MPiecesPoolManager m_pieces_pool_manager;
+
+private Q_SLOTS:
+    void onPieceMoved(QPoint from, QPoint to);
 };
 
 }; // namespace Miniature

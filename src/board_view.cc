@@ -50,14 +50,11 @@ void MBoardView::setScene(QGraphicsScene *scene)
 
 void MBoardView::setBoardBackground()
 {
-    //m_board_item = scene()->addPixmap(QPixmap(":boards/default.png"));
     m_board_item = new MGraphicsBoardItem(":boards/glossy.svg");
-    scene()->addItem(m_board_item);
-}
+    QObject::connect(m_board_item, SIGNAL(pieceMoved(QPoint, QPoint)),
+                     this, SLOT(onPieceMoved(QPoint, QPoint)));
 
-void MBoardView::emitPieceMoved(QPoint from, QPoint to)
-{
-    Q_EMIT pieceMoved(from, to);
+    scene()->addItem(m_board_item);
 }
 
 void MBoardView::clear()
@@ -94,9 +91,6 @@ void MBoardView::drawPosition(const MPosition &position)
     }
 
     clear();
-
-    // TODO: Derive cell_size from "board size * .125"
-    const int cell_size = 60;
 
     /* (x_pos, y_pos) always tells us where to draw the current piece (top
      * left corner of a cell).
@@ -151,4 +145,10 @@ void MBoardView::drawStartPosition()
 {
     MPosition pos;
     drawPosition(pos);
+}
+
+void MBoardView::onPieceMoved(QPoint from, QPoint to)
+{
+    // event propagation
+    Q_EMIT pieceMoved(from, to);
 }

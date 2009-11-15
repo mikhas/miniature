@@ -16,12 +16,9 @@
  */
 
 #include "graphics_board_item.h"
-#include "board_view.h" // ugh ... cyclic dep
 #include <QPainterPath>
 #include <QGraphicsScene>
 #include <cmath>
-#include <iostream>
-
 
 using namespace Miniature;
 
@@ -67,16 +64,6 @@ void MGraphicsBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         (selection[0])->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
         scene()->clearSelection();
 
-        QList<QGraphicsView*> views = scene()->views();
-        for (QList<QGraphicsView*>::iterator iter = views.begin();
-             iter != views.end();
-             ++iter)
-        {
-             MBoardView *board_view = qobject_cast<MBoardView*>(*iter);
-             if (board_view)
-             {
-                 board_view->emitPieceMoved(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
-             }
-        }
+        Q_EMIT pieceMoved(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
     }
 }

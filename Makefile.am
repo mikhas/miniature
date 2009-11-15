@@ -25,6 +25,7 @@ src_miniature_SOURCES = \
                         src/chess_piece_item.h \
                         src/chess_piece_item.cc \
                         src/graphics_board_item.h \
+                        src/graphics_board_item.moc.cc \
                         src/graphics_board_item.cc \
                         src/board_view.h \
                         src/board_view.moc.cc \
@@ -36,6 +37,6 @@ src_miniature_SOURCES = \
                         src/miniature.ui.h
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
-BUILT_SOURCES =  src/miniature.moc.cc src/game.moc.cc src/board_view.moc.cc data/data.qrc.cc src/miniature.ui.h
+BUILT_SOURCES =  src/miniature.moc.cc src/game.moc.cc src/board_view.moc.cc src/graphics_board_item.moc.cc data/data.qrc.cc src/miniature.ui.h
 desktopdir = $(datadir)/applications
 dist_desktop_DATA = miniature.desktop

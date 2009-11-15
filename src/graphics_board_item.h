@@ -27,10 +27,15 @@ namespace Miniature
 class MGraphicsBoardItem
 : public QGraphicsSvgItem
 {
+    Q_OBJECT
+
 public:
     MGraphicsBoardItem(QGraphicsItem *parent = 0);
     MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
+
+Q_SIGNALS:
+    void pieceMoved(QPoint from, QPoint to);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
