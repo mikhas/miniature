@@ -17,10 +17,15 @@ AT_WITH_QT([core gui svg],[no_keywords])
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
 
 AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
-AC_CHECK_FILE(["$desktopentrydir"],,[AC_MSG_ERROR([Cannot find desktop entry file folder])])
-
 AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
-AC_CHECK_FILE(["$dbusservicedir"],,[AC_MSG_ERROR([Cannot find D-Bus service file folder])])
+
+if test -z "x$desktopentrydir"; then
+  AC_MSG_ERROR([Cannot find desktop entry file folder])
+fi
+
+if test -z "$dbusservicedir"; then
+  AC_MSG_ERROR([Cannot find D-Bus service file folder])
+fi
 
 AC_CONFIG_FILES([Makefile
                  data/miniature.desktop
