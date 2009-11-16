@@ -1,3 +1,9 @@
+miniature (0.1-2) unstable; urgency=low
+
+  * Add icon to be shown in Hildon Application Manager.
+
+ -- Ekaterina Gerasimova <bagira00@hotmail.com>  Mon, 16 Nov 2009 22:44:13 +0100
+
 miniature (0.1-1) unstable; urgency=low
 
   * Initial release.

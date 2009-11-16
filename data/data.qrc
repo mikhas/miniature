@@ -21,5 +21,7 @@
 </qresource>
 <qresource>
   <file alias="timer_background.gif">timer_background.gif</file>
+  <file alias="minature.svg">miniature.svg</file>
+  <file alias="miniature-48x48.png">miniature-48x48.png</file>
 </qresource>
 </RCC>
