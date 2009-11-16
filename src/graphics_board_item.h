@@ -22,6 +22,8 @@
 #define GRAPHICS_BOARD_ITEM_H__
 
 #include <QGraphicsSvgItem>
+#include <QGraphicsRectItem>
+#include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
 
 namespace Miniature
@@ -39,12 +41,25 @@ public:
 
     int getCellSize() const;
 
+
 Q_SIGNALS:
     void pieceMoved(QPoint from, QPoint to);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+private:
+    void setupFrameAndTimeLine();
+    void resetFrame();
+    void putFrameAt(QPointF pos);
+
+    int m_selection_duration;
+    QGraphicsRectItem *m_frame;
+    int m_frame_outline;
+    QTimeLine *m_time_line;
+
+private Q_SLOTS:
+    void fadeOutFrame(int step);
 };
 
 };

@@ -103,8 +103,6 @@ void MPiecesPoolManager::addToPool(MPosition::MPieceTypes type, int times)
             ratio = m_piece_size / extent.width();
         }
         piece->scale(ratio, ratio);
-       //piece->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
-       piece->setFlags(QGraphicsItem::ItemIsSelectable);
     }
 }
 

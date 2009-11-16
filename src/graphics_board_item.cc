@@ -19,19 +19,35 @@
  */
 
 #include "graphics_board_item.h"
+
 #include <QPainterPath>
 #include <QGraphicsScene>
+#include <QTime>
+#include <QGraphicsItemAnimation>
+
 #include <cmath>
 
 using namespace Miniature;
 
 MGraphicsBoardItem::MGraphicsBoardItem(QGraphicsItem *parent)
-: QGraphicsSvgItem(parent)
-{}
+: QGraphicsSvgItem(parent),
+  m_selection_duration(2000),
+  m_frame(0),
+  m_frame_outline(4),
+  m_time_line(0)
+{
+    setupFrameAndTimeLine();
+}
 
 MGraphicsBoardItem::MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent)
-: QGraphicsSvgItem(fileName, parent)
-{}
+: QGraphicsSvgItem(fileName, parent),
+  m_selection_duration(2000),
+  m_frame(0),
+  m_frame_outline(4),
+  m_time_line(0)
+{
+    setupFrameAndTimeLine();
+}
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
 {}
@@ -43,35 +59,98 @@ int MGraphicsBoardItem::getCellSize() const
 
 void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QList<QGraphicsItem*> selection = scene()->selectedItems();
-    if(1 != selection.size())
+    static QGraphicsItem *active_item = 0;
+    static QTime duration;
+
+    // auto-deselect
+    if (m_selection_duration < duration.elapsed())
     {
-        event = event;
-        QPainterPath area;
-        QPointF pos = event->pos();
-        area.addRect(pos.x() - 1, pos.y() - 1, 2, 2);
-        scene()->setSelectionArea(area);
+        active_item = 0;
+        resetFrame();
     }
-}
 
-void MGraphicsBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    const int cell_size = getCellSize();
-
-    QList<QGraphicsItem*> selection = scene()->selectedItems();
-    if(1 == selection.size())
+    if(!active_item) // try to find an active item
     {
-        int src_x = floor((selection[0])->pos().x() / cell_size);
-        int src_y = floor((selection[0])->pos().y() / cell_size);
+        active_item = (scene()->items(event->pos().x() - 1, event->pos().y() -1, 2, 2))[0];
+        if (active_item == this)
+        {
+           active_item = 0;
+           resetFrame();
+           //std::cout << "mouse_pressed: selected board!" << std::endl;
+        }
+        else // valid selection!
+        {
+            duration.start();
+            putFrameAt(active_item->pos());
+        }
+        //std::cout << "mouse_pressed: try to select" << std::endl;
+    }
+    else // we have an active item.
+    {
+        const int cell_size = getCellSize();
+        //std::cout << "mouse_pressed: sth was already selected" << std::endl;
+
+        int src_x = floor(active_item->pos().x() / cell_size);
+        int src_y = floor(active_item->pos().y() / cell_size);
 
         int dst_x = floor(event->pos().x() / cell_size);
         int dst_y = floor(event->pos().y() / cell_size);
 
-        //std::cout << "cell_size: " << cell_size << ", src: (" << src_x << ", " << src_y << "), dst: (" << dst_x << ", " << dst_y << ")" << std::endl;
+        if((src_x != dst_x) || (src_y != dst_y))
+        {
+            active_item->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
+            Q_EMIT pieceMoved(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
+        }
 
-        (selection[0])->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
-        scene()->clearSelection();
-
-        Q_EMIT pieceMoved(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
+        active_item = 0;
+        resetFrame();
     }
+}
+
+void MGraphicsBoardItem::setupFrameAndTimeLine()
+{
+    // take a guess on cell size if need be
+    const int frame_size = (getCellSize() > m_frame_outline ? getCellSize() : 60) - m_frame_outline;
+
+    m_frame = new QGraphicsRectItem(QRectF(0, 0, frame_size, frame_size), this);
+    m_frame->setPen(QPen(Qt::darkBlue, m_frame_outline, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
+    m_frame->hide();
+
+    m_time_line = new QTimeLine(m_selection_duration, this);
+    m_time_line->setFrameRange(0, 39);
+
+    QObject::connect(m_time_line, SIGNAL(frameChanged(int)), this, SLOT(fadeOutFrame(int)));
+}
+
+void MGraphicsBoardItem::fadeOutFrame(int step)
+{
+    // empirical values for nice fading:
+    if (step > 30) // start fading after ca. 1.5 sec
+    {
+        // fade-out in 10% steps
+        m_frame->setOpacity(1.0 - (0.1 * (step - 30)));
+    }
+
+    if (39 == step)
+    {
+        resetFrame();
+    }
+}
+
+void MGraphicsBoardItem::putFrameAt(QPointF pos)
+{
+    Q_CHECK_PTR(m_frame);
+    Q_CHECK_PTR(m_time_line);
+
+    int frame_outline_correction = floor(m_frame_outline * 0.5);
+    m_frame->setPos(pos.x() + frame_outline_correction, pos.y() + frame_outline_correction);
+    m_frame->show();
+    m_time_line->start();
+}
+
+void MGraphicsBoardItem::resetFrame()
+{
+    m_time_line->stop();
+    m_frame->hide();
+    m_frame->setOpacity(1);
 }
