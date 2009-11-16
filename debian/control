@@ -10,8 +10,7 @@ Package: miniature
 Section: games
 Architecture: any
 Depends: ${shlibs:Depends}
-Description: A chess board that goes always with you, ready to let you play and
- learn wherever you go.
+Description: A chess board to play and learn wherever you go.
  .
   * The main use case is playing online against other players at
     http://freechess.org (FICS)
