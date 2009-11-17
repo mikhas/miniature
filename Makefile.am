@@ -56,7 +56,7 @@ iconthemedir = $(datadir)/icons/hicolor
 appicon48dir = $(iconthemedir)/48x48/apps
 appiconscdir = $(iconthemedir)/scalable/apps
 
-dist_appicon48_DATA = icons/48x48/miniature.png
-dist_appiconsc_DATA = icons/scalable/miniature.svg
+dist_appicon48_DATA = data/icons/48x48/miniature.png
+dist_appiconsc_DATA = data/icons/scalable/miniature.svg
 
 DISTCHECK_CONFIGURE_FLAGS := --with-qt=@QT_PATH@
