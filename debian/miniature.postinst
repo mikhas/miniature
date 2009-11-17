@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# ensure the task launcher shows our icon immediately
+gtk-update-icon-cache -f /usr/share/icons/hicolor
