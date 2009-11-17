@@ -15,13 +15,17 @@
   <file alias="queen.svg">pieces/white/queen.svg</file>
   <file alias="rook.svg">pieces/white/rook.svg</file>
 </qresource>
+<qresource prefix="/icons/48x48">
+  <file alias="miniature.png">icons/48x48/miniature.png</file>
+</qresource>
+<qresource prefix="/icons/scalable">
+  <file alias="minature.svg">icons/scalable/miniature.svg</file>
+</qresource>
 <qresource prefix="/boards">
   <file alias="default.png">boards/default.png</file>
   <file alias="glossy.svg">boards/glossy.svg</file>
 </qresource>
 <qresource>
   <file alias="timer_background.gif">timer_background.gif</file>
-  <file alias="minature.svg">miniature.svg</file>
-  <file alias="miniature-48x48.png">miniature-48x48.png</file>
 </qresource>
 </RCC>

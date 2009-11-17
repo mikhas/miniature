@@ -52,4 +52,11 @@ BUILT_SOURCES = \
 dist_desktopentry_DATA = data/miniature.desktop
 dist_dbusservice_DATA = data/org.maemo.miniature.service
 
+iconthemedir = $(datadir)/icons/hicolor
+appicon48dir = $(iconthemedir)/48x48/apps
+appiconscdir = $(iconthemedir)/scalable/apps
+
+dist_appicon48_DATA = icons/48x48/miniature.png
+dist_appiconsc_DATA = icons/scalable/miniature.svg
+
 DISTCHECK_CONFIGURE_FLAGS := --with-qt=@QT_PATH@
