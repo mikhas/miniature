@@ -119,7 +119,7 @@ void MGraphicsBoardItem::setupFrameAndTimeLine()
     m_time_line = new QTimeLine(m_selection_duration, this);
     m_time_line->setFrameRange(0, 39);
 
-    QObject::connect(m_time_line, SIGNAL(frameChanged(int)), this, SLOT(fadeOutFrame(int)));
+    connect(m_time_line, SIGNAL(frameChanged(int)), this, SLOT(fadeOutFrame(int)));
 }
 
 void MGraphicsBoardItem::fadeOutFrame(int step)

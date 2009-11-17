@@ -54,8 +54,8 @@ void MBoardView::setScene(QGraphicsScene *scene)
 void MBoardView::setBoardBackground()
 {
     m_board_item = new MGraphicsBoardItem(":boards/glossy.svg");
-    QObject::connect(m_board_item, SIGNAL(pieceMoved(QPoint, QPoint)),
-                     this, SLOT(onPieceMoved(QPoint, QPoint)));
+    connect(m_board_item, SIGNAL(pieceMoved(QPoint, QPoint)),
+            this, SLOT(onPieceMoved(QPoint, QPoint)));
 
     scene()->addItem(m_board_item);
 }

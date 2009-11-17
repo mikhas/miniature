@@ -42,24 +42,24 @@ MMainWindow::MMainWindow()
     updatePlayerInfo();
 
     // Connect game logic w/ player info view.
-    QObject::connect(&m_game, SIGNAL(playerInfoChanged()),
-                     this, SLOT(updatePlayerInfo()));
+    connect(&m_game, SIGNAL(playerInfoChanged()),
+            this, SLOT(updatePlayerInfo()));
 
     // Connect game logic w/ board view.
-    QObject::connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
-                     m_ui.board_view, SLOT(drawPosition(const MPosition&)));
+    connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
+            m_ui.board_view, SLOT(drawPosition(const MPosition&)));
 
     // Connect moves from board with main window.
-    QObject::connect(m_ui.board_view, SIGNAL(pieceMoved(QPoint, QPoint)),
-                     this, SLOT(updateLastMove(QPoint, QPoint)));
+    connect(m_ui.board_view, SIGNAL(pieceMoved(QPoint, QPoint)),
+            this, SLOT(updateLastMove(QPoint, QPoint)));
 
     // Connect menu actions.
-    QObject::connect(m_ui.new_game, SIGNAL(triggered()),
-                     &m_game, SLOT(newGame()));
-    QObject::connect(m_ui.next_move, SIGNAL(triggered()),
-                     &m_game, SLOT(nextMove()));
-    QObject::connect(m_ui.prev_move, SIGNAL(triggered()),
-                     &m_game, SLOT(prevMove()));
+    connect(m_ui.new_game, SIGNAL(triggered()),
+            &m_game, SLOT(newGame()));
+    connect(m_ui.next_move, SIGNAL(triggered()),
+            &m_game, SLOT(nextMove()));
+    connect(m_ui.prev_move, SIGNAL(triggered()),
+            &m_game, SLOT(prevMove()));
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
     QFont big_font("helvetica", 16, QFont::Bold);
@@ -114,7 +114,7 @@ void MMainWindow::updateLastMove(QPoint from, QPoint to)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
     MMainWindow main;
     main.show();
