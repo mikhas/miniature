@@ -21,8 +21,8 @@
 #include "board_view.h"
 #include "pieces_pool_manager.h"
 
-#include <QGraphicsSvgItem>
 #include <QPixmap>
+#include <QUrl>
 
 using namespace Miniature;
 
@@ -53,7 +53,9 @@ void MBoardView::setScene(QGraphicsScene *scene)
 
 void MBoardView::setBoardBackground()
 {
-    m_board_item = new MGraphicsBoardItem(":boards/glossy.svg");
+    m_board_item = new MGraphicsBoardItem();
+
+    m_board_item->loadFromUri(QUrl("qrc:/boards/glossy.svg"));
     connect(m_board_item, SIGNAL(pieceMoved(QPoint, QPoint)),
             this, SLOT(onPieceMoved(QPoint, QPoint)));
 

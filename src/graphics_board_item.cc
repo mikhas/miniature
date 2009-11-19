@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2009 Mathias Hasselmann <mathias.hasselmann@maemo.org>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -20,33 +21,33 @@
 
 #include "graphics_board_item.h"
 
-#include <QPainterPath>
+#include <QPainter>
 #include <QGraphicsScene>
 #include <QTime>
-#include <QGraphicsItemAnimation>
 
 #include <cmath>
 
 using namespace Miniature;
 
 MGraphicsBoardItem::MGraphicsBoardItem(QGraphicsItem *parent)
-: QGraphicsSvgItem(parent),
+: QGraphicsObject(parent),
   m_selection_duration(2000),
   m_frame(0),
   m_frame_outline(4),
   m_time_line(0)
 {
     setupFrameAndTimeLine();
-}
 
-MGraphicsBoardItem::MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent)
-: QGraphicsSvgItem(fileName, parent),
-  m_selection_duration(2000),
-  m_frame(0),
-  m_frame_outline(4),
-  m_time_line(0)
-{
-    setupFrameAndTimeLine();
+    //TODO: move to a setup method
+    /* Set up the internal QWebFrame to notify us when it finished loading the
+     * SVG board.
+     */
+    connect(&m_page, SIGNAL(loadFinished(bool)),
+            this, SLOT(onPageLoaded(bool)));
+
+    QPalette palette = m_page.palette();
+    palette.setColor(QPalette::Base, Qt::transparent);
+    m_page.setPalette(palette);
 }
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
@@ -153,4 +154,33 @@ void MGraphicsBoardItem::resetFrame()
     m_time_line->stop();
     m_frame->hide();
     m_frame->setOpacity(1);
+}
+
+QRectF MGraphicsBoardItem::boundingRect() const
+{
+    QSize size = m_page.viewportSize();
+    return QRectF(0, 0, size.width(), size.height());
+}
+
+void MGraphicsBoardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    // The actual hack: share the QWebFrame painter with the graphics scene item.
+    painter->setBackground(Qt::blue);
+    frame()->render(painter);
+}
+
+void MGraphicsBoardItem::onPageLoaded(bool ok)
+{
+    if (ok)
+    {
+        m_page.setViewportSize(frame()->contentsSize());
+        update();
+    }
+
+    Q_EMIT loadFinished(ok);
+}
+
+void MGraphicsBoardItem::loadFromUri(QUrl uri)
+{
+    frame()->load(uri);
 }

@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2009 Mathias Hasselmann <mathias.hasselmann@maemo.org>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -21,16 +22,25 @@
 #ifndef GRAPHICS_BOARD_ITEM_H__
 #define GRAPHICS_BOARD_ITEM_H__
 
-#include <QGraphicsSvgItem>
+#include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
+#include <QWebPage>
+#include <QWebFrame>
+#include <QUrl>
 
 namespace Miniature
 {
 
+/* This class represents the board. It's our primary item in the scene graph,
+ * as it not only renders the board but also controls the mouse event handling
+ * (= fingertouch handling on Maemo) for all pieces.  Due to the poor rendering
+ * qualities of QtSvg we went for a QtWebkit hack, that is, we use a QWebFrame
+ * to display the SVG board.
+ */
 class MGraphicsBoardItem
-: public QGraphicsSvgItem
+: public QGraphicsObject
 {
     Q_OBJECT
 
@@ -39,11 +49,17 @@ public:
     MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
 
+    // TODO: rename to cellSize(), more qt-ish
     int getCellSize() const;
+    QWebFrame* frame() const { return m_page.mainFrame(); }
 
+    void loadFromUri(QUrl uri);
+    virtual QRectF boundingRect() const;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 Q_SIGNALS:
     void pieceMoved(QPoint from, QPoint to);
+    void loadFinished(bool ok);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -53,13 +69,19 @@ private:
     void resetFrame();
     void putFrameAt(QPointF pos);
 
+    // This class uses a QWebPage to render our SVG board. It's a hack, yep.
+    QWebPage m_page;
     int m_selection_duration;
     QGraphicsRectItem *m_frame;
     int m_frame_outline;
     QTimeLine *m_time_line;
 
 private Q_SLOTS:
+    /* Reduces opacity of the selection frame. */
     void fadeOutFrame(int step);
+
+    /* Resizes viewport of the internal QWebPage, after loading the SVG board has finished. */
+    void onPageLoaded(bool ok);
 };
 
 };

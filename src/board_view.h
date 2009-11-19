@@ -54,7 +54,7 @@ public:
 public Q_SLOTS:
     /* Draws a chess position on this board, by extracting the FEN [1]
      * representation from the given MPosition.
-     * Each figure (= QGraphicsSvgItem) that is added becomes a child of the board.
+     * Each piece (= QGraphicsSvgItem) that is added becomes a child of the board.
      * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
      */
     void drawPosition(const MPosition &position);

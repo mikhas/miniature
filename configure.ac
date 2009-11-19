@@ -12,7 +12,9 @@ AC_PROG_CXX
 PKG_PROG_PKG_CONFIG
 
 AC_LANG([C++])
-AT_WITH_QT([core gui svg],[no_keywords])
+# phonon and xmlpatterns are webkit dependencies, and we want the configure
+# check to complain when they are missing.
+AT_WITH_QT([core gui network svg webkit phonon xmlpatterns],[no_keywords])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
 
