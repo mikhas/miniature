@@ -20,18 +20,91 @@
 
 #include "position.h"
 
+#include <iostream>
+
+
 using namespace Miniature;
 
 MPosition::MPosition()
 : m_position(getDefaultStartPosition())
-{}
+{
+    m_position_list = convertFenToList(getDefaultStartPosition());
+    //std::cout << "MPosition -> empty constructor" << std::endl;
+}
 
 MPosition::MPosition(QString fen)
 : m_position(fen)
-{}
+{
+    m_position_list = convertFenToList(fen);
+    //std::cout << "MPosition -> fen constructor" << std::endl;
+}
 
 MPosition::~MPosition()
 {}
+
+void onPieceMoved(QPoint from, QPoint to)
+{
+    if (from && to)
+    {
+        if(verifyMove(from, to))
+        {
+            // update grid
+            movePiece(from, to);
+        }
+        // TODO?: Emit some sort of warning, when move wasn't verified?
+    }
+
+    Q_EMIT confirmedPosition(MPosition::m_position_list);
+}
+
+void MPosition::movePiece(QPoint from, QPoint to)
+{
+    // TODO: Castling & pawn promotion
+    MPosition::m_position_list[to.x()][to.y()] = MPosition::m_position_list[from.x()][from.y()];
+    Position::m_position_list[from.x()][from.y()] = 0;
+}
+
+bool MPosition::verifyMove(QPoint from, QPoint to) const
+{
+    MPiece::MPieceTypes currentType = (MPosition::m_position_list[from.x()][from.y()])->getType();
+
+    if (currentType == MPiece::PAWN) {return verifyMovePawn(from, to); }
+    if (currentType == MPiece::ROOK) {return verifyMoveRook(from, to); }
+    if (currentType == MPiece::KNIGHT) {return verifyMoveKnight(from, to); }
+    if (currentType == MPiece::BISHOP) {return verifyMoveBishop(from, to); }
+    if (currentType == MPiece::QUEEN) {return verifyMoveQueen(from, to); }
+    if (currentType == MPiece::KING) {return verifyMoveKing(from, to); }
+}
+
+bool MPosition::verifyMovePawn(QPoint from, QPoint to) const
+{
+    return true;
+}
+
+bool MPosition::verifyMoveRook(QPoint from, QPoint to) const
+{
+    return true;
+}
+
+bool MPosition::verifyMoveKnight(QPoint from, QPoint to) const
+{
+    return true;
+}
+
+bool MPosition::verifyMoveBishop(QPoint from, QPoint to) const
+{
+    return true;
+}
+
+bool MPosition::verifyMoveQueen(QPoint from, QPoint to) const
+{
+    return true;
+}
+
+bool MPosition::verifyMoveKing(QPoint from, QPoint to) const
+{
+    return true;
+}
 
 QString MPosition::getDefaultStartPosition() const
 {
@@ -41,6 +114,53 @@ QString MPosition::getDefaultStartPosition() const
 QString MPosition::convertToFen() const
 {
     return m_position;
+}
+
+MPosition::MPiecesGrid MPosition::convertFenToList(QString fen) const
+{
+    MPosition::MPiecesGrid retPosition = new MPosition::MPiecesGrid;
+
+    int x_pos = 0;
+    int y_pos = 0;
+    int count_cells = 0;
+
+    for(int idx = 0; idx < fen.length(); ++idx)
+    {
+        QChar curr = fen.at(idx);
+        if (count_cells < 64)
+        {
+            if (curr == '/')
+            {
+                x_pos = 0;
+                ++y_pos;
+            }
+            else if (curr.isDigit())
+            {
+                for (int j = 0; j < curr; ++j)
+                {
+                    ++x_pos;
+                    retPosition[x_pos][y_pos] = 0;
+                    ++count_cells;
+                }
+            }
+            else
+            {
+                retPosition[x_pos][y_pos] = new MPiece(curr);
+
+                ++x_pos;
+                ++count_cells;
+            }
+        }
+        else // TODO Set player-to-move, castle options, etc.
+        {}
+    }
+
+    return retPosition;
+}
+
+MPosition::MPiecesGrid MPosition::getPositionList() const
+{
+    return m_position_list;
 }
 
 MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
@@ -61,4 +181,97 @@ MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
 
     // Complain?
     return UNKNOWN_PIECE;
+}
+
+MPiece::MPiece(QChar fenPiece)
+{
+    if ('r' == fenPiece)
+    {
+        type = ROOK;
+        colour = BLACK;
+    }
+
+    if ('n' == fenPiece)
+    {
+        type = KNIGHT;
+        colour = BLACK;
+    }
+
+    if ('b' == fenPiece)
+    {
+        type = BISHOP;
+        colour = BLACK;
+    }
+
+    if ('q' == fenPiece)
+    {
+        type = QUEEN;
+        colour = BLACK;
+    }
+
+    if ('k' == fenPiece)
+    {
+        type = KING;
+        colour = BLACK;
+    }
+
+    if ('p' == fenPiece)
+    {
+        type = PAWN;
+        colour = BLACK;
+    }
+
+    if ('R' == fenPiece)
+    {
+        type = ROOK;
+        colour = WHITE;
+    }
+
+    if ('N' == fenPiece)
+    {
+        type = KNIGHT;
+        colour = WHITE;
+    }
+
+    if ('B' == fenPiece)
+    {
+        type = BISHOP;
+        colour = WHITE;
+    }
+
+    if ('Q' == fenPiece)
+    {
+        type = QUEEN;
+        colour = WHITE;
+    }
+
+    if ('K' == fenPiece)
+    {
+        type = KING;
+        colour = WHITE;
+    }
+
+    if ('P' == fenPiece)
+    {
+        type = PAWN;
+        colour = WHITE;
+    }
+}
+
+
+MPiece::MPiece(MColours col, MPieceTypes typ)
+: type(typ), colour(col)
+{}
+
+MPiece::~MPiece()
+{}
+
+MPiece::MColours MPiece::getColour() const
+{
+    return colour;
+}
+
+MPiece::MPieceTypes MPiece::getType() const
+{
+    return type;
 }
