@@ -20,23 +20,19 @@
 
 #include "position.h"
 
-#include <iostream>
-
 
 using namespace Miniature;
 
 MPosition::MPosition()
 : m_position(getDefaultStartPosition())
 {
-    m_position_list = convertFenToList(getDefaultStartPosition());
-    //std::cout << "MPosition -> empty constructor" << std::endl;
+    m_position_list = convertFenToList(getDefaultStartPosition());//std::cout << "MPosition -> empty constructor" << std::endl;
 }
 
 MPosition::MPosition(QString fen)
 : m_position(fen)
 {
     m_position_list = convertFenToList(fen);
-    //std::cout << "MPosition -> fen constructor" << std::endl;
 }
 
 MPosition::~MPosition()
@@ -183,95 +179,5 @@ MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
     return UNKNOWN_PIECE;
 }
 
-MPiece::MPiece(QChar fenPiece)
-{
-    if ('r' == fenPiece)
-    {
-        type = ROOK;
-        colour = BLACK;
-    }
-
-    if ('n' == fenPiece)
-    {
-        type = KNIGHT;
-        colour = BLACK;
-    }
-
-    if ('b' == fenPiece)
-    {
-        type = BISHOP;
-        colour = BLACK;
-    }
-
-    if ('q' == fenPiece)
-    {
-        type = QUEEN;
-        colour = BLACK;
-    }
-
-    if ('k' == fenPiece)
-    {
-        type = KING;
-        colour = BLACK;
-    }
-
-    if ('p' == fenPiece)
-    {
-        type = PAWN;
-        colour = BLACK;
-    }
-
-    if ('R' == fenPiece)
-    {
-        type = ROOK;
-        colour = WHITE;
-    }
-
-    if ('N' == fenPiece)
-    {
-        type = KNIGHT;
-        colour = WHITE;
-    }
-
-    if ('B' == fenPiece)
-    {
-        type = BISHOP;
-        colour = WHITE;
-    }
-
-    if ('Q' == fenPiece)
-    {
-        type = QUEEN;
-        colour = WHITE;
-    }
-
-    if ('K' == fenPiece)
-    {
-        type = KING;
-        colour = WHITE;
-    }
-
-    if ('P' == fenPiece)
-    {
-        type = PAWN;
-        colour = WHITE;
-    }
-}
 
 
-MPiece::MPiece(MColours col, MPieceTypes typ)
-: type(typ), colour(col)
-{}
-
-MPiece::~MPiece()
-{}
-
-MPiece::MColours MPiece::getColour() const
-{
-    return colour;
-}
-
-MPiece::MPieceTypes MPiece::getType() const
-{
-    return type;
-}

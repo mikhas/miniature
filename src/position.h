@@ -24,32 +24,10 @@
 #include <QString>
 #include <QList>
 #include <QPoint>
+#include "piece_includes.h"
 
 namespace Miniature
 {
-
-
-    class MPiece
-{
-public:
-
-    enum MPieceTypes {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN};
-    enum MColours {BLACK, WHITE};
-
-    MPiece(QChar);
-    MPiece(MColours col, MPieceTypes typ);
-    ~MPiece();
-
-
-
-    MPieceTypes getType() const;
-    MColours getColour() const;
-
-private:
-    MPieceTypes type;
-    MColours colour;
-};
-
 
 class MPosition
 {
@@ -94,23 +72,6 @@ private:
     void onPieceMoved(QPoint from, QPoint to);
 };
 
-
-
-
-/*class MGameLogic
-{
-  Q_OBJECT
-
-  public:
-
-  public Q_SLOT:
-
-  Q_SIGNALS:
-
-
-  private:
-
-};*/
 
 }; // namespace Miniature
 
