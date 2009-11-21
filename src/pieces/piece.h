@@ -21,34 +21,39 @@
 #ifndef PIECE_H__
 #define PIECE_H__
 
-namespace miniature
+#include <QList>
+#include <QPoint>
+#include <QChar>
+
+namespace Miniature
 {
 
+/* Abstract base class for all pieces. */
 class MPiece
 {
 public:
 
-    enum MPieceTypes {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN};
-    enum MColours {BLACK, WHITE};
+    enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
+    enum MColour {BLACK, WHITE};
 
-    virtual MPiece(MColours) = 0;
-    virtual MPiece(MColours, int, int) = 0;
+    MPiece(MColour colour, MType pieceType, int width = 8, int height = 8);
     virtual ~MPiece();
 
-    virtual QList<QPoint> getPossibleSquares (QPoint) const = 0;
-    //virtual QList<QPoint> getInbetweenSquares (QPoint, QPoint) const = 0;
-    virtual bool isMoveAllowed (QPoint, QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(QPoint) const = 0;
 
-    MPieceTypes getType() const;
-    MColours getColour() const;
+    MType getType() const;
+    MColour getColour() const;
 
-private:
-    MPieceTypes type;
-    MColours colour;
+    static MPiece* createPiece(MType type, MColour colour, int width = 8, int height = 8);
+    static MPiece* createFromFenPiece(QChar fenPiece, int width = 8, int height = 8);
+
+protected:
+    MColour colour;
+    MType type;
     int xDim;
     int yDim;
 };
 
-}
+} // namespace Miniature
 
 #endif /* PIECE_H__ */

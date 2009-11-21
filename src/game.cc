@@ -65,8 +65,8 @@ void MGame::nextMove()
     {
         ++m_half_move;
 
-        MPosition pos = MPosition(m_game[m_half_move]);
-        Q_EMIT positionChanged(pos);
+        //MPosition pos = MPosition(m_game[m_half_move]);
+        //Q_EMIT positionChanged(pos);
 
         updateMaterialInfo();
     }
@@ -81,8 +81,8 @@ void MGame::prevMove()
     {
        --m_half_move;
 
-        MPosition pos = MPosition(m_game[m_half_move]);
-        Q_EMIT positionChanged(pos);
+        //MPosition pos = MPosition(m_game[m_half_move]);
+        //Q_EMIT positionChanged(pos);
 
         updateMaterialInfo();
     }

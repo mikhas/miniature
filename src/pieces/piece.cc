@@ -19,29 +19,71 @@
  */
 
 #include "piece.h"
+#include "rook.h"
 
-namespace miniature
+namespace Miniature
 {
+
+MPiece::MPiece(MColour colour, MType pieceType, int width, int height)
+: colour(colour),
+  type(pieceType),
+  xDim(width),
+  yDim(height)
+{}
 
 MPiece::~MPiece()
 {}
 
 
-bool MPiece::isMoveAllowed (QPoint from, QPoint to) const
-{
-	// this is just a quick hack and should be implemented in each subclass differently (speed considerations)
-	return getPossibleSquares(from).contains(to);
-}
-
-
-MPiece::MColours MPiece::getColour() const
+MPiece::MColour MPiece::getColour() const
 {
     return colour;
 }
 
-MPiece::MPieceTypes MPiece::getType() const
+MPiece::MType MPiece::getType() const
 {
     return type;
 }
 
+MPiece* MPiece::createPiece(MPiece::MType type, MPiece::MColour colour, int width, int height)
+{
+    MPiece* piece = 0;
+
+    switch(type)
+    {
+        case ROOK:   piece = new MRook(colour, width, height); break;
+/*
+        case KNIGHT: piece = new MKnight(colour, width, height); break;
+        case BISHOP: piece = new MBishop(colour, width, height); break;
+        case QUEEN:  piece = new MQueen(colour, width, height); break;
+        case KING:   piece = new MKing(colour, width, height); break;
+        case PAWN:   piece = new MPawn(colour, width, height); break;
+*/
+        default:     qCritical("MPiece::createPiece(.): Failed to instantiate requested piece."); break;
+    }
+
+    return piece;
 }
+
+MPiece* MPiece::createFromFenPiece(QChar fenPiece, int width, int height)
+{
+    if ('r' == fenPiece) {return createPiece(ROOK, BLACK, width, height);}
+/*
+    if ('n' == fenPiece) {return createPiece(KNIGHT, BLACK, width, height);}
+    if ('b' == fenPiece) {return createPiece(BISHOP, BLACK, width, height);}
+    if ('q' == fenPiece) {return createPiece(QUEEN, BLACK, width, height);}
+    if ('k' == fenPiece) {return createPiece(KING, BLACK, width, height);}
+    if ('p' == fenPiece) {return createPiece(PAWN, BLACK, width, height);}
+*/
+    if ('R' == fenPiece) {return createPiece(ROOK, WHITE, width, height);}
+/*
+    if ('N' == fenPiece) {return createPiece(KNIGHT, WHITE, width, height);}
+    if ('B' == fenPiece) {return createPiece(BISHOP, WHITE, width, height);}
+    if ('Q' == fenPiece) {return createPiece(QUEEN, WHITE, width, height);}
+    if ('K' == fenPiece) {return createPiece(KING, WHITE, width, height);}
+    if ('P' == fenPiece) {return createPiece(PAWN, WHITE, width, height);}
+*/
+    return createPiece(NONE, BLACK, width, height);
+}
+
+} // namespace Miniature

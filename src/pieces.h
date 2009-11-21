@@ -18,22 +18,17 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PIECE_INCLUDES_H__
-#define PIECE_INCLUDES_H__
+#ifndef PIECES_INCL_H__
+#define PIECES_INCL_H__
 
-#include "piece.h"
-#include "piece.cc"
-#include "rook.h"
-#include "rook.cc"
-#include "bishop.h"
-#include "bishop.cc"
-#include "knight.h"
-#include "knight.cc"
-#include "queen.h"
-#include "queen.cc"
-#include "king.h"
-#include "king.cc"
-#include "pawn.h"
-#include "pawn.cc"
+#include "pieces/piece.h"
+#include "pieces/rook.h"
+/*
+#include "pieces/bishop.h"
+#include "pieces/knight.h"
+#include "pieces/queen.h"
+#include "pieces/king.h"
+#include "pieces/pawn.h"
+*/
 
-#endif /* PIECE_INCLUDES_H__ */
+#endif /* PIECES_INCL_H__ */

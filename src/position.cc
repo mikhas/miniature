@@ -20,143 +20,112 @@
 
 #include "position.h"
 
+#include <algorithm>
 
 using namespace Miniature;
 
-MPosition::MPosition()
-: m_position(getDefaultStartPosition())
-{
-    m_position_list = convertFenToList(getDefaultStartPosition());//std::cout << "MPosition -> empty constructor" << std::endl;
-}
+MPosition::MPosition(int width, int height, QObject *parent)
+: QObject(parent),
+  m_position(MPiecesGrid(height, MPiecesRow(width, 0)))
+{}
 
-MPosition::MPosition(QString fen)
-: m_position(fen)
+MPosition::MPosition(QString /*fen*/, int width, int height, QObject *parent)
+: QObject(parent),
+  m_position(MPiecesGrid(height, MPiecesRow(width, 0)))
 {
-    m_position_list = convertFenToList(fen);
 }
 
 MPosition::~MPosition()
 {}
 
-void onPieceMoved(QPoint from, QPoint to)
+void MPosition::onPieceMoved(QPoint from, QPoint to)
 {
-    if (from && to)
+    if(!verifyMove(from, to))
     {
-        if(verifyMove(from, to))
-        {
-            // update grid
-            movePiece(from, to);
-        }
-        // TODO?: Emit some sort of warning, when move wasn't verified?
+        Q_EMIT invalidMove(from, to);
     }
 
-    Q_EMIT confirmedPosition(MPosition::m_position_list);
+    movePiece(from, to);
 }
 
 void MPosition::movePiece(QPoint from, QPoint to)
 {
     // TODO: Castling & pawn promotion
-    MPosition::m_position_list[to.x()][to.y()] = MPosition::m_position_list[from.x()][from.y()];
-    Position::m_position_list[from.x()][from.y()] = 0;
+    // TODO: use shared_ptr, risk of mleaks
+    std::swap(from, to);
+
+    MPiece *piece = pieceAt(from);
+    if (piece)
+    {
+        delete piece;
+        piece = 0;
+    }
+
+    Q_EMIT positionChanged(m_position);
+}
+
+MPiece* MPosition::pieceAt(QPoint pos) const
+{
+    return m_position[pos.x()][pos.y()];
 }
 
 bool MPosition::verifyMove(QPoint from, QPoint to) const
 {
-    MPiece::MPieceTypes currentType = (MPosition::m_position_list[from.x()][from.y()])->getType();
+    MPiece* piece = pieceAt(from);
+    if (piece)
+    {
+      return pieceAt(from)->getPossibleSquares(from).contains(to);
+    }
 
-    if (currentType == MPiece::PAWN) {return verifyMovePawn(from, to); }
-    if (currentType == MPiece::ROOK) {return verifyMoveRook(from, to); }
-    if (currentType == MPiece::KNIGHT) {return verifyMoveKnight(from, to); }
-    if (currentType == MPiece::BISHOP) {return verifyMoveBishop(from, to); }
-    if (currentType == MPiece::QUEEN) {return verifyMoveQueen(from, to); }
-    if (currentType == MPiece::KING) {return verifyMoveKing(from, to); }
-}
-
-bool MPosition::verifyMovePawn(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-bool MPosition::verifyMoveRook(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-bool MPosition::verifyMoveKnight(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-bool MPosition::verifyMoveBishop(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-bool MPosition::verifyMoveQueen(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-bool MPosition::verifyMoveKing(QPoint from, QPoint to) const
-{
-    return true;
-}
-
-QString MPosition::getDefaultStartPosition() const
-{
-    return QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    return false;
 }
 
 QString MPosition::convertToFen() const
 {
-    return m_position;
+    // We currently lie.
+    return QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-MPosition::MPiecesGrid MPosition::convertFenToList(QString fen) const
+void MPosition::convertFromFen(QString fen)
 {
-    MPosition::MPiecesGrid retPosition = new MPosition::MPiecesGrid;
-
     int x_pos = 0;
     int y_pos = 0;
     int count_cells = 0;
 
-    for(int idx = 0; idx < fen.length(); ++idx)
+    for(int idx = 0; idx < fen.length() && count_cells < 64; ++idx)
     {
         QChar curr = fen.at(idx);
-        if (count_cells < 64)
+        if (curr == '/')
         {
-            if (curr == '/')
+            x_pos = 0;
+            ++y_pos;
+        }
+        else if (curr.isDigit())
+        {
+            for (int j = 0; j < curr; ++j)
             {
-                x_pos = 0;
-                ++y_pos;
-            }
-            else if (curr.isDigit())
-            {
-                for (int j = 0; j < curr; ++j)
-                {
-                    ++x_pos;
-                    retPosition[x_pos][y_pos] = 0;
-                    ++count_cells;
-                }
-            }
-            else
-            {
-                retPosition[x_pos][y_pos] = new MPiece(curr);
-
                 ++x_pos;
+                MPiece *empty = pieceAt(QPoint(x_pos, y_pos));
+                empty = 0;
                 ++count_cells;
             }
         }
-        else // TODO Set player-to-move, castle options, etc.
-        {}
+        else
+        {
+            MPiece *piece = pieceAt(QPoint(x_pos, y_pos));
+            piece = MPiece::createFromFenPiece(curr); // TODO: include board dimension, too
+
+            ++x_pos;
+            ++count_cells;
+        }
     }
 
-    return retPosition;
+    // TODO Set player-to-move, castle options, etc.
 }
 
-MPosition::MPiecesGrid MPosition::getPositionList() const
+MPosition::MPiecesGrid MPosition::getPosition() const
 {
-    return m_position_list;
+    return m_position;
 }
 
 MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
@@ -178,6 +147,3 @@ MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
     // Complain?
     return UNKNOWN_PIECE;
 }
-
-
-

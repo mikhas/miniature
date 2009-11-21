@@ -36,7 +36,23 @@ src_miniature_SOURCES = \
 			src/pieces_pool_manager.h \
 			src/player_info.h \
 			src/position.cc \
+			src/position.moc.cc \
 			src/position.h \
+			src/pieces.h \
+			src/pieces/piece.h \
+			src/pieces/piece.cc \
+			src/pieces/rook.h \
+			src/pieces/rook.cc \
+ #			src/pieces/knight.h \
+ #			src/pieces/knight.cc \
+ #			src/pieces/bishop.h \
+ #			src/pieces/bishop.cc \
+ #			src/pieces/queen.h \
+ #			src/pieces/queen.cc \
+ #			src/pieces/king.h \
+ #			src/pieces/king.cc \
+ #			src/pieces/pawn.h \
+ #			src/pieces/pawn.cc \
 			$(null)
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
@@ -47,6 +63,7 @@ BUILT_SOURCES = \
 		src/graphics_board_item.moc.cc \
 		src/miniature.moc.cc \
 		src/miniature.ui.h \
+                src/position.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

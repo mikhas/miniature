@@ -23,16 +23,9 @@
 namespace Miniature
 {
 
-MRook::MRook(MColour col)
-: colour(col), type(ROOK), xDim(8), yDim(8), canCastle(true)
-{}
-
-MRook::MRook(MColour col, int boardWidth, int boardLength)
-: colour(col), type(ROOK), xDim(boardWidth), yDim(boardLength), canCastle(true)
-{}
-
-MRook::MRook(MColour col, int boardWidth, int boardLength, bool canCastle)
-: colour(col), type(ROOK), xDim(boardWidth), yDim(boardLength), canCastle(canCastle)
+MRook::MRook(MColour colour, int width, int height)
+: MPiece(colour, ROOK, width, height),
+  castle(true)
 {}
 
 MRook::~MRook()
@@ -40,72 +33,51 @@ MRook::~MRook()
 
 QList<QPoint> MRook::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+    QList<QPoint> possibleSquares;
 
-	// north
-	int i = 1;
-	while (point.y() + i < yDim)
-	{
-		possibleSquares.append(new QPoint(point.x(), point.y() + i));
-		++i;
-	}
+    // north
+    int i = 1;
+    while (point.y() + i < yDim)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() + i));
+        ++i;
+    }
 
-	// east
-	i = 1;
-	while (point.x() + i < xDim)
-	{
-		possibleSquares.append(new QPoint(point.x() + 1, point.y()));
-		++i;
-	}
+    // east
+    i = 1;
+    while (point.x() + i < xDim)
+    {
+        possibleSquares.append(QPoint(point.x() + 1, point.y()));
+        ++i;
+    }
 
-	// south
-	i = 1;
-	while (point.y() - i >= 0)
-	{
-		possibleSquares.append(new QPoint(point.x(), point.y() - i));
-		++i;
-	}
+    // south
+    i = 1;
+    while (point.y() - i >= 0)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() - i));
+        ++i;
+    }
 
-	// west
-	i = 1;
-	while (point.x() - i >= 0)
-	{
-		possibleSquares.append(new QPoint(point.x() - 1, point.y()));
-		++i;
-	}
+    // west
+    i = 1;
+    while (point.x() - i >= 0)
+    {
+        possibleSquares.append(QPoint(point.x() - 1, point.y()));
+        ++i;
+    }
 
-	return possibleSquares;
-}
-
-bool MRook::isMoveAllowed (QPoint from, QPoint to) const
-{
-	// Test for dimensions
-	if ((from.x() < 0)
-			|| (from.x() >= xDim)
-			|| (from.y() < 0)
-			|| (from.y() >= yDim))
-	{
-		return false;
-	}
-
-	// Test if the move is only vertical or horizontal
-	if ((from.x() != to.x()) && (from.y() != to.y()))
-	{
-		return false;
-	}
-
-	return true;
+    return possibleSquares;
 }
 
 void MRook::hasMoved()
 {
-	canCastle = false;
+    castle = false;
 }
 
-bool MRook::canCastle()
+bool MRook::canCastle() const
 {
-	return canCastle;
+    return castle;
 }
-
 
 }

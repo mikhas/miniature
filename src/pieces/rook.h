@@ -26,19 +26,20 @@
 namespace Miniature
 {
 
-class MRook: public MPiece
+class MRook
+: public MPiece
 {
 public:
-	MRook(MColour);
-	MRook(MColour, int, int);
-	MRook(MColour, int, int, bool);
-	~MRook();
+    MRook(MColour colour, int width = 8, int height = 8);
+    ~MRook();
 
-	void hasMoved();
-	bool canCastle();
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+
+    void hasMoved();
+    bool canCastle() const;
 
 private:
-	bool canCastle;
+    bool castle;
 };
 
 }

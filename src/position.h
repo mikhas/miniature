@@ -21,59 +21,64 @@
 #ifndef POSITION_H__
 #define POSITION_H__
 
+#include "pieces.h"
+
+#include <QObject>
 #include <QString>
-#include <QList>
+#include <QVector>
 #include <QPoint>
-#include "piece_includes.h"
+//#include "piece_includes.h"
 
 namespace Miniature
 {
 
+/* This class represents a chess position.*/
+// TODO: move validation belongs in logic unit
+// TODO: kill off FEN support needed for pieces pool manager
+// TODO: give each MPiece the correct shared svg renderer so that the board can
+//       draw by using MPiece, too
 class MPosition
+: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
-    MPosition(); // construct the start position
-    explicit MPosition(QString fen);
-    // TODO: constructor from a MPiecesGrid
+    explicit MPosition(int width = 8, int height = 8, QObject *parent = 0); // construct the start position
+    explicit MPosition(QString fen, int width = 8, int height = 8, QObject *parent = 0);
     ~MPosition();
 
     enum MPieceTypes {BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BPAWN,
                       WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WPAWN,
                       UNKNOWN_PIECE};
 
-    typedef QList<QList<MPiece*> > MPiecesGrid;
+    typedef QVector<MPiece*> MPiecesRow;
+    typedef QVector<MPiecesRow> MPiecesGrid;
 
     QString convertToFen() const;
     MPieceTypes lookupPieceType(QChar fenPiece) const;
-    MPiecesGrid getPositionList() const;
+    MPiecesGrid getPosition() const;
+
+public Q_SLOTS:
+    void onPieceMoved(QPoint from, QPoint to);
 
 Q_SIGNALS:
-    void confirmedPosition(MPiecesGrid newPosition);
+    void invalidMove(QPoint from, QPoint to);
+    void positionChanged(const MPiecesGrid &position);
 
 private:
     QString getDefaultStartPosition() const;
-    MPiecesGrid convertFenToList(QString fen) const;
-    // TODO: replace with a 8x8 grid
-    QString m_position;
-    MPiecesGrid m_position_list;
+    void convertFromFen(QString fen);
+
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
     void movePiece(QPoint from, QPoint to);
     bool verifyMove(QPoint from, QPoint to) const;
-    bool verifyMovePawn(QPoint from, QPoint to) const;
-    bool verifyMoveRook(QPoint from, QPoint to) const;
-    bool verifyMoveKnight(QPoint from, QPoint to) const;
-    bool verifyMoveBishop(QPoint from, QPoint to) const;
-    bool verifyMoveQueen(QPoint from, QPoint to) const;
-    bool verifyMoveKing(QPoint from, QPoint to) const;
+    MPiece* pieceAt(QPoint pos) const;
 
- private Q_SLOTS:
-    void onPieceMoved(QPoint from, QPoint to);
+    MPiecesGrid m_position;
+
 };
 
 
 }; // namespace Miniature
 
 #endif
-
