@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.8.5 no-define subdir-objects])
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
+MINIATURE_CHECK_PLATFORM
 
 AC_PROG_CXX
 PKG_PROG_PKG_CONFIG
