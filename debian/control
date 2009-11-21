@@ -5,6 +5,8 @@ Maintainer: Michael Hasselmann <michael@taschenorakel.de>
 Uploaders: Mathias Hasselmann <mathias.hasselmann@maemo.org>
 Build-Depends: debhelper (>= 5.0.0), cdbs, libqt4-maemo5-dev (>= 4.6.0~git20091105),
  osso-af-settings (>= 0.9.2)
+Standards-Version: 3.7.2
+
 
 Package: miniature
 Section: user/games
