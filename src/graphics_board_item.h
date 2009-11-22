@@ -58,7 +58,7 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
 Q_SIGNALS:
-    void pieceMoved(QPoint from, QPoint to);
+    void pieceMoveRequested(QPoint from, QPoint to);
     void loadFinished(bool ok);
 
 protected:

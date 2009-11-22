@@ -444,6 +444,7 @@
     <addaction name="new_game"/>
     <addaction name="next_move"/>
     <addaction name="prev_move"/>
+    <addaction name="black_rook_test"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -469,6 +470,14 @@
    </property>
    <property name="shortcut">
     <string>Left</string>
+   </property>
+  </action>
+  <action name="black_rook_test">
+   <property name="text">
+    <string>Black Rook Test</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
  </widget>

@@ -61,7 +61,7 @@ public Q_SLOTS:
     void drawStartPosition();
 
 Q_SIGNALS:
-    void pieceMoved(QPoint from, QPoint to);
+    void pieceMoveRequested(QPoint from, QPoint to);
 
 private:
     void setBoardBackground();
@@ -73,7 +73,7 @@ private:
     MPiecesPoolManager m_pieces_pool_manager;
 
 private Q_SLOTS:
-    void onPieceMoved(QPoint from, QPoint to);
+    void onPieceMoveRequested(QPoint from, QPoint to);
 };
 
 }; // namespace Miniature

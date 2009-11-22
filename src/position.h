@@ -23,61 +23,59 @@
 
 #include "pieces.h"
 
-#include <QObject>
 #include <QString>
 #include <QVector>
 #include <QPoint>
-//#include "piece_includes.h"
 
 namespace Miniature
 {
 
 /* This class represents a chess position.*/
-// TODO: move validation belongs in logic unit
 // TODO: kill off FEN support needed for pieces pool manager
 // TODO: give each MPiece the correct shared svg renderer so that the board can
 //       draw by using MPiece, too
 class MPosition
-: public QObject
 {
-    Q_OBJECT
 
 public:
-    explicit MPosition(int width = 8, int height = 8, QObject *parent = 0); // construct the start position
-    explicit MPosition(QString fen, int width = 8, int height = 8, QObject *parent = 0);
+    // construct empty position
+    explicit MPosition(int width = 8, int height = 8);
+    explicit MPosition(QString fen, int width = 8, int height = 8);
     ~MPosition();
 
+    // TODO: Remove!
     enum MPieceTypes {BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BPAWN,
                       WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WPAWN,
                       UNKNOWN_PIECE};
 
-    typedef QVector<MPiece*> MPiecesRow;
-    typedef QVector<MPiecesRow> MPiecesGrid;
+    typedef QVector<MPiece*> MPieces;
 
+    // These 3 methods are potentially deprecated!
     QString convertToFen() const;
+    void convertFromFen(QString fen);
     MPieceTypes lookupPieceType(QChar fenPiece) const;
-    MPiecesGrid getPosition() const;
 
-public Q_SLOTS:
-    void onPieceMoved(QPoint from, QPoint to);
+    void putPieceAt(MPiece* piece, QPoint pos);
+    // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
+    void movePiece(QPoint from, QPoint to);
+    MPiece* pieceAt(QPoint pos) const;
 
-Q_SIGNALS:
-    void invalidMove(QPoint from, QPoint to);
-    void positionChanged(const MPiecesGrid &position);
+    MPieces::const_iterator begin() const;
+    MPieces::const_iterator end() const;
+
+    int indexFromPoint(QPoint point) const;
+    // This conversion is also used by MBoardView to figure out the correct
+    // position of a piece.
+    QPoint indexToPoint(int index, int scaling = 1) const;
 
 private:
     QString getDefaultStartPosition() const;
-    void convertFromFen(QString fen);
 
-    // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
-    void movePiece(QPoint from, QPoint to);
-    bool verifyMove(QPoint from, QPoint to) const;
-    MPiece* pieceAt(QPoint pos) const;
-
-    MPiecesGrid m_position;
+    const int m_width;
+    const int m_height;
+    MPieces m_position;
 
 };
-
 
 }; // namespace Miniature
 

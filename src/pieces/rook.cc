@@ -19,6 +19,7 @@
  */
 
 #include "rook.h"
+#include <iostream>
 
 namespace Miniature
 {
@@ -47,7 +48,7 @@ QList<QPoint> MRook::getPossibleSquares(QPoint point) const
     i = 1;
     while (point.x() + i < xDim)
     {
-        possibleSquares.append(QPoint(point.x() + 1, point.y()));
+        possibleSquares.append(QPoint(point.x() + i, point.y()));
         ++i;
     }
 
@@ -63,8 +64,15 @@ QList<QPoint> MRook::getPossibleSquares(QPoint point) const
     i = 1;
     while (point.x() - i >= 0)
     {
-        possibleSquares.append(QPoint(point.x() - 1, point.y()));
+        possibleSquares.append(QPoint(point.x() - i, point.y()));
         ++i;
+    }
+
+    for (QList<QPoint>::iterator iter = possibleSquares.begin();
+         iter != possibleSquares.end();
+         ++iter)
+    {
+        std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
     }
 
     return possibleSquares;

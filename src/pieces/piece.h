@@ -45,6 +45,8 @@ public:
     MColour getColour() const;
 
     static MPiece* createPiece(MType type, MColour colour, int width = 8, int height = 8);
+
+    // Potentially deprecated!
     static MPiece* createFromFenPiece(QChar fenPiece, int width = 8, int height = 8);
 
 protected:

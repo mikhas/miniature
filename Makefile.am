@@ -22,6 +22,11 @@ src_miniature_SOURCES = \
 			src/game.cc \
 			src/game.h \
 			src/game.moc.cc \
+			src/logic_analyzer.cc \
+			src/logic_analyzer.moc.cc \
+			src/logic_analyzer.h \
+			src/position.cc \
+			src/position.h \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
@@ -35,9 +40,6 @@ src_miniature_SOURCES = \
 			src/pieces_pool_manager.cc \
 			src/pieces_pool_manager.h \
 			src/player_info.h \
-			src/position.cc \
-			src/position.moc.cc \
-			src/position.h \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
@@ -60,10 +62,10 @@ BUILT_SOURCES = \
 		data/data.qrc.cc \
 		src/board_view.moc.cc \
 		src/game.moc.cc \
+                src/logic_analyzer.moc.cc \
 		src/graphics_board_item.moc.cc \
 		src/miniature.moc.cc \
 		src/miniature.ui.h \
-                src/position.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

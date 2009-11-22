@@ -23,6 +23,7 @@
 
 #include "player_info.h"
 #include "position.h"
+#include "logic_analyzer.h"
 
 #include <vector>
 #include <QGraphicsView>
@@ -55,9 +56,16 @@ public Q_SLOTS:
     void nextMove();
     void prevMove();
 
+    /* Test slots */
+    void blackRookTest();
+
+    void onPieceMoveRequested(QPoint from, QPoint to);
+
 Q_SIGNALS:
     void playerInfoChanged();
     void positionChanged(const MPosition&);
+    void pieceMoved(QPoint from, QPoint to);
+    void invalidMove(QPoint from, QPoint to);
 
 private:
     // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
@@ -77,12 +85,12 @@ private:
      */
     //QGraphicsScene* createScene();
 
-    std::vector<QString> createDummyGame() const;
-
-    // To simplify things, our current internal model is just a list of FEN
-    // strings, one for each position. I fully expect this to change in the future.
-    std::vector<QString> m_game;
+    //std::vector<QString> m_game;
     int m_half_move;
+
+    // The current position + logic_analyzer
+    MPosition m_position;
+    MLogicAnalyzer m_logic_analyzer;
 
     /* Stores player info, to be shown by the main window. */
     MPlayerInfo m_player_info;

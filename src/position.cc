@@ -20,70 +20,61 @@
 
 #include "position.h"
 
-#include <algorithm>
-
 using namespace Miniature;
 
-MPosition::MPosition(int width, int height, QObject *parent)
-: QObject(parent),
-  m_position(MPiecesGrid(height, MPiecesRow(width, 0)))
+MPosition::MPosition(int width, int height)
+: m_width(width),
+  m_height(height),
+  m_position(width * height)
 {}
 
-MPosition::MPosition(QString /*fen*/, int width, int height, QObject *parent)
-: QObject(parent),
-  m_position(MPiecesGrid(height, MPiecesRow(width, 0)))
+MPosition::MPosition(QString /*fen*/, int width, int height)
+: m_width(width),
+  m_height(height),
+  m_position(width * height)
 {
 }
 
 MPosition::~MPosition()
 {}
 
-void MPosition::onPieceMoved(QPoint from, QPoint to)
-{
-    if(!verifyMove(from, to))
-    {
-        Q_EMIT invalidMove(from, to);
-    }
-
-    movePiece(from, to);
-}
-
 void MPosition::movePiece(QPoint from, QPoint to)
 {
     // TODO: Castling & pawn promotion
-    // TODO: use shared_ptr, risk of mleaks
-    std::swap(from, to);
-
-    MPiece *piece = pieceAt(from);
-    if (piece)
-    {
-        delete piece;
-        piece = 0;
-    }
-
-    Q_EMIT positionChanged(m_position);
+    // TODO: use shared_ptr, risk of mleaks when removing pieces
+    putPieceAt(pieceAt(from), to);
+    putPieceAt(0, from);
 }
 
 MPiece* MPosition::pieceAt(QPoint pos) const
 {
-    return m_position[pos.x()][pos.y()];
+    return m_position[indexFromPoint(pos)];
 }
 
-bool MPosition::verifyMove(QPoint from, QPoint to) const
+MPosition::MPieces::const_iterator MPosition::begin() const
 {
-    MPiece* piece = pieceAt(from);
-    if (piece)
-    {
-      return pieceAt(from)->getPossibleSquares(from).contains(to);
-    }
-
-    return false;
+    return m_position.begin();
 }
 
-QString MPosition::convertToFen() const
+MPosition::MPieces::const_iterator MPosition::end() const
 {
-    // We currently lie.
-    return QString("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    return m_position.end();
+}
+
+int MPosition::indexFromPoint(QPoint point) const
+{
+    /* We assume that the top-left cell is (0,0) and that point.x() indicates
+     * the column and point.y() indicates the row.
+     */
+    return (point.x() + point.y() * m_width);
+}
+
+QPoint MPosition::indexToPoint(int index, int scaling) const
+{
+    /* We assume that the top-left cell is (0,0) and that index % m_width
+     * indicates the column and index / m_width indicates the row.
+     */
+    return QPoint((index % m_width) * scaling, (index / m_width) * scaling);
 }
 
 void MPosition::convertFromFen(QString fen)
@@ -123,11 +114,12 @@ void MPosition::convertFromFen(QString fen)
     // TODO Set player-to-move, castle options, etc.
 }
 
-MPosition::MPiecesGrid MPosition::getPosition() const
+void MPosition::putPieceAt(MPiece* piece, QPoint pos)
 {
-    return m_position;
+    m_position[indexFromPoint(pos)] = piece;
 }
 
+// TODO: Remove me once the pieces pool manager is gone ...
 MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
 {
     if ('r' == fenPiece) return BROOK;

@@ -23,6 +23,9 @@
 
 #include "piece.h"
 
+#include <QList>
+#include <QPoint>
+
 namespace Miniature
 {
 

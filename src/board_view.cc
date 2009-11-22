@@ -23,6 +23,9 @@
 
 #include <QPixmap>
 #include <QUrl>
+#include <QPoint>
+
+#include <iostream>
 
 using namespace Miniature;
 
@@ -48,7 +51,6 @@ void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
     setBoardBackground();
-
 }
 
 void MBoardView::setBoardBackground()
@@ -56,8 +58,8 @@ void MBoardView::setBoardBackground()
     m_board_item = new MGraphicsBoardItem();
 
     m_board_item->loadFromUri(QUrl("qrc:/boards/glossy.svg"));
-    connect(m_board_item, SIGNAL(pieceMoved(QPoint, QPoint)),
-            this, SLOT(onPieceMoved(QPoint, QPoint)));
+    connect(m_board_item, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
+            this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
     scene()->addItem(m_board_item);
 }
@@ -86,63 +88,24 @@ void MBoardView::drawPosition(const MPosition &position)
 {
     Q_CHECK_PTR(m_board_item);
 
-    QString fen = position.convertToFen();
-
-    if (fen.isEmpty())
-    {
-        // We have to decide whether we want to treat this as error. Currently,
-        // it's not (calling this method with an empty string).
-        return;
-    }
-
     clear();
 
-    /* (x_pos, y_pos) always tells us where to draw the current piece (top
-     * left corner of a cell).
-     */
-    int x_pos = 0;
-    int y_pos = 0;
-
-    /* We count cells so we know when to stop reading the FEN string. A FEN
-     * string can contain comments and game state information which we do not need.
-     * That is why we stop after we have seen 64 cells.
-     */
-    int count_cells = 0;
-
-    for(int idx = 0; idx < fen.length() && 64 > count_cells; ++idx)
+    for(MPosition::MPieces::const_iterator iter = position.begin();
+        iter != position.end();
+        ++iter)
     {
-        QChar curr = fen.at(idx);
-
-        // scanned one row
-        if ('/' == curr)
+        if (*iter)
         {
-            y_pos += m_board_item->getCellSize();
-            x_pos = 0;
-        }
-        else if (curr.isDigit())
-        {
-            /* This is the nice part about FEN: series of empty squares use a
-             * run-length-encoding. And that's stuff from the 19th century!
-             */
-            x_pos += curr.digitValue() * m_board_item->getCellSize();
-            count_cells += curr.digitValue();
-        }
-        else
-        {
-            // fetch the SVG file and add it to the board
-            MGraphicsChessPieceItem *piece = m_pieces_pool_manager.take(position.lookupPieceType(curr));
+            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
+            // TODO: put shared SVG renderer in MPiece and kill the pool manager.
+            MGraphicsChessPieceItem *piece = m_pieces_pool_manager.take(MPosition::BROOK);
             if (piece)
             {
-                piece->setPos(QPointF(x_pos, y_pos));
+                piece->setPos(cell);
                 piece->show();
                 piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
-                x_pos += m_board_item->getCellSize();
-                ++count_cells;
             }
-            else // Complain!
-            {}
         }
-
     }
 }
 
@@ -152,8 +115,9 @@ void MBoardView::drawStartPosition()
     drawPosition(pos);
 }
 
-void MBoardView::onPieceMoved(QPoint from, QPoint to)
+void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
 {
     // event propagation
-    Q_EMIT pieceMoved(from, to);
+    std::cout << "MBoardView::onPieceMoveRequested emits pieceMoveRequested" << std::endl;
+    Q_EMIT pieceMoveRequested(from, to);
 }

@@ -47,9 +47,11 @@ MMainWindow::MMainWindow()
     // Connect game logic w/ board view.
     connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
             m_ui.board_view, SLOT(drawPosition(const MPosition&)));
+    connect(m_ui.board_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
+            &m_game, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
-    // Connect moves from board with main window.
-    connect(m_ui.board_view, SIGNAL(pieceMoved(QPoint, QPoint)),
+    // Connect moves from game controller with main window.
+    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint)),
             this, SLOT(updateLastMove(QPoint, QPoint)));
 
     // Connect menu actions.
@@ -59,6 +61,8 @@ MMainWindow::MMainWindow()
             &m_game, SLOT(nextMove()));
     connect(m_ui.prev_move, SIGNAL(triggered()),
             &m_game, SLOT(prevMove()));
+    connect(m_ui.black_rook_test, SIGNAL(triggered()),
+            &m_game, SLOT(blackRookTest()));
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
     QFont big_font("helvetica", 16, QFont::Bold);

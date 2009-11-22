@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
+ * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -18,10 +18,39 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PIECES_INCL_H__
-#define PIECES_INCL_H__
+#ifndef LOGIC_ANALYZER_H__
+#define LOGIC_ANALYZER_H__
 
-#include "pieces/piece.h"
-#include "pieces/rook.h"
+#include "position.h"
+#include <QObject>
 
-#endif /* PIECES_INCL_H__ */
+namespace Miniature
+{
+
+typedef int MConstraintList;
+
+/* This class performs logical checks on a given position and move.
+ * Currently, it only validates simple moves.
+ */
+class MLogicAnalyzer
+: public QObject
+{
+    Q_OBJECT
+
+public:
+    MLogicAnalyzer(const MConstraintList &constraints, QObject *parent = 0);
+    virtual ~MLogicAnalyzer();
+
+    bool verifyMove(const MPosition &pos, QPoint from, QPoint to) const;
+
+Q_SIGNALS:
+    void invalidMove(const MPosition &pos, QPoint from, QPoint to) const;
+
+private:
+    MConstraintList m_constraints;
+
+};
+
+}
+
+#endif // LOGIC_ANALYZER_H__

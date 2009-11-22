@@ -20,17 +20,19 @@
 
 #include "game.h"
 #include "position.h"
+#include "pieces.h"
 
 #include <cmath>
-
 #include <QList>
+
+#include <iostream>
 
 using namespace Miniature;
 
 MGame::MGame(QObject *parent)
 : QObject(parent),
-  m_game(createDummyGame()),
-  m_half_move(-1)
+  m_half_move(-1),
+  m_logic_analyzer(0, this)
 {
     m_player_info.white_name = QString("andybehr");
     m_player_info.white_rating = QString("4321");
@@ -61,22 +63,26 @@ void MGame::newGame()
 
 void MGame::nextMove()
 {
+/*
     if (0 < m_game.size() && m_half_move < static_cast<int>(m_game.size()) - 1)
     {
         ++m_half_move;
 
-        //MPosition pos = MPosition(m_game[m_half_move]);
-        //Q_EMIT positionChanged(pos);
+        MPosition pos = MPosition(m_game[m_half_move]);
+        Q_EMIT positionChanged(pos);
 
         updateMaterialInfo();
     }
     else // Complain!
     {
+        newGame();
     }
+*/
 }
 
 void MGame::prevMove()
 {
+/*
     if (m_half_move > 0)
     {
        --m_half_move;
@@ -89,6 +95,34 @@ void MGame::prevMove()
     else // Complain!
     {
         newGame();
+    }
+*/
+}
+
+void MGame::blackRookTest()
+{
+    m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(4,4));
+
+    updateMaterialInfo();
+    Q_EMIT positionChanged(m_position);
+}
+
+
+void MGame::onPieceMoveRequested(QPoint from, QPoint to)
+{
+    // DEBUG
+    std::cout << "piece move from (" << from.x() << ", " << from.y() << ") to (" << to.x() << ", " << to.y() << ") requested!" << std::endl;
+    if(m_logic_analyzer.verifyMove(m_position, from, to))
+    {
+        // DEBUG
+        std::cout << "move verified!" << std::endl;
+        m_position.movePiece(from, to);
+        Q_EMIT pieceMoved(from, to);
+        Q_EMIT positionChanged(m_position);
+    }
+    else
+    {
+        Q_EMIT invalidMove(from, to);
     }
 }
 
@@ -108,14 +142,4 @@ void MGame::updateMaterialInfo()
     m_player_info.black_material = computeBlackMaterial();
 
     Q_EMIT playerInfoChanged();
-}
-
-std::vector<QString> MGame::createDummyGame() const
-{
-    std::vector<QString> game;
-    game.push_back(QString("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"));
-    game.push_back(QString("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"));
-    game.push_back(QString("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"));
-    game.push_back(QString("r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1"));
-    return game;
 }

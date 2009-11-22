@@ -99,8 +99,8 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         if((src_x != dst_x) || (src_y != dst_y))
         {
-            active_item->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
-            Q_EMIT pieceMoved(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
+            //active_item->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
+            Q_EMIT pieceMoveRequested(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
         }
 
         active_item = 0;
