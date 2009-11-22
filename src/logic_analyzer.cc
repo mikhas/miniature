@@ -57,10 +57,107 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         // DEBUG
         std::cout << "found valid piece ... " << std::endl;
         QList<QPoint> list = piece->getPossibleSquares(from);
+        // apply rook constraint
+        list = applyConStraight(pos, list, from);
         return (list.contains(to));
     }
 
     return false;
+}
+
+QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, QList<QPoint> moveList, QPoint from) const
+{
+
+	int xMax = from.x();
+	int xMin = from.x();
+	int yMax = from.y();
+	int yMin = from.y();
+	QList<QPoint> newMoveList = new QList<QPoint>;
+	MColour currColour = pos[MPosition::indexFromPoint(from)]->getColour();
+
+	for (QList<QPoint>::const_iterator i = moveList.begin(); i != moveList.end(); ++i)
+	{
+		MPiece currPiece = pos[MPosition::indexFromPoint(i)];
+
+		// vertical
+		if (i.y() == from.y())
+		{
+			if (!currPiece)
+			{
+				continue;
+			}
+			else
+			{
+				if (currPiece.getColour() == currColour)
+				{
+					if (i.x() > from.x()) {xMax = max(xMax, i.x() - 1);}
+					else {xMin = min(xMin, i.x() + 1);}
+				}
+				else
+				{
+					if (i.x() > from.x()) {xMax = max(xMax, i.x());}
+					else {xMin = min(xMin, i.x());}
+				}
+			}
+		}
+		// horizontal
+		else if (i.x() == from.x())
+		{
+			if (!currPiece)
+			{
+				continue;
+			}
+			else
+			{
+				if (currPiece.getColour() == currColour)
+				{
+					if (i.y() > from.y()) {yMax = max(yMax, i.y() - 1);}
+					else {yMin = min(yMin, i.y() + 1);}
+				}
+				else
+				{
+					if (i.y() > from.y()) {yMax = max(yMax, i.y());}
+					else {yMin = min(yMin, i.y());}
+				}
+			}
+		}
+	}
+
+	for (QList<QPoint>::const_iterator i = moveList.begin(); i != moveList.end(); ++i)
+	{
+		// vertical
+		if (i.y() == from.y())
+		{
+			if (i.x() <= xMax && i.x() >= xMin)
+			{
+				newMoveList.append(i);
+			}
+		}
+		// horizontal
+		else if (i.x() == from.x())
+		{
+			if (i.y() <= yMax && i.y() >= yMin)
+			{
+				newMoveList.append(i);
+			}
+		}
+		else
+		{
+			newMoveList.append(i);
+		}
+	}
+
+	return newMoveList;
+}
+
+int max (int a, int b) const
+{
+	return (b < a) ? a : b;
+}
+
+int min (int a, int b) const
+{
+	return (a < b) ? a : b;
 }
 
 }

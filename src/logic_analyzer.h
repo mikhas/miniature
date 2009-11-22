@@ -49,6 +49,10 @@ Q_SIGNALS:
 private:
     MConstraintList m_constraints;
 
+    QList<QPoint> applyConStraight(const MPosition &pos, QList<QPoint> moveList, QPoint from) const;
+    int max(int, int) const;
+    int min(int, int) const;
+
 };
 
 }
