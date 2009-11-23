@@ -20,6 +20,7 @@
 
 #include "piece.h"
 #include "rook.h"
+#include "knight.h"
 
 namespace Miniature
 {
@@ -52,8 +53,8 @@ MPiece* MPiece::createPiece(MPiece::MType type, MPiece::MColour colour, int widt
     switch(type)
     {
         case ROOK:   piece = new MRook(colour, width, height); break;
-/*
         case KNIGHT: piece = new MKnight(colour, width, height); break;
+/*
         case BISHOP: piece = new MBishop(colour, width, height); break;
         case QUEEN:  piece = new MQueen(colour, width, height); break;
         case KING:   piece = new MKing(colour, width, height); break;
@@ -68,16 +69,16 @@ MPiece* MPiece::createPiece(MPiece::MType type, MPiece::MColour colour, int widt
 MPiece* MPiece::createFromFenPiece(QChar fenPiece, int width, int height)
 {
     if ('r' == fenPiece) {return createPiece(ROOK, BLACK, width, height);}
-/*
     if ('n' == fenPiece) {return createPiece(KNIGHT, BLACK, width, height);}
+/*
     if ('b' == fenPiece) {return createPiece(BISHOP, BLACK, width, height);}
     if ('q' == fenPiece) {return createPiece(QUEEN, BLACK, width, height);}
     if ('k' == fenPiece) {return createPiece(KING, BLACK, width, height);}
     if ('p' == fenPiece) {return createPiece(PAWN, BLACK, width, height);}
 */
     if ('R' == fenPiece) {return createPiece(ROOK, WHITE, width, height);}
-/*
     if ('N' == fenPiece) {return createPiece(KNIGHT, WHITE, width, height);}
+/*
     if ('B' == fenPiece) {return createPiece(BISHOP, WHITE, width, height);}
     if ('Q' == fenPiece) {return createPiece(QUEEN, WHITE, width, height);}
     if ('K' == fenPiece) {return createPiece(KING, WHITE, width, height);}

@@ -104,6 +104,8 @@ void MGame::blackRookTest()
     m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(4,4));
     m_position.putPieceAt(new MRook(MRook::WHITE), QPoint(4,7));
     m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(6,4));
+    m_position.putPieceAt(new MKnight(MKnight::BLACK), QPoint(3,2));
+    m_position.putPieceAt(new MKnight(MKnight::WHITE), QPoint(0,1));
 
     updateMaterialInfo();
     Q_EMIT positionChanged(m_position);

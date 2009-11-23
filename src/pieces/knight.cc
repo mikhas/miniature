@@ -24,8 +24,8 @@
 namespace Miniature
 {
 
-MKnight::MKnight(MColour col)
-: MPiece(colour, KNIGHT, width, height),
+MKnight::MKnight(MColour colour, int width, int height)
+: MPiece(colour, KNIGHT, width, height)
 {}
 
 MKnight::~MKnight()
@@ -33,73 +33,72 @@ MKnight::~MKnight()
 
 QList<QPoint> MKnight::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+    QList<QPoint> possibleSquares;
 
-	// north
-	if (point.y() + 2 < yDim)
-	{
-		if (point.x() + 1 < xDim)
-		{
-			possibleSquares.append(new QPoint(point.x() + 1, point.y() + 2));
-		}
+    // north
+    if (point.y() + 2 < yDim)
+    {
+        if (point.x() + 1 < xDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 1, point.y() + 2));
+        }
 
-		if (point.x() - 1 >= 0)
-		{
-			possibleSquares.append(new QPoint(point.x() - 1, point.y() + 2));
-		}
-	}
+        if (point.x() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 1, point.y() + 2));
+        }
+    }
 
-	// east
-	if (point.x() + 2 < xDim)
-	{
-		if (point.y() + 1 < yDim)
-		{
-			possibleSquares.append(new QPoint(point.x() + 2, point.y() + 1));
-		}
+    // east
+    if (point.x() + 2 < xDim)
+    {
+        if (point.y() + 1 < yDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 2, point.y() + 1));
+        }
 
-		if (point.y() - 1 >= 0)
-		{
-			possibleSquares.append(new QPoint(point.x() + 2, point.y() - 1));
-		}
-	}
+        if (point.y() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() + 2, point.y() - 1));
+        }
+    }
 
-	// south
-	if (point.y() - 2 >= 0)
-	{
-		if (point.x() + 1 < xDim)
-		{
-			possibleSquares.append(new QPoint(point.x() + 1, point.y() - 2));
-		}
+    // south
+    if (point.y() - 2 >= 0)
+    {
+        if (point.x() + 1 < xDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 1, point.y() - 2));
+        }
 
-		if (point.x() - 1 >= 0)
-		{
-			possibleSquares.append(new QPoint(point.x() - 1, point.y() - 2));
-		}
-	}
+        if (point.x() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 1, point.y() - 2));
+        }
+    }
 
-	// west
-	if (point.x() - 2 >= 0)
-	{
-		if (point.y() + 1 < yDim)
-		{
-			possibleSquares.append(new QPoint(point.x() - 2, point.y() + 1));
-		}
+    // west
+    if (point.x() - 2 >= 0)
+    {
+        if (point.y() + 1 < yDim)
+        {
+            possibleSquares.append(QPoint(point.x() - 2, point.y() + 1));
+        }
 
-		if (point.y() - 1 >= 0)
-		{
-			possibleSquares.append(new QPoint(point.x() - 2, point.y() - 1));
-		}
-	}
-	
-    	for (QList<QPoint>::iterator iter = possibleSquares.begin();
+        if (point.y() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 2, point.y() - 1));
+        }
+    }
+
+    for (QList<QPoint>::iterator iter = possibleSquares.begin();
          iter != possibleSquares.end();
          ++iter)
-    	{
+        {
             std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
-    	}
+        }
 
-	return possibleSquares;
+    return possibleSquares;
 }
-
 
 }
