@@ -24,6 +24,10 @@
 namespace Miniature
 {
 
+bool MBishop::hasFinishedLoading = false;
+QSvgRenderer MBishop::blackRenderer;
+QSvgRenderer MBishop::whiteRenderer;
+
 MBishop::MBishop(MColour colour, int width, int height)
 : MPiece(colour, BISHOP, width, height)
 {}
@@ -75,6 +79,24 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
     }
 
 	return possibleSquares;
+}
+
+// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
+QGraphicsSvgItem* MBishop::createSvgItem(int pieceSize) const
+{
+    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
+
+    if (!MBishop::hasFinishedLoading)
+    {
+        MBishop::blackRenderer.load(QString(":pieces/black/bishop.svg"));
+        MBishop::whiteRenderer.load(QString(":pieces/white/bishop.svg"));
+        MBishop::hasFinishedLoading = true;
+    }
+
+    applyRenderer(svgItem, (MBishop::BLACK == getColour() ? MBishop::blackRenderer
+                                                        : MBishop::whiteRenderer), pieceSize);
+
+    return svgItem;
 }
 
 }
