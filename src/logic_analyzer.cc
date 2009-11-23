@@ -79,7 +79,7 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
             // apply rook constraint
             list = applyConStraight(pos, list, from);
 	}
-	else if (piece->getType() == MPiece::ROOK)
+	else if (piece->getType() == MPiece::KNIGHT)
 	{
 	    // apply knight constraint
 	    list = applyConKnight(pos, list, from);
@@ -116,10 +116,12 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
 
 	if (!currPiece)
 	{
+            std::cout << "added because empty (" << cell.x() << "," << cell.y() << ")" << std::endl;
             newMoveList.append(cell);
 	}
 	else if (currPiece->getColour() != currColour)
         {
+            std::cout << "added because of different colour (" << cell.x() << "," << cell.y() << ")" << std::endl;
             newMoveList.append(cell);
 	}	
     }
