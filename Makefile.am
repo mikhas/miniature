@@ -17,8 +17,6 @@ src_miniature_SOURCES = \
 			src/board_view.cc \
 			src/board_view.h \
 			src/board_view.moc.cc \
-			src/chess_piece_item.cc \
-			src/chess_piece_item.h \
 			src/game.cc \
 			src/game.h \
 			src/game.moc.cc \
@@ -35,10 +33,6 @@ src_miniature_SOURCES = \
 			src/miniature.moc.cc \
 			src/miniature.ui \
 			src/miniature.ui.h \
-			src/pieces_pool.cc \
-			src/pieces_pool.h \
-			src/pieces_pool_manager.cc \
-			src/pieces_pool_manager.h \
 			src/player_info.h \
 			src/pieces.h \
 			src/pieces/piece.h \
