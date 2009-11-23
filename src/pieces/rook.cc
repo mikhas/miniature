@@ -24,10 +24,15 @@
 namespace Miniature
 {
 
+bool MRook::hasFinishedLoading = false;
+QSvgRenderer MRook::blackRenderer;
+QSvgRenderer MRook::whiteRenderer;
+
 MRook::MRook(MColour colour, int width, int height)
 : MPiece(colour, ROOK, width, height),
   castle(true)
-{}
+{
+}
 
 MRook::~MRook()
 {}
@@ -86,6 +91,26 @@ void MRook::hasMoved()
 bool MRook::canCastle() const
 {
     return castle;
+}
+
+// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
+MGraphicsChessPieceItem* MRook::takeChessPieceItem(int pieceSize) const
+{
+    MGraphicsChessPieceItem *chessPieceItem = new MGraphicsChessPieceItem;
+
+    if (!MRook::hasFinishedLoading)
+    {
+        MRook::blackRenderer.load(QString(":pieces/black/rook.svg"));
+        MRook::whiteRenderer.load(QString(":pieces/white/rook.svg"));
+        MRook::hasFinishedLoading = true;
+    }
+
+    applyRenderer(chessPieceItem,
+                  (MRook::BLACK == getColour() ? MRook::blackRenderer
+                                               : MRook::whiteRenderer),
+                  pieceSize);
+
+    return chessPieceItem;
 }
 
 }

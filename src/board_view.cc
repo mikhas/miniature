@@ -79,8 +79,12 @@ void MBoardView::clear()
         iter != children.end();
         ++iter)
     {
-        Q_CHECK_PTR(*iter); // This might be paranoid ...
-        (*iter)->hide();
+        MGraphicsChessPieceItem* piece = dynamic_cast<MGraphicsChessPieceItem*>(*iter);
+        if(piece)
+        {
+            delete piece;
+            piece = 0;
+        }
     }
 }
 
@@ -97,24 +101,12 @@ void MBoardView::drawPosition(const MPosition &position)
         MPiece* pos_piece = *iter;
         if (pos_piece) // non-empty cell
         {
-            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
-            // TODO: put shared SVG renderer in MPiece and kill the pool manager.
-            MGraphicsChessPieceItem *piece = 0;
-            switch(pos_piece->getType())
-            {
-                case MPiece::ROOK:   piece = m_pieces_pool_manager.take((pos_piece->getColour() ? MPosition::BROOK
-                                                                                                : MPosition::WROOK)); break;
-                case MPiece::KNIGHT: piece = m_pieces_pool_manager.take((pos_piece->getColour() ? MPosition::BKNIGHT
-                                                                                                : MPosition::WKNIGHT)); break;
-                default: break;
-            }
 
-            if (piece)
-            {
-                piece->setPos(cell);
-                piece->show();
-                piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
-            }
+            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
+            MGraphicsChessPieceItem* piece = pos_piece->takeChessPieceItem(m_board_item->getCellSize());
+            piece->setPos(cell);
+            piece->show();
+            piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
         }
     }
 }

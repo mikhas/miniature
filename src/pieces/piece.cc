@@ -87,4 +87,20 @@ MPiece* MPiece::createFromFenPiece(QChar fenPiece, int width, int height)
     return createPiece(NONE, BLACK, width, height);
 }
 
+void MPiece::
+applyRenderer(MGraphicsChessPieceItem *item, QSvgRenderer &renderer, int pieceSize) const
+{
+    Q_CHECK_PTR(item);
+
+    item->setSharedRenderer(&renderer);
+
+    QRectF extent = item->boundingRect();
+    qreal ratio = 1;
+    if (0 < extent.width())
+    {
+        ratio = pieceSize / static_cast<qreal>(extent.width());
+    }
+    item->scale(ratio, ratio);
+}
+
 } // namespace Miniature

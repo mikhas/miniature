@@ -24,6 +24,10 @@
 namespace Miniature
 {
 
+bool MKnight::hasFinishedLoading = false;
+QSvgRenderer MKnight::blackRenderer;
+QSvgRenderer MKnight::whiteRenderer;
+
 MKnight::MKnight(MColour colour, int width, int height)
 : MPiece(colour, KNIGHT, width, height)
 {}
@@ -99,6 +103,26 @@ QList<QPoint> MKnight::getPossibleSquares(QPoint point) const
         }
 
     return possibleSquares;
+}
+
+// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
+MGraphicsChessPieceItem* MKnight::takeChessPieceItem(int pieceSize) const
+{
+    MGraphicsChessPieceItem* chessPieceItem = new MGraphicsChessPieceItem;
+
+    if (!MKnight::hasFinishedLoading)
+    {
+        MKnight::blackRenderer.load(QString(":pieces/black/knight.svg"));
+        MKnight::whiteRenderer.load(QString(":pieces/white/knight.svg"));
+        MKnight::hasFinishedLoading = true;
+    }
+
+    applyRenderer(chessPieceItem,
+                  (MKnight::BLACK == getColour() ? MKnight::blackRenderer
+                                                 : MKnight::whiteRenderer),
+                  pieceSize);
+
+    return chessPieceItem;
 }
 
 }

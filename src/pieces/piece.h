@@ -21,6 +21,8 @@
 #ifndef PIECE_H__
 #define PIECE_H__
 
+#include <src/chess_piece_item.h>
+
 #include <QList>
 #include <QPoint>
 #include <QChar>
@@ -32,7 +34,6 @@ namespace Miniature
 class MPiece
 {
 public:
-
     enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
     enum MColour {BLACK, WHITE};
 
@@ -48,8 +49,11 @@ public:
 
     // Potentially deprecated!
     static MPiece* createFromFenPiece(QChar fenPiece, int width = 8, int height = 8);
+    virtual MGraphicsChessPieceItem* takeChessPieceItem(int pieceSize = 60) const = 0;
 
 protected:
+    void applyRenderer(MGraphicsChessPieceItem *item, QSvgRenderer &renderer, int pieceSize) const;
+
     MColour colour;
     MType type;
     int xDim;

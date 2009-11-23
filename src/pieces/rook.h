@@ -25,6 +25,7 @@
 
 #include <QList>
 #include <QPoint>
+#include <QSvgRenderer>
 
 namespace Miniature
 {
@@ -41,8 +42,19 @@ public:
     void hasMoved();
     bool canCastle() const;
 
+    virtual MGraphicsChessPieceItem* takeChessPieceItem(int pieceSize = 60) const;
+
 private:
     bool castle;
+
+    /* We have two renderers as class variables because we did not go the full
+     * distance regarding the inheritance tree of our chess pieces: one piece class
+     * is used for both colours. Also, we have to delay loading of SVGs from
+     * the resource file until Qt has finished initializing it.
+     */
+    static bool hasFinishedLoading;
+    static QSvgRenderer blackRenderer;
+    static QSvgRenderer whiteRenderer;
 };
 
 }
