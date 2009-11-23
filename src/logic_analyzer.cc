@@ -92,10 +92,10 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
 
 QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    int xMax = from.x();
-    int xMin = from.x();
-    int yMax = from.y();
-    int yMin = from.y();
+    int xMax = 7;
+    int xMin = 0;
+    int yMax = 7;
+    int yMin = 0;
 
     MPiece *piece = pos.pieceAt(from);
     Q_CHECK_PTR(piece);
@@ -121,13 +121,13 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
             {
                 if (currPiece->getColour() == currColour)
                 {
-                    if (cell.x() > from.x()) {xMax = max(xMax, cell.x() - 1);}
-                    else {xMin = min(xMin, cell.x() + 1);}
+                    if (cell.x() > from.x()) {xMax = min(xMax, cell.x() - 1);}
+                    else {xMin = max(xMin, cell.x() + 1);}
                 }
                 else
                 {
-                    if (cell.x() > from.x()) {xMax = max(xMax, cell.x());}
-                    else {xMin = min(xMin, cell.x());}
+                    if (cell.x() > from.x()) {xMax = min(xMax, cell.x());}
+                    else {xMin = max(xMin, cell.x());}
                 }
             }
         }
@@ -142,18 +142,21 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
             {
                 if (currPiece->getColour() == currColour)
                 {
-                    if (cell.y() > from.y()) {yMax = max(yMax, cell.y() - 1);}
-                    else {yMin = min(yMin, cell.y() + 1);}
+                    if (cell.y() > from.y()) {yMax = min(yMax, cell.y() - 1);}
+                    else {yMin = max(yMin, cell.y() + 1);}
                 }
                 else
                 {
-                    if (cell.y() > from.y()) {yMax = max(yMax, cell.y());}
-                    else {yMin = min(yMin, cell.y());}
+                    if (cell.y() > from.y()) {yMax = min(yMax, cell.y());}
+                    else {yMin = max(yMin, cell.y());}
                 }
             }
         }
     }
 
+    std::cout << "xMax: " << xMax << ", xMin " << xMin << std::endl;
+    std::cout << "yMax: " << yMax << ", yMin " << yMin << std::endl;
+    
     for(QList<QPoint>::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
