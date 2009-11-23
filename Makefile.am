@@ -47,10 +47,10 @@ src_miniature_SOURCES = \
 			src/pieces/rook.cc \
  			src/pieces/knight.h \
  			src/pieces/knight.cc \
- #			src/pieces/bishop.h \
- #			src/pieces/bishop.cc \
- #			src/pieces/queen.h \
- #			src/pieces/queen.cc \
+ 			src/pieces/bishop.h \
+ 			src/pieces/bishop.cc \
+ 			src/pieces/queen.h \
+ 			src/pieces/queen.cc \
  #			src/pieces/king.h \
  #			src/pieces/king.cc \
  #			src/pieces/pawn.h \

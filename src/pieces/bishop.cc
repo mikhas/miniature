@@ -19,16 +19,13 @@
  */
 
 #include "bishop.h"
+#include <iostream>
 
 namespace Miniature
 {
 
-MBishop::MBishop(MColour col)
-: colour(col), type(BISHOP), xDim(8), yDim(8)
-{}
-
-MBishop::MBishop(MColour col, int boardWidth, int boardLength)
-: colour(col), type(BISHOP), xDim(boardWidth), yDim(boardLength)
+MBishop::MBishop(MColour colour, int width, int height)
+: MPiece(colour, BISHOP, width, height)
 {}
 
 MBishop::~MBishop()
@@ -36,13 +33,13 @@ MBishop::~MBishop()
 
 QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+	QList<QPoint> possibleSquares;
 
 	// north-east
 	int i = 1;
 	while ((point.x() + i < xDim) && (point.y() + i < yDim))
 	{
-		possibleSquares.append(new QPoint(point.x() + i, point.y() + i));
+		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
 		++i;
 	}
 
@@ -50,7 +47,7 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() + i < xDim) && (point.y() - i >= 0))
 	{
-		possibleSquares.append(new QPoint(point.x() + i, point.y() - i));
+		possibleSquares.append(QPoint(point.x() + i, point.y() - i));
 		++i;
 	}
 
@@ -58,7 +55,7 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() - i >= 0) && (point.y() - i >= 0))
 	{
-		possibleSquares.append(new QPoint(point.x() - i, point.y() - i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
 		++i;
 	}
 
@@ -66,9 +63,16 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() - i >= 0) && (point.y() + i < yDim))
 	{
-		possibleSquares.append(new QPoint(point.x() - i, point.y() + i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
 		++i;
 	}
+
+    for (QList<QPoint>::iterator iter = possibleSquares.begin();
+         iter != possibleSquares.end();
+         ++iter)
+    {
+        std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
+    }
 
 	return possibleSquares;
 }

@@ -19,16 +19,13 @@
  */
 
 #include "queen.h"
+#include <iostream>
 
 namespace Miniature
 {
 
-MQueen::MQueen(MColour col)
-: colour(col), type(QUEEN), xDim(8), yDim(8)
-{}
-
-MQueen::MQueen(MColour col, int boardWidth, int boardLength)
-: colour(col), type(QUEEN), xDim(boardWidth), yDim(boardLength)
+MQueen::MQueen(MColour colour, int width, int height)
+: MPiece(colour, QUEEN, width, height)
 {}
 
 MQueen::~MQueen()
@@ -36,13 +33,13 @@ MQueen::~MQueen()
 
 QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+	QList<QPoint> possibleSquares;
 
 	// north
 	int i = 1;
 	while (point.y() + i < yDim)
 	{
-		possibleSquares.append(new QPoint(point.x(), point.y() + i));
+		possibleSquares.append(QPoint(point.x(), point.y() + i));
 		++i;
 	}
 
@@ -50,7 +47,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() + i < xDim) && (point.y() + i < yDim))
 	{
-		possibleSquares.append(new QPoint(point.x() + i, point.y() + i));
+		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
 		++i;
 	}
 
@@ -58,7 +55,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while (point.x() + i < xDim)
 	{
-		possibleSquares.append(new QPoint(point.x() + 1, point.y()));
+		possibleSquares.append(QPoint(point.x() + i, point.y()));
 		++i;
 	}
 
@@ -66,7 +63,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() + i < xDim) && (point.y() - i >= 0))
 	{
-		possibleSquares.append(new QPoint(point.x() + i, point.y() - i));
+		possibleSquares.append(QPoint(point.x() + i, point.y() - i));
 		++i;
 	}
 
@@ -74,7 +71,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while (point.y() - i >= 0)
 	{
-		possibleSquares.append(new QPoint(point.x(), point.y() - i));
+		possibleSquares.append(QPoint(point.x(), point.y() - i));
 		++i;
 	}
 
@@ -82,7 +79,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() - i >= 0) && (point.y() - i >= 0))
 	{
-		possibleSquares.append(new QPoint(point.x() - i, point.y() - i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
 		++i;
 	}
 
@@ -90,7 +87,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while (point.x() - i >= 0)
 	{
-		possibleSquares.append(new QPoint(point.x() - 1, point.y()));
+		possibleSquares.append(QPoint(point.x() - i, point.y()));
 		++i;
 	}
 
@@ -98,9 +95,16 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 	i = 1;
 	while ((point.x() - i >= 0) && (point.y() + i < yDim))
 	{
-		possibleSquares.append(new QPoint(point.x() - i, point.y() + i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
 		++i;
 	}
+
+    for (QList<QPoint>::iterator iter = possibleSquares.begin();
+         iter != possibleSquares.end();
+         ++iter)
+    {
+        std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
+    }
 
 	return possibleSquares;
 }

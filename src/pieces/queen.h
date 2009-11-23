@@ -26,12 +26,14 @@
 namespace Miniature
 {
 
-class MQueen: public MPiece
+class MQueen
+: public MPiece
 {
 public:
-	MQueen(MColour);
-	MQueen(MColour, int, int);
+	MQueen(MColour colour, int width = 8, int height = 8);
 	~MQueen();
+
+	virtual QList<QPoint> getPossibleSquares(QPoint) const;
 };
 
 }

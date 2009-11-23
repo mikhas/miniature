@@ -26,11 +26,14 @@
 namespace Miniature
 {
 
-class MBishop: public MPiece
+class MBishop
+: public MPiece
 {
 public:
-	MBishop(MColour, int, int);
+	MBishop(MColour colour, int width = 8, int height = 8);
 	~MBishop();
+
+	virtual QList<QPoint> getPossibleSquares(QPoint) const;
 };
 
 }
