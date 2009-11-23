@@ -102,6 +102,8 @@ void MGame::prevMove()
 void MGame::blackRookTest()
 {
     m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(4,4));
+    m_position.putPieceAt(new MRook(MRook::WHITE), QPoint(4,7));
+    m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(6,4));
 
     updateMaterialInfo();
     Q_EMIT positionChanged(m_position);

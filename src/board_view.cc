@@ -98,7 +98,14 @@ void MBoardView::drawPosition(const MPosition &position)
         {
             QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
             // TODO: put shared SVG renderer in MPiece and kill the pool manager.
-            MGraphicsChessPieceItem *piece = m_pieces_pool_manager.take(MPosition::BROOK);
+            MGraphicsChessPieceItem *piece = 0;
+            switch((*iter)->getColour())
+            {
+                case MPiece::BLACK: piece = m_pieces_pool_manager.take(MPosition::BROOK); break;
+                case MPiece::WHITE: piece = m_pieces_pool_manager.take(MPosition::WROOK); break;
+                default: break;
+            }
+
             if (piece)
             {
                 piece->setPos(cell);
