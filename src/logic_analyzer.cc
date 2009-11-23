@@ -74,8 +74,16 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         // DEBUG
         std::cout << "found valid piece ... " << std::endl;
         QList<QPoint> list = piece->getPossibleSquares(from);
-        // apply rook constraint
-        list = applyConStraight(pos, list, from);
+	if(piece->getType() == MPiece::ROOK)
+	{
+            // apply rook constraint
+            list = applyConStraight(pos, list, from);
+	}
+	else if (piece->getType() == MPiece::ROOK)
+	{
+	    // apply knight constraint
+	    list = applyConKnight(pos, list, from);
+	}
 
         // DEBUG
         for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
@@ -90,6 +98,36 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
     return false;
 }
 
+
+QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+    MPiece *piece = pos.pieceAt(from);
+    Q_CHECK_PTR(piece);
+
+    QList<QPoint> newMoveList;
+    MPiece::MColour currColour = piece->getColour();
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
+
+	if (!currPiece)
+	{
+            newMoveList.append(cell);
+	}
+	else if (currPiece->getColour() != currColour)
+        {
+            newMoveList.append(cell);
+	}	
+    }
+
+    return newMoveList;    
+}	
+
+	
 QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
     int xMax = 7;
