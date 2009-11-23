@@ -26,6 +26,7 @@
 #include <QList>
 
 #include <iostream>
+#include <QTime>
 
 using namespace Miniature;
 
@@ -114,12 +115,13 @@ void MGame::blackRookTest()
 
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 {
-    // DEBUG
-    std::cout << "piece move from (" << from.x() << ", " << from.y() << ") to (" << to.x() << ", " << to.y() << ") requested!" << std::endl;
+    static QTime profiling;
+    qDebug("MGame::onPieceMoveRequested - time elapsed between move requests: %d", profiling.elapsed());
+    profiling.restart();
+
     if(m_logic_analyzer.verifyMove(m_position, from, to))
     {
         // DEBUG
-        std::cout << "move verified!" << std::endl;
         m_position.movePiece(from, to);
         Q_EMIT pieceMoved(from, to);
         Q_EMIT positionChanged(m_position);
@@ -128,6 +130,8 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     {
         Q_EMIT invalidMove(from, to);
     }
+
+    qDebug("MGame::onPieceMoveRequested - move request handling took: %d", profiling.restart());
 }
 
 int MGame::computeWhiteMaterial() const
