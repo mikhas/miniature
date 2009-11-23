@@ -19,16 +19,13 @@
  */
 
 #include "knight.h"
+#include <iostream>
 
 namespace Miniature
 {
 
 MKnight::MKnight(MColour col)
-: colour(col), type(KNIGHT), xDim(8), yDim(8)
-{}
-
-MKnight::MKnight(MColour col, int boardWidth, int boardLength)
-: colour(col), type(KNIGHT), xDim(boardWidth), yDim(boardLength)
+: MPiece(colour, KNIGHT, width, height),
 {}
 
 MKnight::~MKnight()
@@ -93,6 +90,13 @@ QList<QPoint> MKnight::getPossibleSquares(QPoint point) const
 			possibleSquares.append(new QPoint(point.x() - 2, point.y() - 1));
 		}
 	}
+	
+    	for (QList<QPoint>::iterator iter = possibleSquares.begin();
+         iter != possibleSquares.end();
+         ++iter)
+    	{
+            std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
+    	}
 
 	return possibleSquares;
 }

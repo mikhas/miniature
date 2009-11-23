@@ -23,14 +23,19 @@
 
 #include "piece.h"
 
+#include <QList>
+#include <QPoint>
+
 namespace Miniature
 {
 
 class MKnight: public MPiece
 {
 public:
-	MKnight(MColour, int, int);
-	~MKnight();
+    MKnight(MColour colour, int width=8, int length=8);
+    ~MKnight();
+
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
 };
 
 }
