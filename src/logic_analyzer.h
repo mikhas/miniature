@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -49,10 +50,7 @@ Q_SIGNALS:
 private:
     MConstraintList m_constraints;
 
-    QList<QPoint> applyConStraight(const MPosition &pos, QList<QPoint> moveList, QPoint from) const;
-    int max(int, int) const;
-    int min(int, int) const;
-
+    QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
 };
 
 }

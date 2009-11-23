@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -26,8 +27,24 @@
 
 #include <iostream>
 
+namespace
+{
+
+int max (int a, int b)
+{
+    return (b < a) ? a : b;
+}
+
+int min (int a, int b)
+{
+    return (a < b) ? a : b;
+}
+
+} // namespace
+
 namespace Miniature
 {
+
 
 MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints, QObject *parent)
 : QObject(parent),
@@ -59,105 +76,115 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         QList<QPoint> list = piece->getPossibleSquares(from);
         // apply rook constraint
         list = applyConStraight(pos, list, from);
+
+        // DEBUG
+        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        {
+            std::cout << "(" << (*iter).x() << ", " << (*iter).y() << ") ";
+        }
+        std::cout << std::endl;
+
         return (list.contains(to));
     }
 
     return false;
 }
 
-QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, QList<QPoint> moveList, QPoint from) const
+QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
+    int xMax = from.x();
+    int xMin = from.x();
+    int yMax = from.y();
+    int yMin = from.y();
 
-	int xMax = from.x();
-	int xMin = from.x();
-	int yMax = from.y();
-	int yMin = from.y();
-	QList<QPoint> newMoveList = new QList<QPoint>;
-	MColour currColour = pos[MPosition::indexFromPoint(from)]->getColour();
+    MPiece *piece = pos.pieceAt(from);
+    Q_CHECK_PTR(piece);
 
-	for (QList<QPoint>::const_iterator i = moveList.begin(); i != moveList.end(); ++i)
-	{
-		MPiece currPiece = pos[MPosition::indexFromPoint(i)];
+    QList<QPoint> newMoveList;
+    MPiece::MColour currColour = piece->getColour();
 
-		// vertical
-		if (i.y() == from.y())
-		{
-			if (!currPiece)
-			{
-				continue;
-			}
-			else
-			{
-				if (currPiece.getColour() == currColour)
-				{
-					if (i.x() > from.x()) {xMax = max(xMax, i.x() - 1);}
-					else {xMin = min(xMin, i.x() + 1);}
-				}
-				else
-				{
-					if (i.x() > from.x()) {xMax = max(xMax, i.x());}
-					else {xMin = min(xMin, i.x());}
-				}
-			}
-		}
-		// horizontal
-		else if (i.x() == from.x())
-		{
-			if (!currPiece)
-			{
-				continue;
-			}
-			else
-			{
-				if (currPiece.getColour() == currColour)
-				{
-					if (i.y() > from.y()) {yMax = max(yMax, i.y() - 1);}
-					else {yMin = min(yMin, i.y() + 1);}
-				}
-				else
-				{
-					if (i.y() > from.y()) {yMax = max(yMax, i.y());}
-					else {yMin = min(yMin, i.y());}
-				}
-			}
-		}
-	}
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
 
-	for (QList<QPoint>::const_iterator i = moveList.begin(); i != moveList.end(); ++i)
-	{
-		// vertical
-		if (i.y() == from.y())
-		{
-			if (i.x() <= xMax && i.x() >= xMin)
-			{
-				newMoveList.append(i);
-			}
-		}
-		// horizontal
-		else if (i.x() == from.x())
-		{
-			if (i.y() <= yMax && i.y() >= yMin)
-			{
-				newMoveList.append(i);
-			}
-		}
-		else
-		{
-			newMoveList.append(i);
-		}
-	}
+        // vertical
+        if (cell.y() == from.y())
+        {
+            if (!currPiece) // cell empty
+            {
+                continue;
+            }
+            else
+            {
+                if (currPiece->getColour() == currColour)
+                {
+                    if (cell.x() > from.x()) {xMax = max(xMax, cell.x() - 1);}
+                    else {xMin = min(xMin, cell.x() + 1);}
+                }
+                else
+                {
+                    if (cell.x() > from.x()) {xMax = max(xMax, cell.x());}
+                    else {xMin = min(xMin, cell.x());}
+                }
+            }
+        }
+        // horizontal
+        else if (cell.x() == from.x())
+        {
+            if (!currPiece)
+            {
+                continue;
+            }
+            else
+            {
+                if (currPiece->getColour() == currColour)
+                {
+                    if (cell.y() > from.y()) {yMax = max(yMax, cell.y() - 1);}
+                    else {yMin = min(yMin, cell.y() + 1);}
+                }
+                else
+                {
+                    if (cell.y() > from.y()) {yMax = max(yMax, cell.y());}
+                    else {yMin = min(yMin, cell.y());}
+                }
+            }
+        }
+    }
 
-	return newMoveList;
-}
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
 
-int max (int a, int b) const
-{
-	return (b < a) ? a : b;
-}
+        // vertical
+        if (cell.y() == from.y())
+        {
+            if (cell.x() <= xMax && cell.x() >= xMin)
+            {
+                std::cout << "A) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
+                newMoveList.append(cell);
+            }
+        }
+        // horizontal
+        else if (cell.x() == from.x())
+        {
+            if (cell.y() <= yMax && cell.y() >= yMin)
+            {
+                std::cout << "B) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
+                newMoveList.append(cell);
+            }
+        }
+        else
+        {
+            newMoveList.append(cell);
+        }
+    }
 
-int min (int a, int b) const
-{
-	return (a < b) ? a : b;
+    return newMoveList;
 }
 
 }
