@@ -106,23 +106,22 @@ QList<QPoint> MKnight::getPossibleSquares(QPoint point) const
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-MGraphicsChessPieceItem* MKnight::takeChessPieceItem(int pieceSize) const
+QGraphicsSvgItem* MKnight::createSvgItem(int pieceSize) const
 {
-    MGraphicsChessPieceItem* chessPieceItem = new MGraphicsChessPieceItem;
+    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
 
     if (!MKnight::hasFinishedLoading)
     {
         MKnight::blackRenderer.load(QString(":pieces/black/knight.svg"));
         MKnight::whiteRenderer.load(QString(":pieces/white/knight.svg"));
         MKnight::hasFinishedLoading = true;
+
     }
 
-    applyRenderer(chessPieceItem,
-                  (MKnight::BLACK == getColour() ? MKnight::blackRenderer
-                                                 : MKnight::whiteRenderer),
-                  pieceSize);
+    applyRenderer(svgItem, (MKnight::BLACK == getColour() ? MKnight::blackRenderer
+                                                          : MKnight::whiteRenderer), pieceSize);
 
-    return chessPieceItem;
+    return svgItem;
 }
 
 }

@@ -19,7 +19,6 @@
  */
 
 #include "board_view.h"
-#include "pieces_pool_manager.h"
 
 #include <QPixmap>
 #include <QUrl>
@@ -64,35 +63,11 @@ void MBoardView::setBoardBackground()
     scene()->addItem(m_board_item);
 }
 
-void MBoardView::clear()
-{
-    /* Releasing the resources from the pieces pool, so that we can start to
-     * consume them again.
-     */
-    m_pieces_pool_manager.releaseAll();
-
-    /* We clear the board by simply hiding all pieces. We don't know whether we
-     * get the same pieces back from the pool manager, so having a hide/show
-     * transaction is a safe route. */
-    QList<QGraphicsItem*> children = m_board_item->childItems();
-    for(QList<QGraphicsItem*>::iterator iter = children.begin();
-        iter != children.end();
-        ++iter)
-    {
-        MGraphicsChessPieceItem* piece = dynamic_cast<MGraphicsChessPieceItem*>(*iter);
-        if(piece)
-        {
-            delete piece;
-            piece = 0;
-        }
-    }
-}
-
 void MBoardView::drawPosition(const MPosition &position)
 {
     Q_CHECK_PTR(m_board_item);
 
-    clear();
+    m_board_item->removePieces();
 
     for(MPosition::MPieces::const_iterator iter = position.begin();
         iter != position.end();
@@ -103,10 +78,10 @@ void MBoardView::drawPosition(const MPosition &position)
         {
 
             QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
-            MGraphicsChessPieceItem* piece = pos_piece->takeChessPieceItem(m_board_item->getCellSize());
+            QGraphicsSvgItem* piece = pos_piece->createSvgItem(m_board_item->getCellSize());
+            m_board_item->addPiece(piece);
             piece->setPos(cell);
             piece->show();
-            piece->setParentItem(m_board_item); // hm, only important when we first use a piece ...
         }
     }
 }

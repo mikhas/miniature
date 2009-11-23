@@ -22,7 +22,6 @@
 #define BOARD_VIEW_H__
 
 #include "position.h"
-#include "pieces_pool_manager.h"
 #include "graphics_board_item.h"
 
 #include <QString>
@@ -48,9 +47,6 @@ public:
 
     virtual void setScene(QGraphicsScene* scene);
 
-    /* Removes (= deletes) all pieces from the board. */
-    void clear();
-
 public Q_SLOTS:
     /* Draws a chess position on this board, by extracting the FEN [1]
      * representation from the given MPosition.
@@ -68,9 +64,6 @@ private:
 
     /* Store a reference to the board item in the scene graph. */
     MGraphicsBoardItem* m_board_item;
-
-    /* The pool manager is responsible for handing out the SVG items of our pieces. */
-    MPiecesPoolManager m_pieces_pool_manager;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);

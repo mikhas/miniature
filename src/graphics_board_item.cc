@@ -184,3 +184,20 @@ void MGraphicsBoardItem::loadFromUri(QUrl uri)
 {
     frame()->load(uri);
 }
+
+void MGraphicsBoardItem::addPiece(QGraphicsSvgItem *piece)
+{
+    m_pieces.append(piece);
+    piece->setParentItem(this);
+}
+
+void MGraphicsBoardItem::removePieces()
+{
+    for(MPiecesList::iterator iter = m_pieces.begin();
+        iter != m_pieces.end();
+        ++iter)
+    {
+        delete *iter;
+        *iter = 0;
+    }
+}

@@ -94,9 +94,9 @@ bool MRook::canCastle() const
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-MGraphicsChessPieceItem* MRook::takeChessPieceItem(int pieceSize) const
+QGraphicsSvgItem* MRook::createSvgItem(int pieceSize) const
 {
-    MGraphicsChessPieceItem *chessPieceItem = new MGraphicsChessPieceItem;
+    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
 
     if (!MRook::hasFinishedLoading)
     {
@@ -105,12 +105,10 @@ MGraphicsChessPieceItem* MRook::takeChessPieceItem(int pieceSize) const
         MRook::hasFinishedLoading = true;
     }
 
-    applyRenderer(chessPieceItem,
-                  (MRook::BLACK == getColour() ? MRook::blackRenderer
-                                               : MRook::whiteRenderer),
-                  pieceSize);
+    applyRenderer(svgItem, (MRook::BLACK == getColour() ? MRook::blackRenderer
+                                                        : MRook::whiteRenderer), pieceSize);
 
-    return chessPieceItem;
+    return svgItem;
 }
 
 }

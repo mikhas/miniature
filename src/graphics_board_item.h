@@ -23,12 +23,14 @@
 #define GRAPHICS_BOARD_ITEM_H__
 
 #include <QGraphicsItem>
+#include <QGraphicsSvgItem>
 #include <QGraphicsRectItem>
 #include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
 #include <QWebPage>
 #include <QWebFrame>
 #include <QUrl>
+#include <QVector>
 
 namespace Miniature
 {
@@ -57,6 +59,9 @@ public:
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
+    void addPiece(QGraphicsSvgItem *piece);
+    void removePieces();
+
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
     void loadFinished(bool ok);
@@ -76,12 +81,18 @@ private:
     int m_frame_outline;
     QTimeLine *m_time_line;
 
+    // We need a safe way to remember the pieces on the board, so that we can
+    // clear the board correctly.
+    typedef QVector<QGraphicsSvgItem*> MPiecesList;
+    MPiecesList m_pieces;
+
 private Q_SLOTS:
     /* Reduces opacity of the selection frame. */
     void fadeOutFrame(int step);
 
     /* Resizes viewport of the internal QWebPage, after loading the SVG board has finished. */
     void onPageLoaded(bool ok);
+
 };
 
 };

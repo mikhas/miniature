@@ -38,7 +38,7 @@ public:
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const;
 
-    MGraphicsChessPieceItem* takeChessPieceItem(int pieceSize = 60) const;
+    QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
 
 private:
     /* We have two renderers as class variables because we did not go the full

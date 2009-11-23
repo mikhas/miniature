@@ -88,7 +88,7 @@ MPiece* MPiece::createFromFenPiece(QChar fenPiece, int width, int height)
 }
 
 void MPiece::
-applyRenderer(MGraphicsChessPieceItem *item, QSvgRenderer &renderer, int pieceSize) const
+applyRenderer(QGraphicsSvgItem *item, QSvgRenderer &renderer, int pieceSize) const
 {
     Q_CHECK_PTR(item);
 

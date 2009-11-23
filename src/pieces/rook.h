@@ -42,7 +42,7 @@ public:
     void hasMoved();
     bool canCastle() const;
 
-    virtual MGraphicsChessPieceItem* takeChessPieceItem(int pieceSize = 60) const;
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
 
 private:
     bool castle;
