@@ -41,33 +41,33 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 
 	// north-east
 	int i = 1;
-	while ((point.x() + i < xDim) && (point.y() + i < yDim))
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
-		++i;
-	}
-
-	// south-east
-	i = 1;
 	while ((point.x() + i < xDim) && (point.y() - i >= 0))
 	{
 		possibleSquares.append(QPoint(point.x() + i, point.y() - i));
 		++i;
 	}
 
+	// south-east
+	i = 1;
+	while ((point.x() + i < xDim) && (point.y() + i < yDim))
+	{
+		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
+		++i;
+	}
+
 	// south-west
 	i = 1;
-	while ((point.x() - i >= 0) && (point.y() - i >= 0))
+	while ((point.x() - i >= 0) && (point.y() + i < yDim))
 	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
 		++i;
 	}
 
 	// north-west
 	i = 1;
-	while ((point.x() - i >= 0) && (point.y() + i < yDim))
+	while ((point.x() - i >= 0) && (point.y() - i >= 0))
 	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
+		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
 		++i;
 	}
 

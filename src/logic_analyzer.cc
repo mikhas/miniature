@@ -26,6 +26,7 @@
 #include <QPoint>
 
 #include <iostream>
+#include <cstdlib>
 
 namespace
 {
@@ -76,13 +77,24 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         QList<QPoint> list = piece->getPossibleSquares(from);
 	if(piece->getType() == MPiece::ROOK)
 	{
-            // apply rook constraint
-            list = applyConStraight(pos, list, from);
+		// apply rook constraint
+        list = applyConStraight(pos, list, from);
 	}
 	else if (piece->getType() == MPiece::KNIGHT)
 	{
 	    // apply knight constraint
 	    list = applyConKnight(pos, list, from);
+	}
+	else if (piece->getType() == MPiece::BISHOP)
+	{
+	    // apply bishop constraint
+	    list = applyConDiagonal(pos, list, from);
+	}
+	else if (piece->getType() == MPiece::QUEEN)
+	{
+	    // apply queen constraints
+		list = applyConStraight(pos, list, from);
+	    list = applyConDiagonal(pos, list, from);
 	}
 
         // DEBUG
@@ -114,16 +126,14 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
         QPoint cell = *iter;
         MPiece* currPiece = pos.pieceAt(cell);
 
-	if (!currPiece)
-	{
-            std::cout << "added because empty (" << cell.x() << "," << cell.y() << ")" << std::endl;
-            newMoveList.append(cell);
-	}
-	else if (currPiece->getColour() != currColour)
+        if (!currPiece)
         {
-            std::cout << "added because of different colour (" << cell.x() << "," << cell.y() << ")" << std::endl;
             newMoveList.append(cell);
-	}	
+        }
+        else if (currPiece->getColour() != currColour)
+        {
+            newMoveList.append(cell);
+        }
     }
 
     return newMoveList;    
@@ -193,9 +203,6 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
             }
         }
     }
-
-    std::cout << "xMax: " << xMax << ", xMin " << xMin << std::endl;
-    std::cout << "yMax: " << yMax << ", yMin " << yMin << std::endl;
     
     for(QList<QPoint>::const_iterator iter = moveList.begin();
         iter != moveList.end();
@@ -225,6 +232,117 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         {
             newMoveList.append(cell);
         }
+    }
+
+    return newMoveList;
+}
+
+QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+	/* moveList is supposed to contain only legal moves on an empty board and is supposed to be sorted. Sort order
+	 * should be:
+	 * 1) North-east -> south-east -> south-west -> north-west
+	 * 2) Squares closer to the origin square first
+	 */
+
+	bool neObstacle = false;
+	bool seObstacle = false;
+	bool swObstacle = false;
+	bool nwObstacle = false;
+
+	MPiece *piece = pos.pieceAt(from);
+	Q_CHECK_PTR(piece);
+
+	QList<QPoint> newMoveList;
+	MPiece::MColour currColour = piece->getColour();
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
+
+        // north-east
+		if ((from.x() < cell.x()) && (from.y() > cell.y()))
+		{
+			if (neObstacle)
+			{
+				continue;
+			}
+
+            if (!currPiece)
+            {
+            	newMoveList.append(cell);
+            	continue;
+            }
+
+            neObstacle = true;
+            if (currColour != currPiece->getColour())
+            {
+            	newMoveList.append(cell);
+            }
+		}
+        // south-east
+		else if ((from.x() < cell.x()) && (from.y() < cell.y()))
+		{
+			if (seObstacle)
+			{
+				continue;
+			}
+
+            if (!currPiece)
+            {
+            	newMoveList.append(cell);
+            	continue;
+            }
+
+            seObstacle = true;
+            if (currColour != currPiece->getColour())
+            {
+            	newMoveList.append(cell);
+            }
+		}
+        // south-west
+		else if ((from.x() > cell.x()) && (from.y() < cell.y()))
+		{
+			if (swObstacle)
+			{
+				continue;
+			}
+
+            if (!currPiece)
+            {
+            	newMoveList.append(cell);
+            	continue;
+            }
+
+            swObstacle = true;
+            if (currColour != currPiece->getColour())
+            {
+            	newMoveList.append(cell);
+            }
+		}
+        // north-west
+		else if ((from.x() > cell.x()) && (from.y() > cell.y()))
+		{
+			if (nwObstacle)
+			{
+				continue;
+			}
+
+            if (!currPiece)
+            {
+            	newMoveList.append(cell);
+            	continue;
+            }
+
+            nwObstacle = true;
+            if (currColour != currPiece->getColour())
+            {
+            	newMoveList.append(cell);
+            }
+		}
     }
 
     return newMoveList;
