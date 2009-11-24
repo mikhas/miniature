@@ -21,7 +21,6 @@
 
 #include "graphics_board_item.h"
 
-#include <QPainter>
 #include <QGraphicsScene>
 #include <QTime>
 
@@ -29,26 +28,15 @@
 
 using namespace Miniature;
 
-MGraphicsBoardItem::MGraphicsBoardItem(QGraphicsItem *parent)
+MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsItem *parent)
 : QGraphicsObject(parent),
+  m_board_size(board_size),
   m_selection_duration(2000),
   m_frame(0),
   m_frame_outline(4),
   m_time_line(0)
 {
     setupFrameAndTimeLine();
-
-    //TODO: move to a setup method
-    /* Set up the internal QWebFrame to notify us when it finished loading the
-     * SVG board.
-     */
-    connect(&m_page, SIGNAL(loadFinished(bool)),
-            this, SLOT(onPageLoaded(bool)));
-
-    QPalette palette = m_page.palette();
-    palette.setColor(QPalette::Base, Qt::transparent);
-    m_page.setPalette(palette);
-
     setFiltersChildEvents(true);
 }
 
@@ -165,31 +153,7 @@ void MGraphicsBoardItem::resetFrame()
 
 QRectF MGraphicsBoardItem::boundingRect() const
 {
-    QSize size = m_page.viewportSize();
-    return QRectF(0, 0, size.width(), size.height());
-}
-
-void MGraphicsBoardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
-{
-    // The actual hack: share the QWebFrame painter with the graphics scene item.
-    painter->setBackground(Qt::blue);
-    frame()->render(painter);
-}
-
-void MGraphicsBoardItem::onPageLoaded(bool ok)
-{
-    if (ok)
-    {
-        m_page.setViewportSize(frame()->contentsSize());
-        update();
-    }
-
-    Q_EMIT loadFinished(ok);
-}
-
-void MGraphicsBoardItem::loadFromUri(QUrl uri)
-{
-    frame()->load(uri);
+    return QRectF(0, 0, m_board_size, m_board_size);
 }
 
 void MGraphicsBoardItem::addPiece(QGraphicsSvgItem *piece)

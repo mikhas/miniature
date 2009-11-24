@@ -27,10 +27,9 @@
 #include <QGraphicsRectItem>
 #include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
-#include <QWebPage>
-#include <QWebFrame>
 #include <QUrl>
 #include <QVector>
+#include <QPainter>
 
 #include <QTime>
 
@@ -39,9 +38,8 @@ namespace Miniature
 
 /* This class represents the board. It's our primary item in the scene graph,
  * as it not only renders the board but also controls the mouse event handling
- * (= fingertouch handling on Maemo) for all pieces.  Due to the poor rendering
- * qualities of QtSvg we went for a QtWebkit hack, that is, we use a QWebFrame
- * to display the SVG board.
+ * (= fingertouch handling on Maemo) for all pieces. 
+ * We use the QGraphicsObject so that we can use signals and slots.
  */
 class MGraphicsBoardItem
 : public QGraphicsObject
@@ -49,24 +47,21 @@ class MGraphicsBoardItem
     Q_OBJECT
 
 public:
-    MGraphicsBoardItem(QGraphicsItem *parent = 0);
-    MGraphicsBoardItem(const QString &fileName, QGraphicsItem *parent = 0);
+    MGraphicsBoardItem(int board_size = 480, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
 
     // TODO: rename to cellSize(), more qt-ish
     int getCellSize() const;
-    QWebFrame* frame() const { return m_page.mainFrame(); }
 
-    void loadFromUri(QUrl uri);
+    // This object doesnt paint anything itself
+    void virtual paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget *) {}
     virtual QRectF boundingRect() const;
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
 
     void addPiece(QGraphicsSvgItem *piece);
     void removePieces();
 
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
-    void loadFinished(bool ok);
     void sendDebugInfo(QString msg);
 
 protected:
@@ -77,25 +72,22 @@ private:
     void resetFrame();
     void putFrameAt(QPointF pos);
 
-    // This class uses a QWebPage to render our SVG board. It's a hack, yep.
-    QWebPage m_page;
-    int m_selection_duration;
+    const int m_board_size;
+    const int m_selection_duration;
     QGraphicsRectItem *m_frame;
-    int m_frame_outline;
+    const int m_frame_outline;
     QTimeLine *m_time_line;
 
-    // We need a safe way to remember the pieces on the board, so that we can
-    // clear the board correctly.
+    // We need a safe way to remember the pieces on the board. This list acts
+    // as a filter, it stores all SVG items that represents pieces. I expect
+    // the scene graph and this class in particular to become very crowded once
+    // we start adding animations.
     typedef QVector<QGraphicsSvgItem*> MPiecesList;
     MPiecesList m_pieces;
 
 private Q_SLOTS:
     /* Reduces opacity of the selection frame. */
     void fadeOutFrame(int step);
-
-    /* Resizes viewport of the internal QWebPage, after loading the SVG board has finished. */
-    void onPageLoaded(bool ok);
-
 };
 
 };
