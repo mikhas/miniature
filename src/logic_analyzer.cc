@@ -345,6 +345,10 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
             	newMoveList.append(cell);
             }
 		}
+		else
+		{
+			newMoveList.append(cell);
+		}
     }
 
     return newMoveList;
