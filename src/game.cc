@@ -122,7 +122,7 @@ void MGame::setupStartPosition()
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 {
     static QTime profiling;
-    qDebug("MGame::onPieceMoveRequested - time elapsed between move requests: %d", profiling.elapsed());
+    Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1").arg(profiling.elapsed()));
     profiling.restart();
 
     if(m_logic_analyzer.verifyMove(m_position, from, to))
@@ -136,7 +136,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         Q_EMIT invalidMove(from, to);
     }
 
-    qDebug("MGame::onPieceMoveRequested - move request handling took: %d", profiling.restart());
+    Q_EMIT sendDebugInfo(QString("MGame::onPMR - update duration: %1").arg(profiling.restart()));
 }
 
 int MGame::computeWhiteMaterial() const

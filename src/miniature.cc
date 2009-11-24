@@ -67,6 +67,7 @@ MMainWindow::MMainWindow()
     toggleDebugOutput();
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
+    QFont small_font("helvetica", 8, QFont::Light);
     QFont big_font("helvetica", 16, QFont::Bold);
     QFont normal_font("helvetica", 14, QFont::DemiBold);
     m_ui.white_name->setFont(big_font);
@@ -76,6 +77,7 @@ MMainWindow::MMainWindow()
     m_ui.black_name->setFont(big_font);
     m_ui.black_rating->setFont(normal_font);
     m_ui.black_material->setFont(normal_font);
+    m_ui.debug->setFont(small_font);
 
 #ifdef Q_WS_MAEMO_5
 //    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
