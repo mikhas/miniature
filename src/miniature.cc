@@ -44,6 +44,10 @@ MMainWindow::MMainWindow()
     connect(&m_game, SIGNAL(playerInfoChanged()),
             this, SLOT(updatePlayerInfo()));
 
+    // Add debugging output to Miniature app.
+    connect(&m_game, SIGNAL(sendDebugInfo(QString)),
+            this, SLOT(appendDebugOutput(QString)));
+
     // Connect game logic w/ board view.
     connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
             m_ui.board_view, SLOT(drawPosition(const MPosition&)));
@@ -51,18 +55,16 @@ MMainWindow::MMainWindow()
             &m_game, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
     // Connect moves from game controller with main window.
-    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint)),
-            this, SLOT(updateLastMove(QPoint, QPoint)));
+    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint, bool)),
+            this, SLOT(updateLastMove(QPoint, QPoint, bool)));
 
     // Connect menu actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
             &m_game, SLOT(newGame()));
-    connect(m_ui.next_move, SIGNAL(triggered()),
-            &m_game, SLOT(nextMove()));
-    connect(m_ui.prev_move, SIGNAL(triggered()),
-            &m_game, SLOT(prevMove()));
-    connect(m_ui.black_rook_test, SIGNAL(triggered()),
-            &m_game, SLOT(blackRookTest()));
+    connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
+            this, SLOT(toggleDebugOutput()));
+
+    toggleDebugOutput();
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
     QFont big_font("helvetica", 16, QFont::Bold);
@@ -106,11 +108,18 @@ void MMainWindow::updatePlayerInfo()
     m_ui.black_material->setText(QString("%1").arg(info.black_material));
 }
 
-void MMainWindow::updateLastMove(QPoint from, QPoint to)
+void MMainWindow::updateLastMove(QPoint from, QPoint to, bool captured)
 {
-    m_ui.last_move->setText(tr("Moved from [%1, %2] to [%3, %4]").
-                            arg(from.x()).arg(from.y()).
-                            arg(to.x()).arg(to.y()));
+    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]%5")).arg(from.x())
+                                                                             .arg(from.y())
+                                                                             .arg(to.x())
+                                                                             .arg(to.y())
+                                                                             .arg(captured ? QString(" - captured!") : QString()));
+}
+
+void MMainWindow::appendDebugOutput(QString msg)
+{
+    m_ui.debug->append(msg);
 }
 
 void MApplication::open(const QUrl &url)
@@ -143,6 +152,14 @@ MApplication::MApplication(int &argc, char **argv)
 {
     connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
     m_window.show();
+}
+
+void MMainWindow::toggleDebugOutput()
+{
+    static bool toggled = false;
+
+    if (toggled) {m_ui.debug->show();} else {m_ui.debug->hide();}
+    toggled = !toggled;
 }
 
 int main(int argc, char **argv)

@@ -44,9 +44,12 @@ public:
 
 public Q_SLOTS:
     void updatePlayerInfo();
-    void updateLastMove(QPoint from, QPoint to);
+    void updateLastMove(QPoint from, QPoint to, bool captured);
+    void appendDebugOutput(QString msg);
+    void toggleDebugOutput();
 
 private:
+
     /* Our internal game controller */
     Miniature::MGame m_game;
 

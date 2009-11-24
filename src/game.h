@@ -53,15 +53,14 @@ public:
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
     void newGame();
-    void nextMove();
-    void prevMove();
 
-    /* Test slots */
-    void blackRookTest();
+    void nextMove(); // unused
+    void prevMove(); // unsued
 
     void onPieceMoveRequested(QPoint from, QPoint to);
 
 Q_SIGNALS:
+    void sendDebugInfo(QString msg);
     void playerInfoChanged();
     void positionChanged(const MPosition&);
     void pieceMoved(QPoint from, QPoint to, bool captured);
@@ -72,6 +71,7 @@ private:
     QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
     void addBoardToSceneGraph(QGraphicsScene *scene);
+    void setupStartPosition();
 
     /* Computes material for each side, using [1]
      * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system

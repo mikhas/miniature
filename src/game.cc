@@ -42,6 +42,8 @@ MGame::MGame(QObject *parent)
     m_player_info.black_name = QString("mikhas");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
+
+    newGame();
 }
 
 MGame::~MGame()
@@ -54,10 +56,10 @@ MPlayerInfo MGame:: getPlayerInfo() const
 
 void MGame::newGame()
 {
-    MPosition pos;
-    Q_EMIT positionChanged(pos);
-
     m_half_move = -1;
+
+    setupStartPosition();
+    Q_EMIT positionChanged(m_position);
 
     updateMaterialInfo();
 }
@@ -100,13 +102,17 @@ void MGame::prevMove()
 */
 }
 
-void MGame::blackRookTest()
+void MGame::setupStartPosition()
 {
-    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(4,4));
-    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(4,7));
-    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(6,4));
-    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(3,2));
-    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(0,1));
+    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
+    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
+    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
+    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
+
+    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
+    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
+    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
+    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
 
     updateMaterialInfo();
     Q_EMIT positionChanged(m_position);
