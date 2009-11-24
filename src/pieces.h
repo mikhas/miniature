@@ -24,5 +24,7 @@
 #include "pieces/piece.h"
 #include "pieces/rook.h"
 #include "pieces/knight.h"
+#include "pieces/bishop.h"
+#include "pieces/queen.h"
 
 #endif /* PIECES_INCL_H__ */

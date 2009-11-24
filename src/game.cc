@@ -109,6 +109,14 @@ void MGame::setupStartPosition()
     m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
     m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
 
+    m_position.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
+    m_position.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
+    m_position.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
+    m_position.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
+
+    m_position.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
+    m_position.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
+
     updateMaterialInfo();
     Q_EMIT positionChanged(m_position);
 }
