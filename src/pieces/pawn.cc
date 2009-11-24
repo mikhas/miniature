@@ -29,33 +29,34 @@ QSvgRenderer MPawn::whiteRenderer;
 
 MPawn::MPawn(MColour colour, int width, int height)
 : MPiece(colour, PAWN, width, height)
+{}
 
 MPawn::~MPawn()
 {}
 
 QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+	QList<QPoint> possibleSquares;
 
 	// black
 	if (colour == BLACK)
 	{
 		if (point.y() + 1 < yDim)
 		{
-			possibleSquares.append(new QPoint(point.x(), point.y() + 1));
-			possibleSquares.append(new QPoint(point.x(), point.y() + 2));
+			possibleSquares.append(QPoint(point.x(), point.y() + 1));
+			possibleSquares.append(QPoint(point.x(), point.y() + 2));
 			if (point.x() == 0)
 			{
-				possibleSquares.append(new QPoint(point.x() + 1, point.y() + 1));
+				possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
 			}
 			else if (point.x() == xDim - 1)
 			{
-				possibleSquares.append(new QPoint(point.x() - 1, point.y() + 1));
+				possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
 			}
 			else
 			{
-				possibleSquares.append(new QPoint(point.x() + 1, point.y() + 1));
-				possibleSquares.append(new QPoint(point.x() - 1, point.y() + 1));
+				possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
+				possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
 			}
 		}
 	}
@@ -64,20 +65,20 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 	{
 		if (point.y() - 1 >= 0)
 		{
-			possibleSquares.append(new QPoint(point.x(), point.y() - 1));
-			possibleSquares.append(new QPoint(point.x(), point.y() - 2));
+			possibleSquares.append(QPoint(point.x(), point.y() - 1));
+			possibleSquares.append(QPoint(point.x(), point.y() - 2));
 			if (point.x() == 0)
 			{
-				possibleSquares.append(new QPoint(point.x() + 1, point.y() - 1));
+				possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
 			}
 			else if (point.x() == xDim - 1)
 			{
-				possibleSquares.append(new QPoint(point.x() - 1, point.y() - 1));
+				possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
 			}
 			else
 			{
-				possibleSquares.append(new QPoint(point.x() + 1, point.y() - 1));
-				possibleSquares.append(new QPoint(point.x() - 1, point.y() - 1));
+				possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
+				possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
 			}
 		}
 	}
