@@ -27,6 +27,7 @@
 #include <QString>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QHash>
 
 
 namespace Miniature
@@ -64,6 +65,12 @@ private:
 
     /* Store a reference to the board item in the scene graph. */
     MGraphicsBoardItem* m_board_item;
+
+    // A MPiece*-to-QGraphicsSvgItem* mapping, which allows us to cleanly cache
+    // SVG items and to only insert them in the MGraphicsBoardItem once. Done
+    // for mouse event speed optimisation.
+    typedef QHash<MPiece*, QGraphicsSvgItem*> MSvgItemCache;
+    MSvgItemCache m_cache;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);

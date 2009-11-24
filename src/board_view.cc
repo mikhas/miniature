@@ -32,19 +32,26 @@ MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
   m_board_item(0)
 {
-  QGraphicsView::setScene(new QGraphicsScene(this));
-  setBoardBackground();
+    QGraphicsView::setScene(new QGraphicsScene(this));
+    setBoardBackground();
 }
 
 MBoardView::MBoardView(QGraphicsScene *scene, QWidget *parent)
 : QGraphicsView(scene, parent),
   m_board_item(0)
 {
-  setBoardBackground();
+    setBoardBackground();
 }
 
 MBoardView::~MBoardView()
-{}
+{
+    for(MSvgItemCache::iterator iter = m_cache.begin();
+        iter != m_cache.end();
+        ++iter)
+    {
+        delete iter.value();
+    }
+}
 
 void MBoardView::setScene(QGraphicsScene *scene)
 {
@@ -76,12 +83,25 @@ void MBoardView::drawPosition(const MPosition &position)
         MPiece* pos_piece = *iter;
         if (pos_piece) // non-empty cell
         {
-
             QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
-            QGraphicsSvgItem* piece = pos_piece->createSvgItem(m_board_item->getCellSize());
-            m_board_item->addPiece(piece);
-            piece->setPos(cell);
-            piece->show();
+            QGraphicsSvgItem* item = 0;
+
+            // Querying cache for the item.
+            if (!m_cache.contains(pos_piece))
+            {
+                //qDebug("MBV::dp - nothing found at %i ", (int) pos_piece);
+                item = pos_piece->createSvgItem(m_board_item->getCellSize());
+                m_cache.insert(pos_piece, item);
+                m_board_item->addPiece(item);
+            }
+            else
+            {
+                item = m_cache.value(pos_piece);
+                //qDebug("MBV::dp - cache hit at %i, found %i", (int) pos_piece, (int) item);
+            }
+
+            item->setPos(cell);
+            item->show();
         }
     }
 }

@@ -197,7 +197,6 @@ void MGraphicsBoardItem::removePieces()
         iter != m_pieces.end();
         ++iter)
     {
-        delete *iter;
-        *iter = 0;
+        (*iter)->hide();
     }
 }
