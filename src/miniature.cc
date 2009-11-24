@@ -47,6 +47,8 @@ MMainWindow::MMainWindow()
     // Add debugging output to Miniature app.
     connect(&m_game, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
+    connect(m_ui.board_view, SIGNAL(sendDebugInfo(QString)),
+            this, SLOT(appendDebugOutput(QString)));
 
     // Connect game logic w/ board view.
     connect(&m_game, SIGNAL(positionChanged(const MPosition&)),

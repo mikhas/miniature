@@ -48,6 +48,8 @@ MGraphicsBoardItem::MGraphicsBoardItem(QGraphicsItem *parent)
     QPalette palette = m_page.palette();
     palette.setColor(QPalette::Base, Qt::transparent);
     m_page.setPalette(palette);
+
+    setFiltersChildEvents(true);
 }
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
@@ -60,6 +62,9 @@ int MGraphicsBoardItem::getCellSize() const
 
 void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    static QTime profiling;
+    profiling.restart();
+
     static QGraphicsItem *active_item = 0;
     static QTime duration;
 
@@ -106,6 +111,8 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         active_item = 0;
         resetFrame();
     }
+
+    Q_EMIT sendDebugInfo(QString("MGBI::mpe - update duration: %1 ms").arg(profiling.restart()));
 }
 
 void MGraphicsBoardItem::setupFrameAndTimeLine()

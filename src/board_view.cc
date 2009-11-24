@@ -25,6 +25,7 @@
 #include <QPoint>
 
 #include <iostream>
+#include <QTime>
 
 using namespace Miniature;
 
@@ -68,10 +69,16 @@ void MBoardView::setBoardBackground()
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
     scene()->addItem(m_board_item);
+
+    connect(m_board_item, SIGNAL(sendDebugInfo(QString)),
+            this, SLOT(appendDebugOutput(QString)));
 }
 
 void MBoardView::drawPosition(const MPosition &position)
 {
+    static QTime profiling;
+    profiling.restart();
+
     Q_CHECK_PTR(m_board_item);
 
     m_board_item->removePieces();
@@ -104,6 +111,8 @@ void MBoardView::drawPosition(const MPosition &position)
             item->show();
         }
     }
+
+    Q_EMIT sendDebugInfo(QString("MBoardView::dp - update duration: %1 ms").arg(profiling.restart()));
 }
 
 void MBoardView::drawStartPosition()
@@ -116,4 +125,9 @@ void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
 {
     // event propagation
     Q_EMIT pieceMoveRequested(from, to);
+}
+
+void MBoardView::appendDebugOutput(QString msg)
+{
+    Q_EMIT sendDebugInfo(msg);
 }

@@ -59,6 +59,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
+    void sendDebugInfo(QString msg);
 
 private:
     void setBoardBackground();
@@ -74,6 +75,7 @@ private:
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);
+    void appendDebugOutput(QString msg);
 };
 
 }; // namespace Miniature

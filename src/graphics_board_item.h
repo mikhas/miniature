@@ -32,6 +32,8 @@
 #include <QUrl>
 #include <QVector>
 
+#include <QTime>
+
 namespace Miniature
 {
 
@@ -65,6 +67,7 @@ public:
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
     void loadFinished(bool ok);
+    void sendDebugInfo(QString msg);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
