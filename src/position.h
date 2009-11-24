@@ -65,12 +65,15 @@ public:
     // This conversion is also used by MBoardView to figure out the correct
     // position of a piece.
     QPoint indexToPoint(int index, int scaling = 1) const;
+    QPoint getWhiteKing(MPiece::MColour colour) const;
 
 private:
     QString getDefaultStartPosition() const;
 
     const int m_width;
     const int m_height;
+    QPoint whiteKing;
+    QPoint blackKing;
     MPieces m_position;
 
 };
