@@ -72,8 +72,8 @@ MMainWindow::MMainWindow()
     m_ui.black_material->setFont(normal_font);
 
 #ifdef Q_WS_MAEMO_5
-    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
-    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
+//    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
+//    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
 
 // taken 99% verbatim from http://taschenorakel.de/michael/2009/11/09/miniature-it-moves/#c592, thanks again gnuton!
