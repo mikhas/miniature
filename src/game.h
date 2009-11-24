@@ -64,7 +64,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void playerInfoChanged();
     void positionChanged(const MPosition&);
-    void pieceMoved(QPoint from, QPoint to);
+    void pieceMoved(QPoint from, QPoint to, bool captured);
     void invalidMove(QPoint from, QPoint to);
 
 private:

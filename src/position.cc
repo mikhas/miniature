@@ -25,25 +25,28 @@ using namespace Miniature;
 MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height)
+  m_position(width * height, 0)
 {}
 
 MPosition::MPosition(QString /*fen*/, int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height)
+  m_position(width * height, 0)
 {
 }
 
 MPosition::~MPosition()
 {}
 
-void MPosition::movePiece(QPoint from, QPoint to)
+bool MPosition::movePiece(QPoint from, QPoint to)
 {
+    bool captured = capturePieceAt(to);
+
     // TODO: Castling & pawn promotion
-    // TODO: use shared_ptr, risk of mleaks when removing pieces
-    putPieceAt(pieceAt(from), to);
-    putPieceAt(0, from);
+    addPieceAt(pieceAt(from), to);
+    addPieceAt(0, from);
+
+    return captured;
 }
 
 MPiece* MPosition::pieceAt(QPoint pos) const
@@ -114,28 +117,25 @@ void MPosition::convertFromFen(QString fen)
     // TODO Set player-to-move, castle options, etc.
 }
 
-void MPosition::putPieceAt(MPiece* piece, QPoint pos)
+bool MPosition::capturePieceAt(QPoint pos)
+{
+    const int index = indexFromPoint(pos);
+    if (m_position[index])
+    {
+        qDebug("MPosition::captureAt - captured!");
+        delete m_position[index];
+        m_position[index] = 0;
+        return true;
+    }
+    return false;
+}
+
+void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 {
     m_position[indexFromPoint(pos)] = piece;
 }
 
-// TODO: Remove me once the pieces pool manager is gone ...
-MPosition::MPieceTypes MPosition::lookupPieceType(QChar fenPiece) const
+void MPosition::removePieceAt(QPoint pos)
 {
-    if ('r' == fenPiece) return BROOK;
-    if ('n' == fenPiece) return BKNIGHT;
-    if ('b' == fenPiece) return BBISHOP;
-    if ('q' == fenPiece) return BQUEEN;
-    if ('k' == fenPiece) return BKING;
-    if ('p' == fenPiece) return BPAWN;
-
-    if ('R' == fenPiece) return WROOK;
-    if ('N' == fenPiece) return WKNIGHT;
-    if ('B' == fenPiece) return WBISHOP;
-    if ('Q' == fenPiece) return WQUEEN;
-    if ('K' == fenPiece) return WKING;
-    if ('P' == fenPiece) return WPAWN;
-
-    // Complain?
-    return UNKNOWN_PIECE;
+    addPieceAt(0, pos);
 }

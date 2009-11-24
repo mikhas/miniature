@@ -43,21 +43,19 @@ public:
     explicit MPosition(QString fen, int width = 8, int height = 8);
     ~MPosition();
 
-    // TODO: Remove!
-    enum MPieceTypes {BROOK, BKNIGHT, BBISHOP, BQUEEN, BKING, BPAWN,
-                      WROOK, WKNIGHT, WBISHOP, WQUEEN, WKING, WPAWN,
-                      UNKNOWN_PIECE};
-
     typedef QVector<MPiece*> MPieces;
 
     // These 3 methods are potentially deprecated!
     QString convertToFen() const;
     void convertFromFen(QString fen);
-    MPieceTypes lookupPieceType(QChar fenPiece) const;
 
-    void putPieceAt(MPiece* piece, QPoint pos);
+    bool capturePieceAt(QPoint pos);
+    void addPieceAt(MPiece* piece, QPoint pos);
+    void removePieceAt(QPoint pos);
+
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
-    void movePiece(QPoint from, QPoint to);
+    // Returns true if there was a piece at "to".
+    bool movePiece(QPoint from, QPoint to);
     MPiece* pieceAt(QPoint pos) const;
 
     MPieces::const_iterator begin() const;

@@ -102,11 +102,11 @@ void MGame::prevMove()
 
 void MGame::blackRookTest()
 {
-    m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(4,4));
-    m_position.putPieceAt(new MRook(MRook::WHITE), QPoint(4,7));
-    m_position.putPieceAt(new MRook(MRook::BLACK), QPoint(6,4));
-    m_position.putPieceAt(new MKnight(MKnight::BLACK), QPoint(3,2));
-    m_position.putPieceAt(new MKnight(MKnight::WHITE), QPoint(0,1));
+    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(4,4));
+    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(4,7));
+    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(6,4));
+    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(3,2));
+    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(0,1));
 
     updateMaterialInfo();
     Q_EMIT positionChanged(m_position);
@@ -121,9 +121,8 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
     if(m_logic_analyzer.verifyMove(m_position, from, to))
     {
-        // DEBUG
-        m_position.movePiece(from, to);
-        Q_EMIT pieceMoved(from, to);
+        bool captured = m_position.movePiece(from, to);
+        Q_EMIT pieceMoved(from, to, captured);
         Q_EMIT positionChanged(m_position);
     }
     else
