@@ -34,14 +34,12 @@ MBoardView::MBoardView(QWidget *parent)
   m_board_item(0)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
-    setBoardBackground();
-}
 
-MBoardView::MBoardView(QGraphicsScene *scene, QWidget *parent)
-: QGraphicsView(scene, parent),
-  m_board_item(0)
-{
+    connect(&m_background_page, SIGNAL(loadFinished(bool)),
+            this, SLOT(onLoadFinished(bool)));
+
     setBoardBackground();
+
 }
 
 MBoardView::~MBoardView()
@@ -60,11 +58,17 @@ void MBoardView::setScene(QGraphicsScene *scene)
     setBoardBackground();
 }
 
+void MBoardView::drawBackground(QPainter *painter, const QRectF & /*region*/)
+{
+    m_background_page.mainFrame()->render(painter);
+}
+
 void MBoardView::setBoardBackground()
 {
     m_board_item = new MGraphicsBoardItem();
 
-    m_board_item->loadFromUri(QUrl("qrc:/boards/glossy.svg"));
+    m_background_page.mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
+
     connect(m_board_item, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
@@ -130,4 +134,10 @@ void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
 void MBoardView::appendDebugOutput(QString msg)
 {
     Q_EMIT sendDebugInfo(msg);
+}
+
+void MBoardView::onLoadFinished (bool /*ok*/)
+{
+    m_background_page.setViewportSize(m_background_page.mainFrame()->contentsSize());
+    setCacheMode(QGraphicsView::CacheBackground); // calls drawBackground & caches the pixmap
 }

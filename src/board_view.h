@@ -29,6 +29,9 @@
 #include <QGraphicsScene>
 #include <QHash>
 
+#include <QPainter>
+#include <QWebPage>
+#include <QWebFrame>
 
 namespace Miniature
 {
@@ -43,7 +46,6 @@ class MBoardView
 
 public:
     explicit MBoardView(QWidget *parent = 0);
-    explicit MBoardView(QGraphicsScene *scene, QWidget *parent = 0);
     virtual ~MBoardView();
 
     virtual void setScene(QGraphicsScene* scene);
@@ -61,6 +63,9 @@ Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
     void sendDebugInfo(QString msg);
 
+protected:
+    virtual void drawBackground(QPainter *painter, const QRectF &region);
+
 private:
     void setBoardBackground();
 
@@ -73,9 +78,12 @@ private:
     typedef QHash<MPiece*, QGraphicsSvgItem*> MSvgItemCache;
     MSvgItemCache m_cache;
 
+    QWebPage m_background_page;
+
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);
     void appendDebugOutput(QString msg);
+    void onLoadFinished(bool ok);
 };
 
 }; // namespace Miniature
