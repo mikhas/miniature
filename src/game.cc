@@ -42,8 +42,6 @@ MGame::MGame(QObject *parent)
     m_player_info.black_name = QString("mikhas");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
-
-    newGame();
 }
 
 MGame::~MGame()
@@ -59,9 +57,6 @@ void MGame::newGame()
     m_half_move = -1;
 
     setupStartPosition();
-    Q_EMIT positionChanged(m_position);
-
-    updateMaterialInfo();
 }
 
 void MGame::nextMove()
@@ -122,7 +117,7 @@ void MGame::setupStartPosition()
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 {
     static QTime profiling;
-    Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1").arg(profiling.elapsed()));
+    Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1 ms").arg(profiling.elapsed()));
     profiling.restart();
 
     if(m_logic_analyzer.verifyMove(m_position, from, to))
@@ -136,7 +131,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         Q_EMIT invalidMove(from, to);
     }
 
-    Q_EMIT sendDebugInfo(QString("MGame::onPMR - update duration: %1").arg(profiling.restart()));
+    Q_EMIT sendDebugInfo(QString("MGame::onPMR - update duration: %1 ms").arg(profiling.restart()));
 }
 
 int MGame::computeWhiteMaterial() const

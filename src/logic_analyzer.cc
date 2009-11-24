@@ -58,8 +58,9 @@ MLogicAnalyzer::~MLogicAnalyzer()
 bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) const
 {
     // DEBUG
-    std::cout << "verify move ... " << std::endl;
-    std::cout << "index of (" << from.x() << ", " << from.y() << "): " << pos.indexFromPoint(from) << std::endl;
+    //std::cout << "verify move ... " << std::endl;
+    //std::cout << "index of (" << from.x() << ", " << from.y() << "): " << pos.indexFromPoint(from) << std::endl;
+/*
     for (MPosition::MPieces::const_iterator iter = pos.begin();
          iter != pos.end();
          ++iter)
@@ -67,13 +68,14 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         if (*iter) {std::cout << " r ";} else {std::cout << " - ";}
         if (7 == (std::distance(pos.begin(), iter) % 8)) {std::cout << std::endl;}
     }
+*/
     // TODO: add the rest of the validation. Currently only returns how a piece
     // moves on an empty board.
     MPiece* piece = pos.pieceAt(from);
     if (piece)
     {
         // DEBUG
-        std::cout << "found valid piece ... " << std::endl;
+        //std::cout << "found valid piece ... " << std::endl;
         QList<QPoint> list = piece->getPossibleSquares(from);
 	if(piece->getType() == MPiece::ROOK)
 	{
@@ -100,9 +102,9 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         // DEBUG
         for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
         {
-            std::cout << "(" << (*iter).x() << ", " << (*iter).y() << ") ";
+            //std::cout << "(" << (*iter).x() << ", " << (*iter).y() << ") ";
         }
-        std::cout << std::endl;
+        //std::cout << std::endl;
 
         return (list.contains(to));
     }
@@ -215,7 +217,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         {
             if (cell.x() <= xMax && cell.x() >= xMin)
             {
-                std::cout << "A) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
+                //std::cout << "A) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
                 newMoveList.append(cell);
             }
         }
@@ -224,7 +226,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         {
             if (cell.y() <= yMax && cell.y() >= yMin)
             {
-                std::cout << "B) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
+                //std::cout << "B) appending cell(x,y): " << cell.x() << ", " << cell.y() << std::endl;
                 newMoveList.append(cell);
             }
         }

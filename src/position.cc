@@ -122,7 +122,7 @@ bool MPosition::capturePieceAt(QPoint pos)
     const int index = indexFromPoint(pos);
     if (m_position[index])
     {
-        qDebug("MPosition::captureAt - captured!");
+        //qDebug("MPosition::captureAt - captured!");
         delete m_position[index];
         m_position[index] = 0;
         return true;

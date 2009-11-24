@@ -95,6 +95,5 @@ void MBoardView::drawStartPosition()
 void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
 {
     // event propagation
-    std::cout << "MBoardView::onPieceMoveRequested emits pieceMoveRequested" << std::endl;
     Q_EMIT pieceMoveRequested(from, to);
 }

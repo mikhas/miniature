@@ -77,7 +77,7 @@ QList<QPoint> MRook::getPossibleSquares(QPoint point) const
          iter != possibleSquares.end();
          ++iter)
     {
-        std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
+        //std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
     }
 
     return possibleSquares;
