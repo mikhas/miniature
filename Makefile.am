@@ -60,3 +60,6 @@ dist_appicon48_DATA = data/icons/48x48/miniature.png
 dist_appiconsc_DATA = data/icons/scalable/miniature.svg
 
 DISTCHECK_CONFIGURE_FLAGS := --with-qt=@QT_PATH@
+
+install-data-hook:
+	update-desktop-database

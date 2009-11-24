@@ -22,9 +22,8 @@
 #include "miniature.h"
 #include "board_view.h"
 
-#include <QGraphicsTextItem>
-#include <QPixmap>
-#include <QApplication>
+#include <QDBusConnection>
+#include <QMessageBox>
 
 #ifdef Q_WS_HILDON
 //Includes for portrait mode support
@@ -105,19 +104,58 @@ void MMainWindow::updatePlayerInfo()
 
 void MMainWindow::updateLastMove(QPoint from, QPoint to)
 {
-    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]")).arg(from.x())
-                                                                         .arg(from.y())
-                                                                         .arg(to.x())
-                                                                         .arg(to.y()));
+    m_ui.last_move->setText(tr("Moved from [%1, %2] to [%3, %4]").
+                            arg(from.x()).arg(from.y()).
+                            arg(to.x()).arg(to.y()));
+}
+
+void MApplication::open(const QUrl &url)
+{
+    QMessageBox(QMessageBox::Information,
+                tr("Not implemented yet"),
+                tr("Reading of PGN chess files is not implemented yet.\n"
+                   "Cannot read information at %1.").arg(url.toString())).
+                exec();
+}
+
+MApplicationAdaptor::MApplicationAdaptor(MApplication *application)
+: QDBusAbstractAdaptor(application), m_application(application)
+{
+}
+
+void MApplicationAdaptor::top_application()
+{
+    m_application->m_window.raise();
+    m_application->m_window.showNormal();
+}
+
+void MApplicationAdaptor::mime_open(const QString &url)
+{
+    m_application->open(url);
+}
+
+MApplication::MApplication(int &argc, char **argv)
+: QApplication(argc, argv)
+{
+    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
+    m_window.show();
 }
 
 int main(int argc, char **argv)
 {
-    QApplication app(argc, argv);
-    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    MApplication app(argc, argv);
+    new MApplicationAdaptor(&app);
 
-    MMainWindow main;
-    main.show();
+    QDBusConnection session(QDBusConnection::sessionBus());
 
-    return app.exec();
+    if (!session.registerService("org.maemo.miniature") ||
+        !session.registerObject("/org/maemo/miniature", &app)) {
+        qWarning("Cannot register D-Bus service. Aborting.");
+        return 1;
+    }
+
+    if (argc > 1)
+        app.open(QUrl(argv[1]));
+
+    return MApplication(argc, argv).exec();
 }

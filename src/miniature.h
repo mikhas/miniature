@@ -25,8 +25,10 @@
 #include "game.h"
 #include "player_info.h"
 
+#include <QDBusAbstractAdaptor>
 #include <QMainWindow>
 #include <QPoint>
+#include <QUrl>
 
 namespace Miniature
 {
@@ -52,6 +54,39 @@ private:
     //QGraphicsView* m_view;
 
     Ui::MMainWindow m_ui;
+};
+
+class MApplication
+: public QApplication
+{
+    friend class MApplicationAdaptor;
+
+public:
+    MApplication(int &argc, char **argv);
+    virtual ~MApplication() {}
+
+    void open(const QUrl &url);
+
+private:
+    MMainWindow m_window;
+};
+
+class MApplicationAdaptor
+: public QDBusAbstractAdaptor
+{
+    Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.maemo.miniature")
+
+public:
+    MApplicationAdaptor(MApplication *application);
+    virtual ~MApplicationAdaptor() {}
+
+public Q_SLOTS:
+    void top_application();
+    void mime_open(const QString &url);
+
+private:
+    MApplication *m_application;
 };
 
 }; // namespace Miniature

@@ -5,5 +5,6 @@ Type=Application
 Name=Miniature
 Exec=@prefix@/games/miniature
 Icon=miniature
-Categories=Game;BoardGame;Qt
+Categories=Game;BoardGame;Qt;
+MimeType=application/x-chess-pgn
 X-Osso-Service=org.maemo.miniature
