@@ -134,16 +134,16 @@ void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 {
     m_position[indexFromPoint(pos)] = piece;
 
-    if (piece->getType() == MPiece::KING)
+    if (piece && piece->getType() == MPiece::KING)
     {
-    	if (piece->getColour() == MPiece::WHITE)
-    	{
-    		whiteKing = pos;
-    	}
-    	else
-    	{
-    		blackKing = pos;
-    	}
+        if (piece->getColour() == MPiece::WHITE)
+        {
+            m_white_king = pos;
+        }
+        else
+        {
+            m_white_king = pos;
+        }
     }
 }
 
@@ -154,12 +154,12 @@ void MPosition::removePieceAt(QPoint pos)
 
 QPoint MPosition::getWhiteKing(MPiece::MColour colour) const
 {
-	if (colour == MPiece::WHITE)
-	{
-		return whiteKing;
-	}
-	else
-	{
-		return blackKing;
-	}
+    if (colour == MPiece::WHITE)
+    {
+        return m_white_king;
+    }
+    else
+    {
+        return m_black_king;
+    }
 }

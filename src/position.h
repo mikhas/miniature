@@ -72,8 +72,8 @@ private:
 
     const int m_width;
     const int m_height;
-    QPoint whiteKing;
-    QPoint blackKing;
+    QPoint m_white_king;
+    QPoint m_black_king;
     MPieces m_position;
 
 };
