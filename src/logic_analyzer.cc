@@ -101,9 +101,13 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
 	else if (piece->getType() == MPiece::PAWN)
 	{
 	    // apply pawn constraints
+		//std::cout << "1. con" << std::endl;
 		list = applyConPawnBaseline(pos, list, from);
+		//std::cout << "2. con" << std::endl;
 	    list = applyConPawnObstacle(pos, list, from);
+	    std::cout << "3. con" << std::endl;
 	    list = applyConPawnCapture(pos, list, from);
+	    std::cout << "nach 3. con" << std::endl;
 	}
 
         // DEBUG
@@ -382,11 +386,13 @@ QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const Q
         		if (from.y() == 6)
         		{
         			newMoveList.append(cell);
+        			std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         		}
         	}
         	else
         	{
         		newMoveList.append(cell);
+        		std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         	}
         }
         else
@@ -424,14 +430,16 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
         ++iter)
     {
         QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
 
         if (from.x() == cell.x())
         {
         	if (!obstacle)
         	{
-        		if (!piece)
+        		if (!currPiece)
         		{
         			newMoveList.append(cell);
+        			std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         			continue;
         		}
         		else
@@ -443,6 +451,7 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
         else
         {
         	newMoveList.append(cell);
+        	std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         }
     }
 
@@ -465,14 +474,18 @@ QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QL
 
         if (from.x() != cell.x())
         {
-        	if (currColour != currPiece->getColour())
+        	if (currPiece)
         	{
-        		newMoveList.append(cell);
+        		if (currColour != currPiece->getColour())
+        		{
+        			newMoveList.append(cell);
+        		}
         	}
         }
         else
         {
         	newMoveList.append(cell);
+        	std::cout << "added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         }
     }
 

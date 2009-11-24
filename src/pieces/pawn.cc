@@ -20,6 +20,8 @@
 
 #include "pawn.h"
 
+#include <iostream>
+
 namespace Miniature
 {
 
@@ -82,6 +84,13 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 			}
 		}
 	}
+
+    for (QList<QPoint>::iterator iter = possibleSquares.begin();
+         iter != possibleSquares.end();
+         ++iter)
+    {
+        std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
+    }
 
 	return possibleSquares;
 }
