@@ -23,13 +23,12 @@
 namespace Miniature
 {
 
-MPawn::MPawn(MColour col)
-: colour(col), type(PAWN), xDim(8), yDim(8)
-{}
+bool MPawn::hasFinishedLoading = false;
+QSvgRenderer MPawn::blackRenderer;
+QSvgRenderer MPawn::whiteRenderer;
 
-MPawn::MPawn(MColour col, int boardWidth, int boardLength)
-: colour(col), type(PAWN), xDim(boardWidth), yDim(boardLength)
-{}
+MPawn::MPawn(MColour colour, int width, int height)
+: MPiece(colour, PAWN, width, height)
 
 MPawn::~MPawn()
 {}
@@ -38,17 +37,18 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 {
 	QList<QPoint> possibleSquares = new QList<QPoint>;
 
-	// white
-	if (colour == WHITE)
+	// black
+	if (colour == BLACK)
 	{
 		if (point.y() + 1 < yDim)
 		{
 			possibleSquares.append(new QPoint(point.x(), point.y() + 1));
+			possibleSquares.append(new QPoint(point.x(), point.y() + 2));
 			if (point.x() == 0)
 			{
 				possibleSquares.append(new QPoint(point.x() + 1, point.y() + 1));
 			}
-			else if (point.x() == 7)
+			else if (point.x() == xDim - 1)
 			{
 				possibleSquares.append(new QPoint(point.x() - 1, point.y() + 1));
 			}
@@ -58,24 +58,19 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 				possibleSquares.append(new QPoint(point.x() - 1, point.y() + 1));
 			}
 		}
-
-		// pawn is at the base line
-		if (point.y() == 1)
-		{
-			possibleSquares.append(new QPoint(point.x(), point.y() + 2));
-		}
 	}
-	// black
+	// white
 	else
 	{
 		if (point.y() - 1 >= 0)
 		{
 			possibleSquares.append(new QPoint(point.x(), point.y() - 1));
+			possibleSquares.append(new QPoint(point.x(), point.y() - 2));
 			if (point.x() == 0)
 			{
 				possibleSquares.append(new QPoint(point.x() + 1, point.y() - 1));
 			}
-			else if (point.x() == 7)
+			else if (point.x() == xDim - 1)
 			{
 				possibleSquares.append(new QPoint(point.x() - 1, point.y() - 1));
 			}
@@ -85,15 +80,27 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 				possibleSquares.append(new QPoint(point.x() - 1, point.y() - 1));
 			}
 		}
-
-		// pawn is at the base line
-		if (point.y() == 6)
-		{
-			possibleSquares.append(new QPoint(point.x(), point.y() - 2));
-		}
 	}
 
 	return possibleSquares;
+}
+
+// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
+QGraphicsSvgItem* MPawn::createSvgItem(int pieceSize) const
+{
+    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
+
+    if (!MPawn::hasFinishedLoading)
+    {
+    	MPawn::blackRenderer.load(QString(":pieces/black/pawn.svg"));
+        MPawn::whiteRenderer.load(QString(":pieces/white/pawn.svg"));
+        MPawn::hasFinishedLoading = true;
+    }
+
+    applyRenderer(svgItem, (MPawn::BLACK == getColour() ? MPawn::blackRenderer
+                                                        : MPawn::whiteRenderer), pieceSize);
+
+    return svgItem;
 }
 
 }

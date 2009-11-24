@@ -98,6 +98,13 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
 		list = applyConStraight(pos, list, from);
 	    list = applyConDiagonal(pos, list, from);
 	}
+	else if (piece->getType() == MPiece::PAWN)
+	{
+	    // apply pawn constraints
+		list = applyConPawnBaseline(pos, list, from);
+	    list = applyConPawnObstacle(pos, list, from);
+	    list = applyConPawnCapture(pos, list, from);
+	}
 
         // DEBUG
         for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
@@ -349,6 +356,124 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
 		{
 			newMoveList.append(cell);
 		}
+    }
+
+    return newMoveList;
+}
+
+QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+	MPiece *piece = pos.pieceAt(from);
+	Q_CHECK_PTR(piece);
+
+	QList<QPoint> newMoveList;
+	MPiece::MColour currColour = piece->getColour();
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+
+        if (currColour == MPiece::WHITE)
+        {
+        	if (from.y() - cell.y() == 2)
+        	{
+        		if (from.y() == 6)
+        		{
+        			newMoveList.append(cell);
+        		}
+        	}
+        	else
+        	{
+        		newMoveList.append(cell);
+        	}
+        }
+        else
+        {
+        	if (cell.y() - from.y() == 2)
+        	{
+        		if (from.y() == 1)
+        		{
+        			newMoveList.append(cell);
+        		}
+        	}
+        	else
+        	{
+        		newMoveList.append(cell);
+        	}
+        }
+    }
+
+    return newMoveList;
+}
+
+
+QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+	// moveList is supposed to be sorted in a way that the one-step move comes before the two-step move if there's any.
+	bool obstacle = false;
+
+	MPiece *piece = pos.pieceAt(from);
+	Q_CHECK_PTR(piece);
+
+	QList<QPoint> newMoveList;
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+
+        if (from.x() == cell.x())
+        {
+        	if (!obstacle)
+        	{
+        		if (!piece)
+        		{
+        			newMoveList.append(cell);
+        			continue;
+        		}
+        		else
+        		{
+        			obstacle = true;
+        		}
+        	}
+        }
+        else
+        {
+        	newMoveList.append(cell);
+        }
+    }
+
+    return newMoveList;
+}
+QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+	MPiece *piece = pos.pieceAt(from);
+	Q_CHECK_PTR(piece);
+
+	QList<QPoint> newMoveList;
+	MPiece::MColour currColour = piece->getColour();
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
+
+        if (from.x() != cell.x())
+        {
+        	if (currColour != currPiece->getColour())
+        	{
+        		newMoveList.append(cell);
+        	}
+        }
+        else
+        {
+        	newMoveList.append(cell);
+        }
     }
 
     return newMoveList;

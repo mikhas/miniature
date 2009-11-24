@@ -47,8 +47,8 @@ src_miniature_SOURCES = \
  			src/pieces/queen.cc \
  #			src/pieces/king.h \
  #			src/pieces/king.cc \
- #			src/pieces/pawn.h \
- #			src/pieces/pawn.cc \
+ 			src/pieces/pawn.h \
+ 			src/pieces/pawn.cc \
 			$(null)
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
