@@ -123,6 +123,358 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
     return false;
 }
 
+bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
+{
+	MPiece::MColour kingColour = pos.pieceAt(king)->getColour();
+
+	// north
+	int i = 1;
+	while (king.y() - i >= 0)
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x(), king.y() - i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			++i;
+		}
+	}
+
+	// north-east
+	i = 1;
+	while ((king.y() - i >= 0) && (king.x() + i < 8))
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() + i, king.y() - i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			if ((currType == MPiece::PAWN) && (i == 1))
+			{
+				if (kingColour == MPiece::WHITE)
+				{
+					return false;
+				}
+			}
+			++i;
+		}
+	}
+
+	// east
+	i = 1;
+	while (king.x() + i < 8)
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() + i, king.y()));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			++i;
+		}
+	}
+
+	// south-east
+	i = 1;
+	while ((king.y() + i < 8) && (king.x() + i < 8))
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() + i, king.y() + i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			if ((currType == MPiece::PAWN) && (i == 1))
+			{
+				if (kingColour == MPiece::BLACK)
+				{
+					return false;
+				}
+			}
+			++i;
+		}
+	}
+
+	// south
+	i = 1;
+	while (king.y() + i < 8)
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x(), king.y() + i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			++i;
+		}
+	}
+
+	// south-west
+	i = 1;
+	while ((king.y() + i < 8) && (king.x() - i >= 0))
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() - i, king.y() + i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	// west
+	i = 1;
+	while (king.x() - i >= 0)
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() - i, king.y()));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
+			{
+				MPiece::MType currType = piece->getType();
+				if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
+				{
+					return false;
+				}
+				if ((currType == MPiece::PAWN) && (i == 1))
+				{
+					if (kingColour == MPiece::BLACK)
+					{
+						return false;
+					}
+				}
+				++i;
+			}
+			++i;
+		}
+	}
+
+	// north-west
+	i = 1;
+	while ((king.y() - i >= 0) && (king.x() - i >= 0))
+	{
+		MPiece *piece = pos.pieceAt(QPoint(king.x() - i, king.y() - i));
+
+		if (!piece)
+		{
+			++i;
+			continue;
+		}
+		else if (kingColour == piece->getColour())
+		{
+			break;
+		}
+		else
+		{
+			MPiece::MType currType = piece->getType();
+			if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
+			{
+				return false;
+			}
+			if ((currType == MPiece::PAWN) && (i == 1))
+			{
+				if (kingColour == MPiece::WHITE)
+				{
+					return false;
+				}
+			}
+			++i;
+		}
+	}
+
+	// knights
+	// north
+	if (king.y() - 2 >= 0)
+	{
+		if (king.x() - 1 >= 0)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() - 1, king.y() - 2));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+		else if (king.x() + 1 < 8)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() + 1, king.y() - 2));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	// east
+	if (king.x() + 2 < 8)
+	{
+		if (king.y() - 1 >= 0)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() + 2, king.y() - 1));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+		else if (king.y() + 1 < 8)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() + 2, king.y() + 1));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	// south
+	if (king.y() + 2 < 8)
+	{
+		if (king.x() - 1 >= 0)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() - 1, king.y() + 2));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+		else if (king.x() + 1 < 8)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() + 1, king.y() + 2));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	// west
+	if (king.x() - 2 >= 0)
+	{
+		if (king.y() - 1 >= 0)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() - 2, king.y() - 1));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+		else if (king.y() + 1 < 8)
+		{
+			MPiece *piece = pos.pieceAt(QPoint(king.x() - 2, king.y() + 1));
+			if (piece)
+			{
+				if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
 
 QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {

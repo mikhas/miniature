@@ -50,6 +50,7 @@ Q_SIGNALS:
 private:
     MConstraintList m_constraints;
 
+    bool checkCheck(const MPosition &pos, QPoint king);
     QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
