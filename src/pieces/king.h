@@ -23,21 +23,38 @@
 
 #include "piece.h"
 
+#include <QList>
+#include <QPoint>
+#include <QSvgRenderer>
+
 namespace Miniature
 {
 
-class MKing: public MPiece
+class MKing
+: public MPiece
 {
 public:
-	MKing(MColour, int, int);
-	MKing(MColour, int, int, bool);
+	MKing(MColour colour, int width = 8, int height = 8);
 	~MKing();
+
+	virtual QList<QPoint> getPossibleSquares(QPoint) const;
 
 	void hasMoved();
 	bool canCastle();
 
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+
 private:
-	bool canCastle;
+    bool castle;
+
+    /* We have two renderers as class variables because we did not go the full
+     * distance regarding the inheritance tree of our chess pieces: one piece class
+     * is used for both colours. Also, we have to delay loading of SVGs from
+     * the resource file until Qt has finished initializing it.
+     */
+    static bool hasFinishedLoading;
+    static QSvgRenderer blackRenderer;
+    static QSvgRenderer whiteRenderer;
 };
 
 }

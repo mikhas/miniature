@@ -19,20 +19,18 @@
  */
 
 #include "king.h"
+#include <iostream>
 
 namespace Miniature
 {
 
-MKing::MKing(MColour col)
-: colour(col), type(KING), xDim(8), yDim(8), canCastle(true)
-{}
+bool MKing::hasFinishedLoading = false;
+QSvgRenderer MKing::blackRenderer;
+QSvgRenderer MKing::whiteRenderer;
 
-MKing::MKing(MColour col, int boardWidth, int boardLength)
-: colour(col), type(KING), xDim(boardWidth), yDim(boardLength), canCastle(true)
-{}
-
-MKing::MKing(MColour col, int boardWidth, int boardLength, bool canCastle)
-: colour(col), type(KING), xDim(boardWidth), yDim(boardLength), canCastle(canCastle)
+MKing::MKing(MColour colour, int width, int height)
+: MPiece(colour, KING, width, height),
+  castle(true)
 {}
 
 MKing::~MKing()
@@ -40,58 +38,58 @@ MKing::~MKing()
 
 QList<QPoint> MKing::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares = new QList<QPoint>;
+	QList<QPoint> possibleSquares;
 
 	// north-west, north and north-east
 	if (point.y() + 1 < yDim)
 	{
-		possibleSquares.append(new QPoint(point.x(), point.y() + 1));
+		possibleSquares.append(QPoint(point.x(), point.y() + 1));
 		if (point.x() - 1 >= 0)
 		{
-			possibleSquares.append(new QPoint(point.x() - 1, point.y() + 1));
+			possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
 		}
 		if (point.x() + 1 < xDim)
 		{
-			possibleSquares.append(new QPoint(point.x() + 1, point.y() + 1));
+			possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
 		}
 	}
 
 	// east
 	if (point.x() + 1 < xDim)
 	{
-		possibleSquares.append(new QPoint(point.x() + 1, point.y()));
+		possibleSquares.append(QPoint(point.x() + 1, point.y()));
 	}
 
 	// south-east, south, south-west
 	if (point.y() - 1 >= 0)
 	{
-		possibleSquares.append(new QPoint(point.x(), point.y() - 1));
+		possibleSquares.append(QPoint(point.x(), point.y() - 1));
 		if (point.x() - 1 >= 0)
 		{
-			possibleSquares.append(new QPoint(point.x() - 1, point.y() - 1));
+			possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
 		}
 		if (point.x() + 1 < xDim)
 		{
-			possibleSquares.append(new QPoint(point.x() + 1, point.y() - 1));
+			possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
 		}
 	}
 
 	// west
 	if (point.x() - 1 >= 0)
 	{
-		possibleSquares.append(new QPoint(point.x() - 1, point.y()));
+		possibleSquares.append(QPoint(point.x() - 1, point.y()));
 	}
 
 	// castling
-	if (canCastle)
+	if (castle)
 	{
 		if (point.x() + 2 < xDim)
 		{
-			possibleSquares.append(new QPoint(point.x() + 2, point.y()));
+			possibleSquares.append(QPoint(point.x() + 2, point.y()));
 		}
 		if (point.x() - 2 >= 0)
 		{
-			possibleSquares.append(new QPoint(point.x() - 2, point.y()));
+			possibleSquares.append(QPoint(point.x() - 2, point.y()));
 		}
 	}
 
@@ -100,12 +98,30 @@ QList<QPoint> MKing::getPossibleSquares(QPoint point) const
 
 void MKing::hasMoved()
 {
-	canCastle = false;
+	castle = false;
 }
 
 bool MKing::canCastle()
 {
-	return canCastle;
+	return castle;
+}
+
+// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
+QGraphicsSvgItem* MKing::createSvgItem(int pieceSize) const
+{
+    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
+
+    if (!MKing::hasFinishedLoading)
+    {
+        MKing::blackRenderer.load(QString(":pieces/black/king.svg"));
+        MKing::whiteRenderer.load(QString(":pieces/white/king.svg"));
+        MKing::hasFinishedLoading = true;
+    }
+
+    applyRenderer(svgItem, (MKing::BLACK == getColour() ? MKing::blackRenderer
+                                                        : MKing::whiteRenderer), pieceSize);
+
+    return svgItem;
 }
 
 }
