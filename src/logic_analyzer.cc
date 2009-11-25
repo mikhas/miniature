@@ -26,7 +26,6 @@
 #include <QPoint>
 
 #include <iostream>
-#include <cstdlib>
 
 namespace
 {
@@ -97,6 +96,11 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
 	    // apply queen constraints
 		list = applyConStraight(pos, list, from);
 	    list = applyConDiagonal(pos, list, from);
+	}
+    else if (piece->getType() == MPiece::KING)
+	{
+	    // apply king constraint
+	    list = applyConKing(pos, list, from);
 	}
 	else if (piece->getType() == MPiece::PAWN)
 	{
@@ -716,6 +720,41 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
 			newMoveList.append(cell);
 		}
     }
+
+    return newMoveList;
+}
+
+QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+	MPiece *piece = pos.pieceAt(from);
+	Q_CHECK_PTR(piece);
+
+	QList<QPoint> newMoveList;
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MPiece* currPiece = pos.pieceAt(cell);
+
+        if (((from.y() == cell.y()) && ((from.x() == cell.x() + 1) || (from.x() == cell.x() - 1))) || (from.y() != cell.y()))
+        {
+		    if (!currPiece)
+		    {
+               newMoveList.append(cell);
+		    }
+            else if (piece->getColour() != currPiece->getColour())
+            {
+                newMoveList.append(cell);
+            }
+        }
+        else
+        {
+            // TODO uncomment when castling is done
+            //newMoveList.append(cell);
+        }
+	}
 
     return newMoveList;
 }

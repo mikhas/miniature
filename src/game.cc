@@ -117,6 +117,9 @@ void MGame::setupStartPosition()
     m_position.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
     m_position.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
 
+    m_position.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
+    m_position.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
+
     for (int i = 0; i < 8; ++i)
     {
         m_position.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
