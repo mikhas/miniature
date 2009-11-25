@@ -67,6 +67,10 @@ void MBoardView::setBoardBackground()
 {
     m_board_item = new MGraphicsBoardItem();
 
+    QPalette palette = m_background_page.palette();
+    palette.setColor(QPalette::Base, Qt::transparent);
+    m_background_page.setPalette(palette);
+
     m_background_page.mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
 
     connect(m_board_item, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
