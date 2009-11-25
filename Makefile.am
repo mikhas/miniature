@@ -21,7 +21,6 @@ src_miniature_SOURCES = \
 			src/game.h \
 			src/game.moc.cc \
 			src/logic_analyzer.cc \
-			src/logic_analyzer.moc.cc \
 			src/logic_analyzer.h \
 			src/position.cc \
 			src/position.h \
@@ -56,7 +55,6 @@ BUILT_SOURCES = \
 		data/data.qrc.cc \
 		src/board_view.moc.cc \
 		src/game.moc.cc \
-                src/logic_analyzer.moc.cc \
 		src/graphics_board_item.moc.cc \
 		src/miniature.moc.cc \
 		src/miniature.ui.h \

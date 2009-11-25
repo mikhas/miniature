@@ -23,7 +23,6 @@
 #define LOGIC_ANALYZER_H__
 
 #include "position.h"
-#include <QObject>
 
 namespace Miniature
 {
@@ -34,18 +33,15 @@ typedef int MConstraintList;
  * Currently, it only validates simple moves.
  */
 class MLogicAnalyzer
-: public QObject
 {
-    Q_OBJECT
-
 public:
-    MLogicAnalyzer(const MConstraintList &constraints, QObject *parent = 0);
+    enum MState {INVALID, VALID, CHECK, CHECKMATE, STALEMATE, CAPTURE, PROMOTION};
+    typedef QFlags<MState> MStateFlags;
+
+    MLogicAnalyzer(const MConstraintList &constraints);
     virtual ~MLogicAnalyzer();
 
-    bool verifyMove(const MPosition &pos, QPoint from, QPoint to) const;
-
-Q_SIGNALS:
-    void invalidMove(const MPosition &pos, QPoint from, QPoint to) const;
+    MStateFlags verifyMove(const MPosition &pos, QPoint from, QPoint to) const;
 
 private:
     MConstraintList m_constraints;

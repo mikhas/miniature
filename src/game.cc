@@ -33,7 +33,7 @@ using namespace Miniature;
 MGame::MGame(QObject *parent)
 : QObject(parent),
   m_half_move(-1),
-  m_logic_analyzer(0, this)
+  m_logic_analyzer(0)
 {
     m_player_info.white_name = QString("andybehr");
     m_player_info.white_rating = QString("4321");
@@ -134,9 +134,10 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1 ms").arg(profiling.elapsed()));
     profiling.restart();
 
-    if(m_logic_analyzer.verifyMove(m_position, from, to))
+    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_position, from, to);
+    if (MLogicAnalyzer::VALID == result)
     {
-        bool captured = m_position.movePiece(from, to);
+        bool captured = m_position.movePiece(from, to); // TODO: use MStateFlags for capturing!
         Q_EMIT pieceMoved(from, to, captured);
         Q_EMIT positionChanged(m_position);
     }

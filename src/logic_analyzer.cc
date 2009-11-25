@@ -47,16 +47,16 @@ namespace Miniature
 {
 
 
-MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints, QObject *parent)
-: QObject(parent),
-  m_constraints(constraints)
+MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints)
+: m_constraints(constraints)
 {}
 
 MLogicAnalyzer::~MLogicAnalyzer()
 {}
 
-bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) const
+MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) const
 {
+    MStateFlags flags = MLogicAnalyzer::INVALID;
     // DEBUG
     //std::cout << "verify move ... " << std::endl;
     //std::cout << "index of (" << from.x() << ", " << from.y() << "): " << pos.indexFromPoint(from) << std::endl;
@@ -117,10 +117,13 @@ bool MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) co
         }
         //std::cout << std::endl;
 
-        return (list.contains(to));
+        if (list.contains(to))
+        {
+             flags |= MLogicAnalyzer::VALID;
+        }
     }
 
-    return false;
+    return flags;
 }
 
 bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
