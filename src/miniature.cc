@@ -25,13 +25,6 @@
 #include <QDBusConnection>
 #include <QMessageBox>
 
-#ifdef Q_WS_HILDON
-//Includes for portrait mode support
-#  include <X11/Xlib.h>
-#  include <X11/Xatom.h>
-#  include <QtGui/QX11Info>
-#endif
-
 using namespace Miniature;
 
 MMainWindow::MMainWindow()
@@ -82,17 +75,8 @@ MMainWindow::MMainWindow()
     m_ui.debug->setFont(small_font);
 
 #ifdef Q_WS_MAEMO_5
-//    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
-//    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
-#endif
-
-// taken 99% verbatim from http://taschenorakel.de/michael/2009/11/09/miniature-it-moves/#c592, thanks again gnuton!
-#ifdef Q_WS_HILDON
-    int value = 1;
-    Atom portraitSupport = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_SUPPORT", False);
-    Atom portraitRequest = XInternAtom(QX11Info::display(), "_HILDON_PORTRAIT_MODE_REQUEST", False);
-    XChangeProperty(QX11Info::display(), winId(), portraitSupport, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
-    XChangeProperty(QX11Info::display(), winId(), portraitRequest, XA_CARDINAL, 32, PropModeReplace, (uchar *)&value, 1);
+    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
+    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
 }
 
