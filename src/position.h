@@ -52,6 +52,7 @@ public:
     bool capturePieceAt(QPoint pos);
     void addPieceAt(MPiece* piece, QPoint pos);
     void removePieceAt(QPoint pos);
+    void reset();
 
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
     // Returns true if there was a piece at "to".

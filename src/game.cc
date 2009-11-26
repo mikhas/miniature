@@ -42,7 +42,6 @@ MGame::MGame(QObject *parent)
     m_player_info.black_name = QString("mikhas");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
-    updateMoveInfo(true); // TODO: remove, I dont belong here.
 }
 
 MGame::~MGame()
@@ -58,6 +57,7 @@ void MGame::newGame()
     m_half_move = -1;
 
     setupStartPosition();
+    updateMoveInfo(m_position.getColourToMove());
 }
 
 void MGame::nextMove()
@@ -100,6 +100,8 @@ void MGame::prevMove()
 
 void MGame::setupStartPosition()
 {
+    m_position.reset();
+
     m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
     m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
     m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));

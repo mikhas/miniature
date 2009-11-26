@@ -154,6 +154,12 @@ void MPosition::removePieceAt(QPoint pos)
     addPieceAt(0, pos);
 }
 
+void MPosition::reset()
+{
+    m_position = MPieces(m_position.size(), 0);
+    m_colour_to_move = MPiece::WHITE;
+}
+
 QPoint MPosition::getKing(MPiece::MColour colour) const
 {
     if (colour == MPiece::WHITE)
