@@ -66,7 +66,8 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if(!active_item) // try to find an active item
     {
         active_item = (scene()->items(event->pos().x() - 1, event->pos().y() -1, 2, 2))[0];
-        if (active_item == this)
+
+        if (active_item == this || !active_item->data(0).toBool())
         {
            active_item = 0;
            resetFrame();
@@ -79,7 +80,7 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         //std::cout << "mouse_pressed: try to select" << std::endl;
     }
-    else // we have an active item.
+    else
     {
         const int cell_size = getCellSize();
         //std::cout << "mouse_pressed: sth was already selected" << std::endl;

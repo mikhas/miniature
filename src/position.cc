@@ -173,13 +173,7 @@ MPiece::MColour MPosition::getColourToMove() const
 
 void MPosition::nextColour()
 {
-    if (m_colour_to_move == MPiece::WHITE)
-    {
-        m_colour_to_move = MPiece::BLACK;
-    }
-    else
-    {
-        m_colour_to_move = MPiece::WHITE;
-    }
+    m_colour_to_move = (m_colour_to_move == MPiece::WHITE ? MPiece::BLACK
+                                                          : MPiece::WHITE);
 }
 

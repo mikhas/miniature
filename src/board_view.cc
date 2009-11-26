@@ -115,6 +115,8 @@ void MBoardView::drawPosition(const MPosition &position)
                 //qDebug("MBV::dp - cache hit at %i, found %i", (int) pos_piece, (int) item);
             }
 
+            item->setData(0, QVariant((position.getColourToMove() == pos_piece->getColour() ? true
+                                                                                            : false)));
             item->setPos(cell);
             item->show();
         }

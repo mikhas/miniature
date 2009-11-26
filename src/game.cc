@@ -142,6 +142,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     {
         MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
         m_position.movePiece(from, to);
+        m_position.nextColour();
 
         // TODO: remove capturing code in MPostion and control the relevant bits from here!
         /*
