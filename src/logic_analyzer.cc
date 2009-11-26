@@ -109,9 +109,9 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
 		list = applyConPawnBaseline(pos, list, from);
 		//std::cout << "2. con" << std::endl;
 	    list = applyConPawnObstacle(pos, list, from);
-	    std::cout << "3. con" << std::endl;
+	    //std::cout << "3. con" << std::endl;
 	    list = applyConPawnCapture(pos, list, from);
-	    std::cout << "nach 3. con" << std::endl;
+	    //std::cout << "nach 3. con" << std::endl;
 
             // check for promotion
             if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
@@ -786,13 +786,13 @@ QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const Q
         		if (from.y() == 6)
         		{
         			newMoveList.append(cell);
-        			std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        			//std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         		}
         	}
         	else
         	{
         		newMoveList.append(cell);
-        		std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        		//std::cout << "1. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         	}
         }
         else
@@ -839,7 +839,7 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
         		if (!currPiece)
         		{
         			newMoveList.append(cell);
-        			std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        			//std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         			continue;
         		}
         		else
@@ -851,7 +851,7 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
         else
         {
         	newMoveList.append(cell);
-        	std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        	//std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         }
     }
 
@@ -885,7 +885,7 @@ QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QL
         else
         {
         	newMoveList.append(cell);
-        	std::cout << "added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        	//std::cout << "added (" << cell.x() << "," << cell.y() << ")" << std::endl;
         }
     }
 
