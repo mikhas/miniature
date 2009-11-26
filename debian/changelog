@@ -1,9 +1,22 @@
+miniature (0.1.2) unstable; urgency=low
+
+  [ Michael Hasselmann ]
+  * Only legal moves can be performed by every piece.
+  * Pieces can be properly captured.
+  * Black and white take turns. 
+  * Pawns are automatically promoted to pawns once they reach the last rank.
+  * A new - less glossy - board skin was added.
+  * A debug console has been added.
+  * The application properly announces itselt to the Hildon WM on Maemo5.
+
+ -- Michael Hasselmann <michael@taschenorakel.de>  Thu, 26 Nov 2009 02:24:10 +0100
+
 miniature (0.1.1-1) unstable; urgency=low
 
+  [ Mathias Hasselmann ]
   * Add icon to be shown in Hildon Task Launcher and Application Manager.
   * Created a more visible selection frame, refined move handling.
 
- -- Mathias Hasselmann <mathias.hasselmann@maemo.org>  Tue, 17 Nov 2009 23:53:54 +0100
 
 miniature (0.1-1) unstable; urgency=low
 
