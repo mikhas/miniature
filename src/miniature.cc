@@ -50,8 +50,8 @@ MMainWindow::MMainWindow()
             &m_game, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
     // Connect moves from game controller with main window.
-    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint, bool)),
-            this, SLOT(updateLastMove(QPoint, QPoint, bool)));
+    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint)),
+            this, SLOT(updateLastMove(QPoint, QPoint)));
 
     // Connect menu actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
@@ -96,13 +96,12 @@ void MMainWindow::updatePlayerInfo()
     m_ui.black_material->setText(QString("%1").arg(info.black_material));
 }
 
-void MMainWindow::updateLastMove(QPoint from, QPoint to, bool captured)
+void MMainWindow::updateLastMove(QPoint from, QPoint to)
 {
-    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]%5")).arg(from.x())
-                                                                             .arg(from.y())
-                                                                             .arg(to.x())
-                                                                             .arg(to.y())
-                                                                             .arg(captured ? QString(" - captured!") : QString()));
+    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]")).arg(from.x())
+                                                                          .arg(from.y())
+                                                                          .arg(to.x())
+                                                                          .arg(to.y()));
 }
 
 void MMainWindow::appendDebugOutput(QString msg)

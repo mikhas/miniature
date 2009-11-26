@@ -44,7 +44,7 @@ public:
 
 public Q_SLOTS:
     void updatePlayerInfo();
-    void updateLastMove(QPoint from, QPoint to, bool captured);
+    void updateLastMove(QPoint from, QPoint to);
     void appendDebugOutput(QString msg);
     void toggleDebugOutput();
 

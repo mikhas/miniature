@@ -112,6 +112,12 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
 	    std::cout << "3. con" << std::endl;
 	    list = applyConPawnCapture(pos, list, from);
 	    std::cout << "nach 3. con" << std::endl;
+
+            // check for promotion
+            if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+            {
+                flags |= MLogicAnalyzer::PROMOTION;
+            }
 	}
 
         // DEBUG

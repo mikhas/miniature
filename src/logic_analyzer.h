@@ -35,7 +35,16 @@ typedef int MConstraintList;
 class MLogicAnalyzer
 {
 public:
-    enum MState {INVALID, VALID, CHECK, CHECKMATE, STALEMATE, CAPTURE, PROMOTION};
+    enum MState
+    {
+        INVALID   = 0x0,
+        VALID     = 0x1,
+        CHECK     = 0x2,
+        CHECKMATE = 0x3,
+        STALEMATE = 0x4,
+        CAPTURE   = 0x5,
+        PROMOTION = 0x6
+    };
     typedef QFlags<MState> MStateFlags;
 
     MLogicAnalyzer(const MConstraintList &constraints);

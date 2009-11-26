@@ -138,10 +138,33 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     profiling.restart();
 
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_position, from, to);
-    if (MLogicAnalyzer::VALID == result)
+    if (MLogicAnalyzer::VALID & result)
     {
-        bool captured = m_position.movePiece(from, to); // TODO: use MStateFlags for capturing!
-        Q_EMIT pieceMoved(from, to, captured);
+        MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
+        m_position.movePiece(from, to);
+
+        // TODO: remove capturing code in MPostion and control the relevant bits from here!
+        /*
+        if (MLogicAnalyzer::CAPTURE & result)
+        {
+            m_position.removePieceAt(to);
+            Q_EMIT pieceCapturedAt(to);
+        }
+        */
+
+        if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
+        {
+            Q_EMIT check();
+        }
+
+        if (MLogicAnalyzer::PROMOTION & result)
+        {
+            m_position.removePieceAt(to);
+            m_position.addPieceAt(new MQueen(colour), to);
+            Q_EMIT pawnPromoted(to);
+        }
+
+        Q_EMIT pieceMoved(from, to);
         Q_EMIT positionChanged(m_position);
     }
     else

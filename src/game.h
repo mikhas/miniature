@@ -63,8 +63,11 @@ Q_SIGNALS:
     void sendDebugInfo(QString msg);
     void playerInfoChanged();
     void positionChanged(const MPosition&);
-    void pieceMoved(QPoint from, QPoint to, bool captured);
+    void pieceMoved(QPoint from, QPoint to);
     void invalidMove(QPoint from, QPoint to);
+    void check();
+    void pawnPromoted(QPoint where);
+    void pieceCapturedAt(QPoint where);
 
 private:
     // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
