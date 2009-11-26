@@ -82,6 +82,7 @@ private:
     int computeWhiteMaterial() const;
     int computeBlackMaterial() const;
     void updateMaterialInfo();
+    void updateMoveInfo(bool is_white_moving);
 
     /* Creates a scene graph containing all UI elements of the main view
      * (player cards, timer, board).

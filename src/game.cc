@@ -42,6 +42,7 @@ MGame::MGame(QObject *parent)
     m_player_info.black_name = QString("mikhas");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
+    updateMoveInfo(true); // TODO: remove, I dont belong here.
 }
 
 MGame::~MGame()
@@ -142,7 +143,9 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     {
         MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
         m_position.movePiece(from, to);
+
         m_position.nextColour();
+        updateMoveInfo(m_position.getColourToMove() == MPiece::WHITE);
 
         // TODO: remove capturing code in MPostion and control the relevant bits from here!
         /*
@@ -190,6 +193,25 @@ void MGame::updateMaterialInfo()
 {
     m_player_info.white_material = computeWhiteMaterial();
     m_player_info.black_material = computeBlackMaterial();
+
+    Q_EMIT playerInfoChanged();
+}
+
+void MGame::updateMoveInfo(bool is_white_moving)
+{
+    const static QString base_white(m_player_info.white_name);
+    const static QString base_black(m_player_info.black_name);
+
+    if (is_white_moving)
+    {
+        m_player_info.white_name = QString("%1  *").arg(base_white);
+        m_player_info.black_name = QString(base_black);
+    }
+    else
+    {
+        m_player_info.white_name = QString(base_white);
+        m_player_info.black_name = QString("*  %1").arg(base_black);
+    }
 
     Q_EMIT playerInfoChanged();
 }

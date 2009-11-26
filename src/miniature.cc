@@ -59,8 +59,6 @@ MMainWindow::MMainWindow()
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 
-    toggleDebugOutput();
-
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
     QFont small_font("helvetica", 8, QFont::Light);
     QFont big_font("helvetica", 16, QFont::Bold);
@@ -73,6 +71,7 @@ MMainWindow::MMainWindow()
     m_ui.black_rating->setFont(normal_font);
     m_ui.black_material->setFont(normal_font);
     m_ui.debug->setFont(small_font);
+    m_ui.debug->hide();
 
 #ifdef Q_WS_MAEMO_5
     setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
@@ -143,7 +142,7 @@ MApplication::MApplication(int &argc, char **argv)
 
 void MMainWindow::toggleDebugOutput()
 {
-    static bool toggled = false;
+    static bool toggled = true;
 
     if (toggled) {m_ui.debug->show();} else {m_ui.debug->hide();}
     toggled = !toggled;
