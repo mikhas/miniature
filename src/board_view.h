@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QWebPage>
 #include <QWebFrame>
+#include <QImage>
 
 namespace Miniature
 {
@@ -78,7 +79,8 @@ private:
     typedef QHash<MPiece*, QGraphicsSvgItem*> MSvgItemCache;
     MSvgItemCache m_cache;
 
-    QWebPage m_background_page;
+    QWebPage* m_background_page;
+    QImage* m_background_image;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);

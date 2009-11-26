@@ -23,6 +23,8 @@
 #include <QPixmap>
 #include <QUrl>
 #include <QPoint>
+#include <QPainter>
+#include <QImage>
 
 #include <iostream>
 #include <QTime>
@@ -31,11 +33,13 @@ using namespace Miniature;
 
 MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
-  m_board_item(0)
+  m_board_item(0),
+  m_background_page(new QWebPage),
+  m_background_image(0)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
-    connect(&m_background_page, SIGNAL(loadFinished(bool)),
+    connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
 
     setBoardBackground();
@@ -50,6 +54,8 @@ MBoardView::~MBoardView()
     {
         delete iter.value();
     }
+
+    delete m_background_image;
 }
 
 void MBoardView::setScene(QGraphicsScene *scene)
@@ -58,20 +64,31 @@ void MBoardView::setScene(QGraphicsScene *scene)
     setBoardBackground();
 }
 
-void MBoardView::drawBackground(QPainter *painter, const QRectF & /*region*/)
+void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 {
-    m_background_page.mainFrame()->render(painter);
+    if (m_background_page && m_background_image)
+    {
+        QPainter bg_painter(m_background_image);
+        m_background_page->mainFrame()->render(&bg_painter);
+
+        // Get rid of the QWebkit stuff, it seems to slow down mouse event
+        // handling for us even when invisible!
+        delete m_background_page;
+        m_background_page = 0;
+    }
+
+    painter->drawImage(region, *m_background_image);
 }
 
 void MBoardView::setBoardBackground()
 {
     m_board_item = new MGraphicsBoardItem();
 
-    QPalette palette = m_background_page.palette();
+    QPalette palette = m_background_page->palette();
     palette.setColor(QPalette::Base, Qt::transparent);
-    m_background_page.setPalette(palette);
+    m_background_page->setPalette(palette);
 
-    m_background_page.mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
+    m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
 
     connect(m_board_item, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
@@ -144,6 +161,8 @@ void MBoardView::appendDebugOutput(QString msg)
 
 void MBoardView::onLoadFinished (bool /*ok*/)
 {
-    m_background_page.setViewportSize(m_background_page.mainFrame()->contentsSize());
+    m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
+    m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32);
     setCacheMode(QGraphicsView::CacheBackground); // calls drawBackground & caches the pixmap
+
 }
