@@ -65,7 +65,9 @@ public:
     // This conversion is also used by MBoardView to figure out the correct
     // position of a piece.
     QPoint indexToPoint(int index, int scaling = 1) const;
-    QPoint getWhiteKing(MPiece::MColour colour) const;
+    QPoint getKing(MPiece::MColour colour) const;
+    MPiece::MColour getColourToMove() const;
+    void nextColour;
 
 private:
     QString getDefaultStartPosition() const;
@@ -74,6 +76,7 @@ private:
     const int m_height;
     QPoint m_white_king;
     QPoint m_black_king;
+    MPiece::MColour m_colour_to_move;
     MPieces m_position;
 
 };

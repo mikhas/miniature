@@ -25,13 +25,15 @@ using namespace Miniature;
 MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height, 0)
+  m_position(width * height, 0),
+  m_colour_to_move(MPiece::WHITE)
 {}
 
 MPosition::MPosition(QString /*fen*/, int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height, 0)
+  m_position(width * height, 0),
+  m_colour_to_move(MPiece::WHITE)
 {
 }
 
@@ -152,7 +154,7 @@ void MPosition::removePieceAt(QPoint pos)
     addPieceAt(0, pos);
 }
 
-QPoint MPosition::getWhiteKing(MPiece::MColour colour) const
+QPoint MPosition::getKing(MPiece::MColour colour) const
 {
     if (colour == MPiece::WHITE)
     {
@@ -161,5 +163,22 @@ QPoint MPosition::getWhiteKing(MPiece::MColour colour) const
     else
     {
         return m_black_king;
+    }
+}
+
+MPiece::MColour MPosition::getColourToMove() const
+{
+    return m_colour_to_move;
+}
+
+void MPosition::nextColour
+{
+    if (m_colour_to_move == MPiece::WHITE)
+    {
+        m_colour_to_move = MPiece::BLACK;
+    }
+    else
+    {
+        m_colour_to_move = MPiece::WHITE;
     }
 }
