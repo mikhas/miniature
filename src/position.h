@@ -67,7 +67,7 @@ public:
     QPoint indexToPoint(int index, int scaling = 1) const;
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
-    void nextColour;
+    void nextColour();
 
 private:
     QString getDefaultStartPosition() const;

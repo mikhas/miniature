@@ -25,15 +25,15 @@ using namespace Miniature;
 MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height, 0),
-  m_colour_to_move(MPiece::WHITE)
+  m_colour_to_move(MPiece::WHITE),
+  m_position(width * height, 0)
 {}
 
 MPosition::MPosition(QString /*fen*/, int width, int height)
 : m_width(width),
   m_height(height),
-  m_position(width * height, 0),
-  m_colour_to_move(MPiece::WHITE)
+  m_colour_to_move(MPiece::WHITE),
+  m_position(width * height, 0)
 {
 }
 
@@ -171,7 +171,7 @@ MPiece::MColour MPosition::getColourToMove() const
     return m_colour_to_move;
 }
 
-void MPosition::nextColour
+void MPosition::nextColour()
 {
     if (m_colour_to_move == MPiece::WHITE)
     {
@@ -182,3 +182,4 @@ void MPosition::nextColour
         m_colour_to_move = MPiece::WHITE;
     }
 }
+
