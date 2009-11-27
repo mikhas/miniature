@@ -21,17 +21,17 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
-#include "miniature.ui.h"
+//#include "miniature.ui.h"
 #include "game.h"
 #include "player_info.h"
+#include "board_view.h"
+#include "miniature.ui.h"
 
-#include <QDBusAbstractAdaptor>
-#include <QMainWindow>
-#include <QPoint>
-#include <QUrl>
+#include <QtGui>
+#include <QtDBus>
 
-namespace Miniature
-{
+#define SERVICE_NAME "org.maemo.miniature"
+#define SERVICE_PATH "/org/maemo/miniature"
 
 class MMainWindow
 : public QMainWindow
@@ -40,7 +40,6 @@ class MMainWindow
 
 public:
     MMainWindow();
-    virtual ~MMainWindow();
 
 public Q_SLOTS:
     void updatePlayerInfo();
@@ -49,49 +48,27 @@ public Q_SLOTS:
     void toggleDebugOutput();
 
 private:
+    Ui::MMainWindow m_ui;
 
     /* Our internal game controller */
     Miniature::MGame m_game;
-
-    /* A reference to the internal scene view */
-    //QGraphicsView* m_view;
-
-    Ui::MMainWindow m_ui;
+    //Ui::MMainWindow m_ui;
 };
 
-class MApplication
-: public QApplication
-{
-    friend class MApplicationAdaptor;
-
-public:
-    MApplication(int &argc, char **argv);
-    virtual ~MApplication() {}
-
-    void open(const QUrl &url);
-
-private:
-    MMainWindow m_window;
-};
-
-class MApplicationAdaptor
+class MDBusAdaptor
 : public QDBusAbstractAdaptor
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.maemo.miniature")
 
 public:
-    MApplicationAdaptor(MApplication *application);
-    virtual ~MApplicationAdaptor() {}
+    MDBusAdaptor(MMainWindow *window);
 
 public Q_SLOTS:
     void top_application();
-    void mime_open(const QString &url);
 
 private:
-    MApplication *m_application;
+    MMainWindow *m_window;
 };
-
-}; // namespace Miniature
 
 #endif // MINIATURE_H__

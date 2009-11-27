@@ -22,14 +22,12 @@
 #include "miniature.h"
 #include "board_view.h"
 
-#include <QDBusConnection>
-#include <QMessageBox>
-
 using namespace Miniature;
 
 MMainWindow::MMainWindow()
 : QMainWindow()
 {
+
     m_ui.setupUi(this);
     updatePlayerInfo();
 
@@ -49,17 +47,20 @@ MMainWindow::MMainWindow()
     connect(m_ui.board_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             &m_game, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
+
     // Connect moves from game controller with main window.
     connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint)),
             this, SLOT(updateLastMove(QPoint, QPoint)));
 
     // Connect menu actions.
+
     connect(m_ui.new_game, SIGNAL(triggered()),
             &m_game, SLOT(newGame()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
+
     QFont small_font("helvetica", 8, QFont::Light);
     QFont big_font("helvetica", 16, QFont::Bold);
     QFont normal_font("helvetica", 14, QFont::DemiBold);
@@ -78,9 +79,6 @@ MMainWindow::MMainWindow()
     setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
 }
-
-MMainWindow::~MMainWindow()
-{}
 
 void MMainWindow::updatePlayerInfo()
 {
@@ -108,61 +106,57 @@ void MMainWindow::appendDebugOutput(QString msg)
     m_ui.debug->append(msg);
 }
 
-void MApplication::open(const QUrl &url)
-{
-    QMessageBox(QMessageBox::Information,
-                tr("Not implemented yet"),
-                tr("Reading of PGN chess files is not implemented yet.\n"
-                   "Cannot read information at %1.").arg(url.toString())).
-                exec();
-}
-
-MApplicationAdaptor::MApplicationAdaptor(MApplication *application)
-: QDBusAbstractAdaptor(application), m_application(application)
-{
-}
-
-void MApplicationAdaptor::top_application()
-{
-    m_application->m_window.raise();
-    m_application->m_window.showNormal();
-}
-
-void MApplicationAdaptor::mime_open(const QString &url)
-{
-    m_application->open(url);
-}
-
-MApplication::MApplication(int &argc, char **argv)
-: QApplication(argc, argv)
-{
-    connect(this, SIGNAL(lastWindowClosed()), this, SLOT(quit()));
-    m_window.show();
-}
-
 void MMainWindow::toggleDebugOutput()
 {
     static bool toggled = true;
 
-    if (toggled) {m_ui.debug->show();} else {m_ui.debug->hide();}
+    if (toggled)
+    {
+        m_ui.debug->show();
+    }
+    else
+    {
+        m_ui.debug->hide();
+    }
+
     toggled = !toggled;
 }
 
-int main(int argc, char **argv)
+
+MDBusAdaptor::MDBusAdaptor(MMainWindow *window) 
+: QDBusAbstractAdaptor(window),
+  m_window(window)
+{}
+
+void MDBusAdaptor::top_application()
 {
-    MApplication app(argc, argv);
-    new MApplicationAdaptor(&app);
+    qDebug() << __func__;
+    m_window->activateWindow();
+}
+
+int main (int argc, char ** argv)
+{
+    QApplication app(argc, argv);
+    MMainWindow window;
 
     QDBusConnection session(QDBusConnection::sessionBus());
 
-    if (!session.registerService("org.maemo.miniature") ||
-        !session.registerObject("/org/maemo/miniature", &app)) {
-        qWarning("Cannot register D-Bus service. Aborting.");
+    if (!session.registerService(SERVICE_NAME))
+    {
+        qWarning("Cannot register D-Bus service. Trying to activate other instance.");
+        session.call(QDBusMessage::createMethodCall(SERVICE_NAME, SERVICE_PATH,
+                                                    SERVICE_NAME, "top_application"));
         return 1;
     }
 
-    if (argc > 1)
-        app.open(QUrl(argv[1]));
+    if (!session.registerObject(SERVICE_PATH, &window))
+    {
+        qFatal("Cannot register D-Bus service. Aborting.");
+        return 1;
+    }
 
-    return MApplication(argc, argv).exec();
+    new MDBusAdaptor(&window);
+    window.show();
+
+    return app.exec();
 }
