@@ -25,7 +25,7 @@
 #include "game.h"
 #include "player_info.h"
 #include "board_view.h"
-#include "miniature.ui.h"
+#include "miniature_ui.h"
 
 #include <QtGui>
 #include <QtDBus>

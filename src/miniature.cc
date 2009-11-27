@@ -53,14 +53,12 @@ MMainWindow::MMainWindow()
             this, SLOT(updateLastMove(QPoint, QPoint)));
 
     // Connect menu actions.
-
     connect(m_ui.new_game, SIGNAL(triggered()),
             &m_game, SLOT(newGame()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
-
     QFont small_font("helvetica", 8, QFont::Light);
     QFont big_font("helvetica", 16, QFont::Bold);
     QFont normal_font("helvetica", 14, QFont::DemiBold);
