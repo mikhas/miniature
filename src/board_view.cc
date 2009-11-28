@@ -77,7 +77,10 @@ void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
         m_background_page = 0;
     }
 
-    painter->drawImage(region, *m_background_image);
+    if (m_background_image)
+    {
+        painter->drawImage(region, *m_background_image);
+    }
 }
 
 void MBoardView::setBoardBackground()
