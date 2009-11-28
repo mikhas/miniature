@@ -79,7 +79,7 @@ void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 
     if (m_background_image)
     {
-        painter->drawImage(region, *m_background_image);
+        painter->drawImage(region, *m_background_image, region);
     }
 }
 
@@ -166,6 +166,4 @@ void MBoardView::onLoadFinished (bool /*ok*/)
 {
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
     m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32);
-    setCacheMode(QGraphicsView::CacheBackground); // calls drawBackground & caches the pixmap
-
 }
