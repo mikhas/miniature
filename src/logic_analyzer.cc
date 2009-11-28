@@ -820,9 +820,6 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
 	// moveList is supposed to be sorted in a way that the one-step move comes before the two-step move if there's any.
 	bool obstacle = false;
 
-	MPiece *piece = pos.pieceAt(from);
-	Q_CHECK_PTR(piece);
-
 	QList<QPoint> newMoveList;
 
     for(QList<QPoint>::const_iterator iter = moveList.begin();
