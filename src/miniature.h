@@ -43,16 +43,26 @@ public:
 
 public Q_SLOTS:
     void updatePlayerInfo();
-    void updateLastMove(QPoint from, QPoint to);
+    void updateLastMove(int half_move, const QString &last_move);
     void appendDebugOutput(QString msg);
     void toggleDebugOutput();
+    void showBoard();
+    void showMoveList();
+    void clearMoveList();
 
 private:
+    void setupMoveListView();
+    /* Every but the board is created with the Qt designer, to save time when
+     * porting to other platforms where we might have to make some changes to the
+     * layout. We currently manually disable the auto-connect feature, in the
+     * UI file itself.
+     */
     Ui::MMainWindow m_ui;
 
     /* Our internal game controller */
     Miniature::MGame m_game;
-    //Ui::MMainWindow m_ui;
+
+    enum StackedWidgets {STACKED_BOARD, STACKED_MOVE_LIST};
 };
 
 class MDBusAdaptor

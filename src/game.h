@@ -63,7 +63,7 @@ Q_SIGNALS:
     void sendDebugInfo(QString msg);
     void playerInfoChanged();
     void positionChanged(const MPosition&);
-    void pieceMoved(QPoint from, QPoint to);
+    void pieceMoved(int half_move, const QString& last_move);
     void invalidMove(QPoint from, QPoint to);
     void check();
     void pawnPromoted(QPoint where);

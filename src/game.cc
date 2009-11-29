@@ -100,6 +100,7 @@ void MGame::prevMove()
 
 void MGame::setupStartPosition()
 {
+    m_half_move = -1;
     m_position.reset();
 
     m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
@@ -143,6 +144,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_position, from, to);
     if (MLogicAnalyzer::VALID & result)
     {
+        ++m_half_move;
         MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
         m_position.movePiece(from, to);
 
@@ -170,7 +172,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
             Q_EMIT pawnPromoted(to);
         }
 
-        Q_EMIT pieceMoved(from, to);
+        Q_EMIT pieceMoved(m_half_move, QString((MPiece::BLACK == colour ? "Nc6" : "Nf3")));
         Q_EMIT positionChanged(m_position);
     }
     else
