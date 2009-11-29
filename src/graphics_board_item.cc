@@ -160,6 +160,8 @@ QRectF MGraphicsBoardItem::boundingRect() const
 void MGraphicsBoardItem::addPiece(QGraphicsSvgItem *piece)
 {
     m_pieces.append(piece);
+    piece->setData(0, QVariant(true)); // allowed to move
+    piece->setData(1, QVariant(false)); // not rotated
     piece->setParentItem(this);
 }
 

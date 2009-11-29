@@ -65,6 +65,8 @@ MMainWindow::MMainWindow()
             this, SLOT(clearMoveList()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
+    connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
+            m_ui.board_view, SLOT(rotateBlackPieces()));
 
     // Chain up UI elements for switching to the move list view/board view to a single actions.
     connect(m_ui.move_list_button, SIGNAL(pressed()),

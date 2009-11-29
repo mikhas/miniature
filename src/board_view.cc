@@ -35,7 +35,10 @@ MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
   m_board_item(0),
   m_background_page(new QWebPage),
-  m_background_image(0)
+  m_background_image(0),
+  m_white_rotated180(false),
+  m_black_rotated180(false),
+  m_last_drawn_position(0)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
@@ -107,9 +110,12 @@ void MBoardView::drawPosition(const MPosition &position)
     static QTime profiling;
     profiling.restart();
 
+    m_last_drawn_position = &position;
+
     Q_CHECK_PTR(m_board_item);
 
     m_board_item->removePieces();
+    const int cell_size = m_board_item->getCellSize();
 
     for(MPosition::MPieces::const_iterator iter = position.begin();
         iter != position.end();
@@ -118,14 +124,14 @@ void MBoardView::drawPosition(const MPosition &position)
         MPiece* pos_piece = *iter;
         if (pos_piece) // non-empty cell
         {
-            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), m_board_item->getCellSize());
+            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), cell_size);
             QGraphicsSvgItem* item = 0;
 
             // Querying cache for the item.
             if (!m_cache.contains(pos_piece))
             {
                 //qDebug("MBV::dp - nothing found at %i ", (int) pos_piece);
-                item = pos_piece->createSvgItem(m_board_item->getCellSize());
+                item = pos_piece->createSvgItem(cell_size);
                 m_cache.insert(pos_piece, item);
                 m_board_item->addPiece(item);
             }
@@ -137,6 +143,30 @@ void MBoardView::drawPosition(const MPosition &position)
 
             item->setData(0, QVariant((position.getColourToMove() == pos_piece->getColour() ? true
                                                                                             : false)));
+            const bool is_white_piece = (MPiece::WHITE == pos_piece->getColour());
+            const bool is_black_piece = !is_white_piece;
+
+            const bool have_to_rotate = ((is_white_piece && m_white_rotated180) ||
+                                         (is_black_piece && m_black_rotated180));
+
+            const bool is_rotated = item->data(1).toBool();
+            const QRectF correction = item->boundingRect();
+
+            // item is not rotated yet
+            if(!is_rotated && have_to_rotate)
+            {
+                item->rotate(180);
+                item->translate(-correction.width(), -correction.height());
+                item->setData(1, QVariant(true));
+            }
+            // item was rotated, but needs to be reset
+            else if (is_rotated && !have_to_rotate)
+            {
+                item->rotate(180);
+                item->translate(-correction.width(), -correction.height());
+                item->setData(1, QVariant(false));
+            }
+
             item->setPos(cell);
             item->show();
         }
@@ -162,8 +192,31 @@ void MBoardView::appendDebugOutput(QString msg)
     Q_EMIT sendDebugInfo(msg);
 }
 
-void MBoardView::onLoadFinished (bool /*ok*/)
+void MBoardView::onLoadFinished(bool /*ok*/)
 {
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
     m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32);
+    update(); // schedule a redraw
+}
+
+void MBoardView::rotateWhitePieces()
+{
+    m_white_rotated180 = !m_white_rotated180;
+
+    // Yup, it might be that we cannot always redraw the board instantly.
+    if (m_last_drawn_position)
+    {
+        drawPosition(*m_last_drawn_position);
+    }
+}
+
+void MBoardView::rotateBlackPieces()
+{
+    m_black_rotated180 = !m_black_rotated180;
+
+    // Yup, it might be that we cannot always redraw the board instantly.
+    if (m_last_drawn_position)
+    {
+        drawPosition(*m_last_drawn_position);
+    }
 }

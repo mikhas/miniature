@@ -600,6 +600,7 @@
      <string>Main</string>
     </property>
     <addaction name="new_game"/>
+    <addaction name="rotate_black_pieces"/>
     <addaction name="toggle_debug_output"/>
    </widget>
    <widget class="QMenu" name="help">
@@ -653,6 +654,11 @@
   <action name="show_board">
    <property name="text">
     <string>show_board</string>
+   </property>
+  </action>
+  <action name="rotate_black_pieces">
+   <property name="text">
+    <string>Rotate black pieces</string>
    </property>
   </action>
  </widget>

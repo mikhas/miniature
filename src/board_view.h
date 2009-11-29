@@ -59,6 +59,8 @@ public Q_SLOTS:
      */
     void drawPosition(const MPosition &position);
     void drawStartPosition();
+    void rotateBlackPieces();
+    void rotateWhitePieces();
 
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
@@ -81,6 +83,12 @@ private:
 
     QWebPage* m_background_page;
     QImage* m_background_image;
+
+    bool m_white_rotated180;
+    bool m_black_rotated180;
+
+    // Cache a ptr to last drawn position for redrawing the board
+    const MPosition* m_last_drawn_position;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);
