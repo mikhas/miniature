@@ -25,7 +25,8 @@
 #include "game.h"
 #include "player_info.h"
 #include "board_view.h"
-#include "miniature_ui.h"
+#include "miniature.ui.h"
+#include "about.ui.h"
 
 #include <QtGui>
 #include <QtDBus>
@@ -49,6 +50,7 @@ public Q_SLOTS:
     void showBoard();
     void showMoveList();
     void clearMoveList();
+    void showAboutDialog();
 
 private:
     void setupMoveListView();
@@ -58,6 +60,7 @@ private:
      * UI file itself.
      */
     Ui::MMainWindow m_ui;
+    Ui::AboutDialog m_about_dialog;
 
     /* Our internal game controller */
     Miniature::MGame m_game;

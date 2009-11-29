@@ -22,6 +22,9 @@
 #include "miniature.h"
 #include "board_view.h"
 
+#include <QTreeWidgetItem>
+#include <QStringList>
+
 using namespace Miniature;
 
 MMainWindow::MMainWindow()
@@ -29,7 +32,10 @@ MMainWindow::MMainWindow()
 {
 
     m_ui.setupUi(this);
+
     updatePlayerInfo();
+    // Can be done in the Qt Designer, wow!
+    //setupMoveListView();
 
     // Connect game logic w/ player info view.
     connect(&m_game, SIGNAL(playerInfoChanged()),
@@ -49,14 +55,34 @@ MMainWindow::MMainWindow()
 
 
     // Connect moves from game controller with main window.
-    connect(&m_game, SIGNAL(pieceMoved(QPoint, QPoint)),
-            this, SLOT(updateLastMove(QPoint, QPoint)));
+    connect(&m_game, SIGNAL(pieceMoved(int, QString)),
+            this, SLOT(updateLastMove(int, QString)));
 
     // Connect menu actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
             &m_game, SLOT(newGame()));
+    connect(m_ui.new_game, SIGNAL(triggered()),
+            this, SLOT(clearMoveList()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
+
+    // Chain up UI elements for switching to the move list view/board view to a single actions.
+    connect(m_ui.move_list_button, SIGNAL(pressed()),
+            m_ui.show_move_list, SLOT(trigger()));
+    connect(m_ui.board_button, SIGNAL(pressed()),
+            m_ui.show_board, SLOT(trigger()));
+    connect(m_ui.new_game, SIGNAL(triggered()), // switching a to a stacked widget via menu probably breaks Hildon UI spec, oh well ...
+            m_ui.show_board, SLOT(trigger()));
+
+    // Connect the show move list action to show the right stacked widget.
+    connect(m_ui.show_move_list, SIGNAL(triggered()),
+            this, SLOT(showMoveList()));
+    connect(m_ui.show_board, SIGNAL(triggered()),
+            this, SLOT(showBoard()));
+
+    // Connect action to show about dialog
+    connect(m_ui.about, SIGNAL(triggered()),
+            this, SLOT(showAboutDialog()));
 
     // Fix the font sizes, the Maemo5 style is totally wrong regarding that.
     QFont small_font("helvetica", 8, QFont::Light);
@@ -69,13 +95,31 @@ MMainWindow::MMainWindow()
     m_ui.black_name->setFont(big_font);
     m_ui.black_rating->setFont(normal_font);
     m_ui.black_material->setFont(normal_font);
+
     m_ui.debug->setFont(small_font);
     m_ui.debug->hide();
 
 #ifdef Q_WS_MAEMO_5
+    // TODO: query orientation before
     setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
     setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
+}
+
+void MMainWindow::setupMoveListView()
+{
+    QStringList labels;
+    labels << QString(tr("#"))
+           << QString(tr("White"))
+           << QString(tr("Black"));
+
+    m_ui.move_list->setColumnCount(3);
+    m_ui.move_list->setHeaderLabels(labels);
+}
+
+void MMainWindow::clearMoveList()
+{
+    // clear moves from move list, e.g., on new game
 }
 
 void MMainWindow::updatePlayerInfo()
@@ -91,12 +135,22 @@ void MMainWindow::updatePlayerInfo()
     m_ui.black_material->setText(QString("%1").arg(info.black_material));
 }
 
-void MMainWindow::updateLastMove(QPoint from, QPoint to)
+void MMainWindow::updateLastMove(int half_move, const QString& last_move)
 {
-    m_ui.last_move->setText(QString(tr("Moved from [%1, %2] to [%3, %4]")).arg(from.x())
-                                                                          .arg(from.y())
-                                                                          .arg(to.x())
-                                                                          .arg(to.y()));
+    const int full_move = (half_move >> 1);
+    const bool white_moved = !(half_move % 2);
+    m_ui.last_move->setText(QString("%1. %2 %3").arg(full_move + 1)
+                                                .arg(white_moved ? "" : "...")
+                                                .arg(last_move));
+
+    QTreeWidgetItem* item = m_ui.move_list->topLevelItem(full_move);
+    if(!item)
+    {
+        item = new QTreeWidgetItem(m_ui.move_list);
+        m_ui.move_list->insertTopLevelItem(full_move, item);
+    }
+    item->setText(0, QString("%1").arg(full_move + 1));
+    item->setText((white_moved ? 1 : 2), last_move);
 }
 
 void MMainWindow::appendDebugOutput(QString msg)
@@ -120,6 +174,23 @@ void MMainWindow::toggleDebugOutput()
     toggled = !toggled;
 }
 
+void MMainWindow::showBoard()
+{
+    m_ui.stack->setCurrentIndex(STACKED_BOARD);
+}
+
+void MMainWindow::showMoveList()
+{
+    m_ui.stack->setCurrentIndex(STACKED_MOVE_LIST);
+}
+
+void MMainWindow::showAboutDialog()
+{
+    QDialog dialog;
+    m_about_dialog.setupUi(&dialog);
+    m_about_dialog.slogan->setFont(QFont("helvetica", 14, QFont::Normal));
+    dialog.exec();
+}
 
 MDBusAdaptor::MDBusAdaptor(MMainWindow *window) 
 : QDBusAbstractAdaptor(window),

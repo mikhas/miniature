@@ -30,7 +30,8 @@ src_miniature_SOURCES = \
 			src/miniature.cc \
 			src/miniature.h \
 			src/miniature.moc.cc \
-			src/miniature_ui.h \
+			src/about.ui.h \
+			src/miniature.ui.h \
 			src/player_info.h \
 			src/pieces.h \
 			src/pieces/piece.h \
@@ -57,6 +58,7 @@ BUILT_SOURCES = \
 		src/graphics_board_item.moc.cc \
 		src/miniature.moc.cc \
 		src/miniature.ui.h \
+		src/about.ui.h \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
