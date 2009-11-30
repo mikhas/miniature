@@ -72,7 +72,8 @@ MMainWindow::MMainWindow()
             m_ui.show_move_list, SLOT(trigger()));
     connect(m_ui.board_button, SIGNAL(pressed()),
             m_ui.show_board, SLOT(trigger()));
-    connect(m_ui.new_game, SIGNAL(triggered()), // switching a to a stacked widget via menu probably breaks Hildon UI spec, oh well ...
+    // switching a to a stacked widget via menu probably breaks Hildon UI spec, oh well ..
+    connect(m_ui.new_game, SIGNAL(triggered()),
             m_ui.show_board, SLOT(trigger()));
 
     // Connect the show move list action to show the right stacked widget.
@@ -129,7 +130,7 @@ void MMainWindow::setupMoveListView()
 
 void MMainWindow::clearMoveList()
 {
-    // clear moves from move list, e.g., on new game
+    m_ui.move_list->clear();
 }
 
 void MMainWindow::updatePlayerInfo()

@@ -22,6 +22,27 @@
 
 using namespace Miniature;
 
+// MStorage impl
+MStorage::MStorage(int index, MPiece *piece)
+: m_index(index),
+  m_piece(piece)
+{}
+
+MStorage::~MStorage()
+{
+    if(m_piece)
+    {
+        delete m_piece;
+        m_piece = 0;
+    }
+}
+
+bool MStorage::empty() const
+{
+    return (0 == m_piece);
+}
+
+// MPosition impl
 MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
@@ -34,21 +55,23 @@ MPosition::MPosition(QString /*fen*/, int width, int height)
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
   m_position(width * height, 0)
-{
-}
+{}
 
+// TODO: clean up pieces => mem leak
 MPosition::~MPosition()
 {}
 
-bool MPosition::movePiece(QPoint from, QPoint to)
+QString MPosition::movePiece(QPoint from, QPoint to)
 {
-    bool captured = capturePieceAt(to);
+    // since the storage takes ownership it will delete the stored piece at the
+    // end of scope, if need be.
+    MStorage storage = store(to);
 
     // TODO: Castling & pawn promotion
     addPieceAt(pieceAt(from), to);
-    addPieceAt(0, from);
+    removePieceAt(from);
 
-    return captured;
+    return QString("e4");
 }
 
 MPiece* MPosition::pieceAt(QPoint pos) const
@@ -119,17 +142,26 @@ void MPosition::convertFromFen(QString fen)
     // TODO Set player-to-move, castle options, etc.
 }
 
-bool MPosition::capturePieceAt(QPoint pos)
+MStorage MPosition::store(const QPoint &location)
 {
-    const int index = indexFromPoint(pos);
-    if (m_position[index])
+    const int index = indexFromPoint(location);
+
+    MStorage storage = MStorage(index, m_position[index]);
+    m_position[index] = 0;
+
+    return storage;
+}
+
+void MPosition::restore(const MStorage &storage)
+{
+    // delete whatever is at the storage's location, to prevent mem leakage
+    if (m_position[storage.m_index])
     {
-        //qDebug("MPosition::captureAt - captured!");
-        delete m_position[index];
-        m_position[index] = 0;
-        return true;
+        delete m_position[storage.m_index];
+        m_position[storage.m_index] = 0;
     }
-    return false;
+
+    m_position[storage.m_index] = storage.m_piece;
 }
 
 void MPosition::addPieceAt(MPiece* piece, QPoint pos)
@@ -182,4 +214,3 @@ void MPosition::nextColour()
     m_colour_to_move = (m_colour_to_move == MPiece::WHITE ? MPiece::BLACK
                                                           : MPiece::WHITE);
 }
-

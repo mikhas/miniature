@@ -146,7 +146,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     {
         ++m_half_move;
         MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
-        m_position.movePiece(from, to);
+        QString notation = m_position.movePiece(from, to);
 
         m_position.nextColour();
         updateMoveInfo(m_position.getColourToMove() == MPiece::WHITE);
@@ -172,7 +172,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
             Q_EMIT pawnPromoted(to);
         }
 
-        Q_EMIT pieceMoved(m_half_move, QString((MPiece::BLACK == colour ? "Nc6" : "Nf3")));
+        Q_EMIT pieceMoved(m_half_move, notation);
         Q_EMIT positionChanged(m_position);
     }
     else

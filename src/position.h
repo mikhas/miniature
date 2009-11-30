@@ -30,13 +30,25 @@
 namespace Miniature
 {
 
+/* This class represents a simple piece storage. */
+class MStorage
+{
+public:
+    MStorage(int index, MPiece *piece);
+    ~MStorage();
+
+    bool empty() const;
+
+    int m_index;
+    MPiece *m_piece;
+};
+
 /* This class represents a chess position.*/
 // TODO: kill off FEN support needed for pieces pool manager
 // TODO: give each MPiece the correct shared svg renderer so that the board can
 //       draw by using MPiece, too
 class MPosition
 {
-
 public:
     // construct empty position
     explicit MPosition(int width = 8, int height = 8);
@@ -49,14 +61,26 @@ public:
     QString convertToFen() const;
     void convertFromFen(QString fen);
 
-    bool capturePieceAt(QPoint pos);
+    /* Stores the contents of what was found at the given location, and removes
+     * it from m_position. */
+    MStorage store(const QPoint &location);
+    /* Restores a MStorage to m_position, using the original location. If the
+     * original location is non-empty it gets overwritten. Thus, re-applying
+     * restore over the same MStorage is safe. */
+    // TODO: offer MStorage swapping?
+    void restore(const MStorage &storage);
+
+    // Takes ownership of piece, but leaks memory if some other piece was at pos.
     void addPieceAt(MPiece* piece, QPoint pos);
+    // Does not delete piece at pos, only resets pointer to 0.
     void removePieceAt(QPoint pos);
     void reset();
 
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
-    // Returns true if there was a piece at "to".
-    bool movePiece(QPoint from, QPoint to);
+    /* Moves a piece and returns the traditional chess notation for a move,
+     * e.g., "1. (4,6) to (6,6)" = "1. e4"
+     */
+    QString movePiece(QPoint from, QPoint to);
     MPiece* pieceAt(QPoint pos) const;
 
     MPieces::const_iterator begin() const;
