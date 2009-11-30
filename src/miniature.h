@@ -41,6 +41,9 @@ class MMainWindow
 
 public:
     MMainWindow();
+    ~MMainWindow();
+
+    virtual void show();
 
 public Q_SLOTS:
     void updatePlayerInfo();

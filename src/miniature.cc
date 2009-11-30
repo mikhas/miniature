@@ -30,7 +30,6 @@ using namespace Miniature;
 MMainWindow::MMainWindow()
 : QMainWindow()
 {
-
     m_ui.setupUi(this);
 
     updatePlayerInfo();
@@ -106,6 +105,15 @@ MMainWindow::MMainWindow()
     setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
     setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
+}
+
+MMainWindow::~MMainWindow()
+{}
+
+void MMainWindow::show()
+{
+    QMainWindow::show();
+    m_game.newGame();
 }
 
 void MMainWindow::setupMoveListView()
