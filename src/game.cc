@@ -167,7 +167,6 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         if (MLogicAnalyzer::PROMOTION & result)
         {
-            m_position.removePieceAt(to);
             m_position.addPieceAt(new MQueen(colour), to);
             Q_EMIT pawnPromoted(to);
         }

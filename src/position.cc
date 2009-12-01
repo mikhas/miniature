@@ -59,19 +59,28 @@ MPosition::MPosition(QString /*fen*/, int width, int height)
 
 // TODO: clean up pieces => mem leak
 MPosition::~MPosition()
-{}
+{
+    reset();
+}
 
 QString MPosition::movePiece(QPoint from, QPoint to)
 {
+    // TODO: Castling & pawn promotion
+
     // since the storage takes ownership it will delete the stored piece at the
     // end of scope, if need be.
-    MStorage storage = store(to);
+    MStorage from_storage = store(from);
+    MStorage to_storage = store(to);
 
-    // TODO: Castling & pawn promotion
-    addPieceAt(pieceAt(from), to);
-    removePieceAt(from);
+    QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
 
-    return QString("e4");
+    from_storage.m_index = indexFromPoint(to);
+    restore(&from_storage);
+
+    // TODO: fix ambigious moves, e.g., when two pieces of the same kind can move to a location.
+    return QString("%1%2%3").arg(letter)
+                            .arg(to_storage.empty() ? "" : "x")
+                            .arg(convertToChessCell(to));
 }
 
 MPiece* MPosition::pieceAt(QPoint pos) const
@@ -142,6 +151,13 @@ void MPosition::convertFromFen(QString fen)
     // TODO Set player-to-move, castle options, etc.
 }
 
+QString MPosition::convertToChessCell(QPoint location) const
+{
+    const int small_letter_a = 97;
+    return QString("%1%2").arg(static_cast<char>(small_letter_a + location.x()))
+                          .arg(8 - location.y());
+}
+
 MStorage MPosition::store(const QPoint &location)
 {
     const int index = indexFromPoint(location);
@@ -152,20 +168,22 @@ MStorage MPosition::store(const QPoint &location)
     return storage;
 }
 
-void MPosition::restore(const MStorage &storage)
+void MPosition::restore(MStorage* const storage)
 {
-    // delete whatever is at the storage's location, to prevent mem leakage
-    if (m_position[storage.m_index])
-    {
-        delete m_position[storage.m_index];
-        m_position[storage.m_index] = 0;
-    }
+    Q_CHECK_PTR(storage);
 
-    m_position[storage.m_index] = storage.m_piece;
+    // delete whatever is at the storage's location, to prevent mem leakage
+    MStorage removed = store(indexToPoint(storage->m_index)); // TODO: optimise back&forth conversion?
+
+    m_position[storage->m_index] = storage->m_piece;
+    // release ownership of the storage
+    storage->m_piece = 0;
 }
 
 void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 {
+    // Prevents potential memory leak by adding pieces on top of each other.
+    //MStorage removed = store(pos);
     m_position[indexFromPoint(pos)] = piece;
 
     if (piece && piece->getType() == MPiece::KING)
@@ -176,18 +194,14 @@ void MPosition::addPieceAt(MPiece* piece, QPoint pos)
         }
         else
         {
-            m_white_king = pos;
+            m_black_king = pos;
         }
     }
 }
 
-void MPosition::removePieceAt(QPoint pos)
-{
-    addPieceAt(0, pos);
-}
-
 void MPosition::reset()
 {
+    // TODO: check whether this leaks
     m_position = MPieces(m_position.size(), 0);
     m_colour_to_move = MPiece::WHITE;
 }

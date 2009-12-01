@@ -57,23 +57,24 @@ public:
 
     typedef QVector<MPiece*> MPieces;
 
-    // These 3 methods are potentially deprecated!
+    // deprecated?
     QString convertToFen() const;
+    // deprecated?
     void convertFromFen(QString fen);
+    QString convertToChessCell(QPoint location) const;
 
     /* Stores the contents of what was found at the given location, and removes
      * it from m_position. */
     MStorage store(const QPoint &location);
     /* Restores a MStorage to m_position, using the original location. If the
      * original location is non-empty it gets overwritten. Thus, re-applying
-     * restore over the same MStorage is safe. */
+     * restore over the same MStorage is safe. Releases ownership over the stored
+     * piece. */
     // TODO: offer MStorage swapping?
-    void restore(const MStorage &storage);
+    void restore(MStorage* const storage);
 
-    // Takes ownership of piece, but leaks memory if some other piece was at pos.
+    /* Takes ownership of piece. */
     void addPieceAt(MPiece* piece, QPoint pos);
-    // Does not delete piece at pos, only resets pointer to 0.
-    void removePieceAt(QPoint pos);
     void reset();
 
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.

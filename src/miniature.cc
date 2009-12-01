@@ -58,10 +58,13 @@ MMainWindow::MMainWindow()
             this, SLOT(updateLastMove(int, QString)));
 
     // Connect menu actions.
+    // TODO: make this independent of the signal order
     connect(m_ui.new_game, SIGNAL(triggered()),
-            &m_game, SLOT(newGame()));
+            m_ui.board_view, SLOT(resetCache()));
     connect(m_ui.new_game, SIGNAL(triggered()),
             this, SLOT(clearMoveList()));
+    connect(m_ui.new_game, SIGNAL(triggered()),
+            &m_game, SLOT(newGame()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
     connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),

@@ -61,6 +61,7 @@ public Q_SLOTS:
     void drawStartPosition();
     void rotateBlackPieces();
     void rotateWhitePieces();
+    void resetCache();
 
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);

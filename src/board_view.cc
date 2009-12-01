@@ -51,13 +51,7 @@ MBoardView::MBoardView(QWidget *parent)
 
 MBoardView::~MBoardView()
 {
-    for(MSvgItemCache::iterator iter = m_cache.begin();
-        iter != m_cache.end();
-        ++iter)
-    {
-        delete iter.value();
-    }
-
+    resetCache();
     delete m_background_image;
 }
 
@@ -65,6 +59,11 @@ void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
     setBoardBackground();
+}
+
+void MBoardView::resetCache()
+{
+    m_cache.clear();
 }
 
 void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
