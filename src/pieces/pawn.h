@@ -34,12 +34,12 @@ class MPawn
 : public MPiece
 {
 public:
-	MPawn(MColour colour, int width = 8, int height = 8);
-	~MPawn();
+    MPawn(MColour colour, int width = 8, int height = 8);
+    ~MPawn();
 
-	virtual QList<QPoint> getPossibleSquares(QPoint) const;
-
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
     virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QChar getLetter() const;
 
 private:
     /* We have two renderers as class variables because we did not go the full

@@ -111,4 +111,9 @@ QGraphicsSvgItem* MRook::createSvgItem(int pieceSize) const
     return svgItem;
 }
 
+QChar MRook::getLetter() const
+{
+    return QChar('R');
+}
+
 }

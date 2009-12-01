@@ -34,12 +34,12 @@ class MQueen
 : public MPiece
 {
 public:
-	MQueen(MColour colour, int width = 8, int height = 8);
-	~MQueen();
+    MQueen(MColour colour, int width = 8, int height = 8);
+    ~MQueen();
 
-	virtual QList<QPoint> getPossibleSquares(QPoint) const;
-
-	virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QChar getLetter() const;
 
 private:
     /* We have two renderers as class variables because we did not go the full

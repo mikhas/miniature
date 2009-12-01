@@ -38,54 +38,54 @@ MPawn::~MPawn()
 
 QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares;
+    QList<QPoint> possibleSquares;
 
-	// black
-	if (colour == BLACK)
-	{
-		if (point.y() + 1 < yDim)
-		{
-			possibleSquares.append(QPoint(point.x(), point.y() + 1));
-			possibleSquares.append(QPoint(point.x(), point.y() + 2));
-			if (point.x() == 0)
-			{
-				possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
-			}
-			else if (point.x() == xDim - 1)
-			{
-				possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
-			}
-			else
-			{
-				possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
-				possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
-			}
-		}
-	}
-	// white
-	else
-	{
-		if (point.y() - 1 >= 0)
-		{
-			possibleSquares.append(QPoint(point.x(), point.y() - 1));
-			possibleSquares.append(QPoint(point.x(), point.y() - 2));
-			if (point.x() == 0)
-			{
-				possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
-			}
-			else if (point.x() == xDim - 1)
-			{
-				possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
-			}
-			else
-			{
-				possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
-				possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
-			}
-		}
-	}
+    // black
+    if (colour == BLACK)
+    {
+        if (point.y() + 1 < yDim)
+        {
+            possibleSquares.append(QPoint(point.x(), point.y() + 1));
+            possibleSquares.append(QPoint(point.x(), point.y() + 2));
+            if (point.x() == 0)
+            {
+                possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
+            }
+            else if (point.x() == xDim - 1)
+            {
+                possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
+            }
+            else
+            {
+                possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
+                possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
+            }
+        }
+    }
+    // white
+    else
+    {
+        if (point.y() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x(), point.y() - 1));
+            possibleSquares.append(QPoint(point.x(), point.y() - 2));
+            if (point.x() == 0)
+            {
+                possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
+            }
+            else if (point.x() == xDim - 1)
+            {
+                possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
+            }
+            else
+            {
+                possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
+                possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
+            }
+        }
+    }
 
-	return possibleSquares;
+    return possibleSquares;
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
@@ -95,7 +95,7 @@ QGraphicsSvgItem* MPawn::createSvgItem(int pieceSize) const
 
     if (!MPawn::hasFinishedLoading)
     {
-    	MPawn::blackRenderer.load(QString(":pieces/black/pawn.svg"));
+        MPawn::blackRenderer.load(QString(":pieces/black/pawn.svg"));
         MPawn::whiteRenderer.load(QString(":pieces/white/pawn.svg"));
         MPawn::hasFinishedLoading = true;
     }
@@ -104,6 +104,11 @@ QGraphicsSvgItem* MPawn::createSvgItem(int pieceSize) const
                                                         : MPawn::whiteRenderer), pieceSize);
 
     return svgItem;
+}
+
+QChar MPawn::getLetter() const
+{
+    return QChar(' ');
 }
 
 }

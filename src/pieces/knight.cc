@@ -124,4 +124,9 @@ QGraphicsSvgItem* MKnight::createSvgItem(int pieceSize) const
     return svgItem;
 }
 
+QChar MKnight::getLetter() const
+{
+    return QChar('N');
+}
+
 }

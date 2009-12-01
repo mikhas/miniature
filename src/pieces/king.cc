@@ -38,72 +38,72 @@ MKing::~MKing()
 
 QList<QPoint> MKing::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares;
+    QList<QPoint> possibleSquares;
 
-	// north-west, north and north-east
-	if (point.y() + 1 < yDim)
-	{
-		possibleSquares.append(QPoint(point.x(), point.y() + 1));
-		if (point.x() - 1 >= 0)
-		{
-			possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
-		}
-		if (point.x() + 1 < xDim)
-		{
-			possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
-		}
-	}
+    // north-west, north and north-east
+    if (point.y() + 1 < yDim)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() + 1));
+        if (point.x() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
+        }
+        if (point.x() + 1 < xDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
+        }
+    }
 
-	// east
-	if (point.x() + 1 < xDim)
-	{
-		possibleSquares.append(QPoint(point.x() + 1, point.y()));
-	}
+    // east
+    if (point.x() + 1 < xDim)
+    {
+        possibleSquares.append(QPoint(point.x() + 1, point.y()));
+    }
 
-	// south-east, south, south-west
-	if (point.y() - 1 >= 0)
-	{
-		possibleSquares.append(QPoint(point.x(), point.y() - 1));
-		if (point.x() - 1 >= 0)
-		{
-			possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
-		}
-		if (point.x() + 1 < xDim)
-		{
-			possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
-		}
-	}
+    // south-east, south, south-west
+    if (point.y() - 1 >= 0)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() - 1));
+        if (point.x() - 1 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
+        }
+        if (point.x() + 1 < xDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
+        }
+    }
 
-	// west
-	if (point.x() - 1 >= 0)
-	{
-		possibleSquares.append(QPoint(point.x() - 1, point.y()));
-	}
+    // west
+    if (point.x() - 1 >= 0)
+    {
+        possibleSquares.append(QPoint(point.x() - 1, point.y()));
+    }
 
-	// castling
-	if (castle)
-	{
-		if (point.x() + 2 < xDim)
-		{
-			possibleSquares.append(QPoint(point.x() + 2, point.y()));
-		}
-		if (point.x() - 2 >= 0)
-		{
-			possibleSquares.append(QPoint(point.x() - 2, point.y()));
-		}
-	}
+    // castling
+    if (castle)
+    {
+        if (point.x() + 2 < xDim)
+        {
+            possibleSquares.append(QPoint(point.x() + 2, point.y()));
+        }
+        if (point.x() - 2 >= 0)
+        {
+            possibleSquares.append(QPoint(point.x() - 2, point.y()));
+        }
+    }
 
-	return possibleSquares;
+    return possibleSquares;
 }
 
 void MKing::hasMoved()
 {
-	castle = false;
+    castle = false;
 }
 
 bool MKing::canCastle()
 {
-	return castle;
+    return castle;
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
@@ -122,6 +122,11 @@ QGraphicsSvgItem* MKing::createSvgItem(int pieceSize) const
                                                         : MKing::whiteRenderer), pieceSize);
 
     return svgItem;
+}
+
+QChar MKing::getLetter() const
+{
+    return QChar('K');
 }
 
 }

@@ -37,71 +37,71 @@ MQueen::~MQueen()
 
 QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares;
+    QList<QPoint> possibleSquares;
 
-	// north
-	int i = 1;
-	while (point.y() + i < yDim)
-	{
-		possibleSquares.append(QPoint(point.x(), point.y() + i));
-		++i;
-	}
+    // north
+    int i = 1;
+    while (point.y() + i < yDim)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() + i));
+        ++i;
+    }
 
-	// north-east
-	i = 1;
-	while ((point.x() + i < xDim) && (point.y() + i < yDim))
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
-		++i;
-	}
+    // north-east
+    i = 1;
+    while ((point.x() + i < xDim) && (point.y() + i < yDim))
+    {
+        possibleSquares.append(QPoint(point.x() + i, point.y() + i));
+        ++i;
+    }
 
-	// east
-	i = 1;
-	while (point.x() + i < xDim)
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y()));
-		++i;
-	}
+    // east
+    i = 1;
+    while (point.x() + i < xDim)
+    {
+        possibleSquares.append(QPoint(point.x() + i, point.y()));
+        ++i;
+    }
 
-	// south-east
-	i = 1;
-	while ((point.x() + i < xDim) && (point.y() - i >= 0))
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y() - i));
-		++i;
-	}
+    // south-east
+    i = 1;
+    while ((point.x() + i < xDim) && (point.y() - i >= 0))
+    {
+        possibleSquares.append(QPoint(point.x() + i, point.y() - i));
+        ++i;
+    }
 
-	// south
-	i = 1;
-	while (point.y() - i >= 0)
-	{
-		possibleSquares.append(QPoint(point.x(), point.y() - i));
-		++i;
-	}
+    // south
+    i = 1;
+    while (point.y() - i >= 0)
+    {
+        possibleSquares.append(QPoint(point.x(), point.y() - i));
+        ++i;
+    }
 
-	// south-west
-	i = 1;
-	while ((point.x() - i >= 0) && (point.y() - i >= 0))
-	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
-		++i;
-	}
+    // south-west
+    i = 1;
+    while ((point.x() - i >= 0) && (point.y() - i >= 0))
+    {
+        possibleSquares.append(QPoint(point.x() - i, point.y() - i));
+        ++i;
+    }
 
-	// west
-	i = 1;
-	while (point.x() - i >= 0)
-	{
-		possibleSquares.append(QPoint(point.x() - i, point.y()));
-		++i;
-	}
+    // west
+    i = 1;
+    while (point.x() - i >= 0)
+    {
+        possibleSquares.append(QPoint(point.x() - i, point.y()));
+        ++i;
+    }
 
-	// north-west
-	i = 1;
-	while ((point.x() - i >= 0) && (point.y() + i < yDim))
-	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
-		++i;
-	}
+    // north-west
+    i = 1;
+    while ((point.x() - i >= 0) && (point.y() + i < yDim))
+    {
+        possibleSquares.append(QPoint(point.x() - i, point.y() + i));
+        ++i;
+    }
 
     for (QList<QPoint>::iterator iter = possibleSquares.begin();
          iter != possibleSquares.end();
@@ -110,7 +110,7 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
         //std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
     }
 
-	return possibleSquares;
+    return possibleSquares;
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
@@ -120,15 +120,20 @@ QGraphicsSvgItem* MQueen::createSvgItem(int pieceSize) const
 
     if (!MQueen::hasFinishedLoading)
     {
-    	MQueen::blackRenderer.load(QString(":pieces/black/queen.svg"));
-    	MQueen::whiteRenderer.load(QString(":pieces/white/queen.svg"));
-    	MQueen::hasFinishedLoading = true;
+        MQueen::blackRenderer.load(QString(":pieces/black/queen.svg"));
+        MQueen::whiteRenderer.load(QString(":pieces/white/queen.svg"));
+        MQueen::hasFinishedLoading = true;
     }
 
     applyRenderer(svgItem, (MQueen::BLACK == getColour() ? MQueen::blackRenderer
                                                         : MQueen::whiteRenderer), pieceSize);
 
     return svgItem;
+}
+
+QChar MQueen::getLetter() const
+{
+    return QChar('Q');
 }
 
 }

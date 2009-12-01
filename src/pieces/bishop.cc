@@ -37,39 +37,39 @@ MBishop::~MBishop()
 
 QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
 {
-	QList<QPoint> possibleSquares;
+    QList<QPoint> possibleSquares;
 
-	// north-east
-	int i = 1;
-	while ((point.x() + i < xDim) && (point.y() - i >= 0))
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y() - i));
-		++i;
-	}
+    // north-east
+    int i = 1;
+    while ((point.x() + i < xDim) && (point.y() - i >= 0))
+    {
+        possibleSquares.append(QPoint(point.x() + i, point.y() - i));
+        ++i;
+    }
 
-	// south-east
-	i = 1;
-	while ((point.x() + i < xDim) && (point.y() + i < yDim))
-	{
-		possibleSquares.append(QPoint(point.x() + i, point.y() + i));
-		++i;
-	}
+    // south-east
+    i = 1;
+    while ((point.x() + i < xDim) && (point.y() + i < yDim))
+    {
+        possibleSquares.append(QPoint(point.x() + i, point.y() + i));
+        ++i;
+    }
 
-	// south-west
-	i = 1;
-	while ((point.x() - i >= 0) && (point.y() + i < yDim))
-	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() + i));
-		++i;
-	}
+    // south-west
+    i = 1;
+    while ((point.x() - i >= 0) && (point.y() + i < yDim))
+    {
+        possibleSquares.append(QPoint(point.x() - i, point.y() + i));
+        ++i;
+    }
 
-	// north-west
-	i = 1;
-	while ((point.x() - i >= 0) && (point.y() - i >= 0))
-	{
-		possibleSquares.append(QPoint(point.x() - i, point.y() - i));
-		++i;
-	}
+    // north-west
+    i = 1;
+    while ((point.x() - i >= 0) && (point.y() - i >= 0))
+    {
+        possibleSquares.append(QPoint(point.x() - i, point.y() - i));
+        ++i;
+    }
 
     for (QList<QPoint>::iterator iter = possibleSquares.begin();
          iter != possibleSquares.end();
@@ -78,7 +78,7 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
         //std::cout << "    (" << (*iter).x() << ", " << (*iter).y() << "), " << std::endl;
     }
 
-	return possibleSquares;
+    return possibleSquares;
 }
 
 // TODO: hand out cloned pixmap items instead, saves scaling and maybe more
@@ -97,6 +97,11 @@ QGraphicsSvgItem* MBishop::createSvgItem(int pieceSize) const
                                                         : MBishop::whiteRenderer), pieceSize);
 
     return svgItem;
+}
+
+QChar MBishop::getLetter() const
+{
+    return QChar('B');
 }
 
 }

@@ -34,12 +34,12 @@ class MBishop
 : public MPiece
 {
 public:
-	MBishop(MColour colour, int width = 8, int height = 8);
-	~MBishop();
+    MBishop(MColour colour, int width = 8, int height = 8);
+    ~MBishop();
 
-	virtual QList<QPoint> getPossibleSquares(QPoint) const;
-
-	virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QChar getLetter() const;
 
 private:
     /* We have two renderers as class variables because we did not go the full

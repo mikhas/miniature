@@ -34,15 +34,15 @@ class MKing
 : public MPiece
 {
 public:
-	MKing(MColour colour, int width = 8, int height = 8);
-	~MKing();
+    MKing(MColour colour, int width = 8, int height = 8);
+    ~MKing();
 
-	virtual QList<QPoint> getPossibleSquares(QPoint) const;
-
-	void hasMoved();
-	bool canCastle();
-
+    virtual QList<QPoint> getPossibleSquares(QPoint) const;
     virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QChar getLetter() const;
+
+    void hasMoved();
+    bool canCastle();
 
 private:
     bool castle;

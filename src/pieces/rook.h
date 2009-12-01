@@ -38,11 +38,12 @@ public:
     ~MRook();
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
+    virtual QChar getLetter() const;
 
     void hasMoved();
     bool canCastle() const;
 
-    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
 
 private:
     bool castle;

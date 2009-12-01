@@ -40,6 +40,8 @@ public:
     virtual ~MPiece();
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const = 0;
+    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const = 0;
+    virtual QChar getLetter() const = 0;
 
     MType getType() const;
     MColour getColour() const;
@@ -48,7 +50,6 @@ public:
 
     // Potentially deprecated!
     static MPiece* createFromFenPiece(QChar fenPiece, int width = 8, int height = 8);
-    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const = 0;
 
 protected:
     void applyRenderer(QGraphicsSvgItem *item, QSvgRenderer &renderer, int pieceSize) const;
