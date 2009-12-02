@@ -24,6 +24,7 @@
 #include "player_info.h"
 #include "position.h"
 #include "logic_analyzer.h"
+#include "board_view.h"
 
 #include <QList>
 #include <QGraphicsView>
@@ -47,7 +48,7 @@ class MGame
 public:
     typedef QList<MPosition> MPositionList;
 
-    explicit MGame(QObject* parent = 0);
+    explicit MGame(MBoardView* view, QObject* parent = 0);
     virtual ~MGame();
 
     MPlayerInfo getPlayerInfo() const;
@@ -72,7 +73,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
     void playerInfoChanged();
-    void positionChanged(const MPosition&);
+    //void positionChanged(const MPosition&);
     void pieceMoved(int half_move, const QString& last_move);
     void invalidMove(QPoint from, QPoint to);
     void check();
@@ -96,10 +97,8 @@ private:
     void updateMaterialInfo();
     void updateMoveInfo(bool is_white_moving);
 
-    /* Creates a scene graph containing all UI elements of the main view
-     * (player cards, timer, board).
-     */
-    //QGraphicsScene* createScene();
+    // A reference to the board view, we do not take ownership.
+    MBoardView* m_view;
 
     int m_half_move;
     MPositionList m_game;

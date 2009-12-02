@@ -28,50 +28,40 @@
 using namespace Miniature;
 
 MMainWindow::MMainWindow()
-: QMainWindow()
+: QMainWindow(),
+  m_game(0)
 {
     m_ui.setupUi(this);
+    m_game = new MGame(m_ui.board_view, this);
 
     updatePlayerInfo();
     // Can be done in the Qt Designer, wow!
     //setupMoveListView();
 
     // Connect game logic w/ player info view.
-    connect(&m_game, SIGNAL(playerInfoChanged()),
+    connect(m_game, SIGNAL(playerInfoChanged()),
             this, SLOT(updatePlayerInfo()));
 
     // Add debugging output to Miniature app.
-    connect(&m_game, SIGNAL(sendDebugInfo(QString)),
+    connect(m_game, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
     connect(m_ui.board_view, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
 
-    // Connect game logic w/ board view.
-    connect(&m_game, SIGNAL(positionChanged(const MPosition&)),
-            m_ui.board_view, SLOT(drawPosition(const MPosition&)));
-    connect(m_ui.board_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
-            &m_game, SLOT(onPieceMoveRequested(QPoint, QPoint)));
-
-
     // Connect moves from game controller with main window.
-    connect(&m_game, SIGNAL(pieceMoved(int, QString)),
+    connect(m_game, SIGNAL(pieceMoved(int, QString)),
             this, SLOT(updateLastMove(int, QString)));
 
     // Connect menu actions.
-    // TODO: make this independent of the signal order
-    connect(m_ui.new_game, SIGNAL(triggered()),
-            m_ui.board_view, SLOT(resetCache()));
     connect(m_ui.new_game, SIGNAL(triggered()),
             this, SLOT(clearMoveList()));
     connect(m_ui.new_game, SIGNAL(triggered()),
-            &m_game, SLOT(newGame()));
-    connect(m_ui.new_game, SIGNAL(triggered()),
-            &m_game, SLOT(newGame()));
+            m_game, SLOT(newGame()));
 
     connect(m_ui.next_move, SIGNAL(triggered()),
-            &m_game, SLOT(nextMove()));
+            m_game, SLOT(nextMove()));
     connect(m_ui.prev_move, SIGNAL(triggered()),
-            &m_game, SLOT(prevMove()));
+            m_game, SLOT(prevMove()));
 
     connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
             m_ui.board_view, SLOT(rotateBlackPieces()));
@@ -132,7 +122,7 @@ MMainWindow::~MMainWindow()
 void MMainWindow::show()
 {
     QMainWindow::show();
-    m_game.newGame();
+    m_game->newGame();
 }
 
 void MMainWindow::setupMoveListView()
@@ -153,7 +143,9 @@ void MMainWindow::clearMoveList()
 
 void MMainWindow::updatePlayerInfo()
 {
-    MPlayerInfo info = m_game.getPlayerInfo();
+    Q_CHECK_PTR(m_game);
+
+    MPlayerInfo info = m_game->getPlayerInfo();
 
     m_ui.white_name->setText(info.white_name);
     m_ui.white_rating->setText(QString("(%1)").arg(info.white_rating));

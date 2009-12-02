@@ -50,6 +50,10 @@ public:
 // TODO: provide a MPosition* clone() for copying instead of relying on copy
 // ctor/copy assignment op? Qt very rarely allows copy contruction so it could
 // be confusing that MPosition does allow it.
+// OR: Make MPosition a subclass of QSharedData, to be used inside of a
+// QSharedDataPointer. Reasoning: QSharedData uses copy ctors. Much better than
+// to declare MPosition a "value type".
+
 // TODO: kill off FEN support needed for pieces pool manager
 class MPosition
 {

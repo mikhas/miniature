@@ -66,7 +66,7 @@ private:
     Ui::AboutDialog m_about_dialog;
 
     /* Our internal game controller */
-    Miniature::MGame m_game;
+    Miniature::MGame* m_game;
 
     enum StackedWidgets {STACKED_BOARD, STACKED_MOVE_LIST};
 };

@@ -30,11 +30,14 @@
 
 using namespace Miniature;
 
-MGame::MGame(QObject *parent)
+MGame::MGame(MBoardView *view, QObject *parent)
 : QObject(parent),
+  m_view(view),
   m_half_move(-1),
   m_logic_analyzer(0)
 {
+    Q_ASSERT(m_view);
+
     m_player_info.white_name = QString("White");
     m_player_info.white_rating = QString("4321");
     m_player_info.white_material = computeWhiteMaterial();
@@ -42,6 +45,9 @@ MGame::MGame(QObject *parent)
     m_player_info.black_name = QString("Black");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
+
+    connect(m_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
+            this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 }
 
 MGame::~MGame()
@@ -106,7 +112,8 @@ void MGame::setupStartPosition()
 
     m_game.append(pos);
     m_half_move = 0;
-    Q_EMIT positionChanged(pos);
+    m_view->resetCache();
+    m_view->drawPosition(pos);
     updateMaterialInfo();
 
     Q_ASSERT(!m_game.empty());
@@ -123,7 +130,8 @@ void MGame::setPositionTo(int half_move)
     {
         m_half_move = half_move;
         updateMaterialInfo();
-        Q_EMIT positionChanged(m_game[half_move]);
+        m_view->resetCache();
+        m_view->drawPosition(m_game[half_move]);
     }
 }
 
@@ -166,7 +174,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         }
 
         Q_EMIT pieceMoved(m_half_move, notation);
-        Q_EMIT positionChanged(pos);
+        m_view->drawPosition(pos);
 
         // Important: increase counter first, so that for m_half_move ==
         // m_game.size() this will result in appending pos.
