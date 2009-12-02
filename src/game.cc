@@ -61,40 +61,12 @@ void MGame::newGame()
 
 void MGame::nextMove()
 {
-/*
-    if (0 < m_game.size() && m_half_move < static_cast<int>(m_game.size()) - 1)
-    {
-        ++m_half_move;
-
-        MPosition pos = MPosition(m_game[m_half_move]);
-        Q_EMIT positionChanged(pos);
-
-        updateMaterialInfo();
-    }
-    else // Complain!
-    {
-        newGame();
-    }
-*/
+    setPositionTo(m_half_move + 1);
 }
 
 void MGame::prevMove()
 {
-/*
-    if (m_half_move > 0)
-    {
-       --m_half_move;
-
-        //MPosition pos = MPosition(m_game[m_half_move]);
-        //Q_EMIT positionChanged(pos);
-
-        updateMaterialInfo();
-    }
-    else // Complain!
-    {
-        newGame();
-    }
-*/
+    setPositionTo(m_half_move - 1);
 }
 
 void MGame::setupStartPosition()
@@ -131,14 +103,29 @@ void MGame::setupStartPosition()
         pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
     }
 
-    updateMaterialInfo();
-    Q_EMIT positionChanged(pos);
 
     m_game.append(pos);
+    m_half_move = 0;
+    Q_EMIT positionChanged(pos);
+    updateMaterialInfo();
 
     Q_ASSERT(!m_game.empty());
 }
 
+bool MGame::isValidPosition(int half_move) const
+{
+    return (!m_game.empty() && -1 < half_move && half_move < m_game.size());
+}
+
+void MGame::setPositionTo(int half_move)
+{
+    if (isValidPosition(half_move))
+    {
+        m_half_move = half_move;
+        updateMaterialInfo();
+        Q_EMIT positionChanged(m_game[half_move]);
+    }
+}
 
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 {
@@ -146,13 +133,12 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1 ms").arg(profiling.elapsed()));
     profiling.restart();
 
-    Q_ASSERT(!m_game.empty());
-    MPosition pos = MPosition(m_game.last());
+    Q_ASSERT(isValidPosition(m_half_move));
+    MPosition pos = MPosition(m_game[m_half_move]);
 
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(pos, from, to);
     if (MLogicAnalyzer::VALID & result)
     {
-        ++m_half_move;
         MPiece::MColour colour = pos.pieceAt(from)->getColour(); // ugly
         QString notation = pos.movePiece(from, to);
 
@@ -182,7 +168,10 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         Q_EMIT pieceMoved(m_half_move, notation);
         Q_EMIT positionChanged(pos);
 
-        m_game.append(pos);
+        // Important: increase counter first, so that for m_half_move ==
+        // m_game.size() this will result in appending pos.
+        ++m_half_move;
+        m_game.insert(m_half_move, pos);
     }
     else
     {

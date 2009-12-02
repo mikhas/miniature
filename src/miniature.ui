@@ -639,6 +639,8 @@ p, li { white-space: pre-wrap; }
      <string>Main</string>
     </property>
     <addaction name="new_game"/>
+    <addaction name="next_move"/>
+    <addaction name="prev_move"/>
     <addaction name="rotate_black_pieces"/>
     <addaction name="toggle_debug_output"/>
    </widget>

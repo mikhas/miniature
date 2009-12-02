@@ -25,7 +25,7 @@
 #include "position.h"
 #include "logic_analyzer.h"
 
-#include <QVector>
+#include <QList>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QString>
@@ -45,7 +45,7 @@ class MGame
     Q_OBJECT
 
 public:
-    typedef QVector<MPosition> MPositionList;
+    typedef QList<MPosition> MPositionList;
 
     explicit MGame(QObject* parent = 0);
     virtual ~MGame();
@@ -58,6 +58,14 @@ public Q_SLOTS:
 
     void nextMove(); // unused
     void prevMove(); // unsued
+
+    /* If a game was started, sets position to the turn specified by half_move
+     * (one full move: white and black moved, hence half moves). If half_move
+     * specifies an invalid position then the current position is unchanged.
+     * Notice how half_move = 0 would yield the start position in a normal
+     * game.
+     */
+    void setPositionTo(int half_move);
 
     void onPieceMoveRequested(QPoint from, QPoint to);
 
@@ -72,11 +80,13 @@ Q_SIGNALS:
     void pieceCapturedAt(QPoint where);
 
 private:
-    // Formats player info, as seen on the mock-up. I am not sure the last line means turn or sth else.
+    // Formats player info, as seen on the mock-up.
     QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
     void addBoardToSceneGraph(QGraphicsScene *scene);
     void setupStartPosition();
+    // Returns whether the position identified by half_move exists in m_game.
+    bool isValidPosition(int half_move) const;
 
     /* Computes material for each side, using [1]
      * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system

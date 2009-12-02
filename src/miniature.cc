@@ -65,10 +65,18 @@ MMainWindow::MMainWindow()
             this, SLOT(clearMoveList()));
     connect(m_ui.new_game, SIGNAL(triggered()),
             &m_game, SLOT(newGame()));
-    connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
-            this, SLOT(toggleDebugOutput()));
+    connect(m_ui.new_game, SIGNAL(triggered()),
+            &m_game, SLOT(newGame()));
+
+    connect(m_ui.next_move, SIGNAL(triggered()),
+            &m_game, SLOT(nextMove()));
+    connect(m_ui.prev_move, SIGNAL(triggered()),
+            &m_game, SLOT(prevMove()));
+
     connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
             m_ui.board_view, SLOT(rotateBlackPieces()));
+    connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
+            this, SLOT(toggleDebugOutput()));
 
     // Chain up UI elements for switching to the move list view/board view to a single actions.
     connect(m_ui.move_list_button, SIGNAL(pressed()),
