@@ -64,7 +64,7 @@ MMainWindow::MMainWindow()
             m_game, SLOT(prevMove()));
 
     connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
-            m_ui.board_view, SLOT(rotateBlackPieces()));
+            m_game, SLOT(rotateBlackPieces()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 

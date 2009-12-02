@@ -37,8 +37,7 @@ MBoardView::MBoardView(QWidget *parent)
   m_background_page(new QWebPage),
   m_background_image(0),
   m_white_rotated180(false),
-  m_black_rotated180(false),
-  m_last_drawn_position(0)
+  m_black_rotated180(false)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
@@ -108,8 +107,6 @@ void MBoardView::drawPosition(const MPosition &position)
 {
     static QTime profiling;
     profiling.restart();
-
-    m_last_drawn_position = &position;
 
     Q_CHECK_PTR(m_board_item);
 
@@ -201,21 +198,9 @@ void MBoardView::onLoadFinished(bool /*ok*/)
 void MBoardView::rotateWhitePieces()
 {
     m_white_rotated180 = !m_white_rotated180;
-
-    // Yup, it might be that we cannot always redraw the board instantly.
-    if (m_last_drawn_position)
-    {
-        drawPosition(*m_last_drawn_position);
-    }
 }
 
 void MBoardView::rotateBlackPieces()
 {
     m_black_rotated180 = !m_black_rotated180;
-
-    // Yup, it might be that we cannot always redraw the board instantly.
-    if (m_last_drawn_position)
-    {
-        drawPosition(*m_last_drawn_position);
-    }
 }

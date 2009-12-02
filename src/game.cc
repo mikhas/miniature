@@ -75,6 +75,18 @@ void MGame::prevMove()
     setPositionTo(m_half_move - 1);
 }
 
+void MGame::rotateWhitePieces()
+{
+    m_view->rotateWhitePieces();
+    updateBoardView();
+}
+
+void MGame::rotateBlackPieces()
+{
+    m_view->rotateBlackPieces();
+    updateBoardView();
+}
+
 void MGame::setupStartPosition()
 {
     m_game.clear();
@@ -131,8 +143,13 @@ void MGame::setPositionTo(int half_move)
         m_half_move = half_move;
         updateMaterialInfo();
         m_view->resetCache();
-        m_view->drawPosition(m_game[half_move]);
+        updateBoardView();
     }
+}
+
+void MGame::updateBoardView()
+{
+    m_view->drawPosition(m_game[m_half_move]);
 }
 
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
@@ -178,6 +195,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         // Important: increase counter first, so that for m_half_move ==
         // m_game.size() this will result in appending pos.
+        // TODO: Either branch or cut off list when not inserting at end.
         ++m_half_move;
         m_game.insert(m_half_move, pos);
     }

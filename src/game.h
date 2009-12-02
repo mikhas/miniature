@@ -56,9 +56,10 @@ public:
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
     void newGame();
-
-    void nextMove(); // unused
-    void prevMove(); // unsued
+    void nextMove();
+    void prevMove();
+    void rotateBlackPieces();
+    void rotateWhitePieces();
 
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
@@ -88,6 +89,8 @@ private:
     void setupStartPosition();
     // Returns whether the position identified by half_move exists in m_game.
     bool isValidPosition(int half_move) const;
+    // Requests MBoardView to redraw itself with the current position.
+    void updateBoardView();
 
     /* Computes material for each side, using [1]
      * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system

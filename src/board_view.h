@@ -50,17 +50,14 @@ public:
     virtual ~MBoardView();
 
     virtual void setScene(QGraphicsScene* scene);
+    // Effect becomes visible when the next position is drawn.
+    void rotateBlackPieces();
+    // Effect becomes visible when the next position is drawn.
+    void rotateWhitePieces();
 
-public Q_SLOTS:
-    /* Draws a chess position on this board, by extracting the FEN [1]
-     * representation from the given MPosition.
-     * Each piece (= QGraphicsSvgItem) that is added becomes a child of the board.
-     * [1] http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
-     */
+    /* Draws a chess position on this board. */
     void drawPosition(const MPosition &position);
     void drawStartPosition();
-    void rotateBlackPieces();
-    void rotateWhitePieces();
     void resetCache();
 
 Q_SIGNALS:
@@ -87,9 +84,6 @@ private:
 
     bool m_white_rotated180;
     bool m_black_rotated180;
-
-    // Cache a ptr to last drawn position for redrawing the board
-    const MPosition* m_last_drawn_position;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);
