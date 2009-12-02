@@ -35,11 +35,11 @@ MGame::MGame(QObject *parent)
   m_half_move(-1),
   m_logic_analyzer(0)
 {
-    m_player_info.white_name = QString("andybehr");
+    m_player_info.white_name = QString("White");
     m_player_info.white_rating = QString("4321");
     m_player_info.white_material = computeWhiteMaterial();
 
-    m_player_info.black_name = QString("mikhas");
+    m_player_info.black_name = QString("Black");
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
 }
@@ -212,18 +212,19 @@ void MGame::updateMaterialInfo()
 
 void MGame::updateMoveInfo(bool is_white_moving)
 {
+    // ugly ...
     const static QString base_white(m_player_info.white_name);
     const static QString base_black(m_player_info.black_name);
 
     if (is_white_moving)
     {
-        m_player_info.white_name = QString("%1  *").arg(base_white);
+        m_player_info.white_name = QString("<span style=\"text-decoration:underline;\">%1</span>").arg(base_white);
         m_player_info.black_name = QString(base_black);
     }
     else
     {
         m_player_info.white_name = QString(base_white);
-        m_player_info.black_name = QString("*  %1").arg(base_black);
+        m_player_info.black_name = QString("<span style=\"text-decoration:underline;\">%1</span>").arg(base_black);
     }
 
     Q_EMIT playerInfoChanged();

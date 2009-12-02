@@ -101,6 +101,13 @@ MMainWindow::MMainWindow()
     m_ui.black_rating->setFont(normal_font);
     m_ui.black_material->setFont(normal_font);
 
+    // Hide rating + material for both players - we haven't yet decided on the
+    // kind of info we need.
+    m_ui.white_rating->hide();
+    m_ui.white_material->hide();
+    m_ui.black_rating->hide();
+    m_ui.black_material->hide();
+
     m_ui.debug->setFont(small_font);
     m_ui.debug->hide();
 
