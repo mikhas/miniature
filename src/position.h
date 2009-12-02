@@ -26,21 +26,24 @@
 #include <QString>
 #include <QVector>
 #include <QPoint>
+#include <QSharedPointer>
 
 namespace Miniature
 {
+
+typedef QSharedPointer<MPiece> MSharedPiece;
 
 /* This class represents a simple piece storage. */
 class MStorage
 {
 public:
-    MStorage(int index, MPiece *piece);
+    MStorage(int index, MSharedPiece piece);
     ~MStorage();
 
     bool empty() const;
 
     int m_index;
-    MPiece *m_piece;
+    MSharedPiece m_piece;
 };
 
 /* This class represents a chess position.*/
@@ -55,7 +58,7 @@ public:
     explicit MPosition(QString fen, int width = 8, int height = 8);
     ~MPosition();
 
-    typedef QVector<MPiece*> MPieces;
+    typedef QVector<MSharedPiece> MPieces;
 
     // deprecated?
     QString convertToFen() const;
@@ -82,7 +85,7 @@ public:
      * e.g., "1. (4,6) to (6,6)" = "1. e4"
      */
     QString movePiece(QPoint from, QPoint to);
-    MPiece* pieceAt(QPoint pos) const;
+    MSharedPiece pieceAt(QPoint pos) const;
 
     MPieces::const_iterator begin() const;
     MPieces::const_iterator end() const;

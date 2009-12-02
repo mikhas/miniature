@@ -23,23 +23,17 @@
 using namespace Miniature;
 
 // MStorage impl
-MStorage::MStorage(int index, MPiece *piece)
+MStorage::MStorage(int index, MSharedPiece piece)
 : m_index(index),
   m_piece(piece)
 {}
 
 MStorage::~MStorage()
-{
-    if(m_piece)
-    {
-        delete m_piece;
-        m_piece = 0;
-    }
-}
+{}
 
 bool MStorage::empty() const
 {
-    return (0 == m_piece);
+    return m_piece.isNull();
 }
 
 // MPosition impl
@@ -47,17 +41,16 @@ MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
-  m_position(width * height, 0)
+  m_position(width * height)
 {}
 
 MPosition::MPosition(QString /*fen*/, int width, int height)
 : m_width(width),
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
-  m_position(width * height, 0)
+  m_position(width * height)
 {}
 
-// TODO: clean up pieces => mem leak
 MPosition::~MPosition()
 {
     reset();
@@ -83,7 +76,7 @@ QString MPosition::movePiece(QPoint from, QPoint to)
                             .arg(convertToChessCell(to));
 }
 
-MPiece* MPosition::pieceAt(QPoint pos) const
+MSharedPiece MPosition::pieceAt(QPoint pos) const
 {
     return m_position[indexFromPoint(pos)];
 }
@@ -133,15 +126,14 @@ void MPosition::convertFromFen(QString fen)
             for (int j = 0; j < curr; ++j)
             {
                 ++x_pos;
-                MPiece *empty = pieceAt(QPoint(x_pos, y_pos));
-                empty = 0;
+                pieceAt(QPoint(x_pos, y_pos)).clear();
                 ++count_cells;
             }
         }
         else
         {
-            MPiece *piece = pieceAt(QPoint(x_pos, y_pos));
-            piece = MPiece::createFromFenPiece(curr); // TODO: include board dimension, too
+            MSharedPiece piece = pieceAt(QPoint(x_pos, y_pos));
+            piece = MSharedPiece(MPiece::createFromFenPiece(curr)); // TODO: include board dimension, too
 
             ++x_pos;
             ++count_cells;
@@ -163,28 +155,27 @@ MStorage MPosition::store(const QPoint &location)
     const int index = indexFromPoint(location);
 
     MStorage storage = MStorage(index, m_position[index]);
-    m_position[index] = 0;
+    m_position[index].clear(); // drop ref
 
     return storage;
 }
 
 void MPosition::restore(MStorage* const storage)
 {
-    Q_CHECK_PTR(storage);
-
     // delete whatever is at the storage's location, to prevent mem leakage
     MStorage removed = store(indexToPoint(storage->m_index)); // TODO: optimise back&forth conversion?
 
     m_position[storage->m_index] = storage->m_piece;
-    // release ownership of the storage
-    storage->m_piece = 0;
+
+    // drop the shared ref
+    storage->m_piece.clear();
 }
 
 void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 {
     // Prevents potential memory leak by adding pieces on top of each other.
     //MStorage removed = store(pos);
-    m_position[indexFromPoint(pos)] = piece;
+    m_position[indexFromPoint(pos)] = MSharedPiece(piece);
 
     if (piece && piece->getType() == MPiece::KING)
     {
@@ -202,7 +193,7 @@ void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 void MPosition::reset()
 {
     // TODO: check whether this leaks
-    m_position = MPieces(m_position.size(), 0);
+    m_position = MPieces(m_position.size());
     m_colour_to_move = MPiece::WHITE;
 }
 

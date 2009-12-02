@@ -120,23 +120,23 @@ void MBoardView::drawPosition(const MPosition &position)
         iter != position.end();
         ++iter)
     {
-        MPiece* pos_piece = *iter;
+        MSharedPiece pos_piece = *iter;
         if (pos_piece) // non-empty cell
         {
             QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), cell_size);
             QGraphicsSvgItem* item = 0;
 
             // Querying cache for the item.
-            if (!m_cache.contains(pos_piece))
+            if (!m_cache.contains(pos_piece.data()))
             {
                 //qDebug("MBV::dp - nothing found at %i ", (int) pos_piece);
                 item = pos_piece->createSvgItem(cell_size);
-                m_cache.insert(pos_piece, item);
+                m_cache.insert(pos_piece.data(), item);
                 m_board_item->addPiece(item);
             }
             else
             {
-                item = m_cache.value(pos_piece);
+                item = m_cache.value(pos_piece.data());
                 //qDebug("MBV::dp - cache hit at %i, found %i", (int) pos_piece, (int) item);
             }
 
