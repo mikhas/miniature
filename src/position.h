@@ -47,15 +47,17 @@ public:
 };
 
 /* This class represents a chess position.*/
+// TODO: provide a MPosition* clone() for copying instead of relying on copy
+// ctor/copy assignment op? Qt very rarely allows copy contruction so it could
+// be confusing that MPosition does allow it.
 // TODO: kill off FEN support needed for pieces pool manager
-// TODO: give each MPiece the correct shared svg renderer so that the board can
-//       draw by using MPiece, too
 class MPosition
 {
 public:
     // construct empty position
     explicit MPosition(int width = 8, int height = 8);
     explicit MPosition(QString fen, int width = 8, int height = 8);
+
     ~MPosition();
 
     typedef QVector<MSharedPiece> MPieces;
@@ -101,13 +103,12 @@ public:
 private:
     QString getDefaultStartPosition() const;
 
-    const int m_width;
-    const int m_height;
+    int m_width;
+    int m_height;
     QPoint m_white_king;
     QPoint m_black_king;
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
-
 };
 
 }; // namespace Miniature

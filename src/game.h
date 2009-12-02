@@ -25,7 +25,7 @@
 #include "position.h"
 #include "logic_analyzer.h"
 
-#include <vector>
+#include <QVector>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QString>
@@ -45,6 +45,8 @@ class MGame
     Q_OBJECT
 
 public:
+    typedef QVector<MPosition> MPositionList;
+
     explicit MGame(QObject* parent = 0);
     virtual ~MGame();
 
@@ -89,11 +91,11 @@ private:
      */
     //QGraphicsScene* createScene();
 
-    //std::vector<QString> m_game;
     int m_half_move;
+    MPositionList m_game;
 
     // The current position + logic_analyzer
-    MPosition m_position;
+    //MPosition m_position;
     MLogicAnalyzer m_logic_analyzer;
 
     /* Stores player info, to be shown by the main window. */

@@ -55,9 +55,8 @@ MPlayerInfo MGame:: getPlayerInfo() const
 void MGame::newGame()
 {
     m_half_move = -1;
-
     setupStartPosition();
-    updateMoveInfo(m_position.getColourToMove());
+    updateMoveInfo(m_game.last().getColourToMove());
 }
 
 void MGame::nextMove()
@@ -100,38 +99,44 @@ void MGame::prevMove()
 
 void MGame::setupStartPosition()
 {
-    m_half_move = -1;
-    m_position.reset();
+    m_game.clear();
+    Q_ASSERT(m_game.empty());
 
-    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
-    m_position.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
-    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
-    m_position.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
+    MPosition pos;
 
-    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
-    m_position.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
-    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
-    m_position.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
+    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
+    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
+    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
+    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
 
-    m_position.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
-    m_position.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
-    m_position.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
-    m_position.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
+    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
+    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
+    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
+    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
 
-    m_position.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
-    m_position.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
+    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
+    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
+    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
+    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
 
-    m_position.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
-    m_position.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
+    pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
+    pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
+
+    pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
+    pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
 
     for (int i = 0; i < 8; ++i)
     {
-        m_position.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
-        m_position.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
+        pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
+        pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
     }
 
     updateMaterialInfo();
-    Q_EMIT positionChanged(m_position);
+    Q_EMIT positionChanged(pos);
+
+    m_game.append(pos);
+
+    Q_ASSERT(!m_game.empty());
 }
 
 
@@ -141,15 +146,18 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1 ms").arg(profiling.elapsed()));
     profiling.restart();
 
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_position, from, to);
+    Q_ASSERT(!m_game.empty());
+    MPosition pos = MPosition(m_game.last());
+
+    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(pos, from, to);
     if (MLogicAnalyzer::VALID & result)
     {
         ++m_half_move;
-        MPiece::MColour colour = m_position.pieceAt(from)->getColour(); // ugly
-        QString notation = m_position.movePiece(from, to);
+        MPiece::MColour colour = pos.pieceAt(from)->getColour(); // ugly
+        QString notation = pos.movePiece(from, to);
 
-        m_position.nextColour();
-        updateMoveInfo(m_position.getColourToMove() == MPiece::WHITE);
+        pos.nextColour();
+        updateMoveInfo(pos.getColourToMove() == MPiece::WHITE);
 
         // TODO: remove capturing code in MPostion and control the relevant bits from here!
         /*
@@ -167,12 +175,14 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         if (MLogicAnalyzer::PROMOTION & result)
         {
-            m_position.addPieceAt(new MQueen(colour), to);
+            pos.addPieceAt(new MQueen(colour), to);
             Q_EMIT pawnPromoted(to);
         }
 
         Q_EMIT pieceMoved(m_half_move, notation);
-        Q_EMIT positionChanged(m_position);
+        Q_EMIT positionChanged(pos);
+
+        m_game.append(pos);
     }
     else
     {
