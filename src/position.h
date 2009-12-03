@@ -90,7 +90,7 @@ public:
     /* Moves a piece and returns the traditional chess notation for a move,
      * e.g., "1. (4,6) to (6,6)" = "1. e4"
      */
-    QString movePiece(QPoint from, QPoint to);
+    void movePiece(QPoint from, QPoint to);
     MSharedPiece pieceAt(QPoint pos) const;
 
     MPieces::const_iterator begin() const;
@@ -103,6 +103,7 @@ public:
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
     void nextColour();
+    QString getMoveNotation() const;
 
 private:
     QString getDefaultStartPosition() const;
@@ -113,6 +114,7 @@ private:
     QPoint m_black_king;
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
+    QString m_move_notation;
 };
 
 }; // namespace Miniature

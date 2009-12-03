@@ -26,6 +26,7 @@
 namespace Miniature
 {
 
+// TODO: rename to mGameInfo
 struct MPlayerInfo
 {
     QString white_name;
@@ -35,6 +36,11 @@ struct MPlayerInfo
     QString black_name;
     QString black_rating;
     int black_material;
+
+    int half_move;
+    bool has_white_moved;
+    QString notation;
+    QString full_notation;
 };
 
 };

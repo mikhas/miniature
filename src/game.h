@@ -73,9 +73,10 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
-    void playerInfoChanged();
+    // TODO: send info struct as signal argument
+    void gameInfoChanged();
     //void positionChanged(const MPosition&);
-    void pieceMoved(int half_move, const QString& last_move);
+    //void pieceMoved(int half_move, const QString& last_move);
     void invalidMove(QPoint from, QPoint to);
     void check();
     void pawnPromoted(QPoint where);
@@ -86,11 +87,11 @@ private:
     QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
     QString formatTimerInfo(QString time_remaining, bool isWhite) const;
     void addBoardToSceneGraph(QGraphicsScene *scene);
-    void setupStartPosition();
+    MPosition setupStartPosition();
     // Returns whether the position identified by half_move exists in m_game.
     bool isValidPosition(int half_move) const;
     // Requests MBoardView to redraw itself with the current position.
-    void updateBoardView();
+    void updateBoardView(const MPosition &pos);
 
     /* Computes material for each side, using [1]
      * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system
@@ -98,7 +99,7 @@ private:
     int computeWhiteMaterial() const;
     int computeBlackMaterial() const;
     void updateMaterialInfo();
-    void updateMoveInfo(bool is_white_moving);
+    void updateGameInfo(int half_move, const QString &notation, bool has_white_moved);
 
     // A reference to the board view, we do not take ownership.
     MBoardView* m_view;

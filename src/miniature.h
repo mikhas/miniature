@@ -46,14 +46,14 @@ public:
     virtual void show();
 
 public Q_SLOTS:
-    void updatePlayerInfo();
-    void updateLastMove(int half_move, const QString &last_move);
+    void updateGameInfo();
     void appendDebugOutput(QString msg);
     void toggleDebugOutput();
     void showBoard();
     void showMoveList();
     void clearMoveList();
     void showAboutDialog();
+    void onMoveListItemPressed(QTreeWidgetItem *item, int column);
 
 private:
     void setupMoveListView();

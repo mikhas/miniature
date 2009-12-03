@@ -34,23 +34,19 @@ MMainWindow::MMainWindow()
     m_ui.setupUi(this);
     m_game = new MGame(m_ui.board_view, this);
 
-    updatePlayerInfo();
+    updateGameInfo();
     // Can be done in the Qt Designer, wow!
     //setupMoveListView();
 
     // Connect game logic w/ player info view.
-    connect(m_game, SIGNAL(playerInfoChanged()),
-            this, SLOT(updatePlayerInfo()));
+    connect(m_game, SIGNAL(gameInfoChanged()),
+            this, SLOT(updateGameInfo()));
 
     // Add debugging output to Miniature app.
     connect(m_game, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
     connect(m_ui.board_view, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
-
-    // Connect moves from game controller with main window.
-    connect(m_game, SIGNAL(pieceMoved(int, QString)),
-            this, SLOT(updateLastMove(int, QString)));
 
     // Connect menu actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
@@ -82,6 +78,9 @@ MMainWindow::MMainWindow()
             this, SLOT(showMoveList()));
     connect(m_ui.show_board, SIGNAL(triggered()),
             this, SLOT(showBoard()));
+    // Enable direct move selection from the move list.
+    connect(m_ui.move_list, SIGNAL(itemPressed(QTreeWidgetItem *, int)),
+            this, SLOT(onMoveListItemPressed(QTreeWidgetItem *, int)));
 
     // Connect action to show about dialog
     connect(m_ui.about, SIGNAL(triggered()),
@@ -141,7 +140,7 @@ void MMainWindow::clearMoveList()
     m_ui.move_list->clear();
 }
 
-void MMainWindow::updatePlayerInfo()
+void MMainWindow::updateGameInfo()
 {
     Q_CHECK_PTR(m_game);
 
@@ -154,16 +153,12 @@ void MMainWindow::updatePlayerInfo()
     m_ui.black_name->setText(info.black_name);
     m_ui.black_rating->setText(QString("(%1)").arg(info.black_rating));
     m_ui.black_material->setText(QString("%1").arg(info.black_material));
-}
 
-void MMainWindow::updateLastMove(int half_move, const QString& last_move)
-{
-    const int full_move = (half_move >> 1);
-    const bool white_moved = !(half_move % 2);
-    m_ui.last_move->setText(QString("%1. %2 %3").arg(full_move + 1)
-                                                .arg(white_moved ? "" : "...")
-                                                .arg(last_move));
+    m_ui.last_move->setText(info.full_notation);
 
+    // since we start counting at 0 with our half moves, the first white move
+    // is shown when half_move == 1
+    const int full_move = ((info.half_move - 1) / 2);
     QTreeWidgetItem* item = m_ui.move_list->topLevelItem(full_move);
     if(!item)
     {
@@ -171,7 +166,7 @@ void MMainWindow::updateLastMove(int half_move, const QString& last_move)
         m_ui.move_list->insertTopLevelItem(full_move, item);
     }
     item->setText(0, QString("%1").arg(full_move + 1));
-    item->setText((white_moved ? 1 : 2), last_move);
+    item->setText((info.has_white_moved ? 1 : 2), info.notation);
 }
 
 void MMainWindow::appendDebugOutput(QString msg)
@@ -211,6 +206,17 @@ void MMainWindow::showAboutDialog()
     m_about_dialog.setupUi(&dialog);
     m_about_dialog.slogan->setFont(QFont("helvetica", 14, QFont::Normal));
     dialog.exec();
+}
+
+void MMainWindow::onMoveListItemPressed(QTreeWidgetItem *item, int column)
+{
+    // First column contains move, depending on which column was selected
+    // (white, black) we have to add an offset to compute the correct half
+    // move. For simplicity, the first column also selects the white half move.
+    const int full_move = item->data(0, Qt::DisplayRole).toInt() -1;
+    const int half_move = (full_move * 2) + (2 == column ? 2 : 1);
+    m_game->setPositionTo(half_move);
+    showBoard();
 }
 
 MDBusAdaptor::MDBusAdaptor(MMainWindow *window) 

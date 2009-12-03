@@ -61,8 +61,8 @@ MPlayerInfo MGame:: getPlayerInfo() const
 void MGame::newGame()
 {
     m_half_move = -1;
-    setupStartPosition();
-    updateMoveInfo(m_game.last().getColourToMove());
+    MPosition pos = setupStartPosition();
+    updateGameInfo(m_half_move, pos.getMoveNotation(), pos.getColourToMove() == MPiece::BLACK);
 }
 
 void MGame::nextMove()
@@ -78,16 +78,18 @@ void MGame::prevMove()
 void MGame::rotateWhitePieces()
 {
     m_view->rotateWhitePieces();
-    updateBoardView();
+    MPosition pos = m_game[m_half_move];
+    updateBoardView(pos);
 }
 
 void MGame::rotateBlackPieces()
 {
     m_view->rotateBlackPieces();
-    updateBoardView();
+    MPosition pos = m_game[m_half_move];
+    updateBoardView(pos);
 }
 
-void MGame::setupStartPosition()
+MPosition MGame::setupStartPosition()
 {
     m_game.clear();
     Q_ASSERT(m_game.empty());
@@ -129,6 +131,7 @@ void MGame::setupStartPosition()
     updateMaterialInfo();
 
     Q_ASSERT(!m_game.empty());
+    return m_game[m_half_move];
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -141,15 +144,17 @@ void MGame::setPositionTo(int half_move)
     if (isValidPosition(half_move))
     {
         m_half_move = half_move;
+        MPosition pos = m_game[m_half_move];
+        updateGameInfo(m_half_move, pos.getMoveNotation(), pos.getColourToMove() == MPiece::BLACK);
         updateMaterialInfo();
         m_view->resetCache();
-        updateBoardView();
+        updateBoardView(pos);
     }
 }
 
-void MGame::updateBoardView()
+void MGame::updateBoardView(const MPosition& pos)
 {
-    m_view->drawPosition(m_game[m_half_move]);
+    m_view->drawPosition(pos);
 }
 
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
@@ -164,11 +169,12 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(pos, from, to);
     if (MLogicAnalyzer::VALID & result)
     {
-        MPiece::MColour colour = pos.pieceAt(from)->getColour(); // ugly
-        QString notation = pos.movePiece(from, to);
+        MPiece::MColour colour = pos.getColourToMove();
+        pos.movePiece(from, to);
 
         pos.nextColour();
-        updateMoveInfo(pos.getColourToMove() == MPiece::WHITE);
+        ++m_half_move;
+        updateGameInfo(m_half_move, pos.getMoveNotation(), colour == MPiece::WHITE);
 
         // TODO: remove capturing code in MPostion and control the relevant bits from here!
         /*
@@ -190,13 +196,12 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
             Q_EMIT pawnPromoted(to);
         }
 
-        Q_EMIT pieceMoved(m_half_move, notation);
+        //Q_EMIT pieceMoved(m_half_move, notation);
         m_view->drawPosition(pos);
 
         // Important: increase counter first, so that for m_half_move ==
         // m_game.size() this will result in appending pos.
         // TODO: Either branch or cut off list when not inserting at end.
-        ++m_half_move;
         m_game.insert(m_half_move, pos);
     }
     else
@@ -222,25 +227,34 @@ void MGame::updateMaterialInfo()
     m_player_info.white_material = computeWhiteMaterial();
     m_player_info.black_material = computeBlackMaterial();
 
-    Q_EMIT playerInfoChanged();
+    Q_EMIT gameInfoChanged();
 }
 
-void MGame::updateMoveInfo(bool is_white_moving)
+void MGame::updateGameInfo(int half_move, const QString &notation, bool has_white_moved)
 {
     // ugly ...
     const static QString base_white(m_player_info.white_name);
     const static QString base_black(m_player_info.black_name);
 
-    if (is_white_moving)
-    {
-        m_player_info.white_name = QString("<span style=\"text-decoration:underline;\">%1</span>").arg(base_white);
-        m_player_info.black_name = QString(base_black);
-    }
-    else
+    if (has_white_moved)
     {
         m_player_info.white_name = QString(base_white);
         m_player_info.black_name = QString("<span style=\"text-decoration:underline;\">%1</span>").arg(base_black);
     }
+    else
+    {
+        m_player_info.white_name = QString("<span style=\"text-decoration:underline;\">%1</span>").arg(base_white);
+        m_player_info.black_name = QString(base_black);
+    }
 
-    Q_EMIT playerInfoChanged();
+    m_player_info.half_move = half_move;
+    const int full_move = (half_move >> 1);
+    m_player_info.notation = QString(notation);
+    m_player_info.full_notation = QString("%1. %2 %3").arg(full_move + 1)
+                                                      .arg(has_white_moved ? "" : "...")
+                                                      .arg(notation);
+
+    m_player_info.has_white_moved = has_white_moved;
+
+    Q_EMIT gameInfoChanged();
 }

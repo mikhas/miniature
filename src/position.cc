@@ -56,7 +56,7 @@ MPosition::~MPosition()
     reset();
 }
 
-QString MPosition::movePiece(QPoint from, QPoint to)
+void MPosition::movePiece(QPoint from, QPoint to)
 {
     // TODO: Castling & pawn promotion
 
@@ -71,9 +71,9 @@ QString MPosition::movePiece(QPoint from, QPoint to)
     restore(&from_storage);
 
     // TODO: fix ambigious moves, e.g., when two pieces of the same kind can move to a location.
-    return QString("%1%2%3").arg(letter)
-                            .arg(to_storage.empty() ? "" : "x")
-                            .arg(convertToChessCell(to));
+    m_move_notation = QString("%1%2%3").arg(letter)
+                                       .arg(to_storage.empty() ? "" : "x")
+                                       .arg(convertToChessCell(to));
 }
 
 MSharedPiece MPosition::pieceAt(QPoint pos) const
@@ -218,4 +218,9 @@ void MPosition::nextColour()
 {
     m_colour_to_move = (m_colour_to_move == MPiece::WHITE ? MPiece::BLACK
                                                           : MPiece::WHITE);
+}
+
+QString MPosition::getMoveNotation() const
+{
+    return m_move_notation;
 }
