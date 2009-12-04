@@ -140,6 +140,7 @@ MPosition MGame::setupStartPosition()
         pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
         pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
     }
+    pos.resetCastling();
 
 
     m_game.append(pos);
@@ -225,6 +226,11 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
         MPiece::MColour colour = m_trans_position.getColourToMove();
         m_trans_position.movePiece(from, to);
+
+        if (MLogicAnalyzer::KING_MOVED & result)
+        {
+            // TODO update variables
+        }
 
         if (MLogicAnalyzer::PROMOTION & result)
         {

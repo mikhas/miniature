@@ -80,6 +80,8 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
     {
         // apply rook constraint
         list = applyConStraight(pos, list, from);
+
+        flags |= MLogicAnalyzer::ROOK_MOVED;
     }
     else if (piece->getType() == MPiece::KNIGHT)
     {
@@ -101,6 +103,8 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
     {
         // apply king constraint
         list = applyConKing(pos, list, from);
+
+        flags |= MLogicAnalyzer::KING_MOVED;
     }
     else if (piece->getType() == MPiece::PAWN)
     {
@@ -113,11 +117,11 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
         list = applyConPawnCapture(pos, list, from);
         //std::cout << "nach 3. con" << std::endl;
 
-            // check for promotion
-            if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
-            {
-                flags |= MLogicAnalyzer::PROMOTION;
-            }
+        // check for promotion
+        if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+        {
+            flags |= MLogicAnalyzer::PROMOTION;
+        }
     }
 
         // DEBUG
@@ -518,10 +522,10 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
         }
     }
 
-    return newMoveList;    
-}    
+    return newMoveList;
+}
 
-    
+
 QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
     int xMax = 7;
@@ -588,7 +592,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
             }
         }
     }
-    
+
     for(QList<QPoint>::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)

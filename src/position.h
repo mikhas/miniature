@@ -103,7 +103,11 @@ public:
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
     void nextColour();
-    QString getMoveNotation() const;
+    void resetCastling();
+    bool canWhiteCastleQueenside() const;
+    bool canWhiteCastleKingside() const;
+    bool canBlackCastleQueenside() const;
+    bool canBlackCastleKingside() const;
 
 private:
     QString getDefaultStartPosition() const;
@@ -112,6 +116,10 @@ private:
     int m_height;
     QPoint m_white_king;
     QPoint m_black_king;
+    bool m_white_qs_castle;
+    bool m_white_ks_castle;
+    bool m_black_qs_castle;
+    bool m_black_ks_castle;
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
     QString m_move_notation;

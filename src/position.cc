@@ -220,7 +220,30 @@ void MPosition::nextColour()
                                                           : MPiece::WHITE);
 }
 
-QString MPosition::getMoveNotation() const
+void MPosition::resetCastling()
 {
-    return m_move_notation;
+    m_white_qs_castle = true;
+    m_white_ks_castle = true;
+    m_black_qs_castle = true;
+    m_black_ks_castle = true;
+}
+
+bool MPosition::canWhiteCastleQueenside() const
+{
+    return m_white_qs_castle;
+}
+
+bool MPosition::canWhiteCastleKingside() const
+{
+    return m_white_ks_castle;
+}
+
+bool MPosition::canBlackCastleQueenside() const
+{
+    return m_black_qs_castle;
+}
+
+bool MPosition::canBlackCastleKingside() const
+{
+    return m_black_ks_castle;
 }
