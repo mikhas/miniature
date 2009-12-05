@@ -48,21 +48,36 @@ MMainWindow::MMainWindow()
     connect(m_ui.board_view, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
 
-    // Connect menu actions.
+    // Connect actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
             this, SLOT(clearMoveList()));
     connect(m_ui.new_game, SIGNAL(triggered()),
             m_game, SLOT(newGame()));
 
-    connect(m_ui.next_move, SIGNAL(triggered()),
-            m_game, SLOT(nextMove()));
+    // Connect game navi actions
+    connect(m_ui.jump_to_start, SIGNAL(triggered()),
+            m_game, SLOT(jumpToStart()));
     connect(m_ui.prev_move, SIGNAL(triggered()),
             m_game, SLOT(prevMove()));
+    connect(m_ui.next_move, SIGNAL(triggered()),
+            m_game, SLOT(nextMove()));
+    connect(m_ui.jump_to_end, SIGNAL(triggered()),
+            m_game, SLOT(jumpToEnd()));
 
     connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
             m_game, SLOT(rotateBlackPieces()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
+
+    // Chain up UI elements for game navi to their corresponding actions
+    connect(m_ui.jump_to_start_button, SIGNAL(pressed()),
+            m_ui.jump_to_start, SLOT(trigger()));
+    connect(m_ui.prev_move_button, SIGNAL(pressed()),
+            m_ui.prev_move, SLOT(trigger()));
+    connect(m_ui.next_move_button, SIGNAL(pressed()),
+            m_ui.next_move, SLOT(trigger()));
+    connect(m_ui.jump_to_end_button, SIGNAL(pressed()),
+            m_ui.jump_to_end, SLOT(trigger()));
 
     // Chain up UI elements for switching to the move list view/board view to a single actions.
     connect(m_ui.move_list_button, SIGNAL(pressed()),

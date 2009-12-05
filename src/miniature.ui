@@ -106,7 +106,7 @@
           <x>0</x>
           <y>580</y>
           <width>480</width>
-          <height>220</height>
+          <height>191</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -148,10 +148,53 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="move_list_button">
-           <property name="text">
-            <string>Show move list</string>
+          <widget class="QWidget" name="horizontalWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="jump_to_start_button">
+              <property name="text">
+               <string>[start]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="prev_move_button">
+              <property name="text">
+               <string>[prev]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="move_list_button">
+              <property name="text">
+               <string>??Show move list</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="next_move_button">
+              <property name="text">
+               <string>[next]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="jump_to_end_button">
+              <property name="text">
+               <string>[end]</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
          <item>
@@ -700,6 +743,16 @@ p, li { white-space: pre-wrap; }
   <action name="rotate_black_pieces">
    <property name="text">
     <string>Rotate black pieces</string>
+   </property>
+  </action>
+  <action name="jump_to_start">
+   <property name="text">
+    <string>Jump to start of game</string>
+   </property>
+  </action>
+  <action name="jump_to_end">
+   <property name="text">
+    <string>Jump to end of game</string>
    </property>
   </action>
  </widget>

@@ -56,8 +56,10 @@ public:
 public Q_SLOTS:
     /* Reset the game's state and start a new game, next/prev nagivation.*/
     void newGame();
-    void nextMove();
+    void jumpToStart();
     void prevMove();
+    void nextMove();
+    void jumpToEnd();
     void rotateBlackPieces();
     void rotateWhitePieces();
 

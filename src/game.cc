@@ -65,14 +65,24 @@ void MGame::newGame()
     updateGameInfo(m_half_move, pos.getMoveNotation(), pos.getColourToMove() == MPiece::BLACK);
 }
 
-void MGame::nextMove()
+void MGame::jumpToStart()
 {
-    setPositionTo(m_half_move + 1);
+    setPositionTo(0);
 }
 
 void MGame::prevMove()
 {
     setPositionTo(m_half_move - 1);
+}
+
+void MGame::nextMove()
+{
+    setPositionTo(m_half_move + 1);
+}
+
+void MGame::jumpToEnd()
+{
+    setPositionTo(m_game.size() - 1);
 }
 
 void MGame::rotateWhitePieces()
