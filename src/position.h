@@ -104,6 +104,8 @@ public:
     MPiece::MColour getColourToMove() const;
     void nextColour();
     void resetCastling();
+    void kingMoved(MPiece::MColour colour);
+    void rookMoved(MPiece::MColour colour, QPoint location);
     bool canWhiteCastleQueenside() const;
     bool canWhiteCastleKingside() const;
     bool canBlackCastleQueenside() const;

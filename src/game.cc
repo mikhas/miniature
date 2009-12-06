@@ -227,10 +227,14 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         MPiece::MColour colour = m_trans_position.getColourToMove();
         m_trans_position.movePiece(from, to);
 
-        if (MLogicAnalyzer::KING_MOVED & result)
-        {
-            // TODO update variables
-        }
+//        if (MLogicAnalyzer::KING_MOVED & result)
+//        {
+//            pos.kingMoved(colour);
+//        }
+//        if (MLogicAnalyzer::ROOK_MOVED & result)
+//        {
+//            pos.rookMoved(colour, from);
+//        }
 
         if (MLogicAnalyzer::PROMOTION & result)
         {

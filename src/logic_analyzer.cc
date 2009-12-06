@@ -102,20 +102,35 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
     else if (piece->getType() == MPiece::KING)
     {
         // apply king constraint
+        // DEBUG
+        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        {
+            std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        }
+        std::cout << std::endl;
         list = applyConKing(pos, list, from);
+        // DEBUG
+        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        {
+            std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        }
+        std::cout << std::endl;
+        list = applyConKingCastle(pos, list, from);
+        // DEBUG
+        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        {
+            std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        }
+        std::cout << std::endl;
 
-        flags |= MLogicAnalyzer::KING_MOVED;
+        //flags |= MLogicAnalyzer::KING_MOVED;
     }
     else if (piece->getType() == MPiece::PAWN)
     {
         // apply pawn constraints
-        //std::cout << "1. con" << std::endl;
         list = applyConPawnBaseline(pos, list, from);
-        //std::cout << "2. con" << std::endl;
         list = applyConPawnObstacle(pos, list, from);
-        //std::cout << "3. con" << std::endl;
         list = applyConPawnCapture(pos, list, from);
-        //std::cout << "nach 3. con" << std::endl;
 
         // check for promotion
         if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
@@ -769,8 +784,93 @@ QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPo
         }
         else
         {
-            // TODO uncomment when castling is done
-            //newMoveList.append(cell);
+        	newMoveList.append(cell);
+        }
+    }
+
+    return newMoveList;
+}
+
+QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+{
+    MSharedPiece piece = pos.pieceAt(from);
+    MPiece::MColour currColour = MPiece::WHITE;
+    if (!piece.isNull())
+    {
+       currColour = piece->getColour();
+    }
+    QList<QPoint> newMoveList;
+
+    for(QList<QPoint>::const_iterator iter = moveList.begin();
+        iter != moveList.end();
+        ++iter)
+    {
+        QPoint cell = *iter;
+        MSharedPiece currPiece = pos.pieceAt(cell);
+
+        if (from.y() == cell.y())
+        {
+        	// kingside
+        	if (from.x() == cell.x() - 2)
+        	{
+        		MSharedPiece cellInBetween = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
+        		if (currPiece.isNull() && cellInBetween.isNull())
+        		{
+        			if (currColour == MPiece::WHITE)
+        			{
+        				std::cout << "white" << std::endl;
+        				if (pos.canWhiteCastleKingside())
+        				{
+        					std::cout << "castle kingside" << std::endl;
+        					newMoveList.append(cell);
+        				}
+        			}
+        			else if (currColour == MPiece::BLACK)
+        			{
+        				std::cout << "black" << std::endl;
+        				if (pos.canBlackCastleKingside())
+        				{
+        					std::cout << "castle kingside" << std::endl;
+        					newMoveList.append(cell);
+        				}
+        			}
+        		}
+        	}
+        	// queenside
+        	else if (from.x() == cell.x() + 2)
+        	{
+        		MSharedPiece cellInBetween = pos.pieceAt(QPoint(cell.x() + 1, cell.y()));
+        		MSharedPiece cellNextToRook = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
+        		if (cellNextToRook.isNull() && currPiece.isNull() && cellInBetween.isNull())
+        		{
+        			if (currColour == MPiece::WHITE)
+        			{
+        				std::cout << "white" << std::endl;
+        				if (pos.canWhiteCastleQueenside())
+        				{
+        					std::cout << "castle queenside" << std::endl;
+        					newMoveList.append(cell);
+        				}
+        			}
+        			else if (currColour == MPiece::BLACK)
+        			{
+        				std::cout << "black" << std::endl;
+        				if (pos.canBlackCastleQueenside())
+        				{
+        					std::cout << "castle queenside" << std::endl;
+        					newMoveList.append(cell);
+        				}
+        			}
+        		}
+        	}
+        	else
+        	{
+        		newMoveList.append(cell);
+        	}
+        }
+        else
+        {
+        	newMoveList.append(cell);
         }
     }
 

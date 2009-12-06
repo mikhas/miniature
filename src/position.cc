@@ -228,6 +228,47 @@ void MPosition::resetCastling()
     m_black_ks_castle = true;
 }
 
+void MPosition::kingMoved(MPiece::MColour colour)
+{
+	if (colour == MPiece::WHITE)
+	{
+		m_white_ks_castle = false;
+		m_white_qs_castle = false;
+	}
+	else if (colour == MPiece::BLACK)
+	{
+		m_black_qs_castle = false;
+		m_black_ks_castle = false;
+	}
+}
+
+void MPosition::rookMoved(MPiece::MColour colour, QPoint location)
+{
+	int index = indexFromPoint(location);
+	if (colour == MPiece::WHITE)
+	{
+		if (index == 56)
+		{
+			m_white_qs_castle = false;
+		}
+		else if (index == 63)
+		{
+			m_white_ks_castle = false;
+		}
+	}
+	else if (colour == MPiece::BLACK)
+	{
+		if (index == 0)
+		{
+			m_black_qs_castle = false;
+		}
+		else if (index == 7)
+		{
+			m_black_ks_castle = false;
+		}
+	}
+}
+
 bool MPosition::canWhiteCastleQueenside() const
 {
     return m_white_qs_castle;
