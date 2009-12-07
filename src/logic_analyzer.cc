@@ -53,7 +53,7 @@ MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints)
 MLogicAnalyzer::~MLogicAnalyzer()
 {}
 
-MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPoint from, QPoint to) const
+MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition &pos, QPoint from, QPoint to)
 {
     MStateFlags flags = MLogicAnalyzer::INVALID;
     // DEBUG
@@ -76,68 +76,68 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
         // DEBUG
         //std::cout << "found valid piece ... " << std::endl;
         QList<QPoint> list = piece->getPossibleSquares(from);
-    if(piece->getType() == MPiece::ROOK)
-    {
-        // apply rook constraint
-        list = applyConStraight(pos, list, from);
+        if(piece->getType() == MPiece::ROOK)
+        {
+        	// apply rook constraint
+        	list = applyConStraight(pos, list, from);
 
-        flags |= MLogicAnalyzer::ROOK_MOVED;
-    }
-    else if (piece->getType() == MPiece::KNIGHT)
-    {
-        // apply knight constraint
-        list = applyConKnight(pos, list, from);
-    }
-    else if (piece->getType() == MPiece::BISHOP)
-    {
-        // apply bishop constraint
-        list = applyConDiagonal(pos, list, from);
-    }
-    else if (piece->getType() == MPiece::QUEEN)
-    {
-        // apply queen constraints
-        list = applyConStraight(pos, list, from);
-        list = applyConDiagonal(pos, list, from);
-    }
-    else if (piece->getType() == MPiece::KING)
-    {
-        // apply king constraint
-        // DEBUG
-        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        	//flags |= MLogicAnalyzer::ROOK_MOVED;
+		}
+        else if (piece->getType() == MPiece::KNIGHT)
         {
-            std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        	// apply knight constraint
+        	list = applyConKnight(pos, list, from);
         }
-        std::cout << std::endl;
-        list = applyConKing(pos, list, from);
-        // DEBUG
-        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        else if (piece->getType() == MPiece::BISHOP)
         {
-            std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        	// apply bishop constraint
+        	list = applyConDiagonal(pos, list, from);
         }
-        std::cout << std::endl;
-        list = applyConKingCastle(pos, list, from);
-        // DEBUG
-        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+        else if (piece->getType() == MPiece::QUEEN)
         {
-            std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+        	// apply queen constraints
+        	list = applyConStraight(pos, list, from);
+        	list = applyConDiagonal(pos, list, from);
         }
-        std::cout << std::endl;
+        else if (piece->getType() == MPiece::KING)
+        {
+        	// apply king constraint
+        	// DEBUG
+//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//        	{
+//        	    std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//        	}
+//       	std::cout << std::endl;
+        	list = applyConKing(pos, list, from);
+        	// DEBUG
+//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//        	{
+//          	std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//        	}
+//        	std::cout << std::endl;
+        	list = applyConKingCastle(pos, list, from);
+        	// DEBUG
+//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//        	{
+//        		std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//        	}
+//        	std::cout << std::endl;
 
-        //flags |= MLogicAnalyzer::KING_MOVED;
-    }
-    else if (piece->getType() == MPiece::PAWN)
-    {
-        // apply pawn constraints
-        list = applyConPawnBaseline(pos, list, from);
-        list = applyConPawnObstacle(pos, list, from);
-        list = applyConPawnCapture(pos, list, from);
-
-        // check for promotion
-        if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
-        {
-            flags |= MLogicAnalyzer::PROMOTION;
+        	//flags |= MLogicAnalyzer::KING_MOVED;
         }
-    }
+        else if (piece->getType() == MPiece::PAWN)
+        {
+        	// apply pawn constraints
+        	list = applyConPawnBaseline(pos, list, from);
+        	list = applyConPawnObstacle(pos, list, from);
+        	list = applyConPawnCapture(pos, list, from);
+
+        	// check for promotion
+        	if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+        	{
+        		flags |= MLogicAnalyzer::PROMOTION;
+        	}
+        }
 
         // DEBUG
         for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
@@ -148,29 +148,37 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(const MPosition &pos, QPo
 
         if (list.contains(to))
         {
-             flags |= MLogicAnalyzer::VALID;
+        	// check whether the resulting position leaves the player to move in check => invalid move
+        	if (!moveResultsInCkeck(pos, from, to))
+        	{
+        		flags |= MLogicAnalyzer::VALID;
+
+        		// check whether the resulting position leaves the next player in check => check
+        		if (nextPlayerInCkeck(pos, from, to))
+        		{
+        			flags |= MLogicAnalyzer::CHECK;
+        		}
+        	}
         }
     }
 
     return flags;
 }
 
-bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
+bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::MColour colour) const
 {
-    MPiece::MColour kingColour = pos.pieceAt(king)->getColour();
-
     // north
     int i = 1;
-    while (king.y() - i >= 0)
+    while (cell.y() - i >= 0)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x(), king.y() - i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x(), cell.y() - i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -179,7 +187,7 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             ++i;
         }
@@ -187,16 +195,16 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // north-east
     i = 1;
-    while ((king.y() - i >= 0) && (king.x() + i < 8))
+    while ((cell.y() - i >= 0) && (cell.x() + i < 8))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() + i, king.y() - i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() - i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -205,13 +213,13 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             if ((currType == MPiece::PAWN) && (i == 1))
             {
-                if (kingColour == MPiece::WHITE)
+                if (colour == MPiece::WHITE)
                 {
-                    return false;
+                    return true;
                 }
             }
             ++i;
@@ -220,16 +228,16 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // east
     i = 1;
-    while (king.x() + i < 8)
+    while (cell.x() + i < 8)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() + i, king.y()));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y()));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -238,7 +246,7 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             ++i;
         }
@@ -246,16 +254,16 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // south-east
     i = 1;
-    while ((king.y() + i < 8) && (king.x() + i < 8))
+    while ((cell.y() + i < 8) && (cell.x() + i < 8))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() + i, king.y() + i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() + i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -264,13 +272,13 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             if ((currType == MPiece::PAWN) && (i == 1))
             {
-                if (kingColour == MPiece::BLACK)
+                if (colour == MPiece::BLACK)
                 {
-                    return false;
+                    return true;
                 }
             }
             ++i;
@@ -279,16 +287,16 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // south
     i = 1;
-    while (king.y() + i < 8)
+    while (cell.y() + i < 8)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x(), king.y() + i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x(), cell.y() + i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -297,7 +305,7 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             ++i;
         }
@@ -305,37 +313,37 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // south-west
     i = 1;
-    while ((king.y() + i < 8) && (king.x() - i >= 0))
+    while ((cell.y() + i < 8) && (cell.x() - i >= 0))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() - i, king.y() + i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() + i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
         else
         {
-            return false;
+            return true;
         }
     }
 
     // west
     i = 1;
-    while (king.x() - i >= 0)
+    while (cell.x() - i >= 0)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() - i, king.y()));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y()));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -347,13 +355,13 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
                 MPiece::MType currType = piece->getType();
                 if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
                 {
-                    return false;
+                    return true;
                 }
                 if ((currType == MPiece::PAWN) && (i == 1))
                 {
-                    if (kingColour == MPiece::BLACK)
+                    if (colour == MPiece::BLACK)
                     {
-                        return false;
+                        return true;
                     }
                 }
                 ++i;
@@ -364,16 +372,16 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // north-west
     i = 1;
-    while ((king.y() - i >= 0) && (king.x() - i >= 0))
+    while ((cell.y() - i >= 0) && (cell.x() - i >= 0))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(king.x() - i, king.y() - i));
+        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() - i));
 
         if (piece.isNull())
         {
             ++i;
             continue;
         }
-        else if (kingColour == piece->getColour())
+        else if (colour == piece->getColour())
         {
             break;
         }
@@ -382,13 +390,13 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
             MPiece::MType currType = piece->getType();
             if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
             {
-                return false;
+                return true;
             }
             if ((currType == MPiece::PAWN) && (i == 1))
             {
-                if (kingColour == MPiece::WHITE)
+                if (colour == MPiece::WHITE)
                 {
-                    return false;
+                    return true;
                 }
             }
             ++i;
@@ -397,114 +405,152 @@ bool MLogicAnalyzer::checkCheck(const MPosition &pos, QPoint king)
 
     // knights
     // north
-    if (king.y() - 2 >= 0)
+    if (cell.y() - 2 >= 0)
     {
-        if (king.x() - 1 >= 0)
+        if (cell.x() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() - 1, king.y() - 2));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() - 2));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
-        else if (king.x() + 1 < 8)
+        else if (cell.x() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() + 1, king.y() - 2));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() - 2));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
     }
 
     // east
-    if (king.x() + 2 < 8)
+    if (cell.x() + 2 < 8)
     {
-        if (king.y() - 1 >= 0)
+        if (cell.y() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() + 2, king.y() - 1));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() - 1));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
-        else if (king.y() + 1 < 8)
+        else if (cell.y() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() + 2, king.y() + 1));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() + 1));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
     }
 
     // south
-    if (king.y() + 2 < 8)
+    if (cell.y() + 2 < 8)
     {
-        if (king.x() - 1 >= 0)
+        if (cell.x() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() - 1, king.y() + 2));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() + 2));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
-        else if (king.x() + 1 < 8)
+        else if (cell.x() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() + 1, king.y() + 2));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() + 2));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
     }
 
     // west
-    if (king.x() - 2 >= 0)
+    if (cell.x() - 2 >= 0)
     {
-        if (king.y() - 1 >= 0)
+        if (cell.y() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() - 2, king.y() - 1));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() - 1));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
-        else if (king.y() + 1 < 8)
+        else if (cell.y() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(king.x() - 2, king.y() + 1));
+            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() + 1));
             if (!piece.isNull())
             {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != kingColour))
+                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
-                    return false;
+                    return true;
                 }
             }
         }
     }
 
-    return true;
+    return false;
+}
+
+
+bool MLogicAnalyzer::moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour)
+{
+	QPoint king = pos.getKing(colour);
+
+	// move piece
+	MStorage sourcePiece = pos.store(from);
+	MStorage targetPiece = pos.store(to);
+	int restoreIndex = sourcePiece.m_index;
+	sourcePiece.m_index = targetPiece.m_index;
+	pos.restore(&sourcePiece);
+
+	// perform check
+	bool ret = cellUnderAttack(pos, king, colour);
+
+	//restore old position
+	MStorage tempPiece = pos.store(to);
+	pos.restore(&targetPiece);
+	tempPiece.m_index = restoreIndex;
+	pos.restore(&tempPiece);
+
+	return ret;
+}
+
+bool MLogicAnalyzer::moveResultsInCkeck(MPosition &pos, QPoint from, QPoint to)
+{
+	MPiece::MColour col = pos.getColourToMove();
+
+	return moveCheckUndo(pos, from, to, col);
+}
+
+bool MLogicAnalyzer::nextPlayerInCkeck(MPosition &pos, QPoint from, QPoint to)
+{
+	MPiece::MColour col = (pos.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE;
+
+	return moveCheckUndo(pos, from, to, col);
 }
 
 

@@ -43,21 +43,24 @@ public:
         CHECKMATE  = 0x3,
         STALEMATE  = 0x4,
         CAPTURE    = 0x5,
-        PROMOTION  = 0x6,
-        KING_MOVED = 0x7,
-        ROOK_MOVED = 0x8
+        PROMOTION  = 0x6
+        //KING_MOVED = 0x7,
+        //ROOK_MOVED = 0x8
     };
     typedef QFlags<MState> MStateFlags;
 
     MLogicAnalyzer(const MConstraintList &constraints);
     virtual ~MLogicAnalyzer();
 
-    MStateFlags verifyMove(const MPosition &pos, QPoint from, QPoint to) const;
+    MStateFlags verifyMove(MPosition &pos, QPoint from, QPoint to);
 
 private:
     MConstraintList m_constraints;
 
-    bool checkCheck(const MPosition &pos, QPoint king);
+    bool cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::MColour colour) const;
+    bool moveResultsInCkeck(MPosition &pos, QPoint from, QPoint to);
+    bool nextPlayerInCkeck(MPosition &pos, QPoint from, QPoint to);
+    bool moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour);
     QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
