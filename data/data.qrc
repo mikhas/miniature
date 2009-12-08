@@ -27,5 +27,6 @@
 </qresource>
 <qresource>
   <file alias="timer_background.gif">timer_background.gif</file>
+  <file alias="blackout.png">blackout.png</file>
 </qresource>
 </RCC>
