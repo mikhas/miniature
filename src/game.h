@@ -21,7 +21,6 @@
 #ifndef GAME_H__
 #define GAME_H__
 
-#include "player_info.h"
 #include "position.h"
 #include "logic_analyzer.h"
 #include "board_view.h"
@@ -29,7 +28,6 @@
 
 #include <QList>
 #include <QGraphicsView>
-#include <QGraphicsScene>
 #include <QString>
 #include <QObject>
 
@@ -52,11 +50,10 @@ public:
     explicit MGame(MBoardView* view, QObject* parent = 0);
     virtual ~MGame();
 
-    MPlayerInfo getPlayerInfo() const;
-
 public Q_SLOTS:
-    /* Reset the game's state and start a new game, next/prev nagivation.*/
+    /* Reset the game's state and start a new game.*/
     void newGame();
+    /* Game navigation slots. */
     void jumpToStart();
     void prevMove();
     void nextMove();
@@ -72,59 +69,44 @@ public Q_SLOTS:
      */
     void setPositionTo(int half_move);
 
+    /* Process user requests coming from the MBoardView or MActionAreas. */
     void onPieceSelectionRequested(QPoint cell);
     void onPieceMoveRequested(QPoint from, QPoint to);
     void onMoveConfirmed();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
-    // TODO: send info struct as signal argument
-    void gameInfoChanged();
-    //void positionChanged(const MPosition&);
-    //void pieceMoved(int half_move, const QString& last_move);
     void invalidMove(QPoint from, QPoint to);
-    void check();
-    void pawnPromoted(QPoint where);
-    void pieceCapturedAt(QPoint where);
 
 private:
-    // Formats player info, as seen on the mock-up.
-    QString formatPlayerInfo(QString name, int rating, int turn, QString alignment) const;
-    QString formatTimerInfo(QString time_remaining, bool isWhite) const;
-    void addBoardToSceneGraph(QGraphicsScene *scene);
+    /* Creates a MPosition with the default chess start position and stores it
+     * in m_game. */
     MPosition setupStartPosition();
-    // Returns whether the position identified by half_move exists in m_game.
-    bool isValidPosition(int half_move) const;
-    // Requests MBoardView to redraw itself with the current position.
-    void updateBoardView(const MPosition &pos);
-
-    /* Computes material for each side, using [1]
-     * [1] http://en.wikipedia.org/wiki/Chess_piece_relative_value#Hans_Berliner.27s_system
+    /* Returns whether the position identified by half_move exists in m_game.
      */
-    int computeWhiteMaterial() const;
-    int computeBlackMaterial() const;
-    void updateMaterialInfo();
-    void updateGameInfo(int half_move, const QString &notation, bool has_white_moved);
+    bool isValidPosition(int half_move) const;
+    /* Requests MBoardView to redraw itself with the given position. */
+    void updateBoardView(const MPosition &pos);
     /* Sets both action area states in one go. */
     void setActionAreaStates(MActionArea::State s1, MActionArea::State s2);
 
-    // A reference to the board view, we do not take ownership.
+    /* A reference to the board view, we do not take ownership. */
     MBoardView* m_view;
 
+    /* An index to the positions stored in m_game, conceptually each half move
+     * is indexed. */
     int m_half_move;
     /* Stores the game history as a list of positions. */
     MPositionList m_game;
-    /* Stores the  position used for a transition. After a valid transition was completed it will be added to the game history. */
+    /* Stores the  position used for a transition. After a valid transition was
+     * completed it will be added to the game history. */
     MPosition m_trans_position;
-
-    // The current position + logic_analyzer
-    //MPosition m_position;
+    /* The logic analyzer belonges to MGame and is used to validates moves and positions. */
     MLogicAnalyzer m_logic_analyzer;
 
-    /* Stores player info, to be shown by the main window. */
-    MPlayerInfo m_player_info;
-
     /* TODO: remove the silly assumption that white = bottom, black = top */
+    /* Each player has an action area outside of the board, the local player is
+     * always located at the bottom of the board. */
     MActionArea m_top_action_area;
     MActionArea m_bottom_action_area;
 };

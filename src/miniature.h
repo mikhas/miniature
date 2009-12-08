@@ -46,22 +46,11 @@ public:
     virtual void show();
 
 public Q_SLOTS:
-    void updateGameInfo();
     void appendDebugOutput(QString msg);
     void toggleDebugOutput();
-    void showBoard();
-    void showMoveList();
-    void clearMoveList();
     void showAboutDialog();
-    void onMoveListItemPressed(QTreeWidgetItem *item, int column);
 
 private:
-    void setupMoveListView();
-    /* Every but the board is created with the Qt designer, to save time when
-     * porting to other platforms where we might have to make some changes to the
-     * layout. We currently manually disable the auto-connect feature, in the
-     * UI file itself.
-     */
     Ui::MMainWindow m_ui;
     Ui::AboutDialog m_about_dialog;
 
