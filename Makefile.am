@@ -27,6 +27,8 @@ src_miniature_SOURCES = \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
+			src/action_area.cc \
+			src/action_area.h \
 			src/miniature.cc \
 			src/miniature.h \
 			src/miniature.moc.cc \
