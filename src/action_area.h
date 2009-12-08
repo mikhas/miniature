@@ -54,6 +54,9 @@ Q_SIGNALS:
     void moveConfirmed();
 
 private:
+    // TODO: find how to properly create overlays so that I do not have to
+    // mimick the Maemo5 style only for setting different background colors. I
+    // guess I just missed some QPalette one-liner or so.
     QString createButtonStyleBase() const;
     QString createButtonStylePressedBase() const;
     QString createButtonStyleFlat() const;

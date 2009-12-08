@@ -34,9 +34,9 @@ const MActionArea::Colours MActionArea::m_colours =
     QString("#218121"),
     QString("#00f966"),
 
-    QString("#80bcff"),
-    QString("#8080ff"),
-    QString("#80c4ff"),
+    QString("#251964"),
+    QString("#251364"),
+    QString("#9374ff"),
 
     QString("#ae00ff")
 };
