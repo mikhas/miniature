@@ -52,6 +52,7 @@ public Q_SLOT:
 
 Q_SIGNALS:
     void moveConfirmed();
+    void pieceSelectionCancelled();
 
 private:
     // TODO: find how to properly create overlays so that I do not have to

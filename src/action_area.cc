@@ -161,8 +161,10 @@ QGraphicsProxyWidget* MActionArea::createActionAreaProxyWidget(const QString& na
 
 void MActionArea::onActionTriggered()
 {
-    if (TARGET_SELECTED == m_state)
+    switch(m_state)
     {
-        Q_EMIT moveConfirmed();
+        case TARGET_SELECTED: Q_EMIT moveConfirmed(); break;
+        case PIECE_SELECTED: Q_EMIT pieceSelectionCancelled(); break;
+        default: /* emit nothing */ break;
     }
 }

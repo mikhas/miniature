@@ -73,6 +73,7 @@ public Q_SLOTS:
     void onPieceSelectionRequested(QPoint cell);
     void onPieceMoveRequested(QPoint from, QPoint to);
     void onMoveConfirmed();
+    void onPieceSelectionCancelled();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
@@ -89,6 +90,9 @@ private:
     void updateBoardView(const MPosition &pos);
     /* Sets both action area states in one go. */
     void setActionAreaStates(MActionArea::State s1, MActionArea::State s2);
+
+    bool isTopPlayersTurn() const;
+    bool isBottomPlayersTurn() const;
 
     /* A reference to the board view, we do not take ownership. */
     MBoardView* m_view;
@@ -109,6 +113,8 @@ private:
      * always located at the bottom of the board. */
     MActionArea m_top_action_area;
     MActionArea m_bottom_action_area;
+
+    bool m_is_bottom_player_white;
 };
 
 }; // namespace Miniature

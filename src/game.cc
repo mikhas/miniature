@@ -34,7 +34,8 @@ MGame::MGame(MBoardView *view, QObject *parent)
 : QObject(parent),
   m_view(view),
   m_half_move(-1),
-  m_logic_analyzer(0)
+  m_logic_analyzer(0),
+  m_is_bottom_player_white(true)
 {
     Q_ASSERT(m_view);
 
@@ -47,6 +48,10 @@ MGame::MGame(MBoardView *view, QObject *parent)
             this, SLOT(onMoveConfirmed()));
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
+    connect(&m_top_action_area, SIGNAL(pieceSelectionCancelled()),
+            this, SLOT(onPieceSelectionCancelled()));
+    connect(&m_bottom_action_area, SIGNAL(pieceSelectionCancelled()),
+            this, SLOT(onPieceSelectionCancelled()));
 
     m_view->setTopActionArea(m_top_action_area.createActionAreaProxyWidget(QString("qgil")));
     m_view->setBottomActionArea(m_bottom_action_area.createActionAreaProxyWidget(QString("kore")));
@@ -168,7 +173,7 @@ void MGame::updateBoardView(const MPosition& pos)
 void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
 {
     // current mapping is white = bottom
-    if (MPiece::WHITE == m_trans_position.getColourToMove())
+    if (isBottomPlayersTurn())
     {
         m_top_action_area.setState(s1);
         m_bottom_action_area.setState(s2);
@@ -178,6 +183,17 @@ void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
         m_top_action_area.setState(s2);
         m_bottom_action_area.setState(s1);
     }
+}
+
+bool MGame::isTopPlayersTurn() const
+{
+    return !isBottomPlayersTurn();
+}
+
+
+bool MGame::isBottomPlayersTurn() const
+{
+    return (m_half_move % 2 == (m_is_bottom_player_white ? 0 : 1));
 }
 
 void MGame::onPieceSelectionRequested(QPoint cell)
@@ -226,11 +242,11 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
 void MGame::onMoveConfirmed()
 {
-    setActionAreaStates(MActionArea::TURN_STARTED, MActionArea::TURN_ENDED);
     m_trans_position.nextColour();
     ++m_half_move;
-
     m_game.insert(m_half_move, m_trans_position);
+
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 
     m_view->resetPieceSelection();
     // TODO: Clean this up! Currently needs to be redrawn because now pieces of
@@ -241,4 +257,10 @@ void MGame::onMoveConfirmed()
     m_view->drawPosition(m_trans_position);
 
     // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
+}
+
+void MGame::onPieceSelectionCancelled()
+{
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    m_view->resetPieceSelection();
 }
