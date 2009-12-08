@@ -41,10 +41,14 @@ const MActionArea::Colours MActionArea::m_colours =
     QString("#ae00ff")
 };
 
-MActionArea::MActionArea()
-: m_button(new QPushButton()),
+MActionArea::MActionArea(QObject *parent)
+: QObject(parent),
+  m_button(new QPushButton()),
   m_state(NONE)
-{}
+{
+    connect(m_button, SIGNAL(pressed()),
+            this, SLOT(onActionTriggered()));
+}
 
 MActionArea::~MActionArea()
 {}
@@ -153,4 +157,12 @@ QGraphicsProxyWidget* MActionArea::createActionAreaProxyWidget(const QString& na
     m_button->show();
 
     return proxy_widget;
+}
+
+void MActionArea::onActionTriggered()
+{
+    if (TARGET_SELECTED == m_state)
+    {
+        Q_EMIT moveConfirmed();
+    }
 }

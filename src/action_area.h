@@ -36,17 +36,22 @@ namespace Miniature
  * This class is not theming-friendly ...
  */
 class MActionArea
+: public QObject
 {
+    Q_OBJECT
 
 public:
     enum State {NONE, TURN_STARTED, PIECE_SELECTED, INVALID_PIECE_SELECTED, TARGET_SELECTED, INVALID_TARGET_SELECTED, TURN_ENDED};
 
-    MActionArea();
+    explicit MActionArea(QObject *parent = 0);
     ~MActionArea();
     QGraphicsProxyWidget* createActionAreaProxyWidget(const QString& name);
 
 public Q_SLOT:
     void setState(State s);
+
+Q_SIGNALS:
+    void moveConfirmed();
 
 private:
     QString createButtonStyleBase() const;
@@ -77,6 +82,11 @@ private:
     };
 
     static const Colours m_colours;
+
+private Q_SLOTS:
+    /* Checks the current state and emit the corresponding signal whenever the
+     * button was pressed. */
+    void onActionTriggered();
 };
 
 } // namespace Miniature
