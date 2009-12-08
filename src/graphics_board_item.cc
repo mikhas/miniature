@@ -28,7 +28,7 @@
 
 using namespace Miniature;
 
-MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsItem *parent)
+MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
 : QGraphicsObject(parent),
   m_board_size(board_size),
   m_selection_duration(2000),
