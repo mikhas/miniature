@@ -66,6 +66,7 @@ public:
     void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
 
 Q_SIGNALS:
+    void pieceSelectionRequested(QPoint cell);
     void pieceMoveRequested(QPoint from, QPoint to);
     void sendDebugInfo(QString msg);
 
@@ -95,6 +96,7 @@ private:
     const int m_board_item_offset;
 
 private Q_SLOTS:
+    void onPieceSelectionRequested(QPoint cell);
     void onPieceMoveRequested(QPoint from, QPoint to);
     void appendDebugOutput(QString msg);
     void onLoadFinished(bool ok);

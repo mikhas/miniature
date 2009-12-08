@@ -100,6 +100,9 @@ void MBoardView::setupBoardBackground()
 
     m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
 
+    // propagate state transition requests
+    connect(m_board_item, SIGNAL(pieceSelectionRequested(QPoint)),
+            this, SLOT(onPieceSelectionRequested(QPoint)));
     connect(m_board_item, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
@@ -198,6 +201,12 @@ void MBoardView::drawStartPosition()
 {
     MPosition pos;
     drawPosition(pos);
+}
+
+void MBoardView::onPieceSelectionRequested(QPoint cell)
+{
+    // event propagation
+    Q_EMIT pieceSelectionRequested(cell);
 }
 
 void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
