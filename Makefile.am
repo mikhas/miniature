@@ -35,7 +35,6 @@ src_miniature_SOURCES = \
 			src/miniature.moc.cc \
 			src/about.ui.h \
 			src/miniature.ui.h \
-			src/player_info.h \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \

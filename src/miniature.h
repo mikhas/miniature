@@ -23,7 +23,6 @@
 
 //#include "miniature.ui.h"
 #include "game.h"
-#include "player_info.h"
 #include "board_view.h"
 #include "miniature.ui.h"
 #include "about.ui.h"
