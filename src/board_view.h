@@ -64,6 +64,8 @@ public:
     void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
     /* Takes ownership of the proxy widget. */
     void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
+    /* Fwd method to MBoardView */
+    void resetPieceSelection();
 
 Q_SIGNALS:
     void pieceSelectionRequested(QPoint cell);

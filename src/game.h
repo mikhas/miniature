@@ -72,7 +72,9 @@ public Q_SLOTS:
      */
     void setPositionTo(int half_move);
 
+    void onPieceSelectionRequested(QPoint cell);
     void onPieceMoveRequested(QPoint from, QPoint to);
+    void onMoveConfirmed();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
@@ -103,12 +105,17 @@ private:
     int computeBlackMaterial() const;
     void updateMaterialInfo();
     void updateGameInfo(int half_move, const QString &notation, bool has_white_moved);
+    /* Sets both action area states in one go. */
+    void setActionAreaStates(MActionArea::State s1, MActionArea::State s2);
 
     // A reference to the board view, we do not take ownership.
     MBoardView* m_view;
 
     int m_half_move;
+    /* Stores the game history as a list of positions. */
     MPositionList m_game;
+    /* Stores the  position used for a transition. After a valid transition was completed it will be added to the game history. */
+    MPosition m_trans_position;
 
     // The current position + logic_analyzer
     //MPosition m_position;
@@ -117,6 +124,7 @@ private:
     /* Stores player info, to be shown by the main window. */
     MPlayerInfo m_player_info;
 
+    /* TODO: remove the silly assumption that white = bottom, black = top */
     MActionArea m_top_action_area;
     MActionArea m_bottom_action_area;
 };

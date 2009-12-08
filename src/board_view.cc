@@ -129,6 +129,12 @@ void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
     proxy_widget->setPos(QPoint(0, 550));
 }
 
+void MBoardView::resetPieceSelection()
+{
+    Q_CHECK_PTR(m_board_item);
+    m_board_item->resetSelection();
+}
+
 void MBoardView::drawPosition(const MPosition &position)
 {
     static QTime profiling;

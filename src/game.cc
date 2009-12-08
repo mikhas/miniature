@@ -46,8 +46,15 @@ MGame::MGame(MBoardView *view, QObject *parent)
     m_player_info.black_rating = QString("1234");
     m_player_info.black_material = computeBlackMaterial();
 
+    // process state transition requests
+    connect(m_view, SIGNAL(pieceSelectionRequested(QPoint)),
+            this, SLOT(onPieceSelectionRequested(QPoint)));
     connect(m_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
+    connect(&m_top_action_area, SIGNAL(moveConfirmed()),
+            this, SLOT(onMoveConfirmed()));
+    connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
+            this, SLOT(onMoveConfirmed()));
 
     m_view->setTopActionArea(m_top_action_area.createActionAreaProxyWidget(QString("qgil")));
     m_view->setBottomActionArea(m_bottom_action_area.createActionAreaProxyWidget(QString("kore")));
@@ -170,6 +177,33 @@ void MGame::updateBoardView(const MPosition& pos)
     m_view->drawPosition(pos);
 }
 
+void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
+{
+    // current mapping is white = bottom
+    if (MPiece::WHITE == m_trans_position.getColourToMove())
+    {
+        m_top_action_area.setState(s1);
+        m_bottom_action_area.setState(s2);
+    }
+    else
+    {
+        m_top_action_area.setState(s2);
+        m_bottom_action_area.setState(s1);
+    }
+}
+
+void MGame::onPieceSelectionRequested(QPoint cell)
+{
+    // if invalid piece was selected => reset selection, purple flashing.
+    // currently, all piece selections are "valid" (because the logic analyzer
+    // doesnt know how to handle that yet)
+
+    // assume request is valid
+    Q_UNUSED(cell);
+    setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
+    m_view->drawPosition(m_game[m_half_move]);
+}
+
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 {
     static QTime profiling;
@@ -177,17 +211,16 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     profiling.restart();
 
     Q_ASSERT(isValidPosition(m_half_move));
-    MPosition pos = MPosition(m_game[m_half_move]);
+    m_trans_position = MPosition(m_game[m_half_move]);
 
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(pos, from, to);
+    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_trans_position, from, to);
     if (MLogicAnalyzer::VALID & result)
     {
-        MPiece::MColour colour = pos.getColourToMove();
-        pos.movePiece(from, to);
+        setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
+        MPiece::MColour colour = m_trans_position.getColourToMove();
+        m_trans_position.movePiece(from, to);
 
-        pos.nextColour();
-        ++m_half_move;
-        updateGameInfo(m_half_move, pos.getMoveNotation(), colour == MPiece::WHITE);
+       // TODO: check which signals need to be emitted later, during onMoveConfirmed
 
         // TODO: remove capturing code in MPostion and control the relevant bits from here!
         /*
@@ -205,17 +238,16 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         if (MLogicAnalyzer::PROMOTION & result)
         {
-            pos.addPieceAt(new MQueen(colour), to);
+            m_trans_position.addPieceAt(new MQueen(colour), to);
             Q_EMIT pawnPromoted(to);
         }
 
         //Q_EMIT pieceMoved(m_half_move, notation);
-        m_view->drawPosition(pos);
+        m_view->drawPosition(m_trans_position);
 
         // Important: increase counter first, so that for m_half_move ==
         // m_game.size() this will result in appending pos.
         // TODO: Either branch or cut off list when not inserting at end.
-        m_game.insert(m_half_move, pos);
     }
     else
     {
@@ -223,6 +255,26 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
     }
 
     Q_EMIT sendDebugInfo(QString("MGame::onPMR - update duration: %1 ms").arg(profiling.restart()));
+}
+
+void MGame::onMoveConfirmed()
+{
+    setActionAreaStates(MActionArea::TURN_STARTED, MActionArea::TURN_ENDED);
+    m_trans_position.nextColour();
+    ++m_half_move;
+
+    updateGameInfo(m_half_move, m_trans_position.getMoveNotation(), m_trans_position.getColourToMove() != MPiece::WHITE);
+    m_game.insert(m_half_move, m_trans_position);
+
+    m_view->resetPieceSelection();
+    // TODO: Clean this up! Currently needs to be redrawn because now pieces of
+    // the other colour can be selected (the side effect of
+    // m_trans_position.nextColour) . Confirms that doing this
+    // white/black-to-move thing in MGraphicsBoardItem was wrong, can be solved
+    // w/ the valid piece selection check.
+    m_view->drawPosition(m_trans_position);
+
+    // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
 }
 
 int MGame::computeWhiteMaterial() const
