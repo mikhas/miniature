@@ -23,7 +23,6 @@
 
 #include "position.h"
 #include "graphics_board_item.h"
-#include "action_area.h"
 
 #include <QString>
 #include <QGraphicsView>
@@ -61,6 +60,11 @@ public:
     void drawStartPosition();
     void resetCache();
 
+    /* Takes ownership of the proxy widget. */
+    void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
+    /* Takes ownership of the proxy widget. */
+    void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
+
 Q_SIGNALS:
     void pieceMoveRequested(QPoint from, QPoint to);
     void sendDebugInfo(QString msg);
@@ -70,12 +74,9 @@ protected:
 
 private:
     void setupBoardBackground();
-    void setupActionAreas();
 
     /* Store a reference to the board item in the scene graph. */
     MGraphicsBoardItem* m_board_item;
-    MActionArea m_top_area;
-    MActionArea m_bottom_area;
 
     // A MPiece*-to-QGraphicsSvgItem* mapping, which allows us to cleanly cache
     // SVG items and to only insert them in the MGraphicsBoardItem once. Done

@@ -25,6 +25,7 @@
 #include "position.h"
 #include "logic_analyzer.h"
 #include "board_view.h"
+#include "action_area.h"
 
 #include <QList>
 #include <QGraphicsView>
@@ -115,6 +116,9 @@ private:
 
     /* Stores player info, to be shown by the main window. */
     MPlayerInfo m_player_info;
+
+    MActionArea m_top_action_area;
+    MActionArea m_bottom_action_area;
 };
 
 }; // namespace Miniature

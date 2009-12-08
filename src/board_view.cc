@@ -25,6 +25,7 @@
 #include <QPoint>
 #include <QPainter>
 #include <QImage>
+#include <QGraphicsProxyWidget>
 
 #include <iostream>
 #include <QTime>
@@ -45,7 +46,6 @@ MBoardView::MBoardView(QWidget *parent)
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
 
-    setupActionAreas();
     setupBoardBackground();
 }
 
@@ -58,7 +58,6 @@ MBoardView::~MBoardView()
 void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
-    setupActionAreas();
     setupBoardBackground();
 }
 
@@ -111,17 +110,20 @@ void MBoardView::setupBoardBackground()
             this, SLOT(appendDebugOutput(QString)));
 }
 
-void MBoardView::setupActionAreas()
+void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
 {
-    QGraphicsProxyWidget *top_proxy_widget = m_top_area.createActionAreaProxyWidget(QString("qgil"));
-    scene()->addItem(top_proxy_widget);
-    top_proxy_widget->setPos(QPoint(0, 0));
-    m_top_area.setState(MActionArea::NONE);
+    Q_CHECK_PTR(proxy_widget);
 
-    QGraphicsProxyWidget *bottom_proxy_widget = m_bottom_area.createActionAreaProxyWidget(QString("kore"));
-    scene()->addItem(bottom_proxy_widget);
-    bottom_proxy_widget->setPos(QPoint(0, 550));
-    m_bottom_area.setState(MActionArea::TURN_STARTED);
+    scene()->addItem(proxy_widget);
+    proxy_widget->setPos(QPoint(0, 0));
+}
+
+void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
+{
+    Q_CHECK_PTR(proxy_widget);
+
+    scene()->addItem(proxy_widget);
+    proxy_widget->setPos(QPoint(0, 550));
 }
 
 void MBoardView::drawPosition(const MPosition &position)

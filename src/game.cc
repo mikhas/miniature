@@ -48,6 +48,9 @@ MGame::MGame(MBoardView *view, QObject *parent)
 
     connect(m_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
+
+    m_view->setTopActionArea(m_top_action_area.createActionAreaProxyWidget(QString("qgil")));
+    m_view->setBottomActionArea(m_bottom_action_area.createActionAreaProxyWidget(QString("kore")));
 }
 
 MGame::~MGame()
