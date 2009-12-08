@@ -23,6 +23,7 @@
 
 #include "position.h"
 #include "graphics_board_item.h"
+#include "action_area.h"
 
 #include <QString>
 #include <QGraphicsView>
@@ -68,10 +69,13 @@ protected:
     virtual void drawBackground(QPainter *painter, const QRectF &region);
 
 private:
-    void setBoardBackground();
+    void setupBoardBackground();
+    void setupActionAreas();
 
     /* Store a reference to the board item in the scene graph. */
     MGraphicsBoardItem* m_board_item;
+    MActionArea m_top_area;
+    MActionArea m_bottom_area;
 
     // A MPiece*-to-QGraphicsSvgItem* mapping, which allows us to cleanly cache
     // SVG items and to only insert them in the MGraphicsBoardItem once. Done
@@ -84,6 +88,10 @@ private:
 
     bool m_white_rotated180;
     bool m_black_rotated180;
+
+    // Indicates where to position the board item, and where to draw the board
+    // background.
+    const int m_board_item_offset;
 
 private Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);

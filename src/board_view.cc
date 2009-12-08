@@ -37,15 +37,16 @@ MBoardView::MBoardView(QWidget *parent)
   m_background_page(new QWebPage),
   m_background_image(0),
   m_white_rotated180(false),
-  m_black_rotated180(false)
+  m_black_rotated180(false),
+  m_board_item_offset(70)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
 
-    setBoardBackground();
-
+    setupActionAreas();
+    setupBoardBackground();
 }
 
 MBoardView::~MBoardView()
@@ -57,7 +58,8 @@ MBoardView::~MBoardView()
 void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
-    setBoardBackground();
+    setupActionAreas();
+    setupBoardBackground();
 }
 
 void MBoardView::resetCache()
@@ -80,11 +82,16 @@ void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 
     if (m_background_image)
     {
-        painter->drawImage(region, *m_background_image, region);
+        painter->drawImage(region,
+                           *m_background_image,
+                           QRectF(region.x(),
+                                  region.y() - m_board_item_offset,
+                                  region.width(),
+                                  region.height()));
     }
 }
 
-void MBoardView::setBoardBackground()
+void MBoardView::setupBoardBackground()
 {
     m_board_item = new MGraphicsBoardItem();
 
@@ -98,9 +105,23 @@ void MBoardView::setBoardBackground()
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
 
     scene()->addItem(m_board_item);
+    m_board_item->setPos(QPoint(0, m_board_item_offset));
 
     connect(m_board_item, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
+}
+
+void MBoardView::setupActionAreas()
+{
+    QGraphicsProxyWidget *top_proxy_widget = m_top_area.createActionAreaProxyWidget(QString("qgil"));
+    scene()->addItem(top_proxy_widget);
+    top_proxy_widget->setPos(QPoint(0, 0));
+    m_top_area.setState(MActionArea::NONE);
+
+    QGraphicsProxyWidget *bottom_proxy_widget = m_bottom_area.createActionAreaProxyWidget(QString("kore"));
+    scene()->addItem(bottom_proxy_widget);
+    bottom_proxy_widget->setPos(QPoint(0, 550));
+    m_bottom_area.setState(MActionArea::TURN_STARTED);
 }
 
 void MBoardView::drawPosition(const MPosition &position)
