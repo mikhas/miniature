@@ -25,13 +25,10 @@
 #include <QGraphicsItem>
 #include <QGraphicsSvgItem>
 #include <QGraphicsRectItem>
-#include <QTimeLine>
 #include <QGraphicsSceneMouseEvent>
 #include <QUrl>
 #include <QVector>
 #include <QPainter>
-
-#include <QTime>
 
 namespace Miniature
 {
@@ -70,15 +67,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    void setupFrameAndTimeLine();
-    void resetFrame();
-    void putFrameAt(QPointF pos);
-
     const int m_board_size;
-    const int m_selection_duration;
-    QGraphicsRectItem *m_frame;
-    const int m_frame_outline;
-    QTimeLine *m_time_line;
     QGraphicsItem *m_active_item;
 
     // We need a safe way to remember the pieces on the board. This list acts
@@ -87,10 +76,6 @@ private:
     // we start adding animations.
     typedef QVector<QGraphicsSvgItem*> MPiecesList;
     MPiecesList m_pieces;
-
-private Q_SLOTS:
-    /* Reduces opacity of the selection frame. */
-    void fadeOutFrame(int step);
 };
 
 };

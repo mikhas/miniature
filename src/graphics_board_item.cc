@@ -31,13 +31,8 @@ using namespace Miniature;
 MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
 : QGraphicsObject(parent),
   m_board_size(board_size),
-  m_selection_duration(2000),
-  m_frame(0),
-  m_frame_outline(4),
-  m_time_line(0),
   m_active_item(0)
 {
-    setupFrameAndTimeLine();
     setFiltersChildEvents(true);
 }
 
@@ -66,8 +61,6 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         else // valid selection!
         {
-            putFrameAt(m_active_item->pos());
-
             const int cell_size = getCellSize();
             int src_x = floor(m_active_item->pos().x() / cell_size);
             int src_y = floor(m_active_item->pos().y() / cell_size);
@@ -93,55 +86,10 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
             Q_EMIT pieceMoveRequested(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
         }
 
-        resetSelection(); // TODO: nope, the board item should not deselect pieces ...
+        resetSelection(); // TODO: nope, the board item should not deselect pieces ... but I cant see the correct logic.
     }
 
     Q_EMIT sendDebugInfo(QString("MGBI::mpe - update duration: %1 ms").arg(profiling.restart()));
-}
-
-void MGraphicsBoardItem::setupFrameAndTimeLine()
-{
-    // take a guess on cell size if need be
-    const int frame_size = (getCellSize() > m_frame_outline ? getCellSize() : 60) - m_frame_outline;
-
-    m_frame = new QGraphicsRectItem(QRectF(0, 0, frame_size, frame_size), this);
-    m_frame->setPen(QPen(Qt::darkBlue, m_frame_outline, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
-    m_frame->hide();
-
-    m_time_line = new QTimeLine(m_selection_duration, this);
-    m_time_line->setFrameRange(0, 39);
-
-    connect(m_time_line, SIGNAL(frameChanged(int)), this, SLOT(fadeOutFrame(int)));
-}
-
-void MGraphicsBoardItem::fadeOutFrame(int step)
-{
-    // empirical values for nice fading:
-    if (step > 30) // start fading after ca. 1.5 sec
-    {
-        // fade-out in 10% steps
-        m_frame->setOpacity(1.0 - (0.1 * (step - 30)));
-    }
-
-    if (39 == step)
-    {
-        resetFrame();
-    }
-}
-
-void MGraphicsBoardItem::putFrameAt(QPointF pos)
-{
-    Q_CHECK_PTR(m_frame);
-
-    int frame_outline_correction = floor(m_frame_outline * 0.5);
-    m_frame->setPos(pos.x() + frame_outline_correction, pos.y() + frame_outline_correction);
-    m_frame->show();
-}
-
-void MGraphicsBoardItem::resetFrame()
-{
-    m_frame->hide();
-    m_frame->setOpacity(1);
 }
 
 QRectF MGraphicsBoardItem::boundingRect() const
@@ -170,5 +118,4 @@ void MGraphicsBoardItem::removePieces()
 void MGraphicsBoardItem::resetSelection()
 {
     m_active_item = 0;
-    resetFrame();
 }
