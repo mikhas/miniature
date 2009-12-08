@@ -51,6 +51,11 @@ MActionArea::~MActionArea()
 
 void MActionArea::setState(State s)
 {
+    if (m_state == s)
+    {
+        return;
+    }
+
     m_state = s;
     switch(m_state)
     {
@@ -61,6 +66,8 @@ void MActionArea::setState(State s)
             m_button->setStyleSheet(createButtonStyleBorderOnly()); break;
         case PIECE_SELECTED:
             m_button->setStyleSheet(createButtonStyleHalfFilled()); break;
+        case TARGET_SELECTED:
+            m_button->setStyleSheet(createButtonStyle()); break;
     }
 }
 
@@ -119,12 +126,12 @@ QString MActionArea::createButtonStyleHalfFilled() const
 
 QString MActionArea::createButtonStyle() const
 {
-    const QString gradient1 =  QString("qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 %1 stop: 1 %2)").arg(m_colours.blue_gradient1)
-                                                                                                            .arg(m_colours.blue_gradient2);
+    const QString gradient1 =  QString("qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 %1 stop: 1 %2)").arg(m_colours.green_gradient1)
+                                                                                                            .arg(m_colours.green_gradient2);
     const QString gradient2 =  QString("qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 %1 stop: 1 %2)").arg(m_colours.maemo5_orange_gradient1)
                                                                                                             .arg(m_colours.maemo5_orange_gradient2);
 
-    return QString("%1 %2").arg(createButtonStyleBase().arg(m_colours.blue_border).arg("").arg("").arg(gradient1))
+    return QString("%1 %2").arg(createButtonStyleBase().arg(m_colours.green_border).arg("").arg("").arg(gradient1))
                            .arg(createButtonStylePressedBase().arg(m_colours.maemo5_orange_border).arg(gradient2));
 }
 
@@ -142,7 +149,7 @@ QGraphicsProxyWidget* MActionArea::createActionAreaProxyWidget(const QString& na
     layout->addWidget(m_button);
     m_button->setText(name);
 
-    setState(NONE);
+    m_button->setStyleSheet(createButtonStyleFlat());
     m_button->show();
 
     return proxy_widget;
