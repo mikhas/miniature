@@ -70,7 +70,7 @@ QString MActionArea::createButtonStyleBase() const
         "QPushButton {"
             "margin: 3px 2px;"
             "width:472px;"
-            "height: 70px;"
+            "height: 64px;"
             "border-radius: 10px;"
             "border-style: outset;"
             "border-width: 1px;"
