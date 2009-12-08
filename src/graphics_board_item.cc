@@ -34,7 +34,8 @@ MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
   m_selection_duration(2000),
   m_frame(0),
   m_frame_outline(4),
-  m_time_line(0)
+  m_time_line(0),
+  m_active_item(0)
 {
     setupFrameAndTimeLine();
     setFiltersChildEvents(true);
@@ -53,30 +54,25 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     static QTime profiling;
     profiling.restart();
 
-    static QGraphicsItem *active_item = 0;
-    static QTime duration;
-
-    // auto-deselect
-    if (m_selection_duration < duration.elapsed())
+    if(!m_active_item) // try to find an active item
     {
-        active_item = 0;
-        resetFrame();
-    }
+        m_active_item = (scene()->items(mapToScene(event->pos().x() - 1, event->pos().y() -1, 2, 2)))[0];
 
-    if(!active_item) // try to find an active item
-    {
-        active_item = (scene()->items(event->pos().x() - 1, event->pos().y() -1, 2, 2))[0];
-
-        if (active_item == this || !active_item->data(0).toBool())
+        // Do not select board or piece from the wrong colour.
+        if (m_active_item == this || !m_active_item->data(0).toBool())
         {
-           active_item = 0;
-           resetFrame();
+            resetSelection();
            //std::cout << "mouse_pressed: selected board!" << std::endl;
         }
         else // valid selection!
         {
-            duration.start();
-            putFrameAt(active_item->pos());
+            putFrameAt(m_active_item->pos());
+
+            const int cell_size = getCellSize();
+            int src_x = floor(m_active_item->pos().x() / cell_size);
+            int src_y = floor(m_active_item->pos().y() / cell_size);
+
+            Q_EMIT pieceSelectionRequested(QPoint(src_x, src_y));
         }
         //std::cout << "mouse_pressed: try to select" << std::endl;
     }
@@ -85,8 +81,8 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         const int cell_size = getCellSize();
         //std::cout << "mouse_pressed: sth was already selected" << std::endl;
 
-        int src_x = floor(active_item->pos().x() / cell_size);
-        int src_y = floor(active_item->pos().y() / cell_size);
+        int src_x = floor(m_active_item->pos().x() / cell_size);
+        int src_y = floor(m_active_item->pos().y() / cell_size);
 
         int dst_x = floor(event->pos().x() / cell_size);
         int dst_y = floor(event->pos().y() / cell_size);
@@ -97,8 +93,7 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
             Q_EMIT pieceMoveRequested(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
         }
 
-        active_item = 0;
-        resetFrame();
+        resetSelection(); // TODO: nope, the board item should not deselect pieces ...
     }
 
     Q_EMIT sendDebugInfo(QString("MGBI::mpe - update duration: %1 ms").arg(profiling.restart()));
@@ -137,17 +132,14 @@ void MGraphicsBoardItem::fadeOutFrame(int step)
 void MGraphicsBoardItem::putFrameAt(QPointF pos)
 {
     Q_CHECK_PTR(m_frame);
-    Q_CHECK_PTR(m_time_line);
 
     int frame_outline_correction = floor(m_frame_outline * 0.5);
     m_frame->setPos(pos.x() + frame_outline_correction, pos.y() + frame_outline_correction);
     m_frame->show();
-    m_time_line->start();
 }
 
 void MGraphicsBoardItem::resetFrame()
 {
-    m_time_line->stop();
     m_frame->hide();
     m_frame->setOpacity(1);
 }
@@ -173,4 +165,10 @@ void MGraphicsBoardItem::removePieces()
     {
         (*iter)->hide();
     }
+}
+
+void MGraphicsBoardItem::resetSelection()
+{
+    m_active_item = 0;
+    resetFrame();
 }
