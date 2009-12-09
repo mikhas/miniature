@@ -59,8 +59,9 @@ public:
     void resetSelection();
 
 Q_SIGNALS:
-    void pieceMoveRequested(QPoint from, QPoint to);
-    void pieceSelectionRequested(QPoint pos);
+    void pieceMoveRequest(QPoint from, QPoint to);
+    void pieceSelectionRequest(QPoint pos);
+    void undoMoveRequest();
     void sendDebugInfo(QString msg);
 
 protected:
@@ -69,6 +70,8 @@ protected:
 private:
     const int m_board_size;
     QGraphicsItem *m_active_item;
+    QGraphicsRectItem *m_selection;
+    QGraphicsRectItem *m_cancel;
 
     // We need a safe way to remember the pieces on the board. This list acts
     // as a filter, it stores all SVG items that represents pieces. I expect

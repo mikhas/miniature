@@ -74,6 +74,7 @@ public Q_SLOTS:
     void onPieceMoveRequested(QPoint from, QPoint to);
     void onMoveConfirmed();
     void onPieceSelectionCancelled();
+    void onUndoMoveRequested();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);

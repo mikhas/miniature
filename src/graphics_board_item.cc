@@ -22,6 +22,7 @@
 #include "graphics_board_item.h"
 
 #include <QGraphicsScene>
+#include <QGraphicsRectItem>
 #include <QTime>
 
 #include <cmath>
@@ -31,9 +32,21 @@ using namespace Miniature;
 MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
 : QGraphicsObject(parent),
   m_board_size(board_size),
-  m_active_item(0)
+  m_active_item(0),
+  m_selection(0),
+  m_cancel(0)
 {
     setFiltersChildEvents(true);
+    const int cell_size = getCellSize();
+
+    m_selection = new QGraphicsRectItem(QRectF(0, 0, cell_size, cell_size), this);
+    m_selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    m_selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
+    m_selection->hide();
+
+    m_cancel = new QGraphicsRectItem(QRectF(0, 0, cell_size, cell_size), this);
+    m_cancel->setBrush(QBrush(QColor::fromRgbF(0.7, 0, 0.4, 0.5)));
+    m_cancel->hide();
 }
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
@@ -49,9 +62,17 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     static QTime profiling;
     profiling.restart();
 
-    if(!m_active_item) // try to find an active item
+    QGraphicsItem *clicked_item = (scene()->items(mapToScene(event->pos().x() - 1, event->pos().y() -1, 2, 2)))[0];
+
+    if (clicked_item == m_cancel)
     {
-        m_active_item = (scene()->items(mapToScene(event->pos().x() - 1, event->pos().y() -1, 2, 2)))[0];
+        resetSelection();
+        m_cancel->hide();
+        Q_EMIT undoMoveRequest();
+    }
+    else if(!m_active_item) // try to find an active item
+    {
+        m_active_item = clicked_item;
 
         // Do not select board or piece from the wrong colour.
         if (m_active_item == this || !m_active_item->data(0).toBool())
@@ -65,7 +86,12 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
             int src_x = floor(m_active_item->pos().x() / cell_size);
             int src_y = floor(m_active_item->pos().y() / cell_size);
 
-            Q_EMIT pieceSelectionRequested(QPoint(src_x, src_y));
+            Q_EMIT pieceSelectionRequest(QPoint(src_x, src_y));
+            // TODO: make it possible to set the background of a piece from the
+            // outside, perhaps even subclass QGraphicsSvgItem for the pieces.
+            m_cancel->hide();
+            m_selection->setPos(m_active_item->pos());
+            m_selection->show();
         }
         //std::cout << "mouse_pressed: try to select" << std::endl;
     }
@@ -82,8 +108,10 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         if((src_x != dst_x) || (src_y != dst_y))
         {
-            //active_item->setPos(QPointF(dst_x * cell_size, dst_y * cell_size));
-            Q_EMIT pieceMoveRequested(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
+            m_cancel->setPos(m_active_item->pos());
+            m_cancel->show();
+
+            Q_EMIT pieceMoveRequest(QPoint(src_x, src_y), QPoint(dst_x, dst_y));
         }
 
         resetSelection(); // TODO: nope, the board item should not deselect pieces ... but I cant see the correct logic.
@@ -118,4 +146,5 @@ void MGraphicsBoardItem::removePieces()
 void MGraphicsBoardItem::resetSelection()
 {
     m_active_item = 0;
+    m_selection->hide();
 }

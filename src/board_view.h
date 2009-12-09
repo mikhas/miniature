@@ -68,8 +68,9 @@ public:
     void resetPieceSelection();
 
 Q_SIGNALS:
-    void pieceSelectionRequested(QPoint cell);
-    void pieceMoveRequested(QPoint from, QPoint to);
+    void pieceSelectionRequest(QPoint cell);
+    void pieceMoveRequest(QPoint from, QPoint to);
+    void undoMoveRequest();
     void sendDebugInfo(QString msg);
 
 protected:
@@ -100,6 +101,7 @@ private:
 private Q_SLOTS:
     void onPieceSelectionRequested(QPoint cell);
     void onPieceMoveRequested(QPoint from, QPoint to);
+    void onUndoMoveRequested();
     void appendDebugOutput(QString msg);
     void onLoadFinished(bool ok);
 };

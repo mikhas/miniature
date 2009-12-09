@@ -40,10 +40,12 @@ MGame::MGame(MBoardView *view, QObject *parent)
     Q_ASSERT(m_view);
 
     // process state transition requests
-    connect(m_view, SIGNAL(pieceSelectionRequested(QPoint)),
+    connect(m_view, SIGNAL(pieceSelectionRequest(QPoint)),
             this, SLOT(onPieceSelectionRequested(QPoint)));
-    connect(m_view, SIGNAL(pieceMoveRequested(QPoint, QPoint)),
+    connect(m_view, SIGNAL(pieceMoveRequest(QPoint, QPoint)),
             this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
+    connect(m_view, SIGNAL(undoMoveRequest()),
+            this, SLOT(onUndoMoveRequested()));
     connect(&m_top_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
@@ -263,4 +265,11 @@ void MGame::onPieceSelectionCancelled()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
     m_view->resetPieceSelection();
+}
+
+void MGame::onUndoMoveRequested()
+{
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    m_view->resetPieceSelection();
+    m_view->drawPosition(m_game[m_half_move]);
 }
