@@ -229,7 +229,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
         {
-            Q_EMIT check();
+            //Q_EMIT check();
         }
 
         if (MLogicAnalyzer::PROMOTION & result)

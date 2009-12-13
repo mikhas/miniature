@@ -65,12 +65,13 @@ void MPosition::movePiece(QPoint from, QPoint to)
     MStorage from_storage = store(from);
     MStorage to_storage = store(to);
 
-    MPiece::MType type;
-    MPiece::MColour colour;
+    // update king/rook state for castling
+    MPiece::MType type = MPiece::PAWN; // that is, neither king or rook
+    MPiece::MColour colour = MPiece::WHITE;
     if (!from_storage.empty())
     {
-    	type = from_storage.m_piece->getType();
-    	colour = from_storage.m_piece->getColour();
+        type = from_storage.m_piece->getType();
+        colour = from_storage.m_piece->getColour();
     }
 
     QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
