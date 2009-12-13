@@ -65,15 +65,29 @@ void MPosition::movePiece(QPoint from, QPoint to)
     MStorage from_storage = store(from);
     MStorage to_storage = store(to);
 
+    MPiece::MType type;
+    MPiece::MColour colour;
+    if (!from_storage.empty())
+    {
+    	type = from_storage.m_piece->getType();
+    	colour = from_storage.m_piece->getColour();
+    }
+
     QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
 
     from_storage.m_index = indexFromPoint(to);
     restore(&from_storage);
 
-    // TODO: fix ambigious moves, e.g., when two pieces of the same kind can move to a location.
-    m_move_notation = QString("%1%2%3").arg(letter)
-                                       .arg(to_storage.empty() ? "" : "x")
-                                       .arg(convertToChessCell(to));
+    if (type == MPiece::KING)
+    {
+        //from_storage.m_piece->hasMoved();
+        kingMoved(colour);
+    }
+    else if (type == MPiece::ROOK)
+    {
+        //from_storage.m_piece->hasMoved();
+        rookMoved(colour, from);
+    }
 }
 
 MSharedPiece MPosition::pieceAt(QPoint pos) const
@@ -167,6 +181,14 @@ void MPosition::restore(MStorage* const storage)
 
     m_position[storage->m_index] = storage->m_piece;
 
+    if (!storage->empty())
+    {
+    	if (storage->m_piece->getType() == MPiece::KING)
+    	{
+    		updateKingPosition(storage->m_piece->getColour(), indexToPoint(storage->m_index));
+    	}
+    }
+
     // drop the shared ref
     storage->m_piece.clear();
 }
@@ -177,16 +199,18 @@ void MPosition::addPieceAt(MPiece* piece, QPoint pos)
     //MStorage removed = store(pos);
     m_position[indexFromPoint(pos)] = MSharedPiece(piece);
 
+
+
     if (piece && piece->getType() == MPiece::KING)
     {
-        if (piece->getColour() == MPiece::WHITE)
-        {
-            m_white_king = pos;
-        }
-        else
-        {
-            m_black_king = pos;
-        }
+    	if (piece->getColour() == MPiece::WHITE)
+    	{
+    		m_white_king = pos;
+    	}
+    	else
+    	{
+    		m_black_king = pos;
+    	}
     }
 }
 
@@ -226,6 +250,18 @@ void MPosition::resetCastling()
     m_white_ks_castle = true;
     m_black_qs_castle = true;
     m_black_ks_castle = true;
+}
+
+void MPosition::updateKingPosition(MPiece::MColour colour, QPoint to)
+{
+    if (colour == MPiece::WHITE)
+    {
+        m_white_king = to;
+    }
+    else
+    {
+        m_black_king = to;
+    }
 }
 
 void MPosition::kingMoved(MPiece::MColour colour)

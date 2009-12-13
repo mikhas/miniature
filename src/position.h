@@ -113,6 +113,7 @@ public:
 
 private:
     QString getDefaultStartPosition() const;
+    void updateKingPosition(MPiece::MColour colour, QPoint to);
 
     int m_width;
     int m_height;

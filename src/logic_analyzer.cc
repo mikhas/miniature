@@ -518,14 +518,15 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
 
 bool MLogicAnalyzer::moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour)
 {
-	QPoint king = pos.getKing(colour);
-
 	// move piece
 	MStorage sourcePiece = pos.store(from);
 	MStorage targetPiece = pos.store(to);
 	int restoreIndex = sourcePiece.m_index;
 	sourcePiece.m_index = targetPiece.m_index;
 	pos.restore(&sourcePiece);
+
+	QPoint king = pos.getKing(colour);
+	std::cout << "king at: " << king.x() << "," << king.y() << std::endl;
 
 	// perform check
 	bool ret = cellUnderAttack(pos, king, colour);

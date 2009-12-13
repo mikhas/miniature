@@ -37,15 +37,13 @@ class MLogicAnalyzer
 public:
     enum MState
     {
-        INVALID    = 0x0,
-        VALID      = 0x1,
-        CHECK      = 0x2,
-        CHECKMATE  = 0x3,
-        STALEMATE  = 0x4,
-        CAPTURE    = 0x5,
-        PROMOTION  = 0x6
-        //KING_MOVED = 0x7,
-        //ROOK_MOVED = 0x8
+        INVALID    = 0x000,
+        VALID      = 0x001,
+        CHECK      = 0x002,
+        CHECKMATE  = 0x004,
+        STALEMATE  = 0x008,
+        CAPTURE    = 0x010,
+        PROMOTION  = 0x020
     };
     typedef QFlags<MState> MStateFlags;
 
