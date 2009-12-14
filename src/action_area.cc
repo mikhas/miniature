@@ -84,7 +84,7 @@ QString MActionArea::createButtonStyleBase() const
             "height: 64px;"
             "border-radius: 10px;"
             "border-style: outset;"
-            "border-width: 1px;"
+            "border-width: 2px;"
             "border-color: %1;"
             "background-image: url('%2');"
             "background-position: %3;"

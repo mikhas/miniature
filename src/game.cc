@@ -33,20 +33,19 @@ using namespace Miniature;
 MGame::MGame(MBoardView *view, QObject *parent)
 : QObject(parent),
   m_view(view),
+  m_board_item(0),
   m_half_move(-1),
-  m_trans_position(view->getBoardItem()),
+  m_trans_captured_piece(0),
+  m_selected_piece(0),
   m_logic_analyzer(0),
   m_is_bottom_player_white(true)
 {
     Q_ASSERT(m_view);
 
+    setupBoardItem();
+    setupStartPosition();
+
     // process state transition requests
-    connect(m_view, SIGNAL(pieceSelectionRequest(QPoint)),
-            this, SLOT(onPieceSelectionRequested(QPoint)));
-    connect(m_view, SIGNAL(pieceMoveRequest(QPoint, QPoint)),
-            this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
-    connect(m_view, SIGNAL(undoMoveRequest()),
-            this, SLOT(onUndoMoveRequested()));
     connect(&m_top_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
@@ -58,16 +57,37 @@ MGame::MGame(MBoardView *view, QObject *parent)
 
     m_view->setTopActionArea(m_top_action_area.createActionAreaProxyWidget(QString("qgil")));
     m_view->setBottomActionArea(m_bottom_action_area.createActionAreaProxyWidget(QString("kore")));
+
+    newGame();
 }
 
 MGame::~MGame()
 {}
 
+void MGame::setupBoardItem()
+{
+    Q_ASSERT(m_view);
+    // If m_board_item was already setup we will leak memory here. We cannot
+    // delete MPieces directly (which would happen if we delete a
+    // MGraphicsBoardItem) as long as they are owned by MPosition instances
+    // (shared pointers semantics w.r.t. MPieces).
+    Q_ASSERT(!m_board_item);
+
+    m_board_item = new MGraphicsBoardItem;
+    m_view->addBoardItem(m_board_item);
+
+    // process state transition requests
+    connect(m_board_item, SIGNAL(pieceClicked(MPiece *)),
+            this, SLOT(onPieceClicked(MPiece *)));
+    connect(m_board_item, SIGNAL(targetClicked(QPoint)),
+            this, SLOT(onTargetClicked(QPoint)));
+    connect(m_board_item, SIGNAL(undoMoveRequest()),
+            this, SLOT(onUndoMoveRequested()));
+}
+
 void MGame::newGame()
 {
-    m_half_move = -1;
-    MPosition pos = setupStartPosition();
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    jumpToStart();
 }
 
 void MGame::jumpToStart()
@@ -94,69 +114,74 @@ void MGame::jumpToEnd()
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 }
 
+// TODO: remove this method?
 void MGame::rotateWhitePieces()
 {
-    m_view->rotateWhitePieces();
     MPosition pos = m_game[m_half_move];
-    updateBoardView(pos);
 }
 
+// TODO: remove this method?
 void MGame::rotateBlackPieces()
 {
-    m_view->rotateBlackPieces();
     MPosition pos = m_game[m_half_move];
-    updateBoardView(pos);
 }
 
-MPosition MGame::setupStartPosition()
+void MGame::setupStartPosition()
 {
+    // Don't try to delete pieces individually from a MGame instance. The
+    // MSharedPieces and the scene graph conflict w.r.t. to ownership!
+
     m_game.clear();
     Q_ASSERT(m_game.empty());
 
-    MPosition pos(m_view->getBoardItem());
+    MPosition pos;
 
-/*
-    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
-    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
-    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
-    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
+    addPieceToPositionAt(new MRook(MPiece::BLACK), &pos, QPoint(0,0));
+    addPieceToPositionAt(new MRook(MPiece::BLACK), &pos, QPoint(7,0));
+    addPieceToPositionAt(new MRook(MPiece::WHITE), &pos, QPoint(0,7));
+    addPieceToPositionAt(new MRook(MPiece::WHITE), &pos, QPoint(7,7));
 
-    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
-    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
-    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
-    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
-*/
+    addPieceToPositionAt(new MKnight(MPiece::BLACK), &pos, QPoint(1,0));
+    addPieceToPositionAt(new MKnight(MPiece::BLACK), &pos, QPoint(6,0));
+    addPieceToPositionAt(new MKnight(MPiece::WHITE), &pos, QPoint(1,7));
+    addPieceToPositionAt(new MKnight(MPiece::WHITE), &pos, QPoint(6,7));
 
-    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
-    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
-    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
-    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
+    addPieceToPositionAt(new MBishop(MPiece::BLACK), &pos, QPoint(2,0));
+    addPieceToPositionAt(new MBishop(MPiece::BLACK), &pos, QPoint(5,0));
+    addPieceToPositionAt(new MBishop(MPiece::WHITE), &pos, QPoint(2,7));
+    addPieceToPositionAt(new MBishop(MPiece::WHITE), &pos, QPoint(5,7));
 
-/*
-    pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
-    pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
+    addPieceToPositionAt(new MQueen(MPiece::BLACK), &pos, QPoint(3,0));
+    addPieceToPositionAt(new MQueen(MPiece::WHITE), &pos, QPoint(3,7));
 
-    pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
-    pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
-*/
+    addPieceToPositionAt(new MKing(MPiece::BLACK), &pos, QPoint(4,0));
+    addPieceToPositionAt(new MKing(MPiece::WHITE), &pos, QPoint(4,7));
 
-/*
     for (int i = 0; i < 8; ++i)
     {
-        pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
-        pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
+        addPieceToPositionAt(new MPawn(MPiece::BLACK), &pos, QPoint(i,1));
+        addPieceToPositionAt(new MPawn(MPiece::WHITE), &pos, QPoint(i,6));
     }
-*/
     pos.resetCastling();
 
+    pos.updatePieces();
 
     m_game.append(pos);
     m_half_move = 0;
-    //m_view->resetCache();
-    //m_view->drawPosition(pos);
 
     Q_ASSERT(!m_game.empty());
-    return m_game[m_half_move];
+}
+
+void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
+{
+    Q_CHECK_PTR(m_board_item);
+    Q_CHECK_PTR(piece);
+    Q_CHECK_PTR(pos);
+
+    pos->addPieceAt(piece, cell);
+
+    piece->show();
+    piece->setParentItem(m_board_item);
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -168,22 +193,18 @@ void MGame::setPositionTo(int half_move)
 {
     if (isValidPosition(half_move))
     {
+        deSelectPiece();
         m_half_move = half_move;
         MPosition pos = m_game[m_half_move];
-        //m_view->resetCache();
-        //updateBoardView(pos);
-    }
-}
 
-void MGame::updateBoardView(const MPosition& /*pos*/)
-{
-    //m_view->drawPosition(pos);
+        pos.updatePieces();
+    }
 }
 
 void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
 {
     // current mapping is white = bottom
-    if (isBottomPlayersTurn())
+    if (isTurnOfBottomPlayer())
     {
         m_top_action_area.setState(s1);
         m_bottom_action_area.setState(s2);
@@ -195,44 +216,111 @@ void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
     }
 }
 
-bool MGame::isTopPlayersTurn() const
+bool MGame::isTurnOfTopPlayer() const
 {
-    return !isBottomPlayersTurn();
+    return !isTurnOfBottomPlayer();
 }
 
 
-bool MGame::isBottomPlayersTurn() const
+bool MGame::isTurnOfBottomPlayer() const
 {
     return (m_half_move % 2 == (m_is_bottom_player_white ? 0 : 1));
 }
 
-void MGame::onPieceSelectionRequested(QPoint cell)
+void MGame::undoMove()
 {
-    // if invalid piece was selected => reset selection, purple flashing.
-    // currently, all piece selections are "valid" (because the logic analyzer
-    // doesnt know how to handle that yet)
-
-    // assume request is valid
-    Q_UNUSED(cell);
-    setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
-    //m_view->drawPosition(m_game[m_half_move]);
+    if (m_selected_piece)
+    {
+        m_selected_piece->moveTo(m_selected_piece->mapFromCell(m_selected_piece_cell));
+        if (m_trans_captured_piece)
+        {
+            m_trans_captured_piece->show();
+            m_trans_captured_piece = 0;
+        }
+    }
 }
 
-void MGame::onPieceMoveRequested(QPoint from, QPoint to)
+void MGame::deSelectPiece()
 {
-    static QTime profiling;
-    Q_EMIT sendDebugInfo(QString("MGame::onPMR - time between moves: %1 ms").arg(profiling.elapsed()));
-    profiling.restart();
+    if (m_selected_piece)
+    {
+        m_selected_piece->deSelect();
+        m_selected_piece = 0;
+        m_selected_piece_cell = QPoint(-1,-1);
+    }
+}
+
+void MGame::selectPiece(MPiece *piece)
+{
+    if (piece)
+    {
+        undoMove();
+        deSelectPiece();
+        m_selected_piece = piece;
+        m_selected_piece->select();
+        m_selected_piece_cell = m_selected_piece->mapToCell();
+    }
+}
+
+void MGame::onPieceClicked(MPiece *piece)
+{
+    // If invalid piece was selected => reset selection, purple flashing.
+    // Currently, most piece selections are "valid" (because the logic analyzer
+    // doesnt know how to handle that yet)
+    Q_ASSERT(isValidPosition(m_half_move));
+
+    // Only allow selection if piece has the correct colour.
+    if (piece && piece->getColour() == (m_game[m_half_move]).getColourToMove())
+    {
+        selectPiece(piece);
+        setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
+    }
+    // Must be an attempt to capture an enemy piece. Let's forward it then!
+    // Note: From my current understanding, this is the only case where
+    // onTargetClicked is called when target points to a piece. Usually,
+    // onTargetClicked is always only called when target points to an empty
+    // cell.
+    else if (piece)
+    {
+        onTargetClicked(piece->mapToCell());
+    }
+}
+
+void MGame::onTargetClicked(const QPoint &target)
+{
+    // ignore invalid mouse clicks
+    if (!m_selected_piece || !m_selected_piece->isSelected())
+    {
+        return;
+    }
 
     Q_ASSERT(isValidPosition(m_half_move));
     m_trans_position = MPosition(m_game[m_half_move]);
+    // Undo any move that was maybe done from the previous m_trans_position.
+    undoMove(); // TODO: refine this if moving back is visible to the user ... unlikely
 
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_trans_position, from, to);
+    QPoint origin = m_selected_piece_cell;
+    if (origin == target) // hum, cancel?
+    {
+        onUndoMoveRequested();
+        // Dangerous return statement. Makes the surrounding code more fragile because
+        // this special case is not aware of subtle changes in the following code.
+        return; 
+    }
+
+    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_trans_position, origin, target);
     if (MLogicAnalyzer::VALID & result)
     {
+        // TODO: check for capture flag instead.
+        MSharedPiece maybe_captured = m_trans_position.pieceAt(target);
+        if(!maybe_captured.isNull())
+        {
+            m_trans_captured_piece = maybe_captured.data();
+        }
+
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
         MPiece::MColour colour = m_trans_position.getColourToMove();
-        m_trans_position.movePiece(from, to);
+        m_trans_position.movePiece(origin, target);
 
         if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
         {
@@ -241,35 +329,22 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
 
         if (MLogicAnalyzer::PROMOTION & result)
         {
-            m_trans_position.addPieceAt(new MQueen(colour), to);
+            m_trans_position.addPieceAt(new MQueen(colour), target);
         }
-
-        // Draw a temporary position, as this is not stored in the game yet.
-        //m_view->drawPosition(m_trans_position);
     }
-    else
-    {
-        Q_EMIT invalidMove(from, to);
-    }
-
-    Q_EMIT sendDebugInfo(QString("MGame::onPMR - update duration: %1 ms").arg(profiling.restart()));
 }
 
 void MGame::onMoveConfirmed()
 {
+    // Assumption: The move is already visible on the board, hence we only add
+    // the transitional position to the position list.
     m_trans_position.nextColour();
     ++m_half_move;
     m_game.insert(m_half_move, m_trans_position);
 
+    m_trans_captured_piece = 0;
+    deSelectPiece();
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-
-    m_view->resetPieceSelection();
-    // TODO: Clean this up! Currently needs to be redrawn because now pieces of
-    // the other colour can be selected (the side effect of
-    // m_trans_position.nextColour) . Confirms that doing this
-    // white/black-to-move thing in MGraphicsBoardItem was wrong, can be solved
-    // w/ the valid piece selection check.
-    //m_view->drawPosition(m_trans_position);
 
     // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
 }
@@ -277,12 +352,13 @@ void MGame::onMoveConfirmed()
 void MGame::onPieceSelectionCancelled()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    m_view->resetPieceSelection();
+    undoMove();
+    deSelectPiece();
 }
 
 void MGame::onUndoMoveRequested()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    m_view->resetPieceSelection();
-    //m_view->drawPosition(m_game[m_half_move]);
+    undoMove();
+    deSelectPiece();
 }

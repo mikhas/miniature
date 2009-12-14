@@ -37,8 +37,6 @@ MMainWindow::MMainWindow()
     // Add debugging output to Miniature app.
     connect(m_game, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
-    connect(m_ui.board_view, SIGNAL(sendDebugInfo(QString)),
-            this, SLOT(appendDebugOutput(QString)));
 
     // Connect actions.
     connect(m_ui.new_game, SIGNAL(triggered()),
@@ -80,7 +78,6 @@ MMainWindow::~MMainWindow()
 void MMainWindow::show()
 {
     QMainWindow::show();
-    m_game->newGame();
 }
 
 void MMainWindow::appendDebugOutput(QString msg)

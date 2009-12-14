@@ -30,7 +30,9 @@ QSvgRenderer MQueen::whiteRenderer;
 
 MQueen::MQueen(MColour colour, int width, int height)
 : MPiece(colour, QUEEN, width, height)
-{}
+{
+    loadFromSvgFile();
+}
 
 MQueen::~MQueen()
 {}
@@ -113,11 +115,8 @@ QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
     return possibleSquares;
 }
 
-// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-QGraphicsSvgItem* MQueen::createSvgItem(int pieceSize) const
+void MQueen::loadFromSvgFile(int pieceSize)
 {
-    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
-
     if (!MQueen::hasFinishedLoading)
     {
         MQueen::blackRenderer.load(QString(":pieces/black/queen.svg"));
@@ -125,10 +124,8 @@ QGraphicsSvgItem* MQueen::createSvgItem(int pieceSize) const
         MQueen::hasFinishedLoading = true;
     }
 
-    applyRenderer(svgItem, (MQueen::BLACK == getColour() ? MQueen::blackRenderer
-                                                        : MQueen::whiteRenderer), pieceSize);
-
-    return svgItem;
+    applyRenderer((MQueen::BLACK == getColour() ? MQueen::blackRenderer
+                                                : MQueen::whiteRenderer), pieceSize);
 }
 
 QChar MQueen::getLetter() const

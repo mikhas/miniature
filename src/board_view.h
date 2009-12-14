@@ -22,6 +22,7 @@
 #define BOARD_VIEW_H__
 
 #include "position.h"
+#include "graphics_board_item.h"
 
 #include <QGraphicsSvgItem>
 #include <QString>
@@ -50,65 +51,29 @@ public:
     virtual ~MBoardView();
 
     virtual void setScene(QGraphicsScene* scene);
-    // Effect becomes visible when the next position is drawn.
-    void rotateBlackPieces();
-    // Effect becomes visible when the next position is drawn.
-    void rotateWhitePieces();
 
-    /* Draws a chess position on this board. */
-    void drawPosition(const MPosition &position);
-    void drawStartPosition();
-    void resetCache();
-
-    /* Returns the SVG item representing the board. It is used as a simple
-     * parent container for all pieces, mostly to get correct relative coords
-     * when moving the pieces. */
-    QGraphicsSvgItem* getBoardItem() const;
+    void addBoardItem(MGraphicsBoardItem *item);
 
     /* Takes ownership of the proxy widget. */
     void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
     /* Takes ownership of the proxy widget. */
     void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
-    /* Fwd method to MBoardView */
-    void resetPieceSelection();
-
-Q_SIGNALS:
-    void pieceSelectionRequest(QPoint cell);
-    void pieceMoveRequest(QPoint from, QPoint to);
-    void undoMoveRequest();
-    void sendDebugInfo(QString msg);
 
 protected:
     virtual void drawBackground(QPainter *painter, const QRectF &region);
 
+private Q_SLOTS:
+    void onLoadFinished(bool ok);
+
 private:
     void setup();
-
-    /* Store a reference to the board item in the scene graph. */
-    QGraphicsSvgItem* m_board_item;
-
-    // A MPiece*-to-QGraphicsSvgItem* mapping, which allows us to cleanly cache
-    // SVG items and to only insert them in the MGraphicsBoardItem once. Done
-    // for mouse event speed optimisation.
-    typedef QHash<MPiece*, QGraphicsSvgItem*> MSvgItemCache;
-    MSvgItemCache m_cache;
 
     QWebPage* m_background_page;
     QImage* m_background_image;
 
-    bool m_white_rotated180;
-    bool m_black_rotated180;
-
     // Indicates where to position the board item, and where to draw the board
     // background.
     const int m_board_item_offset;
-
-private Q_SLOTS:
-    void onPieceSelectionRequested(QPoint cell);
-    void onPieceMoveRequested(QPoint from, QPoint to);
-    void onUndoMoveRequested();
-    void appendDebugOutput(QString msg);
-    void onLoadFinished(bool ok);
 };
 
 }; // namespace Miniature

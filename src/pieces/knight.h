@@ -37,7 +37,6 @@ public:
     ~MKnight();
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const;
-    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
     virtual QChar getLetter() const;
 
 private:
@@ -46,6 +45,7 @@ private:
      * is used for both colours. Also, we have to delay loading of SVGs from
      * the resource file until Qt has finished initializing it.
      */
+    void loadFromSvgFile(int pieceSize = 60);
     static bool hasFinishedLoading;
     static QSvgRenderer blackRenderer;
     static QSvgRenderer whiteRenderer;

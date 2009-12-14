@@ -27,19 +27,13 @@
 #include <QImage>
 #include <QGraphicsProxyWidget>
 
-#include <iostream>
-#include <QTime>
-
 using namespace Miniature;
 
 MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
-  m_board_item(0),
   m_background_page(new QWebPage),
   m_background_image(0),
-  m_white_rotated180(false),
-  m_black_rotated180(false),
-  m_board_item_offset(70)
+  m_board_item_offset(80)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
@@ -51,7 +45,6 @@ MBoardView::MBoardView(QWidget *parent)
 
 MBoardView::~MBoardView()
 {
-    resetCache();
     delete m_background_image;
 }
 
@@ -59,11 +52,6 @@ void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
     setup();
-}
-
-void MBoardView::resetCache()
-{
-    m_cache.clear();
 }
 
 void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
@@ -92,31 +80,17 @@ void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 
 void MBoardView::setup()
 {
-    m_board_item = new QGraphicsSvgItem();
-    scene()->addItem(m_board_item);
-    m_board_item->setPos(QPoint(0, m_board_item_offset));
-
     QPalette palette = m_background_page->palette();
     palette.setColor(QPalette::Base, Qt::transparent);
     m_background_page->setPalette(palette);
 
     m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
-
-    // propagate state transition requests
-    connect(m_board_item, SIGNAL(pieceSelectionRequest(QPoint)),
-            this, SLOT(onPieceSelectionRequested(QPoint)));
-    connect(m_board_item, SIGNAL(pieceMoveRequest(QPoint, QPoint)),
-            this, SLOT(onPieceMoveRequested(QPoint, QPoint)));
-    connect(m_board_item, SIGNAL(undoMoveRequest()),
-            this, SLOT(onUndoMoveRequested()));
-
-    connect(m_board_item, SIGNAL(sendDebugInfo(QString)),
-            this, SLOT(appendDebugOutput(QString)));
 }
 
-QGraphicsSvgItem* MBoardView::getBoardItem() const
+void MBoardView::addBoardItem(MGraphicsBoardItem *item)
 {
-    return m_board_item;
+    scene()->addItem(item);
+    item->setPos(QPoint(0, m_board_item_offset));
 }
 
 void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
@@ -132,111 +106,7 @@ void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
     Q_CHECK_PTR(proxy_widget);
 
     scene()->addItem(proxy_widget);
-    proxy_widget->setPos(QPoint(0, 550));
-}
-
-void MBoardView::resetPieceSelection()
-{
-    // TODO: still needed?
-}
-
-void MBoardView::drawPosition(const MPosition &position)
-{
-    static QTime profiling;
-    profiling.restart();
-
-    Q_CHECK_PTR(m_board_item);
-    // TODO: remove children of board item when jumping to a new position (we
-    // assume it's non-continuous, that is, not a simple move. Else we wouldnt
-    // need to redraw the whole position.
-
-    const int cell_size = 60; // TODO: remove magic number!
-
-    for(MPosition::MPieces::const_iterator iter = position.begin();
-        iter != position.end();
-        ++iter)
-    {
-        MSharedPiece pos_piece = *iter;
-        if (pos_piece) // non-empty cell
-        {
-            QPoint cell = position.indexToPoint(std::distance(position.begin(), iter), cell_size);
-            QGraphicsSvgItem* item = 0;
-
-            // Querying cache for the item.
-            if (!m_cache.contains(pos_piece.data()))
-            {
-                //qDebug("MBV::dp - nothing found at %i ", (int) pos_piece);
-                item = pos_piece->createSvgItem(cell_size);
-                m_cache.insert(pos_piece.data(), item);
-                //m_board_item->addPiece(item);
-            }
-            else
-            {
-                item = m_cache.value(pos_piece.data());
-                //qDebug("MBV::dp - cache hit at %i, found %i", (int) pos_piece, (int) item);
-            }
-
-            item->setData(0, QVariant((position.getColourToMove() == pos_piece->getColour() ? true
-                                                                                            : false)));
-            const bool is_white_piece = (MPiece::WHITE == pos_piece->getColour());
-            const bool is_black_piece = !is_white_piece;
-
-            const bool have_to_rotate = ((is_white_piece && m_white_rotated180) ||
-                                         (is_black_piece && m_black_rotated180));
-
-            const bool is_rotated = item->data(1).toBool();
-            const QRectF correction = item->boundingRect();
-
-            // item is not rotated yet
-            if(!is_rotated && have_to_rotate)
-            {
-                item->rotate(180);
-                item->translate(-correction.width(), -correction.height());
-                item->setData(1, QVariant(true));
-            }
-            // item was rotated, but needs to be reset
-            else if (is_rotated && !have_to_rotate)
-            {
-                item->rotate(180);
-                item->translate(-correction.width(), -correction.height());
-                item->setData(1, QVariant(false));
-            }
-
-            item->setPos(cell);
-            item->show();
-        }
-    }
-
-    Q_EMIT sendDebugInfo(QString("MBoardView::dp - update duration: %1 ms").arg(profiling.restart()));
-}
-
-void MBoardView::drawStartPosition()
-{
-    //MPosition pos;
-    //drawPosition(pos);
-}
-
-void MBoardView::onPieceSelectionRequested(QPoint cell)
-{
-    // event propagation
-    Q_EMIT pieceSelectionRequest(cell);
-}
-
-void MBoardView::onPieceMoveRequested(QPoint from, QPoint to)
-{
-    // event propagation
-    Q_EMIT pieceMoveRequest(from, to);
-}
-
-void MBoardView::onUndoMoveRequested()
-{
-    // event propagation
-    Q_EMIT undoMoveRequest();
-}
-
-void MBoardView::appendDebugOutput(QString msg)
-{
-    Q_EMIT sendDebugInfo(msg);
+    proxy_widget->setPos(QPoint(0, m_board_item_offset + 480 + 5));
 }
 
 void MBoardView::onLoadFinished(bool /*ok*/)
@@ -244,14 +114,4 @@ void MBoardView::onLoadFinished(bool /*ok*/)
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
     m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32);
     update(); // schedule a redraw
-}
-
-void MBoardView::rotateWhitePieces()
-{
-    m_white_rotated180 = !m_white_rotated180;
-}
-
-void MBoardView::rotateBlackPieces()
-{
-    m_black_rotated180 = !m_black_rotated180;
 }

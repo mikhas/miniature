@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
+ * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -25,6 +26,7 @@
 #include <QPoint>
 #include <QChar>
 #include <QGraphicsSvgItem>
+#include <QGraphicsRectItem>
 
 namespace Miniature
 {
@@ -33,6 +35,8 @@ namespace Miniature
 class MPiece
 : public QGraphicsSvgItem
 {
+    Q_OBJECT
+
 public:
     enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
     enum MColour {BLACK, WHITE};
@@ -41,24 +45,40 @@ public:
     virtual ~MPiece();
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const = 0;
-    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const = 0;
     virtual QChar getLetter() const = 0;
 
     MType getType() const;
     MColour getColour() const;
 
-    static MPiece* createPiece(MType type, MColour colour, int width = 8, int height = 8);
+    void select();
+    void deSelect();
+    bool isSelected() const;
 
-    // Potentially deprecated!
-    static MPiece* createFromFenPiece(QChar fenPiece, int width = 8, int height = 8);
+    // This method was briefly necessary for a hack because setPos(.) is
+    // non-virtual. Now it stays here because its name makes the intend
+    // clearer. And perhaps I need a setPos(.) wrapper again at one point
+    // (animations come to mind).
+    void moveTo(const QPoint &target);
+
+    // mapTo/mapFrom follows the QGraphicsItem API naming conventions, although
+    // our mapping is from a QGI coord system to a MPosition coord system.
+    QPoint mapToCell() const;
+    QPoint mapFromCell(const QPoint &cell) const;
 
 protected:
-    void applyRenderer(QGraphicsSvgItem *item, QSvgRenderer &renderer, int pieceSize) const;
+    void applyRenderer(QSvgRenderer &renderer, int pieceSize);
 
     MColour colour;
     MType type;
     int xDim;
     int yDim;
+
+    // Disable setPos(.) API - use moveTo(.) instead!
+    void setPos(const QPointF &pos);
+    void setPos(qreal x, qreal y);
+
+    // The selection that is drawn around a piece when selected.
+    QGraphicsRectItem *selection;
 };
 
 } // namespace Miniature

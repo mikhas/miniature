@@ -31,7 +31,9 @@ QSvgRenderer MPawn::whiteRenderer;
 
 MPawn::MPawn(MColour colour, int width, int height)
 : MPiece(colour, PAWN, width, height)
-{}
+{
+    loadFromSvgFile();
+}
 
 MPawn::~MPawn()
 {}
@@ -88,11 +90,8 @@ QList<QPoint> MPawn::getPossibleSquares(QPoint point) const
     return possibleSquares;
 }
 
-// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-QGraphicsSvgItem* MPawn::createSvgItem(int pieceSize) const
+void MPawn::loadFromSvgFile(int pieceSize)
 {
-    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
-
     if (!MPawn::hasFinishedLoading)
     {
         MPawn::blackRenderer.load(QString(":pieces/black/pawn.svg"));
@@ -100,10 +99,8 @@ QGraphicsSvgItem* MPawn::createSvgItem(int pieceSize) const
         MPawn::hasFinishedLoading = true;
     }
 
-    applyRenderer(svgItem, (MPawn::BLACK == getColour() ? MPawn::blackRenderer
-                                                        : MPawn::whiteRenderer), pieceSize);
-
-    return svgItem;
+    applyRenderer((MPawn::BLACK == getColour() ? MPawn::blackRenderer
+                                               : MPawn::whiteRenderer), pieceSize);
 }
 
 QChar MPawn::getLetter() const

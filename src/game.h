@@ -25,6 +25,7 @@
 #include "logic_analyzer.h"
 #include "board_view.h"
 #include "action_area.h"
+#include "graphics_board_item.h"
 
 #include <QList>
 #include <QGraphicsView>
@@ -69,43 +70,71 @@ public Q_SLOTS:
      */
     void setPositionTo(int half_move);
 
-    /* Process user requests coming from the MBoardView or MActionAreas. */
-    void onPieceSelectionRequested(QPoint cell);
-    void onPieceMoveRequested(QPoint from, QPoint to);
+    /* Process user requests coming from the MGraphicsBoardItem or MActionAreas. */
+    void onPieceClicked(MPiece *piece);
+    void onTargetClicked(const QPoint &cell);
+
     void onMoveConfirmed();
     void onPieceSelectionCancelled();
     void onUndoMoveRequested();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
-    void invalidMove(QPoint from, QPoint to);
 
 private:
+    void setupBoardItem();
+
     /* Creates a MPosition with the default chess start position and stores it
      * in m_game. */
-    MPosition setupStartPosition();
+    void setupStartPosition();
+
+    /* Connects signals of the piece to controller's slots, adds piece to a
+     * position (which wraps it in a shared pointer and therefore, takes (shared)
+     * ownership. One piece is shared among all positions of a game.
+     */
+    void addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell);
+
     /* Returns whether the position identified by half_move exists in m_game.
      */
     bool isValidPosition(int half_move) const;
-    /* Requests MBoardView to redraw itself with the given position. */
-    void updateBoardView(const MPosition &pos);
+
     /* Sets both action area states in one go. */
     void setActionAreaStates(MActionArea::State s1, MActionArea::State s2);
 
-    bool isTopPlayersTurn() const;
-    bool isBottomPlayersTurn() const;
+    bool isTurnOfTopPlayer() const;
+    bool isTurnOfBottomPlayer() const;
+
+    void undoMove();
+    void deSelectPiece();
+    void selectPiece(MPiece *piece);
 
     /* A reference to the board view, we do not take ownership. */
-    MBoardView* m_view;
+    MBoardView *m_view;
+
+    /* A container for all pieces in the scene graph, useful for coord mapping. */
+    MGraphicsBoardItem *m_board_item;
 
     /* An index to the positions stored in m_game, conceptually each half move
      * is indexed. */
     int m_half_move;
+
     /* Stores the game history as a list of positions. */
     MPositionList m_game;
+
     /* Stores the  position used for a transition. After a valid transition was
      * completed it will be added to the game history. */
     MPosition m_trans_position;
+
+    /* We need to remember the last captured piece during a turn so we can redraw it on undo. */
+    MPiece *m_trans_captured_piece;
+
+    /* We need to remember the currently selected piece on the board. */
+    MPiece *m_selected_piece;
+
+    /* We also remember *where* the piece was selected. This is not necessarily
+     * the scene position of the piece, as it could have already been moved. */
+    QPoint m_selected_piece_cell;
+
     /* The logic analyzer belonges to MGame and is used to validates moves and positions. */
     MLogicAnalyzer m_logic_analyzer;
 

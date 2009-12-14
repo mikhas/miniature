@@ -27,7 +27,6 @@
 #include <QVector>
 #include <QPoint>
 #include <QSharedPointer>
-#include <QGraphicsView>
 
 namespace Miniature
 {
@@ -60,16 +59,12 @@ class MPosition
 {
 public:
     // construct empty position
-    explicit MPosition(QGraphicsSvgItem *board, int width = 8, int height = 8);
+    explicit MPosition(int width = 8, int height = 8);
 
     ~MPosition();
 
     typedef QVector<MSharedPiece> MPieces;
 
-    // deprecated?
-    QString convertToFen() const;
-    // deprecated?
-    void convertFromFen(QString fen);
     QString convertToChessCell(QPoint location) const;
 
     /* Stores the contents of what was found at the given location, and removes
@@ -82,8 +77,9 @@ public:
     // TODO: offer MStorage swapping?
     void restore(MStorage* const storage);
 
-    /* Takes ownership of piece. */
-    void addPieceAt(MPiece* piece, QPoint pos);
+    /* Takes (shared) ownership of piece. */
+    void addPieceAt(MPiece* piece, const QPoint &target);
+    void removePieceAt(const QPoint &target);
     void reset();
 
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
@@ -100,6 +96,11 @@ public:
     // This conversion is also used by MBoardView to figure out the correct
     // position of a piece.
     QPoint indexToPoint(int index, int scaling = 1) const;
+
+    // Moves all pieces on the scene graph to the cell position that was
+    // remembered by the MPosition instance.
+    void updatePieces();
+
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
     void nextColour();
@@ -126,10 +127,6 @@ private:
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
     QString m_move_notation;
-
-    // Since our pieces are now QGraphicsSvgItems we need to know where to draw
-    // them, too.
-    QGraphicsSvgItem *m_board;
 };
 
 }; // namespace Miniature

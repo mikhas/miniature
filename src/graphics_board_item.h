@@ -22,6 +22,8 @@
 #ifndef GRAPHICS_BOARD_ITEM_H__
 #define GRAPHICS_BOARD_ITEM_H__
 
+#include "position.h"
+
 #include <QGraphicsItem>
 #include <QGraphicsSvgItem>
 #include <QGraphicsRectItem>
@@ -55,30 +57,17 @@ public:
     virtual QRectF boundingRect() const;
 
     void addPiece(QGraphicsSvgItem *piece);
-    void removePieces();
-    void resetSelection();
 
 Q_SIGNALS:
-    void pieceMoveRequest(QPoint from, QPoint to);
-    void pieceSelectionRequest(QPoint pos);
+    void pieceClicked(MPiece *piece);
+    void targetClicked(const QPoint &cell);
     void undoMoveRequest();
-    void sendDebugInfo(QString msg);
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     const int m_board_size;
-    QGraphicsItem *m_active_item;
-    QGraphicsRectItem *m_selection;
-    QGraphicsRectItem *m_cancel;
-
-    // We need a safe way to remember the pieces on the board. This list acts
-    // as a filter, it stores all SVG items that represents pieces. I expect
-    // the scene graph and this class in particular to become very crowded once
-    // we start adding animations.
-    typedef QVector<QGraphicsSvgItem*> MPiecesList;
-    MPiecesList m_pieces;
 };
 
 };

@@ -32,6 +32,7 @@ MRook::MRook(MColour colour, int width, int height)
 : MPiece(colour, ROOK, width, height),
   castle(true)
 {
+    loadFromSvgFile();
 }
 
 MRook::~MRook()
@@ -93,11 +94,8 @@ bool MRook::canCastle() const
     return castle;
 }
 
-// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-QGraphicsSvgItem* MRook::createSvgItem(int pieceSize) const
+void MRook::loadFromSvgFile(int pieceSize)
 {
-    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
-
     if (!MRook::hasFinishedLoading)
     {
         MRook::blackRenderer.load(QString(":pieces/black/rook.svg"));
@@ -105,10 +103,8 @@ QGraphicsSvgItem* MRook::createSvgItem(int pieceSize) const
         MRook::hasFinishedLoading = true;
     }
 
-    applyRenderer(svgItem, (MRook::BLACK == getColour() ? MRook::blackRenderer
-                                                        : MRook::whiteRenderer), pieceSize);
-
-    return svgItem;
+    applyRenderer((MRook::BLACK == getColour() ? MRook::blackRenderer
+                                               : MRook::whiteRenderer), pieceSize);
 }
 
 QChar MRook::getLetter() const

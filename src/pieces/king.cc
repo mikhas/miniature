@@ -31,7 +31,9 @@ QSvgRenderer MKing::whiteRenderer;
 MKing::MKing(MColour colour, int width, int height)
 : MPiece(colour, KING, width, height),
   castle(true)
-{}
+{
+    loadFromSvgFile();
+}
 
 MKing::~MKing()
 {}
@@ -106,11 +108,8 @@ bool MKing::canCastle()
     return castle;
 }
 
-// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-QGraphicsSvgItem* MKing::createSvgItem(int pieceSize) const
+void MKing::loadFromSvgFile(int pieceSize)
 {
-    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
-
     if (!MKing::hasFinishedLoading)
     {
         MKing::blackRenderer.load(QString(":pieces/black/king.svg"));
@@ -118,10 +117,8 @@ QGraphicsSvgItem* MKing::createSvgItem(int pieceSize) const
         MKing::hasFinishedLoading = true;
     }
 
-    applyRenderer(svgItem, (MKing::BLACK == getColour() ? MKing::blackRenderer
-                                                        : MKing::whiteRenderer), pieceSize);
-
-    return svgItem;
+    applyRenderer((MKing::BLACK == getColour() ? MKing::blackRenderer
+                                               : MKing::whiteRenderer), pieceSize);
 }
 
 QChar MKing::getLetter() const

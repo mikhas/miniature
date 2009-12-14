@@ -83,24 +83,6 @@ QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
     return possibleSquares;
 }
 
-// TODO: hand out cloned pixmap items instead, saves scaling and maybe more
-QGraphicsSvgItem* MBishop::createSvgItem(int pieceSize) const
-{
-    QGraphicsSvgItem* svgItem = new QGraphicsSvgItem;
-
-    if (!MBishop::hasFinishedLoading)
-    {
-        MBishop::blackRenderer.load(QString(":pieces/black/bishop.svg"));
-        MBishop::whiteRenderer.load(QString(":pieces/white/bishop.svg"));
-        MBishop::hasFinishedLoading = true;
-    }
-
-    applyRenderer(svgItem, (MBishop::BLACK == getColour() ? MBishop::blackRenderer
-                                                        : MBishop::whiteRenderer), pieceSize);
-
-    return svgItem;
-}
-
 void MBishop::loadFromSvgFile(int pieceSize)
 {
     if (!MBishop::hasFinishedLoading)
@@ -110,8 +92,8 @@ void MBishop::loadFromSvgFile(int pieceSize)
         MBishop::hasFinishedLoading = true;
     }
 
-    applyRenderer(this, (MBishop::BLACK == getColour() ? MBishop::blackRenderer
-                                                       : MBishop::whiteRenderer), pieceSize);
+    applyRenderer((MBishop::BLACK == getColour() ? MBishop::blackRenderer
+                                                 : MBishop::whiteRenderer), pieceSize);
 }
 
 QChar MBishop::getLetter() const

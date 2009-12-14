@@ -2,6 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
+ * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -19,89 +20,94 @@
  */
 
 #include "piece.h"
-#include "rook.h"
-#include "knight.h"
+
+#include <QGraphicsScene>
+#include <QBrush>
+#include <QList>
 
 namespace Miniature
 {
 
-MPiece::MPiece(MColour colour, MType pieceType, int width, int height)
+MPiece::
+MPiece(MColour colour, MType pieceType, int width, int height)
 : QGraphicsSvgItem(),
   colour(colour),
   type(pieceType),
   xDim(width),
-  yDim(height)
+  yDim(height),
+  selection(new QGraphicsRectItem(this)) // TODO: get rid of magic numbers
+{
+    selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
+    selection->setEnabled(false);
+    selection->hide();
+}
+
+MPiece::
+~MPiece()
 {}
 
-MPiece::~MPiece()
-{}
-
-
-MPiece::MColour MPiece::getColour() const
+MPiece::MColour MPiece::
+getColour() const
 {
     return colour;
 }
 
-MPiece::MType MPiece::getType() const
+MPiece::MType MPiece::
+getType() const
 {
     return type;
 }
 
-MPiece* MPiece::createPiece(MPiece::MType type, MPiece::MColour colour, int width, int height)
+void MPiece::
+select()
 {
-    MPiece* piece = 0;
-
-    switch(type)
-    {
-        case ROOK:   piece = new MRook(colour, width, height); break;
-        case KNIGHT: piece = new MKnight(colour, width, height); break;
-/*
-        case BISHOP: piece = new MBishop(colour, width, height); break;
-        case QUEEN:  piece = new MQueen(colour, width, height); break;
-        case KING:   piece = new MKing(colour, width, height); break;
-        case PAWN:   piece = new MPawn(colour, width, height); break;
-*/
-        default:     qCritical("MPiece::createPiece(.): Failed to instantiate requested piece."); break;
-    }
-
-    return piece;
-}
-
-MPiece* MPiece::createFromFenPiece(QChar fenPiece, int width, int height)
-{
-    if ('r' == fenPiece) {return createPiece(ROOK, BLACK, width, height);}
-    if ('n' == fenPiece) {return createPiece(KNIGHT, BLACK, width, height);}
-/*
-    if ('b' == fenPiece) {return createPiece(BISHOP, BLACK, width, height);}
-    if ('q' == fenPiece) {return createPiece(QUEEN, BLACK, width, height);}
-    if ('k' == fenPiece) {return createPiece(KING, BLACK, width, height);}
-    if ('p' == fenPiece) {return createPiece(PAWN, BLACK, width, height);}
-*/
-    if ('R' == fenPiece) {return createPiece(ROOK, WHITE, width, height);}
-    if ('N' == fenPiece) {return createPiece(KNIGHT, WHITE, width, height);}
-/*
-    if ('B' == fenPiece) {return createPiece(BISHOP, WHITE, width, height);}
-    if ('Q' == fenPiece) {return createPiece(QUEEN, WHITE, width, height);}
-    if ('K' == fenPiece) {return createPiece(KING, WHITE, width, height);}
-    if ('P' == fenPiece) {return createPiece(PAWN, WHITE, width, height);}
-*/
-    return createPiece(NONE, BLACK, width, height);
+    selection->show();
 }
 
 void MPiece::
-applyRenderer(QGraphicsSvgItem *item, QSvgRenderer &renderer, int pieceSize) const
+deSelect()
 {
-    Q_CHECK_PTR(item);
+    selection->hide();
+}
 
-    item->setSharedRenderer(&renderer);
+bool MPiece::
+isSelected() const
+{
+    return selection->isVisible();
+}
 
-    QRectF extent = item->boundingRect();
+void MPiece::
+moveTo(const QPoint &target)
+{
+    QGraphicsSvgItem::setPos(target);
+}
+
+QPoint MPiece::
+mapToCell() const
+{
+    return QPoint(pos().x() / 60, pos().y() / 60); // TODO: remove magic numbers!
+}
+
+QPoint MPiece::
+mapFromCell(const QPoint &cell) const
+{
+    return QPoint(cell.x() * 60, cell.y() * 60); // TODO: remove magic numbers!
+}
+
+void MPiece::
+applyRenderer(QSvgRenderer &renderer, int pieceSize)
+{
+    this->setSharedRenderer(&renderer);
+
+    QRectF extent = this->boundingRect();
     qreal ratio = 1;
     if (0 < extent.width())
     {
         ratio = pieceSize / static_cast<qreal>(extent.width());
     }
-    item->scale(ratio, ratio);
+    this->scale(ratio, ratio);
+    this->selection->setRect(extent);
 }
 
 } // namespace Miniature

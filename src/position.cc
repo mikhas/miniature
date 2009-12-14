@@ -29,7 +29,9 @@ MStorage::MStorage(int index, MSharedPiece piece)
 {}
 
 MStorage::~MStorage()
-{}
+{
+    // drops refcount of m_piece, too
+}
 
 bool MStorage::empty() const
 {
@@ -37,12 +39,11 @@ bool MStorage::empty() const
 }
 
 // MPosition impl
-MPosition::MPosition(QGraphicsSvgItem *board, int width, int height)
+MPosition::MPosition(int width, int height)
 : m_width(width),
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
-  m_position(width * height),
-  m_board(board)
+  m_position(width * height)
 {}
 
 MPosition::~MPosition()
@@ -52,17 +53,12 @@ MPosition::~MPosition()
 
 void MPosition::movePiece(QPoint from, QPoint to)
 {
-    // TODO: Castling & pawn promotion
-
-    // since the storage takes ownership it will delete the stored piece at the
-    // end of scope, if need be.
     MStorage from_storage = store(from);
-    MStorage to_storage = store(to);
 
     QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
 
     // update position in QGraphicsView
-    from_storage.m_piece->setPos(to.x() * 60, to.y() * 60); // TODO: replace magic numbers!
+    from_storage.m_piece->moveTo(QPoint(to.x() * 60, to.y() * 60)); // TODO: replace magic numbers!
 
     // move piece by updating the index to the index of "to", the restore it to "to"
     from_storage.m_index = indexFromPoint(to);
@@ -121,42 +117,6 @@ QPoint MPosition::indexToPoint(int index, int scaling) const
     return QPoint((index % m_width) * scaling, (index / m_width) * scaling);
 }
 
-void MPosition::convertFromFen(QString fen)
-{
-    int x_pos = 0;
-    int y_pos = 0;
-    int count_cells = 0;
-
-    for(int idx = 0; idx < fen.length() && count_cells < 64; ++idx)
-    {
-        QChar curr = fen.at(idx);
-        if (curr == '/')
-        {
-            x_pos = 0;
-            ++y_pos;
-        }
-        else if (curr.isDigit())
-        {
-            for (int j = 0; j < curr; ++j)
-            {
-                ++x_pos;
-                pieceAt(QPoint(x_pos, y_pos)).clear();
-                ++count_cells;
-            }
-        }
-        else
-        {
-            MSharedPiece piece = pieceAt(QPoint(x_pos, y_pos));
-            piece = MSharedPiece(MPiece::createFromFenPiece(curr)); // TODO: include board dimension, too
-
-            ++x_pos;
-            ++count_cells;
-        }
-    }
-
-    // TODO Set player-to-move, castle options, etc.
-}
-
 QString MPosition::convertToChessCell(QPoint location) const
 {
     const int small_letter_a = 97;
@@ -168,51 +128,61 @@ MStorage MPosition::store(const QPoint &location)
 {
     const int index = indexFromPoint(location);
 
-    MStorage storage = MStorage(index, m_position[index]);
-    m_position[index].clear(); // drop ref
+    MSharedPiece piece = m_position[index];
+    MStorage storage = MStorage(index, piece);
 
+    if (!piece.isNull())
+    {
+        piece->hide();
+    }
+
+    m_position[index].clear(); // remove from position
     return storage;
 }
 
 void MPosition::restore(MStorage* const storage)
 {
-    // delete whatever is at the storage's location, to prevent mem leakage
-    MStorage removed = store(indexToPoint(storage->m_index)); // TODO: optimise back&forth conversion?
-
-    m_position[storage->m_index] = storage->m_piece;
+    // delete whatever is at the storage's location
+    removePieceAt(indexToPoint(storage->m_index));
 
     if (!storage->empty())
     {
+        storage->m_piece->show();
         if (storage->m_piece->getType() == MPiece::KING)
         {
             updateKingPosition(storage->m_piece->getColour(), indexToPoint(storage->m_index));
         }
     }
-
-    // drop the shared ref
-    storage->m_piece.clear();
+    m_position[storage->m_index] = storage->m_piece;
 }
 
-void MPosition::addPieceAt(MPiece* piece, QPoint pos)
+void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
 {
-    Q_CHECK_PTR(m_board);
+    Q_CHECK_PTR(piece);
 
-    piece->setParentItem(m_board);
-    piece->setPos(pos.x() * 60, pos.y() * 60); // TODO: remove magic numbers!
-    piece->show();
+    piece->moveTo(QPoint(target.x() * 60, target.y() * 60)); // TODO: remove magic numbers!
 
-    m_position[indexFromPoint(pos)] = MSharedPiece(piece);
+    m_position[indexFromPoint(target)] = MSharedPiece(piece);
 
     if (piece && piece->getType() == MPiece::KING)
     {
         if (piece->getColour() == MPiece::WHITE)
         {
-            m_white_king = pos;
+            m_white_king = target;
         }
         else
         {
-            m_black_king = pos;
+            m_black_king = target;
         }
+    }
+}
+
+void MPosition::removePieceAt(const QPoint &target)
+{
+    MStorage removed = store(target);
+    if(!removed.m_piece.isNull())
+    {
+        removed.m_piece->hide();
     }
 }
 
@@ -221,6 +191,21 @@ void MPosition::reset()
     // TODO: check whether this leaks
     m_position = MPieces(m_position.size());
     m_colour_to_move = MPiece::WHITE;
+}
+
+void MPosition::updatePieces()
+{
+    for(MPieces::iterator iter = m_position.begin();
+        iter != m_position.end();
+        ++iter)
+    {
+        MSharedPiece piece = *iter;
+        if (!piece.isNull())
+        {
+            piece->moveTo(piece->mapFromCell(indexToPoint(std::distance(m_position.begin(), iter))));
+            piece->show();
+        }
+    }
 }
 
 QPoint MPosition::getKing(MPiece::MColour colour) const

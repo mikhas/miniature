@@ -38,12 +38,14 @@ src_miniature_SOURCES = \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
+			src/pieces/piece.moc.cc \
 			src/pieces/rook.h \
 			src/pieces/rook.cc \
  			src/pieces/knight.h \
  			src/pieces/knight.cc \
  			src/pieces/bishop.h \
  			src/pieces/bishop.cc \
+ 			src/pieces/bishop.moc.cc \
  			src/pieces/queen.h \
  			src/pieces/queen.cc \
  			src/pieces/pawn.h \
@@ -62,6 +64,8 @@ BUILT_SOURCES = \
 		src/miniature.moc.cc \
 		src/miniature.ui.h \
 		src/about.ui.h \
+		src/pieces/piece.moc.cc \
+		src/pieces/bishop.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

@@ -33,12 +33,13 @@ namespace Miniature
 class MBishop
 : public MPiece
 {
+    Q_OBJECT
+
 public:
     MBishop(MColour colour, int width = 8, int height = 8);
     ~MBishop();
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const;
-    virtual QGraphicsSvgItem* createSvgItem(int pieceSize = 60) const;
     virtual QChar getLetter() const;
 
 private:
