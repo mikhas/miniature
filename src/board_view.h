@@ -22,8 +22,8 @@
 #define BOARD_VIEW_H__
 
 #include "position.h"
-#include "graphics_board_item.h"
 
+#include <QGraphicsSvgItem>
 #include <QString>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -60,6 +60,11 @@ public:
     void drawStartPosition();
     void resetCache();
 
+    /* Returns the SVG item representing the board. It is used as a simple
+     * parent container for all pieces, mostly to get correct relative coords
+     * when moving the pieces. */
+    QGraphicsSvgItem* getBoardItem() const;
+
     /* Takes ownership of the proxy widget. */
     void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
     /* Takes ownership of the proxy widget. */
@@ -77,10 +82,10 @@ protected:
     virtual void drawBackground(QPainter *painter, const QRectF &region);
 
 private:
-    void setupBoardBackground();
+    void setup();
 
     /* Store a reference to the board item in the scene graph. */
-    MGraphicsBoardItem* m_board_item;
+    QGraphicsSvgItem* m_board_item;
 
     // A MPiece*-to-QGraphicsSvgItem* mapping, which allows us to cleanly cache
     // SVG items and to only insert them in the MGraphicsBoardItem once. Done

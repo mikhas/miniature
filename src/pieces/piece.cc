@@ -26,7 +26,8 @@ namespace Miniature
 {
 
 MPiece::MPiece(MColour colour, MType pieceType, int width, int height)
-: colour(colour),
+: QGraphicsSvgItem(),
+  colour(colour),
   type(pieceType),
   xDim(width),
   yDim(height)

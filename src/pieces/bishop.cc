@@ -30,7 +30,9 @@ QSvgRenderer MBishop::whiteRenderer;
 
 MBishop::MBishop(MColour colour, int width, int height)
 : MPiece(colour, BISHOP, width, height)
-{}
+{
+    loadFromSvgFile();
+}
 
 MBishop::~MBishop()
 {}
@@ -97,6 +99,19 @@ QGraphicsSvgItem* MBishop::createSvgItem(int pieceSize) const
                                                         : MBishop::whiteRenderer), pieceSize);
 
     return svgItem;
+}
+
+void MBishop::loadFromSvgFile(int pieceSize)
+{
+    if (!MBishop::hasFinishedLoading)
+    {
+        MBishop::blackRenderer.load(QString(":pieces/black/bishop.svg"));
+        MBishop::whiteRenderer.load(QString(":pieces/white/bishop.svg"));
+        MBishop::hasFinishedLoading = true;
+    }
+
+    applyRenderer(this, (MBishop::BLACK == getColour() ? MBishop::blackRenderer
+                                                       : MBishop::whiteRenderer), pieceSize);
 }
 
 QChar MBishop::getLetter() const

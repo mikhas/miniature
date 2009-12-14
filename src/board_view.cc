@@ -46,7 +46,7 @@ MBoardView::MBoardView(QWidget *parent)
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
 
-    setupBoardBackground();
+    setup();
 }
 
 MBoardView::~MBoardView()
@@ -58,7 +58,7 @@ MBoardView::~MBoardView()
 void MBoardView::setScene(QGraphicsScene *scene)
 {
     QGraphicsView::setScene(scene);
-    setupBoardBackground();
+    setup();
 }
 
 void MBoardView::resetCache()
@@ -90,9 +90,11 @@ void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
     }
 }
 
-void MBoardView::setupBoardBackground()
+void MBoardView::setup()
 {
-    m_board_item = new MGraphicsBoardItem();
+    m_board_item = new QGraphicsSvgItem();
+    scene()->addItem(m_board_item);
+    m_board_item->setPos(QPoint(0, m_board_item_offset));
 
     QPalette palette = m_background_page->palette();
     palette.setColor(QPalette::Base, Qt::transparent);
@@ -108,11 +110,13 @@ void MBoardView::setupBoardBackground()
     connect(m_board_item, SIGNAL(undoMoveRequest()),
             this, SLOT(onUndoMoveRequested()));
 
-    scene()->addItem(m_board_item);
-    m_board_item->setPos(QPoint(0, m_board_item_offset));
-
     connect(m_board_item, SIGNAL(sendDebugInfo(QString)),
             this, SLOT(appendDebugOutput(QString)));
+}
+
+QGraphicsSvgItem* MBoardView::getBoardItem() const
+{
+    return m_board_item;
 }
 
 void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
@@ -133,8 +137,7 @@ void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
 
 void MBoardView::resetPieceSelection()
 {
-    Q_CHECK_PTR(m_board_item);
-    m_board_item->resetSelection();
+    // TODO: still needed?
 }
 
 void MBoardView::drawPosition(const MPosition &position)
@@ -143,9 +146,11 @@ void MBoardView::drawPosition(const MPosition &position)
     profiling.restart();
 
     Q_CHECK_PTR(m_board_item);
+    // TODO: remove children of board item when jumping to a new position (we
+    // assume it's non-continuous, that is, not a simple move. Else we wouldnt
+    // need to redraw the whole position.
 
-    m_board_item->removePieces();
-    const int cell_size = m_board_item->getCellSize();
+    const int cell_size = 60; // TODO: remove magic number!
 
     for(MPosition::MPieces::const_iterator iter = position.begin();
         iter != position.end();
@@ -163,7 +168,7 @@ void MBoardView::drawPosition(const MPosition &position)
                 //qDebug("MBV::dp - nothing found at %i ", (int) pos_piece);
                 item = pos_piece->createSvgItem(cell_size);
                 m_cache.insert(pos_piece.data(), item);
-                m_board_item->addPiece(item);
+                //m_board_item->addPiece(item);
             }
             else
             {
@@ -207,8 +212,8 @@ void MBoardView::drawPosition(const MPosition &position)
 
 void MBoardView::drawStartPosition()
 {
-    MPosition pos;
-    drawPosition(pos);
+    //MPosition pos;
+    //drawPosition(pos);
 }
 
 void MBoardView::onPieceSelectionRequested(QPoint cell)

@@ -34,6 +34,7 @@ MGame::MGame(MBoardView *view, QObject *parent)
 : QObject(parent),
   m_view(view),
   m_half_move(-1),
+  m_trans_position(view->getBoardItem()),
   m_logic_analyzer(0),
   m_is_bottom_player_white(true)
 {
@@ -112,8 +113,9 @@ MPosition MGame::setupStartPosition()
     m_game.clear();
     Q_ASSERT(m_game.empty());
 
-    MPosition pos;
+    MPosition pos(m_view->getBoardItem());
 
+/*
     pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
     pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
     pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
@@ -123,30 +125,35 @@ MPosition MGame::setupStartPosition()
     pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
     pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
     pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
+*/
 
     pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
     pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
     pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
     pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
 
+/*
     pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
     pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
 
     pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
     pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
+*/
 
+/*
     for (int i = 0; i < 8; ++i)
     {
         pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
         pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
     }
+*/
     pos.resetCastling();
 
 
     m_game.append(pos);
     m_half_move = 0;
-    m_view->resetCache();
-    m_view->drawPosition(pos);
+    //m_view->resetCache();
+    //m_view->drawPosition(pos);
 
     Q_ASSERT(!m_game.empty());
     return m_game[m_half_move];
@@ -163,14 +170,14 @@ void MGame::setPositionTo(int half_move)
     {
         m_half_move = half_move;
         MPosition pos = m_game[m_half_move];
-        m_view->resetCache();
-        updateBoardView(pos);
+        //m_view->resetCache();
+        //updateBoardView(pos);
     }
 }
 
-void MGame::updateBoardView(const MPosition& pos)
+void MGame::updateBoardView(const MPosition& /*pos*/)
 {
-    m_view->drawPosition(pos);
+    //m_view->drawPosition(pos);
 }
 
 void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
@@ -208,7 +215,7 @@ void MGame::onPieceSelectionRequested(QPoint cell)
     // assume request is valid
     Q_UNUSED(cell);
     setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
-    m_view->drawPosition(m_game[m_half_move]);
+    //m_view->drawPosition(m_game[m_half_move]);
 }
 
 void MGame::onPieceMoveRequested(QPoint from, QPoint to)
@@ -238,7 +245,7 @@ void MGame::onPieceMoveRequested(QPoint from, QPoint to)
         }
 
         // Draw a temporary position, as this is not stored in the game yet.
-        m_view->drawPosition(m_trans_position);
+        //m_view->drawPosition(m_trans_position);
     }
     else
     {
@@ -262,7 +269,7 @@ void MGame::onMoveConfirmed()
     // m_trans_position.nextColour) . Confirms that doing this
     // white/black-to-move thing in MGraphicsBoardItem was wrong, can be solved
     // w/ the valid piece selection check.
-    m_view->drawPosition(m_trans_position);
+    //m_view->drawPosition(m_trans_position);
 
     // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
 }
@@ -277,5 +284,5 @@ void MGame::onUndoMoveRequested()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
     m_view->resetPieceSelection();
-    m_view->drawPosition(m_game[m_half_move]);
+    //m_view->drawPosition(m_game[m_half_move]);
 }

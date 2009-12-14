@@ -37,18 +37,12 @@ bool MStorage::empty() const
 }
 
 // MPosition impl
-MPosition::MPosition(int width, int height)
+MPosition::MPosition(QGraphicsSvgItem *board, int width, int height)
 : m_width(width),
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
-  m_position(width * height)
-{}
-
-MPosition::MPosition(QString /*fen*/, int width, int height)
-: m_width(width),
-  m_height(height),
-  m_colour_to_move(MPiece::WHITE),
-  m_position(width * height)
+  m_position(width * height),
+  m_board(board)
 {}
 
 MPosition::~MPosition()
@@ -65,6 +59,16 @@ void MPosition::movePiece(QPoint from, QPoint to)
     MStorage from_storage = store(from);
     MStorage to_storage = store(to);
 
+    QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
+
+    // update position in QGraphicsView
+    from_storage.m_piece->setPos(to.x() * 60, to.y() * 60); // TODO: replace magic numbers!
+
+    // move piece by updating the index to the index of "to", the restore it to "to"
+    from_storage.m_index = indexFromPoint(to);
+    restore(&from_storage);
+
+
     // update king/rook state for castling
     MPiece::MType type = MPiece::PAWN; // that is, neither king or rook
     MPiece::MColour colour = MPiece::WHITE;
@@ -73,11 +77,6 @@ void MPosition::movePiece(QPoint from, QPoint to)
         type = from_storage.m_piece->getType();
         colour = from_storage.m_piece->getColour();
     }
-
-    QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
-
-    from_storage.m_index = indexFromPoint(to);
-    restore(&from_storage);
 
     if (type == MPiece::KING)
     {
@@ -184,10 +183,10 @@ void MPosition::restore(MStorage* const storage)
 
     if (!storage->empty())
     {
-    	if (storage->m_piece->getType() == MPiece::KING)
-    	{
-    		updateKingPosition(storage->m_piece->getColour(), indexToPoint(storage->m_index));
-    	}
+        if (storage->m_piece->getType() == MPiece::KING)
+        {
+            updateKingPosition(storage->m_piece->getColour(), indexToPoint(storage->m_index));
+        }
     }
 
     // drop the shared ref
@@ -196,22 +195,24 @@ void MPosition::restore(MStorage* const storage)
 
 void MPosition::addPieceAt(MPiece* piece, QPoint pos)
 {
-    // Prevents potential memory leak by adding pieces on top of each other.
-    //MStorage removed = store(pos);
+    Q_CHECK_PTR(m_board);
+
+    piece->setParentItem(m_board);
+    piece->setPos(pos.x() * 60, pos.y() * 60); // TODO: remove magic numbers!
+    piece->show();
+
     m_position[indexFromPoint(pos)] = MSharedPiece(piece);
-
-
 
     if (piece && piece->getType() == MPiece::KING)
     {
-    	if (piece->getColour() == MPiece::WHITE)
-    	{
-    		m_white_king = pos;
-    	}
-    	else
-    	{
-    		m_black_king = pos;
-    	}
+        if (piece->getColour() == MPiece::WHITE)
+        {
+            m_white_king = pos;
+        }
+        else
+        {
+            m_black_king = pos;
+        }
     }
 }
 
@@ -267,43 +268,43 @@ void MPosition::updateKingPosition(MPiece::MColour colour, QPoint to)
 
 void MPosition::kingMoved(MPiece::MColour colour)
 {
-	if (colour == MPiece::WHITE)
-	{
-		m_white_ks_castle = false;
-		m_white_qs_castle = false;
-	}
-	else if (colour == MPiece::BLACK)
-	{
-		m_black_qs_castle = false;
-		m_black_ks_castle = false;
-	}
+    if (colour == MPiece::WHITE)
+    {
+        m_white_ks_castle = false;
+        m_white_qs_castle = false;
+    }
+    else if (colour == MPiece::BLACK)
+    {
+        m_black_qs_castle = false;
+        m_black_ks_castle = false;
+    }
 }
 
 void MPosition::rookMoved(MPiece::MColour colour, QPoint location)
 {
-	int index = indexFromPoint(location);
-	if (colour == MPiece::WHITE)
-	{
-		if (index == 56)
-		{
-			m_white_qs_castle = false;
-		}
-		else if (index == 63)
-		{
-			m_white_ks_castle = false;
-		}
-	}
-	else if (colour == MPiece::BLACK)
-	{
-		if (index == 0)
-		{
-			m_black_qs_castle = false;
-		}
-		else if (index == 7)
-		{
-			m_black_ks_castle = false;
-		}
-	}
+    int index = indexFromPoint(location);
+    if (colour == MPiece::WHITE)
+    {
+        if (index == 56)
+        {
+            m_white_qs_castle = false;
+        }
+        else if (index == 63)
+        {
+            m_white_ks_castle = false;
+        }
+    }
+    else if (colour == MPiece::BLACK)
+    {
+        if (index == 0)
+        {
+            m_black_qs_castle = false;
+        }
+        else if (index == 7)
+        {
+            m_black_ks_castle = false;
+        }
+    }
 }
 
 bool MPosition::canWhiteCastleQueenside() const

@@ -27,6 +27,7 @@
 #include <QVector>
 #include <QPoint>
 #include <QSharedPointer>
+#include <QGraphicsView>
 
 namespace Miniature
 {
@@ -59,8 +60,7 @@ class MPosition
 {
 public:
     // construct empty position
-    explicit MPosition(int width = 8, int height = 8);
-    explicit MPosition(QString fen, int width = 8, int height = 8);
+    explicit MPosition(QGraphicsSvgItem *board, int width = 8, int height = 8);
 
     ~MPosition();
 
@@ -126,6 +126,10 @@ private:
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
     QString m_move_notation;
+
+    // Since our pieces are now QGraphicsSvgItems we need to know where to draw
+    // them, too.
+    QGraphicsSvgItem *m_board;
 };
 
 }; // namespace Miniature

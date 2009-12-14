@@ -31,6 +31,7 @@ namespace Miniature
 
 /* Abstract base class for all pieces. */
 class MPiece
+: public QGraphicsSvgItem
 {
 public:
     enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
