@@ -70,73 +70,73 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition &pos, QPoint fr
 */
     // TODO: add the rest of the validation. Currently only returns how a piece
     // moves on an empty board.
-    MSharedPiece piece = pos.pieceAt(from);
-    if (!piece.isNull())
+    MPiece *piece = pos.pieceAt(from);
+    if (piece)
     {
         // DEBUG
         //std::cout << "found valid piece ... " << std::endl;
         QList<QPoint> list = piece->getPossibleSquares(from);
         if(piece->getType() == MPiece::ROOK)
         {
-        	// apply rook constraint
-        	list = applyConStraight(pos, list, from);
+            // apply rook constraint
+            list = applyConStraight(pos, list, from);
 
-        	//flags |= MLogicAnalyzer::ROOK_MOVED;
-		}
+            //flags |= MLogicAnalyzer::ROOK_MOVED;
+        }
         else if (piece->getType() == MPiece::KNIGHT)
         {
-        	// apply knight constraint
-        	list = applyConKnight(pos, list, from);
+            // apply knight constraint
+            list = applyConKnight(pos, list, from);
         }
         else if (piece->getType() == MPiece::BISHOP)
         {
-        	// apply bishop constraint
-        	list = applyConDiagonal(pos, list, from);
+            // apply bishop constraint
+            list = applyConDiagonal(pos, list, from);
         }
         else if (piece->getType() == MPiece::QUEEN)
         {
-        	// apply queen constraints
-        	list = applyConStraight(pos, list, from);
-        	list = applyConDiagonal(pos, list, from);
+            // apply queen constraints
+            list = applyConStraight(pos, list, from);
+            list = applyConDiagonal(pos, list, from);
         }
         else if (piece->getType() == MPiece::KING)
         {
-        	// apply king constraint
-        	// DEBUG
-//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//        	{
-//        	    std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//        	}
-//       	std::cout << std::endl;
-        	list = applyConKing(pos, list, from);
-        	// DEBUG
-//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//        	{
-//          	std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//        	}
-//        	std::cout << std::endl;
-        	list = applyConKingCastle(pos, list, from);
-        	// DEBUG
-//        	for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//        	{
-//        		std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//        	}
-//        	std::cout << std::endl;
+            // apply king constraint
+            // DEBUG
+//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//            {
+//                std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//            }
+//           std::cout << std::endl;
+            list = applyConKing(pos, list, from);
+            // DEBUG
+//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//            {
+//              std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//            }
+//            std::cout << std::endl;
+            list = applyConKingCastle(pos, list, from);
+            // DEBUG
+//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
+//            {
+//                std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
+//            }
+//            std::cout << std::endl;
 
-        	//flags |= MLogicAnalyzer::KING_MOVED;
+            //flags |= MLogicAnalyzer::KING_MOVED;
         }
         else if (piece->getType() == MPiece::PAWN)
         {
-        	// apply pawn constraints
-        	list = applyConPawnBaseline(pos, list, from);
-        	list = applyConPawnObstacle(pos, list, from);
-        	list = applyConPawnCapture(pos, list, from);
+            // apply pawn constraints
+            list = applyConPawnBaseline(pos, list, from);
+            list = applyConPawnObstacle(pos, list, from);
+            list = applyConPawnCapture(pos, list, from);
 
-        	// check for promotion
-        	if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
-        	{
-        		flags |= MLogicAnalyzer::PROMOTION;
-        	}
+            // check for promotion
+            if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+            {
+                flags |= MLogicAnalyzer::PROMOTION;
+            }
         }
 
         // DEBUG
@@ -148,17 +148,17 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition &pos, QPoint fr
 
         if (list.contains(to))
         {
-        	// check whether the resulting position leaves the player to move in check => invalid move
-        	if (!moveResultsInCkeck(pos, from, to))
-        	{
-        		flags |= MLogicAnalyzer::VALID;
+            // check whether the resulting position leaves the player to move in check => invalid move
+            if (!moveResultsInCkeck(pos, from, to))
+            {
+                flags |= MLogicAnalyzer::VALID;
 
-        		// check whether the resulting position leaves the next player in check => check
-        		if (nextPlayerInCkeck(pos, from, to))
-        		{
-        			flags |= MLogicAnalyzer::CHECK;
-        		}
-        	}
+                // check whether the resulting position leaves the next player in check => check
+                if (nextPlayerInCkeck(pos, from, to))
+                {
+                    flags |= MLogicAnalyzer::CHECK;
+                }
+            }
         }
     }
 
@@ -171,9 +171,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     int i = 1;
     while (cell.y() - i >= 0)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x(), cell.y() - i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x(), cell.y() - i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -197,9 +197,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while ((cell.y() - i >= 0) && (cell.x() + i < 8))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() - i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() - i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -230,9 +230,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while (cell.x() + i < 8)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y()));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y()));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -256,9 +256,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while ((cell.y() + i < 8) && (cell.x() + i < 8))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() + i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() + i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -289,9 +289,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while (cell.y() + i < 8)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x(), cell.y() + i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x(), cell.y() + i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -315,9 +315,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while ((cell.y() + i < 8) && (cell.x() - i >= 0))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() + i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() + i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -336,9 +336,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while (cell.x() - i >= 0)
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y()));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y()));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -374,9 +374,9 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     i = 1;
     while ((cell.y() - i >= 0) && (cell.x() - i >= 0))
     {
-        MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() - i));
+        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() - i));
 
-        if (piece.isNull())
+        if (!piece)
         {
             ++i;
             continue;
@@ -409,8 +409,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     {
         if (cell.x() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() - 2));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() - 2));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -420,8 +420,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
         }
         else if (cell.x() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() - 2));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() - 2));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -436,8 +436,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     {
         if (cell.y() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() - 1));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() - 1));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -447,8 +447,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
         }
         else if (cell.y() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() + 1));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() + 1));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -463,8 +463,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     {
         if (cell.x() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() + 2));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() + 2));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -474,8 +474,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
         }
         else if (cell.x() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() + 2));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() + 2));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -490,8 +490,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
     {
         if (cell.y() - 1 >= 0)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() - 1));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() - 1));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -501,8 +501,8 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
         }
         else if (cell.y() + 1 < 8)
         {
-            MSharedPiece piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() + 1));
-            if (!piece.isNull())
+            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() + 1));
+            if (piece)
             {
                 if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
                 {
@@ -518,51 +518,51 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
 
 bool MLogicAnalyzer::moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour)
 {
-	// move piece
-	MStorage sourcePiece = pos.store(from);
-	MStorage targetPiece = pos.store(to);
-	int restoreIndex = sourcePiece.m_index;
-	sourcePiece.m_index = targetPiece.m_index;
-	pos.restore(&sourcePiece);
+    // move piece
+    mStorage originPiece = pos.store(from);
+    mStorage targetPiece = pos.store(to);
+    int restoreIndex = originPiece.index;
+    originPiece.index = targetPiece.index;
+    pos.restore(&originPiece);
 
-	QPoint king = pos.getKing(colour);
-	std::cout << "king at: " << king.x() << "," << king.y() << std::endl;
+    QPoint king = pos.getKing(colour);
+    std::cout << "king at: " << king.x() << "," << king.y() << std::endl;
 
-	// perform check
-	bool ret = cellUnderAttack(pos, king, colour);
+    // perform check
+    bool ret = cellUnderAttack(pos, king, colour);
 
-	//restore old position
-	MStorage tempPiece = pos.store(to);
-	pos.restore(&targetPiece);
-	tempPiece.m_index = restoreIndex;
-	pos.restore(&tempPiece);
+    //restore old position
+    mStorage tempPiece = pos.store(to);
+    pos.restore(&targetPiece);
+    tempPiece.index = restoreIndex;
+    pos.restore(&tempPiece);
 
-	return ret;
+    return ret;
 }
 
 bool MLogicAnalyzer::moveResultsInCkeck(MPosition &pos, QPoint from, QPoint to)
 {
-	MPiece::MColour col = pos.getColourToMove();
+    MPiece::MColour col = pos.getColourToMove();
 
-	return moveCheckUndo(pos, from, to, col);
+    return moveCheckUndo(pos, from, to, col);
 }
 
 bool MLogicAnalyzer::nextPlayerInCkeck(MPosition &pos, QPoint from, QPoint to)
 {
-	MPiece::MColour col = (pos.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE;
+    MPiece::MColour col = (pos.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE;
 
-	return moveCheckUndo(pos, from, to, col);
+    return moveCheckUndo(pos, from, to, col);
 }
 
 
 QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
 
     QList<QPoint> newMoveList;
 
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
         currColour = piece->getColour();
     }
@@ -572,9 +572,9 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
-        if (currPiece.isNull())
+        if (!currPiece)
         {
             newMoveList.append(cell);
         }
@@ -595,11 +595,11 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
     int yMax = 7;
     int yMin = 0;
 
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
 
     QList<QPoint> newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
         currColour = piece->getColour();
     }
@@ -609,12 +609,12 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         // vertical
         if (cell.y() == from.y())
         {
-            if (currPiece.isNull()) // cell empty
+            if (!currPiece) // cell empty
             {
                 continue;
             }
@@ -635,7 +635,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         // horizontal
         else if (cell.x() == from.x())
         {
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                 continue;
             }
@@ -701,11 +701,11 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
     bool swObstacle = false;
     bool nwObstacle = false;
 
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
 
     QList<QPoint> newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
         currColour = piece->getColour();
     }
@@ -715,7 +715,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         // north-east
         if ((from.x() < cell.x()) && (from.y() > cell.y()))
@@ -725,7 +725,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
                 continue;
             }
 
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                 newMoveList.append(cell);
                 continue;
@@ -745,7 +745,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
                 continue;
             }
 
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                 newMoveList.append(cell);
                 continue;
@@ -765,7 +765,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
                 continue;
             }
 
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                 newMoveList.append(cell);
                 continue;
@@ -785,7 +785,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
                 continue;
             }
 
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                 newMoveList.append(cell);
                 continue;
@@ -808,7 +808,7 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
 
 QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
     QList<QPoint> newMoveList;
 
     for(QList<QPoint>::const_iterator iter = moveList.begin();
@@ -816,11 +816,11 @@ QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPo
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         if (((from.y() == cell.y()) && ((from.x() == cell.x() + 1) || (from.x() == cell.x() - 1))) || (from.y() != cell.y()))
         {
-            if (currPiece.isNull())
+            if (!currPiece)
             {
                newMoveList.append(cell);
             }
@@ -831,7 +831,7 @@ QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPo
         }
         else
         {
-        	newMoveList.append(cell);
+            newMoveList.append(cell);
         }
     }
 
@@ -840,9 +840,9 @@ QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPo
 
 QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
        currColour = piece->getColour();
     }
@@ -853,71 +853,71 @@ QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QLi
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         if (from.y() == cell.y())
         {
-        	// kingside
-        	if (from.x() == cell.x() - 2)
-        	{
-        		MSharedPiece cellInBetween = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
-        		if (currPiece.isNull() && cellInBetween.isNull())
-        		{
-        			if (currColour == MPiece::WHITE)
-        			{
-        				std::cout << "white" << std::endl;
-        				if (pos.canWhiteCastleKingside())
-        				{
-        					std::cout << "castle kingside" << std::endl;
-        					newMoveList.append(cell);
-        				}
-        			}
-        			else if (currColour == MPiece::BLACK)
-        			{
-        				std::cout << "black" << std::endl;
-        				if (pos.canBlackCastleKingside())
-        				{
-        					std::cout << "castle kingside" << std::endl;
-        					newMoveList.append(cell);
-        				}
-        			}
-        		}
-        	}
-        	// queenside
-        	else if (from.x() == cell.x() + 2)
-        	{
-        		MSharedPiece cellInBetween = pos.pieceAt(QPoint(cell.x() + 1, cell.y()));
-        		MSharedPiece cellNextToRook = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
-        		if (cellNextToRook.isNull() && currPiece.isNull() && cellInBetween.isNull())
-        		{
-        			if (currColour == MPiece::WHITE)
-        			{
-        				std::cout << "white" << std::endl;
-        				if (pos.canWhiteCastleQueenside())
-        				{
-        					std::cout << "castle queenside" << std::endl;
-        					newMoveList.append(cell);
-        				}
-        			}
-        			else if (currColour == MPiece::BLACK)
-        			{
-        				std::cout << "black" << std::endl;
-        				if (pos.canBlackCastleQueenside())
-        				{
-        					std::cout << "castle queenside" << std::endl;
-        					newMoveList.append(cell);
-        				}
-        			}
-        		}
-        	}
-        	else
-        	{
-        		newMoveList.append(cell);
-        	}
+            // kingside
+            if (from.x() == cell.x() - 2)
+            {
+                MPiece *cellInBetween = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
+                if (!currPiece && !cellInBetween)
+                {
+                    if (currColour == MPiece::WHITE)
+                    {
+                        std::cout << "white" << std::endl;
+                        if (pos.canWhiteCastleKingside())
+                        {
+                            std::cout << "castle kingside" << std::endl;
+                            newMoveList.append(cell);
+                        }
+                    }
+                    else if (currColour == MPiece::BLACK)
+                    {
+                        std::cout << "black" << std::endl;
+                        if (pos.canBlackCastleKingside())
+                        {
+                            std::cout << "castle kingside" << std::endl;
+                            newMoveList.append(cell);
+                        }
+                    }
+                }
+            }
+            // queenside
+            else if (from.x() == cell.x() + 2)
+            {
+                MPiece *cellInBetween = pos.pieceAt(QPoint(cell.x() + 1, cell.y()));
+                MPiece *cellNextToRook = pos.pieceAt(QPoint(cell.x() - 1, cell.y()));
+                if (!cellNextToRook && !currPiece && !cellInBetween)
+                {
+                    if (currColour == MPiece::WHITE)
+                    {
+                        std::cout << "white" << std::endl;
+                        if (pos.canWhiteCastleQueenside())
+                        {
+                            std::cout << "castle queenside" << std::endl;
+                            newMoveList.append(cell);
+                        }
+                    }
+                    else if (currColour == MPiece::BLACK)
+                    {
+                        std::cout << "black" << std::endl;
+                        if (pos.canBlackCastleQueenside())
+                        {
+                            std::cout << "castle queenside" << std::endl;
+                            newMoveList.append(cell);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                newMoveList.append(cell);
+            }
         }
         else
         {
-        	newMoveList.append(cell);
+            newMoveList.append(cell);
         }
     }
 
@@ -926,11 +926,11 @@ QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QLi
 
 QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
 
     QList<QPoint> newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
         currColour = piece->getColour();
     }
@@ -989,13 +989,13 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         if (from.x() == cell.x())
         {
             if (!obstacle)
             {
-                if (currPiece.isNull())
+                if (!currPiece)
                 {
                     newMoveList.append(cell);
                     //std::cout << "2. Con: added (" << cell.x() << "," << cell.y() << ")" << std::endl;
@@ -1018,11 +1018,11 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
 }
 QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
-    MSharedPiece piece = pos.pieceAt(from);
+    MPiece *piece = pos.pieceAt(from);
 
     QList<QPoint> newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
-    if (!piece.isNull())
+    if (piece)
     {
         currColour = piece->getColour();
     }
@@ -1033,11 +1033,11 @@ QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QL
         ++iter)
     {
         QPoint cell = *iter;
-        MSharedPiece currPiece = pos.pieceAt(cell);
+        MPiece *currPiece = pos.pieceAt(cell);
 
         if (from.x() != cell.x())
         {
-            if (!currPiece.isNull())
+            if (currPiece)
             {
                 if (currColour != currPiece->getColour())
                 {
