@@ -22,24 +22,25 @@
 
 using namespace Miniature;
 
-// MStorage impl
-MStorage::MStorage(int index, MSharedPiece piece)
-: m_index(index),
-  m_piece(piece)
+// mStorage impl
+mStorage::mStorage(int idx, MPiece *ptr)
+: index(idx),
+  piece(ptr)
 {}
 
-MStorage::~MStorage()
+mStorage::~mStorage()
 {
-    // drops refcount of m_piece, too
+    // No need to delete. MPieces are owned by the MGraphicsBoard instances.
+    piece = 0;
 }
 
-bool MStorage::empty() const
+bool mStorage::empty() const
 {
-    return m_piece.isNull();
+    return (0 == piece);
 }
 
 // MPosition impl
-MPosition::MPosition(int width, int height)
+MPosition::MPosition(int width, int height, int /*cell_size*/)
 : m_width(width),
   m_height(height),
   m_colour_to_move(MPiece::WHITE),
@@ -48,47 +49,43 @@ MPosition::MPosition(int width, int height)
 
 MPosition::~MPosition()
 {
+    // TODO: is this necessary?
     reset();
 }
 
-void MPosition::movePiece(QPoint from, QPoint to)
+void MPosition::movePiece(const QPoint &origin, const QPoint &target)
 {
-    MStorage from_storage = store(from);
+    mStorage origin_storage = store(origin);
 
-    QChar letter = QChar(from_storage.empty() ? ' ' : from_storage.m_piece->getLetter());
+    QChar letter = QChar(origin_storage.empty() ? ' ' : origin_storage.piece->getLetter());
 
     // update position in QGraphicsView
-    from_storage.m_piece->moveTo(QPoint(to.x() * 60, to.y() * 60)); // TODO: replace magic numbers!
+    origin_storage.piece->moveTo(QPoint(target.x() * 60, target.y() * 60)); // TODO: replace magic numbers!
 
-    // move piece by updating the index to the index of "to", the restore it to "to"
-    from_storage.m_index = indexFromPoint(to);
-    restore(&from_storage);
-
+    // move piece by updating the index to the index of origin, then restore it to target
+    origin_storage.index = indexFromPoint(target);
+    restore(&origin_storage);
 
     // update king/rook state for castling
-    MPiece::MType type = MPiece::PAWN; // that is, neither king or rook
-    MPiece::MColour colour = MPiece::WHITE;
-    if (!from_storage.empty())
+    if (!origin_storage.empty())
     {
-        type = from_storage.m_piece->getType();
-        colour = from_storage.m_piece->getColour();
-    }
+        MPiece::MType type = origin_storage.piece->getType();
+        MPiece::MColour colour = origin_storage.piece->getColour();
 
-    if (type == MPiece::KING)
-    {
-        //from_storage.m_piece->hasMoved();
-        kingMoved(colour);
-    }
-    else if (type == MPiece::ROOK)
-    {
-        //from_storage.m_piece->hasMoved();
-        rookMoved(colour, from);
+        if (type == MPiece::KING)
+        {
+            kingMoved(colour);
+        }
+        else if (type == MPiece::ROOK)
+        {
+            rookMoved(colour, origin);
+        }
     }
 }
 
-MSharedPiece MPosition::pieceAt(QPoint pos) const
+Piece * MPosition::pieceAt(const QPoint &cell) const
 {
-    return m_position[indexFromPoint(pos)];
+    return m_position[indexFromPoint(cell)];
 }
 
 MPosition::MPieces::const_iterator MPosition::begin() const
@@ -101,12 +98,12 @@ MPosition::MPieces::const_iterator MPosition::end() const
     return m_position.end();
 }
 
-int MPosition::indexFromPoint(QPoint point) const
+int MPosition::indexFromPoint(const QPoint &cell) const
 {
     /* We assume that the top-left cell is (0,0) and that point.x() indicates
      * the column and point.y() indicates the row.
      */
-    return (point.x() + point.y() * m_width);
+    return (cell.x() + cell.y() * m_width);
 }
 
 QPoint MPosition::indexToPoint(int index, int scaling) const
@@ -117,43 +114,42 @@ QPoint MPosition::indexToPoint(int index, int scaling) const
     return QPoint((index % m_width) * scaling, (index / m_width) * scaling);
 }
 
-QString MPosition::convertToChessCell(QPoint location) const
+QString MPosition::mapToString(QPoint cell) const
 {
     const int small_letter_a = 97;
     return QString("%1%2").arg(static_cast<char>(small_letter_a + location.x()))
                           .arg(8 - location.y());
 }
 
-MStorage MPosition::store(const QPoint &location)
+mStorage MPosition::store(const QPoint &cell)
 {
-    const int index = indexFromPoint(location);
+    const int index = indexFromPoint(cell);
 
-    MSharedPiece piece = m_position[index];
-    MStorage storage = MStorage(index, piece);
+    mStorage storage = mStorage(index, m_position[index]);
 
-    if (!piece.isNull())
+    if (!storage.empty())
     {
-        piece->hide();
+        storage.piece->hide();
     }
 
-    m_position[index].clear(); // remove from position
+    m_position[index] = 0; // remove from position
     return storage;
 }
 
-void MPosition::restore(MStorage* const storage)
+void MPosition::restore(mStorage* const storage)
 {
     // delete whatever is at the storage's location
-    removePieceAt(indexToPoint(storage->m_index));
+    removePieceAt(indexToPoint(storage->index));
 
     if (!storage->empty())
     {
-        storage->m_piece->show();
-        if (storage->m_piece->getType() == MPiece::KING)
+        storage->piece->show();
+        if (storage->piece->getType() == MPiece::KING)
         {
-            updateKingPosition(storage->m_piece->getColour(), indexToPoint(storage->m_index));
+            updateKingPosition(storage->piece->getColour(), indexToPoint(storage->index));
         }
     }
-    m_position[storage->m_index] = storage->m_piece;
+    m_position[storage->index] = storage->piece;
 }
 
 void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
@@ -161,10 +157,9 @@ void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
     Q_CHECK_PTR(piece);
 
     piece->moveTo(QPoint(target.x() * 60, target.y() * 60)); // TODO: remove magic numbers!
+    m_position[indexFromPoint(target)] = piece;
 
-    m_position[indexFromPoint(target)] = MSharedPiece(piece);
-
-    if (piece && piece->getType() == MPiece::KING)
+    if (piece->getType() == MPiece::KING)
     {
         if (piece->getColour() == MPiece::WHITE)
         {
@@ -179,10 +174,10 @@ void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
 
 void MPosition::removePieceAt(const QPoint &target)
 {
-    MStorage removed = store(target);
-    if(!removed.m_piece.isNull())
+    mStorage removed = store(target);
+    if(!removed.empty())
     {
-        removed.m_piece->hide();
+        removed.piece->hide();
     }
 }
 
@@ -199,8 +194,8 @@ void MPosition::updatePieces()
         iter != m_position.end();
         ++iter)
     {
-        MSharedPiece piece = *iter;
-        if (!piece.isNull())
+        MPiece *piece = *iter;
+        if (piece)
         {
             piece->moveTo(piece->mapFromCell(indexToPoint(std::distance(m_position.begin(), iter))));
             piece->show();
@@ -239,15 +234,15 @@ void MPosition::resetCastling()
     m_black_ks_castle = true;
 }
 
-void MPosition::updateKingPosition(MPiece::MColour colour, QPoint to)
+void MPosition::updateKingPosition(MPiece::MColour colour, const QPoint &target)
 {
     if (colour == MPiece::WHITE)
     {
-        m_white_king = to;
+        m_white_king = target;
     }
     else
     {
-        m_black_king = to;
+        m_black_king = target;
     }
 }
 
@@ -265,9 +260,9 @@ void MPosition::kingMoved(MPiece::MColour colour)
     }
 }
 
-void MPosition::rookMoved(MPiece::MColour colour, QPoint location)
+void MPosition::rookMoved(MPiece::MColour colour, const QPoint &target)
 {
-    int index = indexFromPoint(location);
+    int index = indexFromPoint(target);
     if (colour == MPiece::WHITE)
     {
         if (index == 56)

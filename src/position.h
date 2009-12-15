@@ -31,19 +31,17 @@
 namespace Miniature
 {
 
-typedef QSharedPointer<MPiece> MSharedPiece;
-
 /* This class represents a simple piece storage. */
-class MStorage
+class mStorage
 {
 public:
-    MStorage(int index, MSharedPiece piece);
-    ~MStorage();
+    mStorage(int index, MPiece *piece);
+    ~mStorage();
 
     bool empty() const;
 
-    int m_index;
-    MSharedPiece m_piece;
+    int index;
+    MPiece *piece;
 };
 
 /* This class represents a chess position.*/
@@ -59,25 +57,24 @@ class MPosition
 {
 public:
     // construct empty position
-    explicit MPosition(int width = 8, int height = 8);
+    explicit MPosition(int width = 8, int height = 8, int cell_size = 60);
 
     ~MPosition();
 
-    typedef QVector<MSharedPiece> MPieces;
+    typedef QVector<MPiece*> MPieces;
 
-    QString convertToChessCell(QPoint location) const;
+    QString mapToString(const QPoint &cell) const;
 
     /* Stores the contents of what was found at the given location, and removes
      * it from m_position. */
-    MStorage store(const QPoint &location);
+    mStorage store(const QPoint &location);
     /* Restores a MStorage to m_position, using the original location. If the
      * original location is non-empty it gets overwritten. Thus, re-applying
-     * restore over the same MStorage is safe. Releases ownership over the stored
-     * piece. */
-    // TODO: offer MStorage swapping?
-    void restore(MStorage* const storage);
+     * restore over the same MStorage is safe.
+     */
+    void restore(mStorage* const storage);
 
-    /* Takes (shared) ownership of piece. */
+    /* Takes no ownership of piece! */
     void addPieceAt(MPiece* piece, const QPoint &target);
     void removePieceAt(const QPoint &target);
     void reset();
@@ -86,13 +83,13 @@ public:
     /* Moves a piece and returns the traditional chess notation for a move,
      * e.g., "1. (4,6) to (6,6)" = "1. e4"
      */
-    void movePiece(QPoint from, QPoint to);
-    MSharedPiece pieceAt(QPoint pos) const;
+    void movePiece(const QPoint &origin, const QPoint &target);
+    MPiece * pieceAt(const QPoint &cell) const;
 
     MPieces::const_iterator begin() const;
     MPieces::const_iterator end() const;
 
-    int indexFromPoint(QPoint point) const;
+    int indexFromPoint(const QPoint &cell) const;
     // This conversion is also used by MBoardView to figure out the correct
     // position of a piece.
     QPoint indexToPoint(int index, int scaling = 1) const;
@@ -106,7 +103,7 @@ public:
     void nextColour();
     void resetCastling();
     void kingMoved(MPiece::MColour colour);
-    void rookMoved(MPiece::MColour colour, QPoint location);
+    void rookMoved(MPiece::MColour colour, const QPoint &target);
     bool canWhiteCastleQueenside() const;
     bool canWhiteCastleKingside() const;
     bool canBlackCastleQueenside() const;
@@ -114,7 +111,7 @@ public:
 
 private:
     QString getDefaultStartPosition() const;
-    void updateKingPosition(MPiece::MColour colour, QPoint to);
+    void updateKingPosition(MPiece::MColour colour, const QPoint &target);
 
     int m_width;
     int m_height;
@@ -129,6 +126,6 @@ private:
     QString m_move_notation;
 };
 
-}; // namespace Miniature
+} // namespace Miniature
 
 #endif
