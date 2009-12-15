@@ -68,6 +68,9 @@ QRectF MGraphicsBoardItem::boundingRect() const
 
 void MGraphicsBoardItem::hidePieces()
 {
+// Disabled. This code still crashes randomly ...
+
+/*
     if(!scene())
     {
         return; // pieces can not be visible yet!
@@ -83,4 +86,5 @@ void MGraphicsBoardItem::hidePieces()
             (*iter)->hide();
         }
     }
+*/
 }
