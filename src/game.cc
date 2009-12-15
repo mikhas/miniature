@@ -128,9 +128,6 @@ void MGame::rotateBlackPieces()
 
 void MGame::setupStartPosition()
 {
-    // Don't try to delete pieces individually from a MGame instance. The
-    // MSharedPieces and the scene graph conflict w.r.t. to ownership!
-
     m_game.clear();
     Q_ASSERT(m_game.empty());
 
@@ -312,10 +309,10 @@ void MGame::onTargetClicked(const QPoint &target)
     if (MLogicAnalyzer::VALID & result)
     {
         // TODO: check for capture flag instead.
-        MSharedPiece maybe_captured = m_trans_position.pieceAt(target);
-        if(!maybe_captured.isNull())
+        MPiece *maybe_captured = m_trans_position.pieceAt(target);
+        if(maybe_captured)
         {
-            m_trans_captured_piece = maybe_captured.data();
+            m_trans_captured_piece = maybe_captured;
         }
 
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
