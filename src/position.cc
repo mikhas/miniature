@@ -83,7 +83,7 @@ void MPosition::movePiece(const QPoint &origin, const QPoint &target)
     }
 }
 
-Piece * MPosition::pieceAt(const QPoint &cell) const
+MPiece * MPosition::pieceAt(const QPoint &cell) const
 {
     return m_position[indexFromPoint(cell)];
 }
@@ -114,11 +114,11 @@ QPoint MPosition::indexToPoint(int index, int scaling) const
     return QPoint((index % m_width) * scaling, (index / m_width) * scaling);
 }
 
-QString MPosition::mapToString(QPoint cell) const
+QString MPosition::mapToString(const QPoint &cell) const
 {
     const int small_letter_a = 97;
-    return QString("%1%2").arg(static_cast<char>(small_letter_a + location.x()))
-                          .arg(8 - location.y());
+    return QString("%1%2").arg(static_cast<char>(small_letter_a + cell.x()))
+                          .arg(8 - cell.y());
 }
 
 mStorage MPosition::store(const QPoint &cell)
