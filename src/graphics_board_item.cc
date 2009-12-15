@@ -65,3 +65,22 @@ QRectF MGraphicsBoardItem::boundingRect() const
 {
     return QRectF(0, 0, m_board_size, m_board_size);
 }
+
+void MGraphicsBoardItem::hidePieces()
+{
+    if(!scene())
+    {
+        return; // pieces can not be visible yet!
+    }
+
+    for (QList<QGraphicsItem *>::iterator iter = childItems().begin();
+         iter != childItems().end();
+         ++iter)
+    {
+        // prevent it from crashing
+        if(!(*iter)->isVisible())
+        {
+            (*iter)->hide();
+        }
+    }
+}

@@ -56,7 +56,7 @@ public:
     void virtual paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget *) {}
     virtual QRectF boundingRect() const;
 
-    void addPiece(QGraphicsSvgItem *piece);
+    void hidePieces();
 
 Q_SIGNALS:
     void pieceClicked(MPiece *piece);

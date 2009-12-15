@@ -190,12 +190,15 @@ bool MGame::isValidPosition(int half_move) const
 
 void MGame::setPositionTo(int half_move)
 {
+    Q_CHECK_PTR(m_board_item);
+
     if (isValidPosition(half_move))
     {
         deSelectPiece();
         m_half_move = half_move;
         MPosition pos = m_game[m_half_move];
 
+        m_board_item->hidePieces();
         pos.updatePieces();
         updatePlayerStatus(pos);
     }
