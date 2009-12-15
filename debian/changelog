@@ -1,11 +1,12 @@
 miniature (0.1.3-0) unstable; urgency=low
 
-  * Display moves in traditional chess notation.
+  * Moved players to bottom and top of board so that a player is located "behind" his pieces.
+  * Introduced an action area for each player that indicates the status during
+    a turn. It also allows the player to cancel a piece selection and to
+    confirm a move, thus ending a turn. Undoing a move can be performed by clicking
+    the piece's origin.
   * Store a complete history of the game, thus enabling prev/next move
     functionality again.
-  * Changed player info to only show "White" and "Black" for now, underlined
-    indicates whose turn it is.
-  * Black pieces can be rotated for a simplistic human vs human offline mode.
 
   --
 
