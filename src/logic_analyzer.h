@@ -37,33 +37,33 @@ class MLogicAnalyzer
 public:
     enum MState
     {
-        INVALID    = 0x000,
-        VALID      = 0x001,
-        CHECK      = 0x002,
-        CHECKMATE  = 0x004,
-        STALEMATE  = 0x008,
-        CAPTURE    = 0x010,
-        PROMOTION  = 0x020
+        INVALID   = 0x000,
+        VALID     = 0x001,
+        CHECK     = 0x002,
+        CHECKMATE = 0x004,
+        STALEMATE = 0x008,
+        CAPTURE   = 0x010,
+        PROMOTION = 0x020
     };
     typedef QFlags<MState> MStateFlags;
 
     MLogicAnalyzer(const MConstraintList &constraints);
     virtual ~MLogicAnalyzer();
 
-    MStateFlags verifyMove(MPosition &pos, QPoint from, QPoint to);
+    MStateFlags verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target);
 
 private:
     MConstraintList m_constraints;
 
     bool cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::MColour colour) const;
-    bool moveResultsInCkeck(MPosition &pos, QPoint from, QPoint to);
-    bool nextPlayerInCkeck(MPosition &pos, QPoint from, QPoint to);
+    bool moveResultsInCheck(MPosition &pos, QPoint from, QPoint to);
+    bool nextPlayerInCheck(MPosition &pos, QPoint from, QPoint to);
     bool moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour);
     QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-	QList<QPoint> applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-	QList<QPoint> applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
+    QList<QPoint> applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
+    QList<QPoint> applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConPawnBaseline(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConPawnObstacle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConPawnCapture(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;

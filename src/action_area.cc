@@ -75,6 +75,20 @@ void MActionArea::setState(State s)
     }
 }
 
+void MActionArea::setText(const QString &text)
+{
+    Q_CHECK_PTR(m_button);
+
+    m_button->setText(text);
+}
+
+QString MActionArea::getText() const
+{
+    Q_CHECK_PTR(m_button);
+
+    return m_button->text();
+}
+
 QString MActionArea::createButtonStyleBase() const
 {
     return QString(

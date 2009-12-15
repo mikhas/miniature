@@ -108,6 +108,10 @@ public:
     bool canWhiteCastleKingside() const;
     bool canBlackCastleQueenside() const;
     bool canBlackCastleKingside() const;
+    //RReturns whether the currently moving side is in check.
+    bool inCheck() const;
+
+    void setInCheck(bool check);
 
 private:
     QString getDefaultStartPosition() const;
@@ -117,10 +121,12 @@ private:
     int m_height;
     QPoint m_white_king;
     QPoint m_black_king;
+    // TODO: unify all booleans into a bitset?
     bool m_white_qs_castle;
     bool m_white_ks_castle;
     bool m_black_qs_castle;
     bool m_black_ks_castle;
+    bool m_in_check;
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
     QString m_move_notation;

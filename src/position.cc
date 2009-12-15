@@ -43,7 +43,14 @@ bool mStorage::empty() const
 MPosition::MPosition(int width, int height, int /*cell_size*/)
 : m_width(width),
   m_height(height),
-  m_colour_to_move(MPiece::WHITE),
+  m_white_king(-1, -1),
+  m_black_king(-1, -1),
+  m_white_qs_castle(true),
+  m_white_ks_castle(true),
+  m_black_qs_castle(true),
+  m_black_ks_castle(true),
+  m_in_check(false),
+  m_colour_to_move(MPiece::WHITE), // TODO: do we need a "none" flag?
   m_position(width * height)
 {}
 
@@ -186,6 +193,8 @@ void MPosition::reset()
     // TODO: check whether this leaks
     m_position = MPieces(m_position.size());
     m_colour_to_move = MPiece::WHITE;
+    m_in_check = true;
+    resetCastling();
 }
 
 void MPosition::updatePieces()
@@ -305,4 +314,14 @@ bool MPosition::canBlackCastleQueenside() const
 bool MPosition::canBlackCastleKingside() const
 {
     return m_black_ks_castle;
+}
+
+bool MPosition::inCheck() const
+{
+    return m_in_check;
+}
+
+void MPosition::setInCheck(bool check)
+{
+    m_in_check = check;
 }

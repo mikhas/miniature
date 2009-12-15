@@ -175,9 +175,11 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
     Q_CHECK_PTR(piece);
     Q_CHECK_PTR(pos);
 
+    // Does not take ownership of the piece!
     pos->addPieceAt(piece, cell);
 
     piece->show();
+    // Assign ownership to m_board_item.
     piece->setParentItem(m_board_item);
 }
 
@@ -195,6 +197,7 @@ void MGame::setPositionTo(int half_move)
         MPosition pos = m_game[m_half_move];
 
         pos.updatePieces();
+        updatePlayerStatus(pos);
     }
 }
 
@@ -259,6 +262,26 @@ void MGame::selectPiece(MPiece *piece)
     }
 }
 
+void MGame::updatePlayerStatus(const MPosition &position)
+{
+    // assumption: white == bottom ...
+    if (position.inCheck() && MPiece::WHITE == position.getColourToMove())
+    {
+        m_bottom_action_area.setText(QString("kore (check)"));
+        m_top_action_area.setText(QString("qgil"));
+    }
+    else if (position.inCheck() && MPiece::BLACK == position.getColourToMove())
+    {
+        m_bottom_action_area.setText(QString("kore"));
+        m_top_action_area.setText(QString("qgil (check)"));
+    }
+    else
+    {
+        m_bottom_action_area.setText(QString("kore"));
+        m_top_action_area.setText(QString("qgil"));
+    }
+}
+
 void MGame::onPieceClicked(MPiece *piece)
 {
     // If invalid piece was selected => reset selection, purple flashing.
@@ -291,23 +314,26 @@ void MGame::onTargetClicked(const QPoint &target)
         return;
     }
 
-    Q_ASSERT(isValidPosition(m_half_move));
-    m_trans_position = MPosition(m_game[m_half_move]);
-    // Undo any move that was maybe done from the previous m_trans_position.
-    undoMove(); // TODO: refine this if moving back is visible to the user ... unlikely
-
     QPoint origin = m_selected_piece_cell;
     if (origin == target) // hum, cancel?
     {
         onUndoMoveRequested();
         // Dangerous return statement. Makes the surrounding code more fragile because
         // this special case is not aware of subtle changes in the following code.
-        return; 
+        return;
     }
 
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(m_trans_position, origin, target);
+    Q_ASSERT(isValidPosition(m_half_move));
+    MPosition position = MPosition(m_game[m_half_move]);
+
+    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(&position, origin, target);
     if (MLogicAnalyzer::VALID & result)
     {
+        // Undo any move that was maybe done from the previous m_trans_position,
+        // that is, to "reset" the state.
+        undoMove(); // TODO: refine this if moving back is visible to the user ... unlikely
+        m_trans_position = position;
+
         // TODO: check for capture flag instead.
         MPiece *maybe_captured = m_trans_position.pieceAt(target);
         if(maybe_captured)
@@ -316,19 +342,19 @@ void MGame::onTargetClicked(const QPoint &target)
         }
 
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
-        MPiece::MColour colour = m_trans_position.getColourToMove();
         m_trans_position.movePiece(origin, target);
 
+        // just example code to visualize check
         if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
         {
-            //Q_EMIT check();
+            m_trans_position.setInCheck(true);
         }
-
-        if (MLogicAnalyzer::PROMOTION & result)
+        else
         {
-            m_trans_position.addPieceAt(new MQueen(colour), target);
+            m_trans_position.setInCheck(false);
         }
     }
+
 }
 
 void MGame::onMoveConfirmed()
@@ -342,6 +368,7 @@ void MGame::onMoveConfirmed()
     m_trans_captured_piece = 0;
     deSelectPiece();
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    updatePlayerStatus(m_trans_position);
 
     // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
 }

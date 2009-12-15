@@ -53,111 +53,83 @@ MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints)
 MLogicAnalyzer::~MLogicAnalyzer()
 {}
 
-MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition &pos, QPoint from, QPoint to)
+MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target)
 {
     MStateFlags flags = MLogicAnalyzer::INVALID;
-    // DEBUG
-    //std::cout << "verify move ... " << std::endl;
-    //std::cout << "index of (" << from.x() << ", " << from.y() << "): " << pos.indexFromPoint(from) << std::endl;
-/*
-    for (MPosition::MPieces::const_iterator iter = pos.begin();
-         iter != pos.end();
-         ++iter)
+
+    MPiece *piece = position->pieceAt(origin);
+    if (!piece)
     {
-        if (*iter) {std::cout << " r ";} else {std::cout << " - ";}
-        if (7 == (std::distance(pos.begin(), iter) % 8)) {std::cout << std::endl;}
+        return flags;
     }
-*/
-    // TODO: add the rest of the validation. Currently only returns how a piece
-    // moves on an empty board.
-    MPiece *piece = pos.pieceAt(from);
-    if (piece)
+
+    QList<QPoint> list = piece->getPossibleSquares(origin);
+    switch(piece->getType())
     {
-        // DEBUG
-        //std::cout << "found valid piece ... " << std::endl;
-        QList<QPoint> list = piece->getPossibleSquares(from);
-        if(piece->getType() == MPiece::ROOK)
+        case MPiece::ROOK:
         {
             // apply rook constraint
-            list = applyConStraight(pos, list, from);
+            list = applyConStraight(*position, list, origin);
 
             //flags |= MLogicAnalyzer::ROOK_MOVED;
-        }
-        else if (piece->getType() == MPiece::KNIGHT)
+        } break;
+
+        case MPiece::KNIGHT:
         {
             // apply knight constraint
-            list = applyConKnight(pos, list, from);
-        }
-        else if (piece->getType() == MPiece::BISHOP)
+            list = applyConKnight(*position, list, origin);
+        } break;
+
+        case MPiece::BISHOP:
         {
             // apply bishop constraint
-            list = applyConDiagonal(pos, list, from);
-        }
-        else if (piece->getType() == MPiece::QUEEN)
+            list = applyConDiagonal(*position, list, origin);
+        } break;
+
+        case MPiece::QUEEN:
         {
             // apply queen constraints
-            list = applyConStraight(pos, list, from);
-            list = applyConDiagonal(pos, list, from);
-        }
-        else if (piece->getType() == MPiece::KING)
+            list = applyConStraight(*position, list, origin);
+            list = applyConDiagonal(*position, list, origin);
+        } break;
+
+        case MPiece::KING:
         {
             // apply king constraint
-            // DEBUG
-//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//            {
-//                std::cout << "1 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//            }
-//           std::cout << std::endl;
-            list = applyConKing(pos, list, from);
-            // DEBUG
-//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//            {
-//              std::cout << "2 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//            }
-//            std::cout << std::endl;
-            list = applyConKingCastle(pos, list, from);
-            // DEBUG
-//            for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-//            {
-//                std::cout << "3 (" << (*iter).x() << ", " << (*iter).y() << ") ";
-//            }
-//            std::cout << std::endl;
-
+            list = applyConKing(*position, list, origin);
+            list = applyConKingCastle(*position, list, origin);
             //flags |= MLogicAnalyzer::KING_MOVED;
-        }
-        else if (piece->getType() == MPiece::PAWN)
+        } break;
+
+
+        case MPiece::PAWN:
         {
             // apply pawn constraints
-            list = applyConPawnBaseline(pos, list, from);
-            list = applyConPawnObstacle(pos, list, from);
-            list = applyConPawnCapture(pos, list, from);
+            list = applyConPawnBaseline(*position, list, origin);
+            list = applyConPawnObstacle(*position, list, origin);
+            list = applyConPawnCapture(*position, list, origin);
 
             // check for promotion
-            if (to.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+            if (origin.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
             {
                 flags |= MLogicAnalyzer::PROMOTION;
             }
-        }
+        } break;
 
-        // DEBUG
-        for (QList<QPoint>::const_iterator iter = list.begin(); iter != list.end(); ++iter)
-        {
-            //std::cout << "(" << (*iter).x() << ", " << (*iter).y() << ") ";
-        }
-        //std::cout << std::endl;
+        default: case MPiece::NONE: break; // nothing to do!
+    }
 
-        if (list.contains(to))
+    if (list.contains(target))
+    {
+        // check whether the resulting position leaves the player to move in check => invalid move
+        if (!moveResultsInCheck(*position, origin, target))
         {
-            // check whether the resulting position leaves the player to move in check => invalid move
-            if (!moveResultsInCkeck(pos, from, to))
+            flags |= MLogicAnalyzer::VALID;
+
+            // check whether the resulting position leaves the next player in check => check
+            if (nextPlayerInCheck(*position, origin, target))
             {
-                flags |= MLogicAnalyzer::VALID;
-
-                // check whether the resulting position leaves the next player in check => check
-                if (nextPlayerInCkeck(pos, from, to))
-                {
-                    flags |= MLogicAnalyzer::CHECK;
-                }
+                flags |= MLogicAnalyzer::CHECK;
             }
         }
     }
@@ -540,14 +512,14 @@ bool MLogicAnalyzer::moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiec
     return ret;
 }
 
-bool MLogicAnalyzer::moveResultsInCkeck(MPosition &pos, QPoint from, QPoint to)
+bool MLogicAnalyzer::moveResultsInCheck(MPosition &pos, QPoint from, QPoint to)
 {
     MPiece::MColour col = pos.getColourToMove();
 
     return moveCheckUndo(pos, from, to, col);
 }
 
-bool MLogicAnalyzer::nextPlayerInCkeck(MPosition &pos, QPoint from, QPoint to)
+bool MLogicAnalyzer::nextPlayerInCheck(MPosition &pos, QPoint from, QPoint to)
 {
     MPiece::MColour col = (pos.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE;
 

@@ -46,9 +46,11 @@ public:
     explicit MActionArea(QObject *parent = 0);
     ~MActionArea();
     QGraphicsProxyWidget* createActionAreaProxyWidget(const QString& name);
+    QString getText() const;
 
 public Q_SLOT:
     void setState(State s);
+    void setText(const QString &text);
 
 Q_SIGNALS:
     void moveConfirmed();

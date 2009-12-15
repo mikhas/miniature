@@ -107,6 +107,7 @@ private:
     void undoMove();
     void deSelectPiece();
     void selectPiece(MPiece *piece);
+    void updatePlayerStatus(const MPosition &position);
 
     /* A reference to the board view, we do not take ownership. */
     MBoardView *m_view;
