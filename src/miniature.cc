@@ -52,8 +52,6 @@ MMainWindow::MMainWindow()
     connect(m_ui.jump_to_end, SIGNAL(triggered()),
             m_game, SLOT(jumpToEnd()));
 
-    connect(m_ui.rotate_black_pieces, SIGNAL(triggered()),
-            m_game, SLOT(rotateBlackPieces()));
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 
