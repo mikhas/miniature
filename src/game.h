@@ -59,8 +59,6 @@ public Q_SLOTS:
     void prevMove();
     void nextMove();
     void jumpToEnd();
-    void rotateBlackPieces();
-    void rotateWhitePieces();
 
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
@@ -82,6 +80,7 @@ Q_SIGNALS:
     void sendDebugInfo(QString msg);
 
 private:
+    void cleanupTransitionData();
     void setupBoardItem();
 
     /* Creates a MPosition with the default chess start position and stores it

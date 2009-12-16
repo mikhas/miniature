@@ -42,9 +42,6 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    setupBoardItem();
-    setupStartPosition();
-
     // process state transition requests
     connect(&m_top_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
@@ -67,11 +64,12 @@ MGame::~MGame()
 void MGame::setupBoardItem()
 {
     Q_ASSERT(m_view);
-    // If m_board_item was already setup we will leak memory here. We cannot
-    // delete MPieces directly (which would happen if we delete a
-    // MGraphicsBoardItem) as long as they are owned by MPosition instances
-    // (shared pointers semantics w.r.t. MPieces).
-    Q_ASSERT(!m_board_item);
+
+    if (m_board_item)
+    {
+        delete m_board_item;
+        m_board_item = 0;
+    }
 
     m_board_item = new MGraphicsBoardItem;
     m_view->addBoardItem(m_board_item);
@@ -85,45 +83,51 @@ void MGame::setupBoardItem()
             this, SLOT(onUndoMoveRequested()));
 }
 
+void MGame::cleanupTransitionData()
+{
+    deSelectPiece();
+    m_trans_position = MPosition();
+    m_trans_captured_piece = 0;
+}
+
 void MGame::newGame()
 {
-    jumpToStart();
+    cleanupTransitionData();
+
+    m_game.clear();
+    m_game = MPositionList();
+    setupBoardItem();
+    setupStartPosition();
+
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 }
 
 void MGame::jumpToStart()
 {
+    cleanupTransitionData();
     setPositionTo(0);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 }
 
 void MGame::prevMove()
 {
+    cleanupTransitionData();
     setPositionTo(m_half_move - 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 }
 
 void MGame::nextMove()
 {
+    cleanupTransitionData();
     setPositionTo(m_half_move + 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
 }
 
 void MGame::jumpToEnd()
 {
+    cleanupTransitionData();
     setPositionTo(m_game.size() - 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-}
-
-// TODO: remove this method?
-void MGame::rotateWhitePieces()
-{
-    MPosition pos = m_game[m_half_move];
-}
-
-// TODO: remove this method?
-void MGame::rotateBlackPieces()
-{
-    MPosition pos = m_game[m_half_move];
 }
 
 void MGame::setupStartPosition()
@@ -372,8 +376,7 @@ void MGame::onMoveConfirmed()
     deSelectPiece();
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
     updatePlayerStatus(m_trans_position);
-
-    // TODO: mark m_trans_position as empty again, probably by using a smart pointer and resetting it here.
+    cleanupTransitionData();
 }
 
 void MGame::onPieceSelectionCancelled()
