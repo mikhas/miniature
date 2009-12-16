@@ -73,14 +73,16 @@ void MGraphicsBoardItem::hidePieces()
         return; // pieces can not be visible yet!
     }
 
-    for (QList<QGraphicsItem *>::iterator iter = childItems().begin();
-         iter != childItems().end();
+    // Save childItems() in a temporary variable *outside* the block context
+    // since otherwise the returned list would be destroyed right after the
+    // iterator assignment in the for header, and not just at the end of the
+    // loop block!
+    QList<QGraphicsItem *> children = childItems();
+
+    for (QList<QGraphicsItem *>::iterator iter = children.begin();
+         iter != children.end();
          ++iter)
     {
-        // prevent it from crashing
-        if(!(*iter)->isVisible())
-        {
-            (*iter)->hide();
-        }
+        (*iter)->hide();
     }
 }
