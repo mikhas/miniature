@@ -103,7 +103,7 @@ private:
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
 
-    void undoMove();
+    void undoTransitionalMove();
     void deSelectPiece();
     void selectPiece(MPiece *piece);
     void updatePlayerStatus(const MPosition &position);

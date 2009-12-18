@@ -163,6 +163,7 @@ void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
 {
     Q_CHECK_PTR(piece);
 
+    removePieceAt(target);
     piece->moveTo(QPoint(target.x() * 60, target.y() * 60)); // TODO: remove magic numbers!
     m_position[indexFromPoint(target)] = piece;
 

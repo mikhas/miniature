@@ -110,7 +110,7 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition * const positio
             list = applyConPawnCapture(*position, list, origin);
 
             // check for promotion
-            if (origin.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
+            if (target.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
             {
                 flags |= MLogicAnalyzer::PROMOTION;
             }

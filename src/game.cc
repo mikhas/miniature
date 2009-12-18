@@ -198,7 +198,7 @@ void MGame::setPositionTo(int half_move)
 
     if (isValidPosition(half_move))
     {
-        deSelectPiece();
+        cleanupTransitionData();
         m_half_move = half_move;
         MPosition pos = m_game[m_half_move];
 
@@ -234,7 +234,7 @@ bool MGame::isTurnOfBottomPlayer() const
     return (m_half_move % 2 == (m_is_bottom_player_white ? 0 : 1));
 }
 
-void MGame::undoMove()
+void MGame::undoTransitionalMove()
 {
     if (m_selected_piece)
     {
@@ -261,7 +261,7 @@ void MGame::selectPiece(MPiece *piece)
 {
     if (piece)
     {
-        undoMove();
+        undoTransitionalMove();
         deSelectPiece();
         m_selected_piece = piece;
         m_selected_piece->select();
@@ -336,9 +336,11 @@ void MGame::onTargetClicked(const QPoint &target)
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(&position, origin, target);
     if (MLogicAnalyzer::VALID & result)
     {
+        // TODO: clean up the evaluation of the logic analyzer's result. Try to make it a switch stmt at least.
+
         // Undo any move that was maybe done from the previous m_trans_position,
         // that is, to "reset" the state.
-        undoMove(); // TODO: refine this if moving back is visible to the user ... unlikely
+        undoTransitionalMove(); // TODO: refine this if moving back is visible to the user ... unlikely
         m_trans_position = position;
 
         // TODO: check for capture flag instead.
@@ -348,8 +350,22 @@ void MGame::onTargetClicked(const QPoint &target)
             m_trans_captured_piece = maybe_captured;
         }
 
+        if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
+        {
+            m_trans_position.setInCheck(true);
+        }
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
         m_trans_position.movePiece(origin, target);
+
+        if (MLogicAnalyzer::PROMOTION & result)
+        {
+            MPiece *pawn = m_trans_position.pieceAt(target);
+            if (pawn) // actually silly, the surrounding code already makes sure this is true
+            {
+                MPiece::MColour colour = pawn->getColour();
+                addPieceToPositionAt(new MQueen(colour), &m_trans_position, target);
+            }
+        }
 
         // just example code to visualize check
         if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
@@ -362,6 +378,11 @@ void MGame::onTargetClicked(const QPoint &target)
         }
     }
 
+    sendDebugInfo(QString("origin = (%1, %2), target = (%3, %4), result flags = %5").arg(origin.x())
+                                                                                    .arg(origin.y())
+                                                                                    .arg(target.x())
+                                                                                    .arg(target.y())
+                                                                                    .arg((int)result));
 }
 
 void MGame::onMoveConfirmed()
@@ -373,7 +394,6 @@ void MGame::onMoveConfirmed()
     m_game.insert(m_half_move, m_trans_position);
 
     m_trans_captured_piece = 0;
-    deSelectPiece();
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
     updatePlayerStatus(m_trans_position);
     cleanupTransitionData();
@@ -382,13 +402,12 @@ void MGame::onMoveConfirmed()
 void MGame::onPieceSelectionCancelled()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    undoMove();
-    deSelectPiece();
+    undoTransitionalMove();
 }
 
 void MGame::onUndoMoveRequested()
 {
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    undoMove();
-    deSelectPiece();
+    undoTransitionalMove();
+    cleanupTransitionData();
 }
