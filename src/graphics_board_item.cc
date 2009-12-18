@@ -24,6 +24,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QTime>
+#include <QGraphicsRotation>
+#include <QPropertyAnimation>
+#include <QVector3D>
 
 #include <cmath>
 
@@ -84,5 +87,20 @@ void MGraphicsBoardItem::hidePieces()
          ++iter)
     {
         (*iter)->hide();
+    }
+}
+
+void MGraphicsBoardItem::flipOneEighty()
+{
+    QList<QGraphicsItem *> children = childItems();
+    for (QList<QGraphicsItem *>::iterator iter = children.begin();
+         iter != children.end();
+         ++iter)
+    {
+        MPiece *piece = dynamic_cast<MPiece *>(*iter);
+        if (piece)
+        {
+            piece->flipOneEighty();
+        }
     }
 }

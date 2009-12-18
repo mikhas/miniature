@@ -24,6 +24,8 @@
 #include <QGraphicsScene>
 #include <QBrush>
 #include <QList>
+#include <QGraphicsRotation>
+#include <QTime>
 
 namespace Miniature
 {
@@ -35,12 +37,16 @@ MPiece(MColour colour, MType pieceType, int width, int height)
   type(pieceType),
   xDim(width),
   yDim(height),
-  selection(new QGraphicsRectItem(this)) // TODO: get rid of magic numbers
+  selection(new QGraphicsRectItem(this)), // TODO: get rid of magic numbers
+  rotationAnim(new QPropertyAnimation(this, "rotation", this)),
+  rotationAngle(0.0)
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
     selection->setEnabled(false);
     selection->hide();
+
+    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 }
 
 MPiece::
@@ -108,6 +114,24 @@ applyRenderer(QSvgRenderer &renderer, int pieceSize)
     }
     this->scale(ratio, ratio);
     this->selection->setRect(extent);
+}
+
+void MPiece::
+flipOneEighty()
+{
+    static const int flip_range = RAND_MAX / 2;
+    static const int duration_range = RAND_MAX / 250;
+
+    const int center = boundingRect().width() * 0.5;
+    const int flip = (qrand() / flip_range) ? -1 : 1;
+
+    rotationAnim->setDuration(250 + (qrand() / duration_range));
+    setTransformOriginPoint(center, center);
+    rotationAnim->setStartValue(rotationAngle);
+    rotationAngle = 180 - rotationAngle;
+    rotationAnim->setEndValue(rotationAngle * flip);
+
+    rotationAnim->start();
 }
 
 } // namespace Miniature

@@ -397,6 +397,8 @@ void MGame::onMoveConfirmed()
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
     updatePlayerStatus(m_trans_position);
     cleanupTransitionData();
+
+    m_board_item->flipOneEighty();
 }
 
 void MGame::onPieceSelectionCancelled()

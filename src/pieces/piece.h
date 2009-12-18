@@ -27,6 +27,7 @@
 #include <QChar>
 #include <QGraphicsSvgItem>
 #include <QGraphicsRectItem>
+#include <QPropertyAnimation>
 
 namespace Miniature
 {
@@ -53,6 +54,7 @@ public:
     void select();
     void deSelect();
     bool isSelected() const;
+    void flipOneEighty();
 
     // This method was briefly necessary for a hack because setPos(.) is
     // non-virtual. Now it stays here because its name makes the intend
@@ -79,6 +81,8 @@ protected:
 
     // The selection that is drawn around a piece when selected.
     QGraphicsRectItem *selection;
+    QPropertyAnimation *rotationAnim;
+    qreal rotationAngle;
 };
 
 } // namespace Miniature
