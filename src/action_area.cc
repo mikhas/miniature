@@ -93,8 +93,8 @@ QString MActionArea::createButtonStyleBase() const
 {
     return QString(
         "QPushButton {"
-            "margin: 3px 2px;"
-            "width:472px;"
+            "margin: 3px 0px;"
+            "width:476px;"
             "height: 64px;"
             "border-radius: 10px;"
             "border-style: outset;"
