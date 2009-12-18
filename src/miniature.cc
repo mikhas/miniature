@@ -101,9 +101,13 @@ void MMainWindow::toggleDebugOutput()
 
 void MMainWindow::showAboutDialog()
 {
+    QFont font = QFont("helvetica", 14, QFont::Normal);
     QDialog dialog;
     m_about_dialog.setupUi(&dialog);
-    m_about_dialog.slogan->setFont(QFont("helvetica", 14, QFont::Normal));
+    m_about_dialog.slogan->setFont(font);
+    m_about_dialog.version->setFont(font);
+    m_about_dialog.version->setText(QString("%1: %2").arg(tr("Version"))
+                                                     .arg(PACKAGE_VERSION));
     dialog.exec();
 }
 

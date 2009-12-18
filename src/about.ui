@@ -28,6 +28,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="version">
+     <property name="text">
+      <string>Version: 0.0.0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTextEdit" name="description">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
