@@ -68,6 +68,11 @@ MMainWindow::MMainWindow()
     setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
     setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
 #endif
+
+#ifndef Q_WS_MAEMO_5
+    // TODO: Cant I just use this in general?
+    resize(480, -1);
+#endif
 }
 
 MMainWindow::~MMainWindow()
