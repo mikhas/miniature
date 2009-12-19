@@ -41,6 +41,10 @@ MBoardView::MBoardView(QWidget *parent)
             this, SLOT(onLoadFinished(bool)));
 
     setup();
+
+#ifdef Q_WS_MAEMO_5
+    setStyleSheet("* {background:black;}");
+#endif
 #ifndef Q_WS_MAEMO_5
     setStyleSheet("* {background:transparent;}");
 #endif
