@@ -44,10 +44,24 @@ const MActionArea::Colours MActionArea::m_colours =
 MActionArea::MActionArea(QObject *parent)
 : QObject(parent),
   m_button(new QPushButton()),
-  m_state(NONE)
+  m_state(NONE),
+  m_rotated(false),
+  m_proxy_widget(new QGraphicsProxyWidget())
 {
     connect(m_button, SIGNAL(pressed()),
             this, SLOT(onActionTriggered()));
+
+    // create the button and wrap it in a proxy widget
+    QWidget *box = new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout();
+    box->setLayout(layout);
+    m_proxy_widget->setWidget(box); // TODO: ownership?
+
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_button);
+
+    m_button->setStyleSheet(createButtonStyleFlat());
+    m_button->show();
 }
 
 MActionArea::~MActionArea()
@@ -153,24 +167,9 @@ QString MActionArea::createButtonStyle() const
                            .arg(createButtonStylePressedBase().arg(m_colours.maemo5_orange_border).arg(gradient2));
 }
 
-QGraphicsProxyWidget* MActionArea::createActionAreaProxyWidget(const QString& name)
+QGraphicsProxyWidget* MActionArea::getProxyWidget()
 {
-    Q_CHECK_PTR(m_button);
-
-    QGraphicsProxyWidget *proxy_widget = new QGraphicsProxyWidget();
-    QWidget *box = new QWidget();
-    QVBoxLayout *layout = new QVBoxLayout();
-    box->setLayout(layout);
-    proxy_widget->setWidget(box); // TODO: ownership?
-
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_button);
-    m_button->setText(name);
-
-    m_button->setStyleSheet(createButtonStyleFlat());
-    m_button->show();
-
-    return proxy_widget;
+    return m_proxy_widget;
 }
 
 void MActionArea::onActionTriggered()
@@ -181,4 +180,19 @@ void MActionArea::onActionTriggered()
         case PIECE_SELECTED: Q_EMIT pieceSelectionCancelled(); break;
         default: /* emit nothing */ break;
     }
+}
+
+void MActionArea::flipOneEighty()
+{
+    if(!m_proxy_widget)
+    {
+        return;
+    }
+
+    const int center_width = m_proxy_widget->boundingRect().width() * 0.5;
+    const int center_height = m_proxy_widget->boundingRect().height() * 0.5;
+    m_proxy_widget->setTransformOriginPoint(center_width, center_height);
+    const int angle = (m_rotated ? 0 : 180);
+    m_rotated = !m_rotated;
+    m_proxy_widget->setRotation(angle);
 }

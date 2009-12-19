@@ -78,7 +78,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
-    void flipPieces();
+    void flipBoard();
 
 private:
     void cleanupTransitionData();

@@ -52,8 +52,16 @@ MGame::MGame(MBoardView *view, QObject *parent)
     connect(&m_bottom_action_area, SIGNAL(pieceSelectionCancelled()),
             this, SLOT(onPieceSelectionCancelled()));
 
-    m_view->setTopActionArea(m_top_action_area.createActionAreaProxyWidget(QString("qgil")));
-    m_view->setBottomActionArea(m_bottom_action_area.createActionAreaProxyWidget(QString("kore")));
+    connect(this, SIGNAL(flipBoard()),
+            &m_top_action_area, SLOT(flipOneEighty()));
+    connect(this, SIGNAL(flipBoard()),
+            &m_bottom_action_area, SLOT(flipOneEighty()));
+
+    m_view->setTopActionArea(m_top_action_area.getProxyWidget());
+    m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
+
+    m_top_action_area.setText(QString("qgil"));
+    m_bottom_action_area.setText(QString("kore"));
 
     newGame();
 }
@@ -186,9 +194,9 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
     // Assign ownership to m_board_item.
     piece->setParentItem(m_board_item);
 
-    connect(this, SIGNAL(flipPieces()),
-            piece, SLOT(flipOneEighty()),
-            Qt::QueuedConnection);
+    connect(this, SIGNAL(flipBoard()),
+            piece, SLOT(flipOneEighty()));
+            //Qt::QueuedConnection);
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -402,7 +410,7 @@ void MGame::onMoveConfirmed()
     updatePlayerStatus(m_trans_position);
     cleanupTransitionData();
 
-    Q_EMIT flipPieces();
+    Q_EMIT flipBoard();
 }
 
 void MGame::onPieceSelectionCancelled()

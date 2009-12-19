@@ -45,12 +45,13 @@ public:
 
     explicit MActionArea(QObject *parent = 0);
     ~MActionArea();
-    QGraphicsProxyWidget* createActionAreaProxyWidget(const QString& name);
     QString getText() const;
+    QGraphicsProxyWidget* getProxyWidget();
 
-public Q_SLOT:
+public Q_SLOTS:
     void setState(State s);
     void setText(const QString &text);
+    void flipOneEighty();
 
 Q_SIGNALS:
     void moveConfirmed();
@@ -69,6 +70,8 @@ private:
 
     QPushButton *m_button;
     State m_state;
+    bool m_rotated;
+    QGraphicsProxyWidget *m_proxy_widget;
 
     struct Colours
     {
