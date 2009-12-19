@@ -26,6 +26,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QGraphicsProxyWidget>
+#include <QGLWidget>
 
 using namespace Miniature;
 
@@ -92,6 +93,9 @@ void MBoardView::setup()
     m_background_page->setPalette(palette);
 
     m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
+
+    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)
@@ -119,6 +123,6 @@ void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
 void MBoardView::onLoadFinished(bool /*ok*/)
 {
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
-    m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32);
+    m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32_Premultiplied);
     update(); // schedule a redraw
 }

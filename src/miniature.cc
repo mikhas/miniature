@@ -129,6 +129,11 @@ void MDBusAdaptor::top_application()
 
 int main(int argc, char ** argv)
 {
+    // the Qt docs warn of opengl as an experimental feature!
+#ifdef Q_WS_MAEMO_5
+    QApplication::setGraphicsSystem(QString("opengl"));
+#endif
+
     QApplication app(argc, argv);
     MMainWindow window;
 
