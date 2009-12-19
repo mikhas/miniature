@@ -26,6 +26,7 @@
 #include <QList>
 #include <QGraphicsRotation>
 #include <QTime>
+#include <QTimeLine>
 
 namespace Miniature
 {
@@ -38,8 +39,11 @@ MPiece(MColour colour, MType pieceType, int width, int height)
   xDim(width),
   yDim(height),
   selection(new QGraphicsRectItem(this)), // TODO: get rid of magic numbers
-  rotationAnim(new QPropertyAnimation(this, "rotation", this)),
-  rotationAngle(0.0)
+  rotated(false),
+  rotationAnimForward(new QPropertyAnimation(this, "rotation")),
+  rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
+  rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
+  rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation"))
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
@@ -47,6 +51,29 @@ MPiece(MColour colour, MType pieceType, int width, int height)
     selection->hide();
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+
+    const int duration = 750;
+    QEasingCurve curve = QEasingCurve::OutQuart;
+
+    rotationAnimForward->setDuration(duration);
+    rotationAnimForward->setStartValue(0);
+    rotationAnimForward->setEndValue(180);
+    rotationAnimForward->setEasingCurve(curve);
+
+    rotationAnimForwardCcw->setDuration(duration);
+    rotationAnimForwardCcw->setStartValue(0);
+    rotationAnimForwardCcw->setEndValue(-180);
+    rotationAnimForwardCcw->setEasingCurve(curve);
+
+    rotationAnimBackward->setDuration(duration);
+    rotationAnimBackward->setStartValue(180);
+    rotationAnimBackward->setEndValue(360);
+    rotationAnimBackward->setEasingCurve(curve);
+
+    rotationAnimBackwardCcw->setDuration(duration);
+    rotationAnimBackwardCcw->setStartValue(180);
+    rotationAnimBackwardCcw->setEndValue(0);
+    rotationAnimBackwardCcw->setEasingCurve(curve);
 }
 
 MPiece::
@@ -120,18 +147,20 @@ void MPiece::
 flipOneEighty()
 {
     static const int flip_range = RAND_MAX / 2;
-    static const int duration_range = RAND_MAX / 250;
+    const bool flipped = qrand() / flip_range;
 
     const int center = boundingRect().width() * 0.5;
-    const int flip = (qrand() / flip_range) ? -1 : 1;
-
-    rotationAnim->setDuration(250 + (qrand() / duration_range));
     setTransformOriginPoint(center, center);
-    rotationAnim->setStartValue(rotationAngle);
-    rotationAngle = 180 - rotationAngle;
-    rotationAnim->setEndValue(rotationAngle * flip);
 
-    rotationAnim->start();
+    QPropertyAnimation *anim;
+    anim = (rotated ? (flipped ? rotationAnimBackward
+                               : rotationAnimBackwardCcw)
+                    : (flipped ? rotationAnimForward
+                               : rotationAnimForwardCcw));
+
+    rotated = !rotated;
+
+    anim->start();
 }
 
 } // namespace Miniature

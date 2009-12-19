@@ -185,6 +185,10 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
     piece->show();
     // Assign ownership to m_board_item.
     piece->setParentItem(m_board_item);
+
+    connect(this, SIGNAL(flipPieces()),
+            piece, SLOT(flipOneEighty()),
+            Qt::QueuedConnection);
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -398,7 +402,7 @@ void MGame::onMoveConfirmed()
     updatePlayerStatus(m_trans_position);
     cleanupTransitionData();
 
-    m_board_item->flipOneEighty();
+    Q_EMIT flipPieces();
 }
 
 void MGame::onPieceSelectionCancelled()

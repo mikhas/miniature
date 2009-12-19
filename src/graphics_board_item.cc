@@ -89,18 +89,3 @@ void MGraphicsBoardItem::hidePieces()
         (*iter)->hide();
     }
 }
-
-void MGraphicsBoardItem::flipOneEighty()
-{
-    QList<QGraphicsItem *> children = childItems();
-    for (QList<QGraphicsItem *>::iterator iter = children.begin();
-         iter != children.end();
-         ++iter)
-    {
-        MPiece *piece = dynamic_cast<MPiece *>(*iter);
-        if (piece)
-        {
-            piece->flipOneEighty();
-        }
-    }
-}

@@ -58,9 +58,6 @@ public:
 
     void hidePieces();
 
-public Q_SLOTS:
-    void flipOneEighty();
-
 Q_SIGNALS:
     void pieceClicked(MPiece *piece);
     void targetClicked(const QPoint &cell);

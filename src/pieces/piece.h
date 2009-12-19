@@ -54,7 +54,6 @@ public:
     void select();
     void deSelect();
     bool isSelected() const;
-    void flipOneEighty();
 
     // This method was briefly necessary for a hack because setPos(.) is
     // non-virtual. Now it stays here because its name makes the intend
@@ -66,6 +65,9 @@ public:
     // our mapping is from a QGI coord system to a MPosition coord system.
     QPoint mapToCell() const;
     QPoint mapFromCell(const QPoint &cell) const;
+
+public Q_SLOTS:
+    void flipOneEighty();
 
 protected:
     void applyRenderer(QSvgRenderer &renderer, int pieceSize);
@@ -81,8 +83,13 @@ protected:
 
     // The selection that is drawn around a piece when selected.
     QGraphicsRectItem *selection;
-    QPropertyAnimation *rotationAnim;
-    qreal rotationAngle;
+
+    // Flipping a piece, animated
+    bool rotated;
+    QPropertyAnimation *rotationAnimForward;
+    QPropertyAnimation *rotationAnimForwardCcw;
+    QPropertyAnimation *rotationAnimBackward;
+    QPropertyAnimation *rotationAnimBackwardCcw;
 };
 
 } // namespace Miniature
