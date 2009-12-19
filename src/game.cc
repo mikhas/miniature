@@ -42,7 +42,7 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    // process state transition requests
+    // Process state transition requests.
     connect(&m_top_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
@@ -52,6 +52,7 @@ MGame::MGame(MBoardView *view, QObject *parent)
     connect(&m_bottom_action_area, SIGNAL(pieceSelectionCancelled()),
             this, SLOT(onPieceSelectionCancelled()));
 
+    // Enable rotation for action areas.
     connect(this, SIGNAL(flipBoard()),
             &m_top_action_area, SLOT(flipOneEighty()));
     connect(this, SIGNAL(flipBoard()),
@@ -194,6 +195,7 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
     // Assign ownership to m_board_item.
     piece->setParentItem(m_board_item);
 
+    // Enable rotation for this piece.
     connect(this, SIGNAL(flipBoard()),
             piece, SLOT(flipOneEighty()));
             //Qt::QueuedConnection);
@@ -415,8 +417,7 @@ void MGame::onMoveConfirmed()
 
 void MGame::onPieceSelectionCancelled()
 {
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    undoTransitionalMove();
+    onUndoMoveRequested();
 }
 
 void MGame::onUndoMoveRequested()
