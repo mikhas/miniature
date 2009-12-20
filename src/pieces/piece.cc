@@ -33,13 +33,13 @@ namespace Miniature
 
 MPiece::
 MPiece(MColour colour, MType pieceType, int width, int height)
-: QGraphicsSvgItem(),
+: QGraphicsObject(),
   colour(colour),
   type(pieceType),
   xDim(width),
   yDim(height),
-  selection(new QGraphicsRectItem(this)), // TODO: get rid of magic numbers
-  rotated(false),
+  selection(new QGraphicsRectItem(QRectF(0, 0, 60, 60), this)), // TODO: get rid of magic numbers
+  image(60, 60, QImage::Format_ARGB32_Premultiplied),
   rotationAnimForward(new QPropertyAnimation(this, "rotation")),
   rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
@@ -49,6 +49,8 @@ MPiece(MColour colour, MType pieceType, int width, int height)
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
     selection->setEnabled(false);
     selection->hide();
+
+    image.fill(0); // I forgot how important filling a pixmap is ...
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -79,6 +81,19 @@ MPiece(MColour colour, MType pieceType, int width, int height)
 MPiece::
 ~MPiece()
 {}
+
+void MPiece::
+paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter->drawImage(QRectF(0, 0, 60, 60), image);
+}
+
+QRectF MPiece::
+boundingRect() const
+{
+    return QRectF(0, 0, 60, 60);
+}
 
 MPiece::MColour MPiece::
 getColour() const
@@ -113,7 +128,7 @@ isSelected() const
 void MPiece::
 moveTo(const QPoint &target)
 {
-    QGraphicsSvgItem::setPos(target);
+    QGraphicsObject::setPos(target);
 }
 
 QPoint MPiece::
@@ -131,6 +146,11 @@ mapFromCell(const QPoint &cell) const
 void MPiece::
 applyRenderer(QSvgRenderer &renderer, int pieceSize)
 {
+    QPainter painter(&image);
+    renderer.render(&painter);
+
+    Q_UNUSED(pieceSize);
+/*
     this->setSharedRenderer(&renderer);
 
     QRectF extent = this->boundingRect();
@@ -141,24 +161,40 @@ applyRenderer(QSvgRenderer &renderer, int pieceSize)
     }
     this->scale(ratio, ratio);
     this->selection->setRect(extent);
+*/
 }
 
 void MPiece::
-flipOneEighty()
+rotate0()
 {
+    rotate(false);
+}
+
+void MPiece::
+rotate180()
+{
+    rotate(true);
+}
+
+void MPiece::
+rotate(bool flip)
+{
+    // Actually, we cheat with the angle here, we only know 0 and 180. But
+    // that's because the easing functions of the animations have been computed
+    // in the ctor already, to save time.
+
     static const int flip_range = RAND_MAX / 2;
-    const bool flipped = qrand() / flip_range;
+    const bool direction_flipped = qrand() / flip_range;
 
     const int center = boundingRect().width() * 0.5;
     setTransformOriginPoint(center, center);
 
     QPropertyAnimation *anim;
-    anim = (rotated ? (flipped ? rotationAnimBackward
-                               : rotationAnimBackwardCcw)
-                    : (flipped ? rotationAnimForward
-                               : rotationAnimForwardCcw));
+    anim = (flip ? (direction_flipped ? rotationAnimForward
+                                      : rotationAnimForwardCcw)
+                 : (direction_flipped ? rotationAnimBackward
+                                      : rotationAnimBackwardCcw));
 
-    rotated = !rotated;
 
     anim->start();
 }

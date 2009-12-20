@@ -25,16 +25,20 @@
 #include <QList>
 #include <QPoint>
 #include <QChar>
-#include <QGraphicsSvgItem>
+#include <QGraphicsObject>
+#include <QSvgRenderer>
 #include <QGraphicsRectItem>
 #include <QPropertyAnimation>
+#include <QImage>
+#include <QPainter>
+#include <QStyleOptionGraphicsItem>
 
 namespace Miniature
 {
 
 /* Abstract base class for all pieces. */
 class MPiece
-: public QGraphicsSvgItem
+: public QGraphicsObject
 {
     Q_OBJECT
 
@@ -44,6 +48,9 @@ public:
 
     MPiece(MColour colour, MType pieceType, int width = 8, int height = 8);
     virtual ~MPiece();
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    virtual QRectF boundingRect() const;
 
     virtual QList<QPoint> getPossibleSquares(QPoint) const = 0;
     virtual QChar getLetter() const = 0;
@@ -67,7 +74,9 @@ public:
     QPoint mapFromCell(const QPoint &cell) const;
 
 public Q_SLOTS:
-    void flipOneEighty();
+    void rotate0();
+    void rotate180();
+    void rotate(bool flip);
 
 protected:
     void applyRenderer(QSvgRenderer &renderer, int pieceSize);
@@ -84,8 +93,9 @@ protected:
     // The selection that is drawn around a piece when selected.
     QGraphicsRectItem *selection;
 
+    QImage image;
+
     // Flipping a piece, animated
-    bool rotated;
     QPropertyAnimation *rotationAnimForward;
     QPropertyAnimation *rotationAnimForwardCcw;
     QPropertyAnimation *rotationAnimBackward;
