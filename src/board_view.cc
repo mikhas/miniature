@@ -96,6 +96,8 @@ void MBoardView::setup()
 
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+    setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)
