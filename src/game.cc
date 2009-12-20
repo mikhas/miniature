@@ -52,17 +52,22 @@ MGame::MGame(MBoardView *view, QObject *parent)
     connect(&m_bottom_action_area, SIGNAL(pieceSelectionCancelled()),
             this, SLOT(onPieceSelectionCancelled()));
 
-    // Enable rotation for action areas.
-    connect(this, SIGNAL(flipBoard()),
-            &m_top_action_area, SLOT(flipOneEighty()));
-    connect(this, SIGNAL(flipBoard()),
-            &m_bottom_action_area, SLOT(flipOneEighty()));
-
     m_view->setTopActionArea(m_top_action_area.getProxyWidget());
     m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
 
     m_top_action_area.setText(QString("qgil"));
     m_bottom_action_area.setText(QString("kore"));
+
+    // Enable rotation for action areas.
+    connect(this, SIGNAL(turnOfTopPlayer()),
+            &m_top_action_area, SLOT(rotate180()));
+    connect(this, SIGNAL(turnOfTopPlayer()),
+            &m_bottom_action_area, SLOT(rotate180()));
+
+    connect(this, SIGNAL(turnOfBottomPlayer()),
+            &m_top_action_area, SLOT(rotate0()));
+    connect(this, SIGNAL(turnOfBottomPlayer()),
+            &m_bottom_action_area, SLOT(rotate0()));
 
     newGame();
 }
@@ -108,35 +113,35 @@ void MGame::newGame()
     setupBoardItem();
     setupStartPosition();
 
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToStart()
 {
     cleanupTransitionData();
     setPositionTo(0);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::prevMove()
 {
     cleanupTransitionData();
     setPositionTo(m_half_move - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::nextMove()
 {
     cleanupTransitionData();
     setPositionTo(m_half_move + 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToEnd()
 {
     cleanupTransitionData();
     setPositionTo(m_game.size() - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::setupStartPosition()
@@ -196,9 +201,11 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
     piece->setParentItem(m_board_item);
 
     // Enable rotation for this piece.
-    connect(this, SIGNAL(flipBoard()),
-            piece, SLOT(flipOneEighty()));
-            //Qt::QueuedConnection);
+    connect(this, SIGNAL(turnOfTopPlayer()),
+            piece, SLOT(rotate180()));
+
+    connect(this, SIGNAL(turnOfBottomPlayer()),
+            piece, SLOT(rotate0()));
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -222,18 +229,31 @@ void MGame::setPositionTo(int half_move)
     }
 }
 
-void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2)
+void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal)
 {
     // current mapping is white = bottom
     if (isTurnOfBottomPlayer())
     {
         m_top_action_area.setState(s1);
         m_bottom_action_area.setState(s2);
+
+        if (emit_turn_signal)
+        {
+            Q_EMIT turnOfBottomPlayer();
+        }
     }
     else
     {
         m_top_action_area.setState(s2);
         m_bottom_action_area.setState(s1);
+
+        m_top_action_area.rotate(180);
+        m_bottom_action_area.rotate(180);
+
+        if (emit_turn_signal)
+        {
+            Q_EMIT turnOfTopPlayer();
+        }
     }
 }
 
@@ -408,11 +428,9 @@ void MGame::onMoveConfirmed()
     m_game.insert(m_half_move, m_trans_position);
 
     m_trans_captured_piece = 0;
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
+    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
     updatePlayerStatus(m_trans_position);
     cleanupTransitionData();
-
-    Q_EMIT flipBoard();
 }
 
 void MGame::onPieceSelectionCancelled()

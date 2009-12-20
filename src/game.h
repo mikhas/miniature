@@ -79,6 +79,8 @@ public Q_SLOTS:
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
     void flipBoard();
+    void turnOfTopPlayer();
+    void turnOfBottomPlayer();
 
 private:
     void cleanupTransitionData();
@@ -99,7 +101,7 @@ private:
     bool isValidPosition(int half_move) const;
 
     /* Sets both action area states in one go. */
-    void setActionAreaStates(MActionArea::State s1, MActionArea::State s2);
+    void setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal = false);
 
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
