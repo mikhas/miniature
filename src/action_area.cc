@@ -45,7 +45,6 @@ MActionArea::MActionArea(QObject *parent)
 : QObject(parent),
   m_button(new QPushButton()),
   m_state(NONE),
-  m_rotated(false),
   m_proxy_widget(new QGraphicsProxyWidget())
 {
     connect(m_button, SIGNAL(pressed()),
@@ -182,17 +181,21 @@ void MActionArea::onActionTriggered()
     }
 }
 
-void MActionArea::flipOneEighty()
+void MActionArea::rotate0()
 {
-    if(!m_proxy_widget)
-    {
-        return;
-    }
+    rotate(false);
+}
 
+void MActionArea::rotate180()
+{
+    rotate(true);
+}
+
+void MActionArea::rotate(bool flip)
+{
     const int center_width = m_proxy_widget->boundingRect().width() * 0.5;
     const int center_height = m_proxy_widget->boundingRect().height() * 0.5;
     m_proxy_widget->setTransformOriginPoint(center_width, center_height);
-    const int angle = (m_rotated ? 0 : 180);
-    m_rotated = !m_rotated;
-    m_proxy_widget->setRotation(angle);
+
+    m_proxy_widget->setRotation(flip ? 180 : 0);
 }

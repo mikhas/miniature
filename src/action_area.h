@@ -51,7 +51,9 @@ public:
 public Q_SLOTS:
     void setState(State s);
     void setText(const QString &text);
-    void flipOneEighty();
+    void rotate0();
+    void rotate180();
+    void rotate(bool flip);
 
 Q_SIGNALS:
     void moveConfirmed();
@@ -70,7 +72,6 @@ private:
 
     QPushButton *m_button;
     State m_state;
-    bool m_rotated;
     QGraphicsProxyWidget *m_proxy_widget;
 
     struct Colours
