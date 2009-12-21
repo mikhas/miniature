@@ -32,25 +32,33 @@ namespace Miniature
 {
 
 MPiece::
-MPiece(MColour colour, MType pieceType, int width, int height)
+MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int width, int height)
 : QGraphicsObject(),
   colour(colour),
   type(pieceType),
-  xDim(width),
-  yDim(height),
-  selection(new QGraphicsRectItem(QRectF(0, 0, 60, 60), this)), // TODO: get rid of magic numbers
-  image(60, 60, QImage::Format_ARGB32_Premultiplied),
+  xDim(xDimension),
+  yDim(yDimension),
+  selection(new QGraphicsRectItem(QRect(0, 0, width, height), this)), // TODO: get rid of magic numbers
+  image(width, height, QImage::Format_ARGB32_Premultiplied),
+  ghost(new QGraphicsPixmapItem(this)),
+  rotated(false),
   rotationAnimForward(new QPropertyAnimation(this, "rotation")),
   rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
-  rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation"))
+  rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation")),
+  ghostFadeOutTimer(new QTimeLine(250, this))
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
     selection->setEnabled(false);
     selection->hide();
 
-    image.fill(0); // I forgot how important filling a pixmap is ...
+    ghost->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    ghost->setEnabled(false);
+    ghost->hide();
+
+    // Initialize QImage so that we dont get artifacts from previous images.
+    image.fill(0);
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -76,6 +84,10 @@ MPiece(MColour colour, MType pieceType, int width, int height)
     rotationAnimBackwardCcw->setStartValue(180);
     rotationAnimBackwardCcw->setEndValue(0);
     rotationAnimBackwardCcw->setEasingCurve(curve);
+
+    ghostFadeOutTimer->setDirection(QTimeLine::Backward);
+    connect(ghostFadeOutTimer, SIGNAL(valueChanged(qreal)),
+            this, SLOT(fadeOutGhost(qreal)));
 }
 
 MPiece::
@@ -126,8 +138,43 @@ isSelected() const
 }
 
 void MPiece::
+showGhostAt(const QPoint &target)
+{
+    // transfers ownership, which probably makes this reparenting ugly
+    ghost->setParentItem(parentItem());
+
+    ghost->setPos(mapFromCell(target));
+    ghost->setRotation(rotated ? 180 : 0);
+
+    ghost->setOpacity(0.4);
+    ghost->show();
+}
+
+void MPiece::
+hideGhost()
+{
+    ghostFadeOutTimer->start();
+}
+
+void MPiece::
+fadeOutGhost(qreal timer_value)
+{
+    const qreal new_value = timer_value * 0.4;
+    if (0.01 >= new_value && ghost->isVisible())
+    {
+        ghost->setOpacity(0);
+        ghost->hide();
+    }
+    else
+    {
+        ghost->setOpacity(new_value);
+    }
+}
+
+void MPiece::
 moveTo(const QPoint &target)
 {
+    QPointF origin = pos();
     QGraphicsObject::setPos(target);
 }
 
@@ -149,19 +196,17 @@ applyRenderer(QSvgRenderer &renderer, int pieceSize)
     QPainter painter(&image);
     renderer.render(&painter);
 
-    Q_UNUSED(pieceSize);
-/*
-    this->setSharedRenderer(&renderer);
+    QPixmap ghost_pixmap = QPixmap(image.size());
+    ghost_pixmap.fill(Qt::transparent);
+    QPainter ghost_painter(&ghost_pixmap);
+    renderer.render(&ghost_painter);
 
-    QRectF extent = this->boundingRect();
-    qreal ratio = 1;
-    if (0 < extent.width())
-    {
-        ratio = pieceSize / static_cast<qreal>(extent.width());
-    }
-    this->scale(ratio, ratio);
-    this->selection->setRect(extent);
-*/
+    ghost->setPixmap(ghost_pixmap);
+    ghost->setOpacity(0);
+    const QRectF extent = ghost->boundingRect();
+    ghost->setTransformOriginPoint(extent.width() * .5, extent.height() * .5);
+
+    Q_UNUSED(pieceSize);
 }
 
 void MPiece::
@@ -179,6 +224,12 @@ rotate180()
 void MPiece::
 rotate(bool flip)
 {
+    if (rotated == flip)
+    {
+        return; // dont rotate then
+    }
+
+    rotated = flip;
     // Actually, we cheat with the angle here, we only know 0 and 180. But
     // that's because the easing functions of the animations have been computed
     // in the ctor already, to save time.

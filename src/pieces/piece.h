@@ -28,15 +28,40 @@
 #include <QGraphicsObject>
 #include <QSvgRenderer>
 #include <QGraphicsRectItem>
+#include <QGraphicsPixmapItem>
 #include <QPropertyAnimation>
 #include <QImage>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <QTimeLine>
 
 namespace Miniature
 {
 
-/* Abstract base class for all pieces. */
+/* QGV items are quite inconistent: Some are QObjects (SvgItem, QGO, ...), others aren't. */
+/*
+class MGraphicsPixmapObject
+: public QObject,
+  public QGraphicsPixmapItem
+{
+    Q_OBJECT
+
+public:
+    explicit MGraphicsPixmapObject(QGraphicsItem *item, QObject *parent = 0)
+    : QObject(parent),
+      QGraphicsPixmapItem(item)
+    {}
+
+    ~MGraphicsPixmapObject()
+    {}
+};
+*/
+
+/* Abstract base class for all pieces. Each piece animation is a member of
+ * piece (at some point, there should be a piece animation class), and
+ * animations are initialized during piece construction. This serves for
+ * caching purposes. Could be made static member vars even.
+ */
 class MPiece
 : public QGraphicsObject
 {
@@ -46,7 +71,7 @@ public:
     enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
     enum MColour {BLACK, WHITE};
 
-    MPiece(MColour colour, MType pieceType, int width = 8, int height = 8);
+    MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int width = 60, int height = 60);
     virtual ~MPiece();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
@@ -58,8 +83,6 @@ public:
     MType getType() const;
     MColour getColour() const;
 
-    void select();
-    void deSelect();
     bool isSelected() const;
 
     // This method was briefly necessary for a hack because setPos(.) is
@@ -74,6 +97,14 @@ public:
     QPoint mapFromCell(const QPoint &cell) const;
 
 public Q_SLOTS:
+    void select();
+    void deSelect();
+
+    void showGhostAt(const QPoint &target);
+    void hideGhost();
+
+    void fadeOutGhost(qreal timer_value);
+
     void rotate0();
     void rotate180();
     void rotate(bool flip);
@@ -94,12 +125,17 @@ protected:
     QGraphicsRectItem *selection;
 
     QImage image;
+    QGraphicsPixmapItem *ghost;
 
-    // Flipping a piece, animated
+    // Flipping a piece, animated.
+    bool rotated;
     QPropertyAnimation *rotationAnimForward;
     QPropertyAnimation *rotationAnimForwardCcw;
     QPropertyAnimation *rotationAnimBackward;
     QPropertyAnimation *rotationAnimBackwardCcw;
+
+    // Fade out the ghost piece ... somehow, QPropertyAnimations did not work
+    QTimeLine *ghostFadeOutTimer;
 };
 
 } // namespace Miniature

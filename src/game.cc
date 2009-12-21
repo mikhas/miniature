@@ -286,6 +286,8 @@ void MGame::deSelectPiece()
     if (m_selected_piece)
     {
         m_selected_piece->deSelect();
+        m_selected_piece->hideGhost();
+
         m_selected_piece = 0;
         m_selected_piece_cell = QPoint(-1,-1);
     }
@@ -390,6 +392,9 @@ void MGame::onTargetClicked(const QPoint &target)
         }
         setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
         m_trans_position.movePiece(origin, target);
+
+        MPiece *piece = m_trans_position.pieceAt(target);
+        piece->showGhostAt(origin);
 
         if (MLogicAnalyzer::PROMOTION & result)
         {
