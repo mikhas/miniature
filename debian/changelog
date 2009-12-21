@@ -1,3 +1,10 @@
+miniature (0.1.5-1) unstable; urgency=low
+
+  * Improve animation speed.
+  * Introduce piece shadows as cancel indicator.
+
+ -- Mathias Hasselmann <mathias.hasselmann@maemo.org>  Mon, 21 Dec 2009 22:35:18 +0100
+
 miniature (0.1.4-1) unstable; urgency=low
 
   * Introduce various animations.
