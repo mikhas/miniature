@@ -108,6 +108,7 @@ public Q_SLOTS:
     void rotate0();
     void rotate180();
     void rotate(bool flip);
+    void onRotationFinished();
 
 protected:
     void applyRenderer(QSvgRenderer &renderer, int pieceSize);
@@ -133,6 +134,8 @@ protected:
     QPropertyAnimation *rotationAnimForwardCcw;
     QPropertyAnimation *rotationAnimBackward;
     QPropertyAnimation *rotationAnimBackwardCcw;
+
+    QGraphicsEffect *dropShadow;
 
     // Fade out the ghost piece ... somehow, QPropertyAnimations did not work
     QTimeLine *ghostFadeOutTimer;

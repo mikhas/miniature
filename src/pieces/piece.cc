@@ -24,9 +24,9 @@
 #include <QGraphicsScene>
 #include <QBrush>
 #include <QList>
-#include <QGraphicsRotation>
 #include <QTime>
-#include <QTimeLine>
+#include <QGraphicsRotation>
+#include <QGraphicsDropShadowEffect>
 
 namespace Miniature
 {
@@ -46,6 +46,7 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
   rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation")),
+  dropShadow(new QGraphicsDropShadowEffect(this)),
   ghostFadeOutTimer(new QTimeLine(250, this))
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
@@ -69,25 +70,36 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     rotationAnimForward->setStartValue(0);
     rotationAnimForward->setEndValue(180);
     rotationAnimForward->setEasingCurve(curve);
+    connect(rotationAnimForward, SIGNAL(finished()),
+            this, SLOT(onRotationFinished()));
 
     rotationAnimForwardCcw->setDuration(duration);
     rotationAnimForwardCcw->setStartValue(0);
     rotationAnimForwardCcw->setEndValue(-180);
     rotationAnimForwardCcw->setEasingCurve(curve);
+    connect(rotationAnimForwardCcw, SIGNAL(finished()),
+            this, SLOT(onRotationFinished()));
 
     rotationAnimBackward->setDuration(duration);
     rotationAnimBackward->setStartValue(180);
     rotationAnimBackward->setEndValue(360);
     rotationAnimBackward->setEasingCurve(curve);
+    connect(rotationAnimBackward, SIGNAL(finished()),
+            this, SLOT(onRotationFinished()));
 
     rotationAnimBackwardCcw->setDuration(duration);
     rotationAnimBackwardCcw->setStartValue(180);
     rotationAnimBackwardCcw->setEndValue(0);
     rotationAnimBackwardCcw->setEasingCurve(curve);
+    connect(rotationAnimBackwardCcw, SIGNAL(finished()),
+            this, SLOT(onRotationFinished()));
 
     ghostFadeOutTimer->setDirection(QTimeLine::Backward);
     connect(ghostFadeOutTimer, SIGNAL(valueChanged(qreal)),
             this, SLOT(fadeOutGhost(qreal)));
+
+    setGraphicsEffect(dropShadow);
+    dropShadow->setEnabled(false);
 }
 
 MPiece::
@@ -240,6 +252,9 @@ rotate(bool flip)
     const int center = boundingRect().width() * 0.5;
     setTransformOriginPoint(center, center);
 
+    QGraphicsObject::setPos(QPoint(pos().x() + 3, pos().y() + 3));
+    dropShadow->setEnabled(true);
+
     QPropertyAnimation *anim;
     anim = (flip ? (direction_flipped ? rotationAnimForward
                                       : rotationAnimForwardCcw)
@@ -248,6 +263,13 @@ rotate(bool flip)
 
 
     anim->start();
+}
+
+void MPiece::
+onRotationFinished()
+{
+    dropShadow->setEnabled(false);
+    QGraphicsObject::setPos(QPoint(pos().x() - 3, pos().y() - 3));
 }
 
 } // namespace Miniature
