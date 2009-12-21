@@ -64,7 +64,7 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     dropShadow->hide();
 
     // Initialize QImage so that we dont get artifacts from previous images.
-    image.fill(0);
+    image.fill(Qt::transparent);
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -222,6 +222,8 @@ applyRenderer(QSvgRenderer &renderer, int pieceSize)
 
     QBitmap shadowMask = ghost_pixmap.mask();
     QPixmap shadowPixmap = QPixmap(ghost_pixmap.size());
+    shadowPixmap.fill(Qt::transparent);
+
     QPainter shadowPainter(&shadowPixmap);
     shadowPainter.setPen(QColor(60, 60, 60));
     shadowPainter.drawPixmap(0, 0, shadowMask);
