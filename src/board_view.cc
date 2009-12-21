@@ -26,7 +26,10 @@
 #include <QPainter>
 #include <QImage>
 #include <QGraphicsProxyWidget>
-#include <QGLWidget>
+
+#ifdef HAVE_MINIATURE_OPENGL
+  #include <QGLWidget>
+#endif
 
 using namespace Miniature;
 
@@ -94,10 +97,12 @@ void MBoardView::setup()
 
     m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
 
+#ifdef HAVE_MINIATURE_OPENGL
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+#endif
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)

@@ -16,10 +16,15 @@ AC_LANG([C++])
 
 # phonon and xmlpatterns are webkit dependencies,
 # and we want the configure check to complain when they are missing.
-AT_WITH_QT([core dbus gui network svg webkit phonon xmlpatterns opengl],[no_keywords])
+# TODO: how to remove the opengl dependency when configured without opengl?
+AT_WITH_QT([core dbus gui network svg webkit phonon xmlpatterns, opengl],[no_keywords])
 AT_REQUIRE_QT_VERSION([4.6])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
+AC_ARG_ENABLE(opengl,
+    [Enable OpenGL to be used as the Qt graphics system.],
+    [AC_DEFINE(HAVE_MINIATURE_OPENGL, [1], [Define to enable Qt's OpenGL graphics system])]
+)
 
 AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
 AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
