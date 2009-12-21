@@ -127,6 +127,7 @@ protected:
 
     QImage image;
     QGraphicsPixmapItem *ghost;
+    QGraphicsPixmapItem *dropShadow;
 
     // Flipping a piece, animated.
     bool rotated;
@@ -134,8 +135,6 @@ protected:
     QPropertyAnimation *rotationAnimForwardCcw;
     QPropertyAnimation *rotationAnimBackward;
     QPropertyAnimation *rotationAnimBackwardCcw;
-
-    QGraphicsEffect *dropShadow;
 
     // Fade out the ghost piece ... somehow, QPropertyAnimations did not work
     QTimeLine *ghostFadeOutTimer;

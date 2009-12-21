@@ -23,6 +23,7 @@
 
 #include <QGraphicsScene>
 #include <QBrush>
+#include <QBitmap>
 #include <QList>
 #include <QTime>
 #include <QGraphicsRotation>
@@ -41,12 +42,12 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
   selection(new QGraphicsRectItem(QRect(0, 0, width, height), this)), // TODO: get rid of magic numbers
   image(width, height, QImage::Format_ARGB32_Premultiplied),
   ghost(new QGraphicsPixmapItem(this)),
+  dropShadow(new QGraphicsPixmapItem(this)),
   rotated(false),
   rotationAnimForward(new QPropertyAnimation(this, "rotation")),
   rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation")),
-  dropShadow(new QGraphicsDropShadowEffect(this)),
   ghostFadeOutTimer(new QTimeLine(250, this))
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
@@ -57,6 +58,10 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     ghost->setFlag(QGraphicsItem::ItemStacksBehindParent);
     ghost->setEnabled(false);
     ghost->hide();
+
+    dropShadow->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    dropShadow->setEnabled(false);
+    dropShadow->hide();
 
     // Initialize QImage so that we dont get artifacts from previous images.
     image.fill(0);
@@ -97,9 +102,6 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     ghostFadeOutTimer->setDirection(QTimeLine::Backward);
     connect(ghostFadeOutTimer, SIGNAL(valueChanged(qreal)),
             this, SLOT(fadeOutGhost(qreal)));
-
-    setGraphicsEffect(dropShadow);
-    dropShadow->setEnabled(false);
 }
 
 MPiece::
@@ -218,6 +220,15 @@ applyRenderer(QSvgRenderer &renderer, int pieceSize)
     const QRectF extent = ghost->boundingRect();
     ghost->setTransformOriginPoint(extent.width() * .5, extent.height() * .5);
 
+    QBitmap shadowMask = ghost_pixmap.mask();
+    QPixmap shadowPixmap = QPixmap(ghost_pixmap.size());
+    QPainter shadowPainter(&shadowPixmap);
+    shadowPainter.setPen(QColor(60, 60, 60));
+    shadowPainter.drawPixmap(0, 0, shadowMask);
+
+    dropShadow->setPixmap(shadowPixmap);
+    dropShadow->setTransformOriginPoint(extent.width() * .5, extent.height() * .5);
+
     Q_UNUSED(pieceSize);
 }
 
@@ -253,7 +264,8 @@ rotate(bool flip)
     setTransformOriginPoint(center, center);
 
     QGraphicsObject::setPos(QPoint(pos().x() + 3, pos().y() + 3));
-    dropShadow->setEnabled(true);
+    dropShadow->setPos(QPoint(-5, -5));
+    dropShadow->show();
 
     QPropertyAnimation *anim;
     anim = (flip ? (direction_flipped ? rotationAnimForward
@@ -268,7 +280,7 @@ rotate(bool flip)
 void MPiece::
 onRotationFinished()
 {
-    dropShadow->setEnabled(false);
+    dropShadow->hide();
     QGraphicsObject::setPos(QPoint(pos().x() - 3, pos().y() - 3));
 }
 
