@@ -51,11 +51,42 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
   ghostFadeOutTimer(new QTimeLine(250, this)),
   enableRotations(true)
 {
+    // Initialize QImage so that we dont get artifacts from previous images.
+    image.fill(Qt::transparent);
+
+    initializeSelection();
+    initializeEffects();
+}
+
+MPiece::
+~MPiece()
+{}
+
+void MPiece::
+paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+{
+    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter->drawImage(QRectF(0, 0, 60, 60), image);
+}
+
+QRectF MPiece::
+boundingRect() const
+{
+    return QRectF(0, 0, 60, 60);
+}
+
+void MPiece::
+initializeSelection()
+{
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
     selection->setEnabled(false);
     selection->hide();
+}
 
+void MPiece::
+initializeEffects()
+{
     ghost->setFlag(QGraphicsItem::ItemStacksBehindParent);
     ghost->setEnabled(false);
     ghost->hide();
@@ -63,9 +94,6 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     dropShadow->setFlag(QGraphicsItem::ItemStacksBehindParent);
     dropShadow->setEnabled(false);
     dropShadow->hide();
-
-    // Initialize QImage so that we dont get artifacts from previous images.
-    image.fill(Qt::transparent);
 
     qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
 
@@ -103,23 +131,6 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
     ghostFadeOutTimer->setDirection(QTimeLine::Backward);
     connect(ghostFadeOutTimer, SIGNAL(valueChanged(qreal)),
             this, SLOT(fadeOutGhost(qreal)));
-}
-
-MPiece::
-~MPiece()
-{}
-
-void MPiece::
-paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
-{
-    painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
-    painter->drawImage(QRectF(0, 0, 60, 60), image);
-}
-
-QRectF MPiece::
-boundingRect() const
-{
-    return QRectF(0, 0, 60, 60);
 }
 
 MPiece::MColour MPiece::

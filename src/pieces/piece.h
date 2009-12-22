@@ -113,7 +113,11 @@ public Q_SLOTS:
     void toggleRotations();
 
 protected:
-    void applyRenderer(QSvgRenderer &renderer, int pieceSize);
+    // Initialization of the selection frame is mandatory.
+    virtual void initializeSelection();
+    // Initialization of effects is optional.
+    virtual void initializeEffects();
+    virtual void applyRenderer(QSvgRenderer &renderer, int pieceSize);
 
     MColour colour;
     MType type;
