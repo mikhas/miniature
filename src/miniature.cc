@@ -132,10 +132,8 @@ void MDBusAdaptor::top_application()
 
 int main(int argc, char ** argv)
 {
-    // the Qt docs warn of opengl as an experimental feature!
-#ifdef HAVE_MINIATURE_OPENGL
-    QApplication::setGraphicsSystem(QString("opengl"));
-#endif
+    // raster backend is faster than native, but not as disruptive as opengl
+    QApplication::setGraphicsSystem(QString("raster"));
 
     QApplication app(argc, argv);
     MMainWindow window;
