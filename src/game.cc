@@ -144,6 +144,11 @@ void MGame::jumpToEnd()
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
+void MGame::onPieceRotationsToggled()
+{
+    Q_EMIT togglePieceRotations();
+}
+
 void MGame::setupStartPosition()
 {
     m_game.clear();
@@ -206,6 +211,9 @@ void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
 
     connect(this, SIGNAL(turnOfBottomPlayer()),
             piece, SLOT(rotate0()));
+
+    connect(this, SIGNAL(togglePieceRotations()),
+            piece, SLOT(toggleRotations()));
 }
 
 bool MGame::isValidPosition(int half_move) const

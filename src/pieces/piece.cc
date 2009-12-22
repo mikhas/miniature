@@ -48,7 +48,8 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
   rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
   rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation")),
-  ghostFadeOutTimer(new QTimeLine(250, this))
+  ghostFadeOutTimer(new QTimeLine(250, this)),
+  enableRotations(true)
 {
     selection->setFlag(QGraphicsItem::ItemStacksBehindParent);
     selection->setBrush(QBrush(QColor::fromRgbF(0, .5, 0, .5)));
@@ -249,7 +250,7 @@ rotate180()
 void MPiece::
 rotate(bool flip)
 {
-    if (rotated == flip)
+    if (rotated == flip || !enableRotations)
     {
         return; // dont rotate then
     }
@@ -284,6 +285,12 @@ onRotationFinished()
 {
     dropShadow->hide();
     QGraphicsObject::setPos(QPoint(pos().x() - 3, pos().y() - 3));
+}
+
+void MPiece::
+toggleRotations()
+{
+    enableRotations = !enableRotations;
 }
 
 } // namespace Miniature

@@ -110,6 +110,8 @@ public Q_SLOTS:
     void rotate(bool flip);
     void onRotationFinished();
 
+    void toggleRotations();
+
 protected:
     void applyRenderer(QSvgRenderer &renderer, int pieceSize);
 
@@ -138,6 +140,8 @@ protected:
 
     // Fade out the ghost piece ... somehow, QPropertyAnimations did not work
     QTimeLine *ghostFadeOutTimer;
+
+    bool enableRotations;
 };
 
 } // namespace Miniature

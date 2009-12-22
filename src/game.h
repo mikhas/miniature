@@ -60,6 +60,8 @@ public Q_SLOTS:
     void nextMove();
     void jumpToEnd();
 
+    void onPieceRotationsToggled();
+
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
      * specifies an invalid position then the current position is unchanged.
@@ -81,6 +83,7 @@ Q_SIGNALS:
     void flipBoard();
     void turnOfTopPlayer();
     void turnOfBottomPlayer();
+    void togglePieceRotations();
 
 private:
     void cleanupTransitionData();

@@ -52,6 +52,9 @@ MMainWindow::MMainWindow()
     connect(m_ui.jump_to_end, SIGNAL(triggered()),
             m_game, SLOT(jumpToEnd()));
 
+    connect(m_ui.toggle_piece_rotations, SIGNAL(triggered()),
+            m_game, SLOT(onPieceRotationsToggled()));
+
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
 

@@ -117,6 +117,7 @@
     <addaction name="new_game"/>
     <addaction name="next_move"/>
     <addaction name="prev_move"/>
+    <addaction name="toggle_piece_rotations"/>
     <addaction name="toggle_debug_output"/>
    </widget>
    <widget class="QMenu" name="help">
@@ -180,6 +181,11 @@
   <action name="jump_to_end">
    <property name="text">
     <string>Jump to end of game</string>
+   </property>
+  </action>
+  <action name="toggle_piece_rotations">
+   <property name="text">
+    <string>Toggle piece rotations</string>
    </property>
   </action>
  </widget>
