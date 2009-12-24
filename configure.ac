@@ -17,7 +17,7 @@ AC_LANG([C++])
 # phonon and xmlpatterns are webkit dependencies,
 # and we want the configure check to complain when they are missing.
 # TODO: how to remove the opengl dependency when configured without opengl?
-AT_WITH_QT([core dbus gui network svg webkit phonon xmlpatterns, opengl],[no_keywords])
+AT_WITH_QT([core dbus gui network svg webkit phonon xmlpatterns opengl],[no_keywords])
 AT_REQUIRE_QT_VERSION([4.6])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
