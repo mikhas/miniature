@@ -58,10 +58,15 @@ public:
 
     void hidePieces();
 
+    // Takes ownership and connects propagated signals.
+    void addPiece(MPiece *const piece);
+
 Q_SIGNALS:
     void pieceClicked(MPiece *piece);
     void targetClicked(const QPoint &cell);
-    void undoMoveRequest();
+    void rotatePieces180();
+    void rotatePieces0();
+    void togglePieceRotations();
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);

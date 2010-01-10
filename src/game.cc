@@ -30,14 +30,13 @@
 
 using namespace Miniature;
 
+
 MGame::MGame(MBoardView *view, QObject *parent)
 : QObject(parent),
   m_view(view),
   m_board_item(0),
-  m_half_move(-1),
-  m_trans_captured_piece(0),
-  m_selected_piece(0),
-  m_logic_analyzer(0),
+  m_half_move_index(-1),
+  m_trans_half_move(MPosition()),
   m_is_bottom_player_white(true)
 {
     Q_ASSERT(m_view);
@@ -47,10 +46,6 @@ MGame::MGame(MBoardView *view, QObject *parent)
             this, SLOT(onMoveConfirmed()));
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
-    connect(&m_top_action_area, SIGNAL(pieceSelectionCancelled()),
-            this, SLOT(onPieceSelectionCancelled()));
-    connect(&m_bottom_action_area, SIGNAL(pieceSelectionCancelled()),
-            this, SLOT(onPieceSelectionCancelled()));
 
     m_view->setTopActionArea(m_top_action_area.getProxyWidget());
     m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
@@ -93,23 +88,34 @@ void MGame::setupBoardItem()
             this, SLOT(onPieceClicked(MPiece *)));
     connect(m_board_item, SIGNAL(targetClicked(QPoint)),
             this, SLOT(onTargetClicked(QPoint)));
-    connect(m_board_item, SIGNAL(undoMoveRequest()),
-            this, SLOT(onUndoMoveRequested()));
+
+    // connecting signals to signals (which act as if a slot would re-emit
+    // them) is a nice feature
+    connect(this, SIGNAL(turnOfTopPlayer()),
+            m_board_item, SIGNAL(rotatePieces180()));
+
+    connect(this, SIGNAL(turnOfBottomPlayer()),
+            m_board_item, SIGNAL(rotatePieces0()));
+
+    connect(this, SIGNAL(togglePieceRotations()),
+            m_board_item, SIGNAL(togglePieceRotations()));
 }
 
-void MGame::cleanupTransitionData()
+void MGame::addPieceToPositionAt(MPiece *const piece, MPosition *const position, const QPoint &target)
 {
-    deSelectPiece();
-    m_trans_position = MPosition();
-    m_trans_captured_piece = 0;
+    Q_CHECK_PTR(m_board_item);
+    Q_CHECK_PTR(piece);
+    Q_CHECK_PTR(position);
+
+    // Does not take ownership of the piece!
+    position->addPieceAt(piece, target);
+
+    // Does take ownership of the piece.
+    m_board_item->addPiece(piece);
 }
 
 void MGame::newGame()
 {
-    cleanupTransitionData();
-
-    m_game.clear();
-    m_game = MPositionList();
     setupBoardItem();
     setupStartPosition();
 
@@ -118,40 +124,32 @@ void MGame::newGame()
 
 void MGame::jumpToStart()
 {
-    cleanupTransitionData();
     setPositionTo(0);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::prevMove()
 {
-    cleanupTransitionData();
-    setPositionTo(m_half_move - 1);
+    setPositionTo(m_half_move_index - 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::nextMove()
 {
-    cleanupTransitionData();
-    setPositionTo(m_half_move + 1);
+    setPositionTo(m_half_move_index + 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToEnd()
 {
-    cleanupTransitionData();
     setPositionTo(m_game.size() - 1);
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
-}
-
-void MGame::onPieceRotationsToggled()
-{
-    Q_EMIT togglePieceRotations();
 }
 
 void MGame::setupStartPosition()
 {
     m_game.clear();
+    m_game = MPositionList();
     Q_ASSERT(m_game.empty());
 
     MPosition pos;
@@ -187,33 +185,10 @@ void MGame::setupStartPosition()
     pos.updatePieces();
 
     m_game.append(pos);
-    m_half_move = 0;
+    m_half_move_index = 0;
+    m_trans_half_move = mHalfMove(pos);
 
     Q_ASSERT(!m_game.empty());
-}
-
-void MGame::addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell)
-{
-    Q_CHECK_PTR(m_board_item);
-    Q_CHECK_PTR(piece);
-    Q_CHECK_PTR(pos);
-
-    // Does not take ownership of the piece!
-    pos->addPieceAt(piece, cell);
-
-    piece->show();
-    // Assign ownership to m_board_item.
-    piece->setParentItem(m_board_item);
-
-    // Enable rotation for this piece.
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            piece, SLOT(rotate180()));
-
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            piece, SLOT(rotate0()));
-
-    connect(this, SIGNAL(togglePieceRotations()),
-            piece, SLOT(toggleRotations()));
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -227,12 +202,12 @@ void MGame::setPositionTo(int half_move)
 
     if (isValidPosition(half_move))
     {
-        cleanupTransitionData();
-        m_half_move = half_move;
-        MPosition pos = m_game[m_half_move];
+        m_half_move_index = half_move;
+        MPosition pos = m_game[m_half_move_index];
 
         m_board_item->hidePieces();
         pos.updatePieces();
+        m_trans_half_move = mHalfMove(pos);
         updatePlayerStatus(pos);
     }
 }
@@ -273,44 +248,7 @@ bool MGame::isTurnOfTopPlayer() const
 
 bool MGame::isTurnOfBottomPlayer() const
 {
-    return (m_half_move % 2 == (m_is_bottom_player_white ? 0 : 1));
-}
-
-void MGame::undoTransitionalMove()
-{
-    if (m_selected_piece)
-    {
-        m_selected_piece->moveTo(m_selected_piece->mapFromCell(m_selected_piece_cell));
-        if (m_trans_captured_piece)
-        {
-            m_trans_captured_piece->show();
-            m_trans_captured_piece = 0;
-        }
-    }
-}
-
-void MGame::deSelectPiece()
-{
-    if (m_selected_piece)
-    {
-        m_selected_piece->deSelect();
-        m_selected_piece->hideGhost();
-
-        m_selected_piece = 0;
-        m_selected_piece_cell = QPoint(-1,-1);
-    }
-}
-
-void MGame::selectPiece(MPiece *piece)
-{
-    if (piece)
-    {
-        undoTransitionalMove();
-        deSelectPiece();
-        m_selected_piece = piece;
-        m_selected_piece->select();
-        m_selected_piece_cell = m_selected_piece->mapToCell();
-    }
+    return (m_half_move_index % 2 == (m_is_bottom_player_white ? 0 : 1));
 }
 
 void MGame::updatePlayerStatus(const MPosition &position)
@@ -338,12 +276,16 @@ void MGame::onPieceClicked(MPiece *piece)
     // If invalid piece was selected => reset selection, purple flashing.
     // Currently, most piece selections are "valid" (because the logic analyzer
     // doesnt know how to handle that yet)
-    Q_ASSERT(isValidPosition(m_half_move));
+    Q_ASSERT(isValidPosition(m_half_move_index));
 
     // Only allow selection if piece has the correct colour.
-    if (piece && piece->getColour() == (m_game[m_half_move]).getColourToMove())
+    MPosition position = m_game[m_half_move_index];
+    if (piece && piece->getColour() == position.getColourToMove())
     {
-        selectPiece(piece);
+        m_trans_half_move.undo();
+        m_trans_half_move = mHalfMove(position);
+        m_trans_half_move.select(piece->mapToCell());
+
         setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
     }
     // Must be an attempt to capture an enemy piece. Let's forward it then!
@@ -355,105 +297,35 @@ void MGame::onPieceClicked(MPiece *piece)
     {
         onTargetClicked(piece->mapToCell());
     }
+
+    // TODO: complain here
 }
 
 void MGame::onTargetClicked(const QPoint &target)
 {
-    // ignore invalid mouse clicks
-    if (!m_selected_piece || !m_selected_piece->isSelected())
+    // Ignores invalid mouse clicks, updates/reset action areas when move was
+    // valid/invalid.
+    if (m_trans_half_move.applyToTarget(target))
     {
-        return;
+        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TARGET_SELECTED, true);
     }
-
-    QPoint origin = m_selected_piece_cell;
-    if (origin == target) // hum, cancel?
+    else
     {
-        onUndoMoveRequested();
-        // Dangerous return statement. Makes the surrounding code more fragile because
-        // this special case is not aware of subtle changes in the following code.
-        return;
+        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
     }
-
-    Q_ASSERT(isValidPosition(m_half_move));
-    MPosition position = MPosition(m_game[m_half_move]);
-
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(&position, origin, target);
-    if (MLogicAnalyzer::VALID & result)
-    {
-        // TODO: clean up the evaluation of the logic analyzer's result. Try to make it a switch stmt at least.
-
-        // Undo any move that was maybe done from the previous m_trans_position,
-        // that is, to "reset" the state.
-        undoTransitionalMove(); // TODO: refine this if moving back is visible to the user ... unlikely
-        m_trans_position = position;
-
-        // TODO: check for capture flag instead.
-        MPiece *maybe_captured = m_trans_position.pieceAt(target);
-        if(maybe_captured)
-        {
-            m_trans_captured_piece = maybe_captured;
-        }
-
-        if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
-        {
-            m_trans_position.setInCheck(true);
-        }
-        setActionAreaStates(MActionArea::NONE, MActionArea::TARGET_SELECTED);
-        m_trans_position.movePiece(origin, target);
-
-        MPiece *piece = m_trans_position.pieceAt(target);
-        piece->showGhostAt(origin);
-
-        if (MLogicAnalyzer::PROMOTION & result)
-        {
-            MPiece *pawn = m_trans_position.pieceAt(target);
-            if (pawn) // actually silly, the surrounding code already makes sure this is true
-            {
-                MPiece::MColour colour = pawn->getColour();
-                addPieceToPositionAt(new MQueen(colour), &m_trans_position, target);
-            }
-        }
-
-        // just example code to visualize check
-        if ((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result)
-        {
-            m_trans_position.setInCheck(true);
-        }
-        else
-        {
-            m_trans_position.setInCheck(false);
-        }
-    }
-
-    sendDebugInfo(QString("origin = (%1, %2), target = (%3, %4), result flags = %5").arg(origin.x())
-                                                                                    .arg(origin.y())
-                                                                                    .arg(target.x())
-                                                                                    .arg(target.y())
-                                                                                    .arg((int)result));
 }
 
 void MGame::onMoveConfirmed()
 {
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
-    m_trans_position.nextColour();
-    ++m_half_move;
-    m_game.insert(m_half_move, m_trans_position);
+    MPosition position = MPosition(m_trans_half_move.getPosition());
+    m_trans_half_move.deSelect();
 
-    m_trans_captured_piece = 0;
+    position.nextColour();
+    ++m_half_move_index;
+    m_game.insert(m_half_move_index, position);
+
     setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
-    updatePlayerStatus(m_trans_position);
-    cleanupTransitionData();
-}
-
-void MGame::onPieceSelectionCancelled()
-{
-    onUndoMoveRequested();
-}
-
-void MGame::onUndoMoveRequested()
-{
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED);
-    undoTransitionalMove();
-    cleanupTransitionData();
+    updatePlayerStatus(position);
 }

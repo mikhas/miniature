@@ -89,3 +89,21 @@ void MGraphicsBoardItem::hidePieces()
         (*iter)->hide();
     }
 }
+
+void MGraphicsBoardItem::addPiece(MPiece *const piece)
+{
+    Q_CHECK_PTR(piece);
+
+    // Enable rotation for this piece.
+    connect(this, SIGNAL(rotatePieces180()),
+            piece, SLOT(rotate180()));
+
+    connect(this, SIGNAL(rotatePieces0()),
+            piece, SLOT(rotate0()));
+
+    connect(this, SIGNAL(togglePieceRotations()),
+            piece, SLOT(toggleRotations()));
+
+    piece->setParentItem(this);
+    piece->show();
+}

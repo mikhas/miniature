@@ -22,7 +22,7 @@
 #define GAME_H__
 
 #include "position.h"
-#include "logic_analyzer.h"
+#include "half_move.h"
 #include "board_view.h"
 #include "action_area.h"
 #include "graphics_board_item.h"
@@ -34,6 +34,7 @@
 
 namespace Miniature
 {
+
 /* This class represents the data structure for a single game. It communicates
  * with the various backends (fics, freechess, chess engines, ...) and is also
  * responsible for sending the current chess position to the board. Therefore,
@@ -60,8 +61,6 @@ public Q_SLOTS:
     void nextMove();
     void jumpToEnd();
 
-    void onPieceRotationsToggled();
-
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
      * specifies an invalid position then the current position is unchanged.
@@ -73,10 +72,7 @@ public Q_SLOTS:
     /* Process user requests coming from the MGraphicsBoardItem or MActionAreas. */
     void onPieceClicked(MPiece *piece);
     void onTargetClicked(const QPoint &cell);
-
     void onMoveConfirmed();
-    void onPieceSelectionCancelled();
-    void onUndoMoveRequested();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
@@ -86,7 +82,6 @@ Q_SIGNALS:
     void togglePieceRotations();
 
 private:
-    void cleanupTransitionData();
     void setupBoardItem();
 
     /* Creates a MPosition with the default chess start position and stores it
@@ -97,7 +92,7 @@ private:
      * position (which wraps it in a shared pointer and therefore, takes (shared)
      * ownership. One piece is shared among all positions of a game.
      */
-    void addPieceToPositionAt(MPiece *piece, MPosition *pos, QPoint cell);
+    void addPieceToPositionAt(MPiece *const piece, MPosition *const position, const QPoint &target);
 
     /* Returns whether the position identified by half_move exists in m_game.
      */
@@ -109,9 +104,6 @@ private:
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
 
-    void undoTransitionalMove();
-    void deSelectPiece();
-    void selectPiece(MPiece *piece);
     void updatePlayerStatus(const MPosition &position);
 
     /* A reference to the board view, we do not take ownership. */
@@ -122,27 +114,17 @@ private:
 
     /* An index to the positions stored in m_game, conceptually each half move
      * is indexed. */
-    int m_half_move;
+    int m_half_move_index;
 
     /* Stores the game history as a list of positions. */
     MPositionList m_game;
 
-    /* Stores the  position used for a transition. After a valid transition was
-     * completed it will be added to the game history. */
-    MPosition m_trans_position;
-
-    /* We need to remember the last captured piece during a turn so we can redraw it on undo. */
-    MPiece *m_trans_captured_piece;
-
-    /* We need to remember the currently selected piece on the board. */
-    MPiece *m_selected_piece;
-
-    /* We also remember *where* the piece was selected. This is not necessarily
-     * the scene position of the piece, as it could have already been moved. */
-    QPoint m_selected_piece_cell;
-
-    /* The logic analyzer belonges to MGame and is used to validates moves and positions. */
-    MLogicAnalyzer m_logic_analyzer;
+    /* Encapsulates all transitional data for a *potential* half move. Remember
+     * that our UI requires a player to confirm moves so the UI needs to be
+     * able to show candidate moves that will never be part of the game
+     * history. MGame takes ownership. */
+    // TODO: I *think* this one got auto_ptr semantics, all this delete/assign 0 stuff.
+    mHalfMove m_trans_half_move;
 
     /* TODO: remove the silly assumption that white = bottom, black = top */
     /* Each player has an action area outside of the board, the local player is
