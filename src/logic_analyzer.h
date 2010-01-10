@@ -35,6 +35,9 @@ typedef int MConstraintList;
 class MLogicAnalyzer
 {
 public:
+    typedef QList<QPoint> mCellList;
+    typedef QListIterator<QPoint> mCellListIter;
+
     enum mMoveState
     {
         INVALID_MOVE = 0x000,
@@ -64,6 +67,7 @@ private:
     MConstraintList m_constraints;
 
     bool cellUnderAttack(const MPosition &position, const QPoint &origin, MPiece::MColour colour) const;
+    bool isPieceInList(const MPosition &position, const MPiece& piece, const mCellList &list) const;
     bool moveResultsInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const;
     bool nextPlayerInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const;
     bool inCheck(const MPosition &position) const;

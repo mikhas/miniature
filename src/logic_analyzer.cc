@@ -65,7 +65,7 @@ MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position
 
     // This switch should be rewritten using polymorphism. Each piece should
     // know its list of contraints, IMO.
-    QList<QPoint> list = piece->getPossibleSquares(origin);
+    mCellList list = piece->getPossibleSquares(origin);
     switch(piece->getType())
     {
         case MPiece::ROOK:
@@ -146,356 +146,88 @@ MLogicAnalyzer::mPositionFlags MLogicAnalyzer::verifyPosition(MPosition * const 
     return flags;
 }
 
-bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, const QPoint &cell, MPiece::MColour colour) const
+bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &cell, MPiece::MColour colour) const
 {
-    // north
-    int i = 1;
-    while (cell.y() - i >= 0)
+    MPiece::MColour oppositeColor = ((colour == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE);
+
+    /* The idea is to make a reverse search, starting from cell. First, look
+     * whether a piece could reach the cell by *pretending we'd want to move that
+     * piece somewhere, starting *from* cell. Then, we look whether the constrained
+     * list contains a piece of that type.
+     */
+
     {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x(), cell.y() - i));
+        // Attacked by a queen?
+        MQueen piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConStraight(position, list, cell);
+        list = applyConDiagonal(position, list, cell);
 
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            ++i;
-        }
-    }
-
-    // north-east
-    i = 1;
-    while ((cell.y() - i >= 0) && (cell.x() + i < 8))
-    {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() - i));
-
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            if ((currType == MPiece::PAWN) && (i == 1))
-            {
-                if (colour == MPiece::WHITE)
-                {
-                    return true;
-                }
-            }
-            ++i;
-        }
-    }
-
-    // east
-    i = 1;
-    while (cell.x() + i < 8)
-    {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y()));
-
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            ++i;
-        }
-    }
-
-    // south-east
-    i = 1;
-    while ((cell.y() + i < 8) && (cell.x() + i < 8))
-    {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() + i, cell.y() + i));
-
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            if ((currType == MPiece::PAWN) && (i == 1))
-            {
-                if (colour == MPiece::BLACK)
-                {
-                    return true;
-                }
-            }
-            ++i;
-        }
-    }
-
-    // south
-    i = 1;
-    while (cell.y() + i < 8)
-    {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x(), cell.y() + i));
-
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            ++i;
-        }
-    }
-
-    // south-west
-    i = 1;
-    while ((cell.y() + i < 8) && (cell.x() - i >= 0))
-    {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() + i));
-
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
+        if (isPieceInList(position, piece, list))
             return true;
-        }
     }
 
-    // west
-    i = 1;
-    while (cell.x() - i >= 0)
     {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y()));
+        // Attacked by a rook?
+        MRook piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConStraight(position, list, cell);
 
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::ROOK) || (currType == MPiece::QUEEN))
-            {
-                MPiece::MType currType = piece->getType();
-                if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
-                {
-                    return true;
-                }
-                if ((currType == MPiece::PAWN) && (i == 1))
-                {
-                    if (colour == MPiece::BLACK)
-                    {
-                        return true;
-                    }
-                }
-                ++i;
-            }
-            ++i;
-        }
+        if (isPieceInList(position, piece, list))
+            return true;
     }
 
-    // north-west
-    i = 1;
-    while ((cell.y() - i >= 0) && (cell.x() - i >= 0))
     {
-        MPiece *piece = pos.pieceAt(QPoint(cell.x() - i, cell.y() - i));
+        // Attacked by a bishop?
+        MBishop piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConDiagonal(position, list, cell);
 
-        if (!piece)
-        {
-            ++i;
-            continue;
-        }
-        else if (colour == piece->getColour())
-        {
-            break;
-        }
-        else
-        {
-            MPiece::MType currType = piece->getType();
-            if ((currType == MPiece::BISHOP) || (currType == MPiece::QUEEN))
-            {
-                return true;
-            }
-            if ((currType == MPiece::PAWN) && (i == 1))
-            {
-                if (colour == MPiece::WHITE)
-                {
-                    return true;
-                }
-            }
-            ++i;
-        }
+        if (isPieceInList(position, piece, list))
+            return true;
     }
 
-    // knights
-    // north
-    if (cell.y() - 2 >= 0)
     {
-        if (cell.x() - 1 >= 0)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() - 2));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-        else if (cell.x() + 1 < 8)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() - 2));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
+        // Attacked by a knight?
+        MKnight piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConKnight(position, list, cell);
+
+        if (isPieceInList(position, piece, list))
+            return true;
     }
 
-    // east
-    if (cell.x() + 2 < 8)
     {
-        if (cell.y() - 1 >= 0)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() - 1));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-        else if (cell.y() + 1 < 8)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 2, cell.y() + 1));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-    }
+        // Attacked by a pawn?
+        MPawn piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConPawnBaseline(position, list, cell);
+        list = applyConPawnObstacle(position, list, cell);
+        list = applyConPawnCapture(position, list, cell);
 
-    // south
-    if (cell.y() + 2 < 8)
-    {
-        if (cell.x() - 1 >= 0)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 1, cell.y() + 2));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-        else if (cell.x() + 1 < 8)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() + 1, cell.y() + 2));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-    }
-
-    // west
-    if (cell.x() - 2 >= 0)
-    {
-        if (cell.y() - 1 >= 0)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() - 1));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
-        else if (cell.y() + 1 < 8)
-        {
-            MPiece *piece = pos.pieceAt(QPoint(cell.x() - 2, cell.y() + 1));
-            if (piece)
-            {
-                if ((piece->getType() == MPiece::KNIGHT) && (piece->getColour() != colour))
-                {
-                    return true;
-                }
-            }
-        }
+        if (isPieceInList(position, piece, list))
+            return true;
     }
 
     return false;
 }
 
+bool MLogicAnalyzer::isPieceInList(const MPosition &position, const MPiece& piece, const mCellList &list) const
+{
+    mCellListIter iter(list);
+    while (iter.hasNext())
+    {
+        MPiece *foundPiece = position.pieceAt(iter.next());
+        if (foundPiece &&
+            piece.getType() == foundPiece->getType() &&
+            piece.getColour() == foundPiece->getColour())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 bool MLogicAnalyzer::moveCheckUndo(const MPosition &position, const QPoint &origin, const QPoint &target, MPiece::MColour colour) const
 {
@@ -527,11 +259,11 @@ bool MLogicAnalyzer::inCheck(const MPosition &position) const
     return cellUnderAttack(position, position.getKing(colour), colour);
 }
 
-QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKnight(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     MPiece *piece = pos.pieceAt(from);
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
 
     MPiece::MColour currColour = MPiece::WHITE;
     if (piece)
@@ -539,7 +271,7 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
         currColour = piece->getColour();
     }
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -560,7 +292,7 @@ QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<Q
 }
 
 
-QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConStraight(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     int xMax = 7;
     int xMin = 0;
@@ -569,14 +301,14 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
 
     MPiece *piece = pos.pieceAt(from);
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
     if (piece)
     {
         currColour = piece->getColour();
     }
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -627,7 +359,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
         }
     }
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -660,7 +392,7 @@ QList<QPoint> MLogicAnalyzer::applyConStraight(const MPosition &pos, const QList
     return newMoveList;
 }
 
-QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     /* moveList is supposed to contain only legal moves on an empty board and is supposed to be sorted. Sort order
      * should be:
@@ -675,14 +407,14 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
 
     MPiece *piece = pos.pieceAt(from);
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
     if (piece)
     {
         currColour = piece->getColour();
     }
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -778,12 +510,12 @@ QList<QPoint> MLogicAnalyzer::applyConDiagonal(const MPosition &pos, const QList
     return newMoveList;
 }
 
-QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKing(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     MPiece *piece = pos.pieceAt(from);
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -810,7 +542,7 @@ QList<QPoint> MLogicAnalyzer::applyConKing(const MPosition &pos, const QList<QPo
     return newMoveList;
 }
 
-QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     MPiece *piece = pos.pieceAt(from);
     MPiece::MColour currColour = MPiece::WHITE;
@@ -818,9 +550,9 @@ QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QLi
     {
        currColour = piece->getColour();
     }
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -896,18 +628,18 @@ QList<QPoint> MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const QLi
     return newMoveList;
 }
 
-QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     MPiece *piece = pos.pieceAt(from);
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
     if (piece)
     {
         currColour = piece->getColour();
     }
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -949,14 +681,14 @@ QList<QPoint> MLogicAnalyzer::applyConPawnBaseline(const MPosition &pos, const Q
 }
 
 
-QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     // moveList is supposed to be sorted in a way that the one-step move comes before the two-step move if there's any.
     bool obstacle = false;
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
@@ -988,11 +720,12 @@ QList<QPoint> MLogicAnalyzer::applyConPawnObstacle(const MPosition &pos, const Q
 
     return newMoveList;
 }
-QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
+
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const mCellList &moveList, QPoint from) const
 {
     MPiece *piece = pos.pieceAt(from);
 
-    QList<QPoint> newMoveList;
+    mCellList newMoveList;
     MPiece::MColour currColour = MPiece::WHITE;
     if (piece)
     {
@@ -1000,7 +733,7 @@ QList<QPoint> MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const QL
     }
 
 
-    for(QList<QPoint>::const_iterator iter = moveList.begin();
+    for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
         ++iter)
     {
