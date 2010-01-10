@@ -52,16 +52,14 @@ public:
 // QSharedDataPointer. Reasoning: QSharedData uses copy ctors. Much better than
 // to declare MPosition a "value type".
 
-// TODO: kill off FEN support needed for pieces pool manager
 class MPosition
 {
 public:
+    typedef QVector<MPiece*> MPieces;
+
     // construct empty position
     explicit MPosition(int width = 8, int height = 8, int cell_size = 60);
-
     ~MPosition();
-
-    typedef QVector<MPiece*> MPieces;
 
     QString mapToString(const QPoint &cell) const;
 
@@ -108,10 +106,13 @@ public:
     bool canWhiteCastleKingside() const;
     bool canBlackCastleQueenside() const;
     bool canBlackCastleKingside() const;
-    //RReturns whether the currently moving side is in check.
+    // Returns whether the currently moving side is in check.
     bool inCheck() const;
-
     void setInCheck(bool check);
+
+    // A position is invalid if one of the two kings is located in an invalid
+    // cell (-1,-1) - see m_invalid_target.
+    bool isValid() const;
 
 private:
     QString getDefaultStartPosition() const;
@@ -130,6 +131,8 @@ private:
     MPiece::MColour m_colour_to_move;
     MPieces m_position;
     QString m_move_notation;
+
+    static const QPoint m_invalid_target;
 };
 
 } // namespace Miniature

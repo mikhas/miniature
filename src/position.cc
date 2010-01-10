@@ -40,11 +40,13 @@ bool mStorage::empty() const
 }
 
 // MPosition impl
+const QPoint MPosition::m_invalid_target = QPoint(-1, -1);
+
 MPosition::MPosition(int width, int height, int /*cell_size*/)
 : m_width(width),
   m_height(height),
-  m_white_king(-1, -1),
-  m_black_king(-1, -1),
+  m_white_king(m_invalid_target),
+  m_black_king(m_invalid_target),
   m_white_qs_castle(true),
   m_white_ks_castle(true),
   m_black_qs_castle(true),
@@ -62,6 +64,8 @@ MPosition::~MPosition()
 
 void MPosition::movePiece(const QPoint &origin, const QPoint &target)
 {
+    Q_ASSERT(*this != MPosition::invalid);
+
     mStorage origin_storage = store(origin);
 
     QChar letter = QChar(origin_storage.empty() ? ' ' : origin_storage.piece->getLetter());
@@ -325,4 +329,9 @@ bool MPosition::inCheck() const
 void MPosition::setInCheck(bool check)
 {
     m_in_check = check;
+}
+
+bool MPosition::isValid() const
+{
+    return (m_white_king != m_invalid_target) && (m_black_king != m_invalid_target);
 }
