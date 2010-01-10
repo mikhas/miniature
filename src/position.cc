@@ -62,16 +62,14 @@ MPosition::~MPosition()
     reset();
 }
 
-void MPosition::movePiece(const QPoint &origin, const QPoint &target)
+MPiece * MPosition::movePiece(const QPoint &origin, const QPoint &target)
 {
     Q_ASSERT(*this != MPosition::invalid);
 
     mStorage origin_storage = store(origin);
+    MPiece *piece = origin_storage.piece;
 
-    QChar letter = QChar(origin_storage.empty() ? ' ' : origin_storage.piece->getLetter());
-
-    // update position in QGraphicsView
-    origin_storage.piece->moveTo(QPoint(target.x() * 60, target.y() * 60)); // TODO: replace magic numbers!
+    Q_CHECK_PTR(piece);
 
     // move piece by updating the index to the index of origin, then restore it to target
     origin_storage.index = indexFromPoint(target);
@@ -92,6 +90,8 @@ void MPosition::movePiece(const QPoint &origin, const QPoint &target)
             rookMoved(colour, origin);
         }
     }
+
+    return piece;
 }
 
 MPiece * MPosition::pieceAt(const QPoint &cell) const
@@ -135,13 +135,7 @@ QString MPosition::mapToString(const QPoint &cell) const
 mStorage MPosition::store(const QPoint &cell)
 {
     const int index = indexFromPoint(cell);
-
     mStorage storage = mStorage(index, m_position[index]);
-
-    if (!storage.empty())
-    {
-        storage.piece->hide();
-    }
 
     m_position[index] = 0; // remove from position
     return storage;
@@ -187,10 +181,6 @@ void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
 void MPosition::removePieceAt(const QPoint &target)
 {
     mStorage removed = store(target);
-    if(!removed.empty())
-    {
-        removed.piece->hide();
-    }
 }
 
 void MPosition::reset()

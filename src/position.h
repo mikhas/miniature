@@ -81,7 +81,7 @@ public:
     /* Moves a piece and returns the traditional chess notation for a move,
      * e.g., "1. (4,6) to (6,6)" = "1. e4"
      */
-    void movePiece(const QPoint &origin, const QPoint &target);
+    MPiece * movePiece(const QPoint &origin, const QPoint &target);
     MPiece * pieceAt(const QPoint &cell) const;
 
     MPieces::const_iterator begin() const;
