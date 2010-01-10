@@ -283,6 +283,7 @@ void MGame::onPieceClicked(MPiece *piece)
     if (piece && piece->getColour() == position.getColourToMove())
     {
         m_trans_half_move.undo();
+        m_trans_half_move.deSelect();
         m_trans_half_move = mHalfMove(position);
         m_trans_half_move.select(piece->mapToCell());
 

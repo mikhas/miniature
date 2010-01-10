@@ -28,11 +28,8 @@ namespace Miniature
 {
 
 /** This class represents the delta between two MPositions, p and p', whereas
-  * p' can be obtained by applying an instance of MHalfMove on p.  MHalfMove
-  * guarantees that p' is the result of a valid transition, or that p' is null
-  * otherwise. Please be aware that a MHalfMove instance is not bound to a
-  * MPosition. For example, consider the pawn move c2-c4: It can be applied to
-  * many different positions, so MHalfMove behaves similar.
+  * p' can be obtained by applying an instance of mHalfMove on p.  mHalfMove
+  * guarantees that p' is the result of a valid transition.
   *
   * However, the main use case of this class is to provide UNDO of non-trivial
   * moves (capturing, en-passant, castling, promotions, moves from/to checked
@@ -71,9 +68,6 @@ public:
 
 
 private:
-    /* Cleans up transitional data and restores original position. */
-    void rewindPosition();
-
     /* The current position, which can be: a) the one given in the ctor, b) the
      * one after applying the move, c) the one after undoing the move (equal to
      * position in a)) */

@@ -82,6 +82,12 @@ select(const QPoint &origin)
 void mHalfMove::
 deSelect()
 {
+    if (m_promotion)
+    {
+        m_promotion->deSelect();
+        m_promotion = 0;
+    }
+
     if (m_selected_piece)
     {
         m_selected_piece->deSelect();
@@ -103,15 +109,13 @@ apply()
     // With m_selected_piece we also assume that select() was called on it.
     Q_ASSERT(m_selected_piece && isValidOrigin() && isValidTarget());
 
-
+    undo();
     // Let's treat cancelling of a move as a special move that needs no logic check ...
     if (m_origin == m_target)
     {
-        undo();
         return false;
     }
 
-    rewindPosition();
     MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(&m_position, m_origin, m_target);
     if (MLogicAnalyzer::VALID & result)
     {
@@ -130,13 +134,8 @@ apply()
         // logic analyzer forgets to run check checks after promotions!
         if (MLogicAnalyzer::PROMOTION & result)
         {
-            if (m_promotion)
-            {
-                delete m_promotion;
-                m_promotion = 0;
-            }
-
             m_promotion = new MQueen(m_selected_piece->getColour());
+            m_promotion->select();
             m_position.addPieceAt(m_promotion, m_target);
 
             MGraphicsBoardItem *board_item = dynamic_cast<MGraphicsBoardItem *>(m_selected_piece->parentItem());
@@ -161,21 +160,14 @@ undo()
 {
     Q_ASSERT(m_selected_piece && isValidOrigin() && isValidTarget());
 
-    rewindPosition();
-    deSelect();
-}
+    if (m_promotion)
+    {
+        delete m_promotion;
+        m_promotion = 0;
+    }
 
-void mHalfMove::
-rewindPosition()
-{
     if(m_selected_piece)
     {
-        if (m_promotion)
-        {
-            delete m_promotion;
-            m_promotion = 0;
-        }
-
         if (m_captured_piece)
         {
             m_captured_piece->show();
@@ -184,6 +176,7 @@ rewindPosition()
 
         // can be hidden due to promotion
         m_selected_piece->show();
+        m_selected_piece->select();
         m_selected_piece->moveTo(m_selected_piece->mapFromCell(m_origin));
 
         m_position = m_position_origin;
