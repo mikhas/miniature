@@ -53,7 +53,7 @@ MMainWindow::MMainWindow()
             m_game, SLOT(jumpToEnd()));
 
     connect(m_ui.toggle_piece_rotations, SIGNAL(triggered()),
-            m_game, SLOT(onPieceRotationsToggled()));
+            m_game, SIGNAL(togglePieceRotations()));
 
     connect(m_ui.toggle_debug_output, SIGNAL(triggered()),
             this, SLOT(toggleDebugOutput()));
@@ -126,7 +126,6 @@ MDBusAdaptor::MDBusAdaptor(MMainWindow *window)
 
 void MDBusAdaptor::top_application()
 {
-    qDebug() << __func__;
     m_window->activateWindow();
 }
 

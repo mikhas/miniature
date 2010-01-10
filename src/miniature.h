@@ -21,7 +21,6 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
-//#include "miniature.ui.h"
 #include "game.h"
 #include "board_view.h"
 #include "miniature.ui.h"
@@ -55,8 +54,6 @@ private:
 
     /* Our internal game controller */
     Miniature::MGame* m_game;
-
-    enum StackedWidgets {STACKED_BOARD, STACKED_MOVE_LIST};
 };
 
 class MDBusAdaptor
