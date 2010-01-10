@@ -124,6 +124,7 @@ MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position
     if (list.contains(target))
     {
         // check whether the resulting position leaves the player to move in check => invalid move
+        // Why is it that kings can move *into* chess?
         if (!moveResultsInCheck(*position, origin, target))
         {
             flags |= MLogicAnalyzer::VALID_MOVE;
@@ -204,6 +205,16 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
         list = applyConPawnBaseline(position, list, cell);
         list = applyConPawnObstacle(position, list, cell);
         list = applyConPawnCapture(position, list, cell);
+
+        if (isPieceInList(position, piece, list))
+            return true;
+    }
+
+    {
+        // Attacked by a king?
+        MKing piece(oppositeColor);
+        mCellList list = piece.getPossibleSquares(cell);
+        list = applyConKing(position, list, cell);
 
         if (isPieceInList(position, piece, list))
             return true;
