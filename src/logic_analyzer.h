@@ -35,30 +35,40 @@ typedef int MConstraintList;
 class MLogicAnalyzer
 {
 public:
-    enum MState
+    enum mMoveState
     {
-        INVALID   = 0x000,
-        VALID     = 0x001,
-        CHECK     = 0x002,
-        CHECKMATE = 0x004,
-        STALEMATE = 0x008,
-        CAPTURE   = 0x010,
-        PROMOTION = 0x020
+        INVALID_MOVE = 0x000,
+        VALID_MOVE   = 0x001,
+        CAPTURE      = 0x002,
+        PROMOTION    = 0x004
     };
-    typedef QFlags<MState> MStateFlags;
+    typedef QFlags<mMoveState> mMoveFlags;
+
+    enum mPositionState
+    {
+        INVALID_POSITION = 0x000,
+        VALID_POSITION   = 0x001,
+        IN_CHECK         = 0x002,
+        IN_CHECKMATE     = 0x004,
+        IN_STALEMATE     = 0x008,
+    };
+    typedef QFlags<mPositionState> mPositionFlags;
 
     MLogicAnalyzer(const MConstraintList &constraints);
     virtual ~MLogicAnalyzer();
 
-    MStateFlags verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target);
+    mMoveFlags verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target) const;
+    mPositionFlags verifyPosition(MPosition * const position) const;
 
 private:
     MConstraintList m_constraints;
 
-    bool cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::MColour colour) const;
-    bool moveResultsInCheck(MPosition &pos, QPoint from, QPoint to);
-    bool nextPlayerInCheck(MPosition &pos, QPoint from, QPoint to);
-    bool moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour);
+    bool cellUnderAttack(const MPosition &position, const QPoint &origin, MPiece::MColour colour) const;
+    bool moveResultsInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const;
+    bool nextPlayerInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const;
+    bool inCheck(const MPosition &position) const;
+    bool moveCheckUndo(const MPosition &position, const QPoint &origin, const QPoint &target, MPiece::MColour colour) const;
+
     QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
     QList<QPoint> applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;

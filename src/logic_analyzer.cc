@@ -53,9 +53,9 @@ MLogicAnalyzer::MLogicAnalyzer(const MConstraintList &constraints)
 MLogicAnalyzer::~MLogicAnalyzer()
 {}
 
-MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target)
+MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position, const QPoint &origin, const QPoint &target) const
 {
-    MStateFlags flags = MLogicAnalyzer::INVALID;
+    mMoveFlags flags = MLogicAnalyzer::INVALID_MOVE;
 
     MPiece *piece = position->pieceAt(origin);
     if (!piece)
@@ -63,6 +63,8 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition * const positio
         return flags;
     }
 
+    // This switch should be rewritten using polymorphism. Each piece should
+    // know its list of contraints, IMO.
     QList<QPoint> list = piece->getPossibleSquares(origin);
     switch(piece->getType())
     {
@@ -124,20 +126,27 @@ MLogicAnalyzer::MStateFlags MLogicAnalyzer::verifyMove(MPosition * const positio
         // check whether the resulting position leaves the player to move in check => invalid move
         if (!moveResultsInCheck(*position, origin, target))
         {
-            flags |= MLogicAnalyzer::VALID;
-
-            // check whether the resulting position leaves the next player in check => check
-            if (nextPlayerInCheck(*position, origin, target))
-            {
-                flags |= MLogicAnalyzer::CHECK;
-            }
+            flags |= MLogicAnalyzer::VALID_MOVE;
         }
     }
 
     return flags;
 }
 
-bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::MColour colour) const
+MLogicAnalyzer::mPositionFlags MLogicAnalyzer::verifyPosition(MPosition * const position) const
+{
+    mPositionFlags flags = MLogicAnalyzer::INVALID_POSITION;
+
+    // check whether the resulting position leaves the next player in check => check
+    if (inCheck(*position))
+    {
+       flags |= MLogicAnalyzer::IN_CHECK;
+    }
+
+    return flags;
+}
+
+bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, const QPoint &cell, MPiece::MColour colour) const
 {
     // north
     int i = 1;
@@ -488,42 +497,36 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &pos, QPoint cell, MPiece::
 }
 
 
-bool MLogicAnalyzer::moveCheckUndo(MPosition &pos, QPoint from, QPoint to, MPiece::MColour colour)
+bool MLogicAnalyzer::moveCheckUndo(const MPosition &position, const QPoint &origin, const QPoint &target, MPiece::MColour colour) const
 {
-    // move piece
-    mStorage originPiece = pos.store(from);
-    mStorage targetPiece = pos.store(to);
-    int restoreIndex = originPiece.index;
-    originPiece.index = targetPiece.index;
-    pos.restore(&originPiece);
+    MPosition moveCheck = MPosition(position);
+    moveCheck.movePiece(origin, target);
 
-    QPoint king = pos.getKing(colour);
+    QPoint king = moveCheck.getKing(colour);
     std::cout << "king at: " << king.x() << "," << king.y() << std::endl;
 
     // perform check
-    bool ret = cellUnderAttack(pos, king, colour);
-
-    //restore old position
-    mStorage tempPiece = pos.store(to);
-    pos.restore(&targetPiece);
-    tempPiece.index = restoreIndex;
-    pos.restore(&tempPiece);
+    bool ret = cellUnderAttack(moveCheck, king, colour);
 
     return ret;
 }
 
-bool MLogicAnalyzer::moveResultsInCheck(MPosition &pos, QPoint from, QPoint to)
+bool MLogicAnalyzer::moveResultsInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const
 {
-    MPiece::MColour col = pos.getColourToMove();
-
-    return moveCheckUndo(pos, from, to, col);
+    return moveCheckUndo(position, origin, target,
+                         position.getColourToMove());
 }
 
-bool MLogicAnalyzer::nextPlayerInCheck(MPosition &pos, QPoint from, QPoint to)
+bool MLogicAnalyzer::nextPlayerInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const
 {
-    MPiece::MColour col = (pos.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE;
+    return moveCheckUndo(position, origin, target,
+                         ((position.getColourToMove() == MPiece::WHITE) ? MPiece::BLACK : MPiece::WHITE));
+}
 
-    return moveCheckUndo(pos, from, to, col);
+bool MLogicAnalyzer::inCheck(const MPosition &position) const
+{
+    Q_UNUSED(position);
+    return true;
 }
 
 

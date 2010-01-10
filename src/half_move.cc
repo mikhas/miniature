@@ -116,8 +116,8 @@ apply()
         return false;
     }
 
-    MLogicAnalyzer::MStateFlags result = m_logic_analyzer.verifyMove(&m_position, m_origin, m_target);
-    if (MLogicAnalyzer::VALID & result)
+    MLogicAnalyzer::mMoveFlags move_result = m_logic_analyzer.verifyMove(&m_position, m_origin, m_target);
+    if (MLogicAnalyzer::VALID_MOVE & move_result)
     {
 
         // TODO: check for capture flag instead.
@@ -132,7 +132,7 @@ apply()
         m_selected_piece->showGhostAt(m_origin);
 
         // logic analyzer forgets to run check checks after promotions!
-        if (MLogicAnalyzer::PROMOTION & result)
+        if (MLogicAnalyzer::PROMOTION & move_result)
         {
             m_promotion = new MQueen(m_selected_piece->getColour());
             m_promotion->select();
@@ -147,7 +147,8 @@ apply()
             board_item->addPiece(m_promotion);
         }
 
-        m_position.setInCheck((MLogicAnalyzer::CHECK | MLogicAnalyzer::CHECKMATE) & result);
+        MLogicAnalyzer::mPositionFlags position_result = m_logic_analyzer.verifyPosition(&m_position);
+        m_position.setInCheck((MLogicAnalyzer::IN_CHECK | MLogicAnalyzer::IN_CHECKMATE) & position_result);
 
         return true;
     }
