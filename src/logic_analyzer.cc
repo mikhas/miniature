@@ -506,9 +506,7 @@ bool MLogicAnalyzer::moveCheckUndo(const MPosition &position, const QPoint &orig
     std::cout << "king at: " << king.x() << "," << king.y() << std::endl;
 
     // perform check
-    bool ret = cellUnderAttack(moveCheck, king, colour);
-
-    return ret;
+    return cellUnderAttack(moveCheck, king, colour);
 }
 
 bool MLogicAnalyzer::moveResultsInCheck(const MPosition &position, const QPoint &origin, const QPoint &target) const
@@ -525,10 +523,9 @@ bool MLogicAnalyzer::nextPlayerInCheck(const MPosition &position, const QPoint &
 
 bool MLogicAnalyzer::inCheck(const MPosition &position) const
 {
-    Q_UNUSED(position);
-    return true;
+    MPiece::MColour colour = position.getColourToMove();
+    return cellUnderAttack(position, position.getKing(colour), colour);
 }
-
 
 QList<QPoint> MLogicAnalyzer::applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const
 {
