@@ -24,6 +24,8 @@ src_miniature_SOURCES = \
 			src/logic_analyzer.h \
 			src/position.cc \
 			src/position.h \
+			src/half_move.cc \
+			src/half_move.h \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
