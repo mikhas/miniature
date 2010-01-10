@@ -323,7 +323,6 @@ void MGame::onMoveConfirmed()
     MPosition position = MPosition(m_trans_half_move.getPosition());
     m_trans_half_move.deSelect();
 
-    position.nextColour();
     ++m_half_move_index;
     m_game.insert(m_half_move_index, position);
 

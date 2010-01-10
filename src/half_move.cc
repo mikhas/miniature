@@ -147,6 +147,8 @@ apply()
             board_item->addPiece(m_promotion);
         }
 
+        m_position.nextColour();
+
         MLogicAnalyzer::mPositionFlags position_result = m_logic_analyzer.verifyPosition(&m_position);
         m_position.setInCheck((MLogicAnalyzer::IN_CHECK | MLogicAnalyzer::IN_CHECKMATE) & position_result);
 
