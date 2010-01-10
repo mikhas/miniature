@@ -207,7 +207,10 @@ void MGame::setPositionTo(int half_move)
 
         m_board_item->hidePieces();
         pos.updatePieces();
+
+        m_trans_half_move.deSelect();
         m_trans_half_move = mHalfMove(pos);
+
         updatePlayerStatus(pos);
     }
 }
