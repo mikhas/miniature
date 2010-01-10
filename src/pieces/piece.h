@@ -85,6 +85,7 @@ public:
 
     bool isSelected() const;
 
+    static void updatePieceInView(MPiece *piece, const QPoint &target);
     // This method was briefly necessary for a hack because setPos(.) is
     // non-virtual. Now it stays here because its name makes the intend
     // clearer. And perhaps I need a setPos(.) wrapper again at one point

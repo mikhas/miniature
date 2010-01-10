@@ -119,7 +119,6 @@ apply()
     MLogicAnalyzer::mMoveFlags move_result = m_logic_analyzer.verifyMove(&m_position, m_origin, m_target);
     if (MLogicAnalyzer::VALID_MOVE & move_result)
     {
-
         // TODO: check for capture flag instead.
         MPiece *maybe_captured = m_position.pieceAt(m_target);
         if (maybe_captured)
@@ -128,7 +127,7 @@ apply()
             m_captured_piece->hide();
         }
 
-        m_position.movePiece(m_origin, m_target);
+        MPiece::updatePieceInView(m_position.movePiece(m_origin, m_target), m_target);
         m_selected_piece->showGhostAt(m_origin);
 
         // logic analyzer forgets to run check checks after promotions!
@@ -145,6 +144,7 @@ apply()
             }
 
             board_item->addPiece(m_promotion);
+            m_selected_piece->hide();
         }
 
         m_position.nextColour();

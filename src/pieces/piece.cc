@@ -197,6 +197,13 @@ fadeOutGhost(qreal timer_value)
     }
 }
 
+void MPiece::updatePieceInView(MPiece *piece, const QPoint &target)
+{
+    Q_CHECK_PTR(piece);
+
+    piece->moveTo(piece->mapFromCell(target));
+}
+
 void MPiece::
 moveTo(const QPoint &target)
 {
