@@ -74,7 +74,8 @@ public:
 
     /* Takes no ownership of piece! */
     void addPieceAt(MPiece* piece, const QPoint &target);
-    void removePieceAt(const QPoint &target);
+    /* Returns the pointer to the removed piece. */
+    MPiece * removePieceAt(const QPoint &target);
     void reset();
 
     // TODO: add variables for castle options, player-to-move, half-move-counter(?), en-passant options, etc.
@@ -95,6 +96,11 @@ public:
     // Moves all pieces on the scene graph to the cell position that was
     // remembered by the MPosition instance.
     void updatePieces();
+
+    // Returns the pawn's position that can be taken en-passant, or (-1,-1)
+    // (m_invalid_target)
+    QPoint getPawnDoubleMove() const;
+    void setPawnDoubleMove(const QPoint& target);
 
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
@@ -123,6 +129,7 @@ private:
 
     int m_width;
     int m_height;
+    QPoint m_pawn_double_move;
     QPoint m_white_king;
     QPoint m_black_king;
     // TODO: unify all booleans into a bitset?

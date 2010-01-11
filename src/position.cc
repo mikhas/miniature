@@ -32,7 +32,6 @@ mStorage::mStorage(int idx, MPiece *ptr)
 mStorage::~mStorage()
 {
     // No need to delete. MPieces are owned by the MGraphicsBoard instances.
-    piece = 0;
 }
 
 bool mStorage::empty() const
@@ -46,6 +45,7 @@ const QPoint MPosition::m_invalid_target = QPoint(-1, -1);
 MPosition::MPosition(int width, int height, int /*cell_size*/)
 : m_width(width),
   m_height(height),
+  m_pawn_double_move(m_invalid_target),
   m_white_king(m_invalid_target),
   m_black_king(m_invalid_target),
   m_white_qs_castle(true),
@@ -145,10 +145,15 @@ QString MPosition::mapToString(const QPoint &cell) const
 mStorage MPosition::store(const QPoint &cell)
 {
     const int index = indexFromPoint(cell);
-    mStorage storage = mStorage(index, m_position[index]);
 
-    m_position[index] = 0; // remove from position
-    return storage;
+    if (0 <= index && index < m_position.size())
+    {
+        mStorage storage = mStorage(index, m_position[index]);
+        m_position[index] = 0; // remove from position
+        return storage;
+    }
+
+    return mStorage(-1, 0);
 }
 
 void MPosition::restore(mStorage* const storage)
@@ -188,9 +193,10 @@ void MPosition::addPieceAt(MPiece* piece, const QPoint &target)
     }
 }
 
-void MPosition::removePieceAt(const QPoint &target)
+MPiece * MPosition::removePieceAt(const QPoint &target)
 {
     mStorage removed = store(target);
+    return removed.piece;
 }
 
 void MPosition::reset()
@@ -215,6 +221,16 @@ void MPosition::updatePieces()
             piece->show();
         }
     }
+}
+
+QPoint MPosition::getPawnDoubleMove() const
+{
+    return m_pawn_double_move;
+}
+
+void MPosition::setPawnDoubleMove(const QPoint& target)
+{
+    m_pawn_double_move = QPoint(target);
 }
 
 QPoint MPosition::getKing(MPiece::MColour colour) const
@@ -370,6 +386,6 @@ void MPosition::print() const
          }
     }
 
-    cout << "\n----\n\n";
+    cout << "\n" << "pawn double move: (" << m_pawn_double_move.x() << ", " << m_pawn_double_move.y() << ")\n----\n";
     cout.flush();
 }
