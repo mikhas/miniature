@@ -114,6 +114,9 @@ public:
     // cell (-1,-1) - see m_invalid_target.
     bool isValid() const;
 
+    // Print the position, for debugging purposes.
+    void print() const;
+
 private:
     QString getDefaultStartPosition() const;
     void updateKingPosition(MPiece::MColour colour, const QPoint &target);

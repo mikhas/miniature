@@ -19,6 +19,7 @@
  */
 
 #include "position.h"
+#include <QTextStream>
 
 using namespace Miniature;
 
@@ -96,7 +97,16 @@ MPiece * MPosition::movePiece(const QPoint &origin, const QPoint &target)
 
 MPiece * MPosition::pieceAt(const QPoint &cell) const
 {
-    return m_position[indexFromPoint(cell)];
+    // I wanted to avoid this boundaries check, but it is quite reasonable to
+    // expect out-of-boundaries access, especially from the logic
+    // analyzer. (4, -1) for example.
+    const int index = indexFromPoint(cell);
+    if (0 <= index && index < m_position.size())
+    {
+        return m_position[index];
+    }
+
+    return 0;
 }
 
 MPosition::MPieces::const_iterator MPosition::begin() const
@@ -324,4 +334,42 @@ void MPosition::setInCheck(bool check)
 bool MPosition::isValid() const
 {
     return (m_white_king != m_invalid_target) && (m_black_king != m_invalid_target);
+}
+
+void MPosition::print() const
+{
+    QTextStream cout(stdout);
+    int i = 0;
+    for(MPieces::const_iterator iter = m_position.begin();
+        iter != m_position.end();
+        ++iter)
+    {
+         MPiece *piece = *iter;
+         if (piece)
+         {
+             switch(piece->getType())
+             {
+                 case MPiece::PAWN:   cout << (piece->getColour() == MPiece::WHITE ? " P " : " p "); break;
+                 case MPiece::KNIGHT: cout << (piece->getColour() == MPiece::WHITE ? " N " : " n "); break;
+                 case MPiece::ROOK:   cout << (piece->getColour() == MPiece::WHITE ? " R " : " r "); break;
+                 case MPiece::BISHOP: cout << (piece->getColour() == MPiece::WHITE ? " B " : " b "); break;
+                 case MPiece::QUEEN:  cout << (piece->getColour() == MPiece::WHITE ? " Q " : " q "); break;
+                 case MPiece::KING:   cout << (piece->getColour() == MPiece::WHITE ? " K " : " k "); break;
+
+                 default: break;
+             }
+         }
+         else
+         {
+             cout << " . ";
+         }
+
+         if (7 == i++ % 8)
+         {
+             cout << "\n";
+         }
+    }
+
+    cout << "\n----\n\n";
+    cout.flush();
 }
