@@ -40,10 +40,12 @@ public:
 
     enum mMoveState
     {
-        INVALID_MOVE = 0x000,
-        VALID_MOVE   = 0x001,
-        CAPTURE      = 0x002,
-        PROMOTION    = 0x004
+        INVALID_MOVE     = 0x000,
+        VALID_MOVE       = 0x001,
+        CAPTURE          = 0x002,
+        PROMOTION        = 0x004,
+        CASTLE_KINGSIDE  = 0x008,
+        CASTLE_QUEENSIDE = 0x010
     };
     typedef QFlags<mMoveState> mMoveFlags;
 
@@ -73,14 +75,14 @@ private:
     bool inCheck(const MPosition &position) const;
     bool moveCheckUndo(const MPosition &position, const QPoint &origin, const QPoint &target, MPiece::MColour colour) const;
 
-    QList<QPoint> applyConStraight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConDiagonal(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConKnight(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConKing(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConKingCastle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConPawnBaseline(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConPawnObstacle(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
-    QList<QPoint> applyConPawnCapture(const MPosition &pos, const QList<QPoint> &moveList, QPoint from) const;
+    mCellList applyConStraight(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConDiagonal(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConKnight(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConKing(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConKingCastle(const MPosition &pos, const mCellList &moveList, const QPoint &from, mMoveFlags &flags) const;
+    mCellList applyConPawnBaseline(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConPawnObstacle(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConPawnCapture(const MPosition &pos, const mCellList &moveList, QPoint from) const;
 };
 
 }

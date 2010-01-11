@@ -99,7 +99,7 @@ MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position
         {
             // apply king constraint
             list = applyConKing(*position, list, origin);
-            list = applyConKingCastle(*position, list, origin);
+            list = applyConKingCastle(*position, list, origin, flags);
             //flags |= MLogicAnalyzer::KING_MOVED;
         } break;
 
@@ -560,7 +560,10 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKing(const MPosition &pos, con
     return newMoveList;
 }
 
-MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &pos, const mCellList &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &pos,
+                                                             const mCellList &moveList,
+                                                             const QPoint &from,
+                                                             mMoveFlags &flags) const
 {
     MPiece *piece = pos.pieceAt(from);
     MPiece::MColour currColour = MPiece::WHITE;
@@ -590,6 +593,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &po
                         std::cout << "white" << std::endl;
                         if (pos.canWhiteCastleKingside())
                         {
+                            flags |= CASTLE_KINGSIDE;
                             std::cout << "castle kingside" << std::endl;
                             newMoveList.append(cell);
                         }
@@ -599,6 +603,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &po
                         std::cout << "black" << std::endl;
                         if (pos.canBlackCastleKingside())
                         {
+                            flags |= CASTLE_KINGSIDE;
                             std::cout << "castle kingside" << std::endl;
                             newMoveList.append(cell);
                         }
@@ -617,6 +622,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &po
                         std::cout << "white" << std::endl;
                         if (pos.canWhiteCastleQueenside())
                         {
+                            flags |= CASTLE_QUEENSIDE;
                             std::cout << "castle queenside" << std::endl;
                             newMoveList.append(cell);
                         }
@@ -626,6 +632,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConKingCastle(const MPosition &po
                         std::cout << "black" << std::endl;
                         if (pos.canBlackCastleQueenside())
                         {
+                            flags |= CASTLE_QUEENSIDE;
                             std::cout << "castle queenside" << std::endl;
                             newMoveList.append(cell);
                         }

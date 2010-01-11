@@ -147,6 +147,25 @@ apply()
             m_selected_piece->hide();
         }
 
+        // TODO: undo for castling!
+        if (MLogicAnalyzer::CASTLE_KINGSIDE & move_result)
+        {
+            // let the rook jump! it would be cleaner if we stored the rook
+            // position in MPosition, right? Because this hack wont work for chess variants =)
+            QPoint rook_origin = QPoint(7, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
+            QPoint rook_target = QPoint(5, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
+            MPiece::updatePieceInView(m_position.movePiece(rook_origin, rook_target), rook_target);
+        }
+
+        if (MLogicAnalyzer::CASTLE_QUEENSIDE & move_result)
+        {
+            // let the rook jump! it would be cleaner if we stored the rook
+            // position in MPosition, right? Because this hack wont work for chess variants =)
+            QPoint rook_origin = QPoint(0, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
+            QPoint rook_target = QPoint(3, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
+            MPiece::updatePieceInView(m_position.movePiece(rook_origin, rook_target), rook_target);
+        }
+
         m_position.nextColour();
 
         MLogicAnalyzer::mPositionFlags position_result = m_logic_analyzer.verifyPosition(&m_position);
