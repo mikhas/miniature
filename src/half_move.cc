@@ -153,12 +153,6 @@ apply()
             m_selected_piece->hide();
         }
 
-        // mark pawn double moves in position
-        if (MLogicAnalyzer::PAWN_DOUBLEMOVE & move_result)
-        {
-            m_position.setPawnDoubleMove(m_target);
-        }
-
         // capture pawns en-passant - we know this flag means that the current piece is a pawn.
         if ((MLogicAnalyzer::EN_PASSANT_ALLOWED & move_result) &&
             (m_position.getPawnDoubleMove().x() == m_target.x()))
@@ -172,8 +166,17 @@ apply()
             m_en_passant->hide();
         }
 
-        // invalidate last pawn double move, else it would stay in the system
-        m_position.setPawnDoubleMove(QPoint(-1, -1));
+        // mark pawn double moves in position
+        if (MLogicAnalyzer::PAWN_DOUBLEMOVE & move_result)
+        {
+            m_position.setPawnDoubleMove(m_target);
+        }
+        else
+        {
+            // invalidate last pawn double move, else it would stay in the
+            // system, once set.
+            m_position.setPawnDoubleMove(QPoint(-1, -1));
+        }
 
         // TODO: make this generic, a board could be smaller/bigger than that!
         if ((MLogicAnalyzer::CASTLE_KINGSIDE | MLogicAnalyzer::CASTLE_QUEENSIDE) & move_result)
