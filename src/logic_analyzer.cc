@@ -200,11 +200,18 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
 
     {
         // Attacked by a pawn?
+        // The pawn is the only unit that cannot move reversivly, so the
+        // generic approach fails here. Luckily, pawn attacks are dead-simple.
         MPawn piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
-        list = applyConPawnBaseline(position, list, cell);
-        list = applyConPawnObstacle(position, list, cell);
-        list = applyConPawnCapture(position, list, cell);
+        mCellList list;
+        if (MPiece::WHITE == colour)
+        {
+            // can be attacked from {north,south}-west
+            list << QPoint(cell.x() -1, cell.y() + (MPiece::WHITE == colour ? -1 : 1));
+
+            // can be attacked from {south,north}-east
+            list << QPoint(cell.x() +1, cell.y() + (MPiece::WHITE == colour ? -1 : 1));
+        }
 
         if (isPieceInList(position, piece, list))
             return true;
