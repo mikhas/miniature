@@ -123,13 +123,20 @@ MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position
             // apply pawn constraints
             list = applyConPawnBaseline(*position, list, origin);
             list = applyConPawnObstacle(*position, list, origin);
-            list = applyConPawnCapture(*position, list, origin);
+            list = applyConPawnCapture(*position, list, origin, flags);
 
             // check for promotion
             if (target.y() == (piece->getColour() == MPiece::BLACK ? 7 : 0))
             {
                 flags |= MLogicAnalyzer::PROMOTION;
             }
+
+            // check for double move, probably belongs into applyConPawnBaseline?
+            if (2 == qAbs(target.y() - origin.y()))
+            {
+                flags |= MLogicAnalyzer::PAWN_DOUBLEMOVE;
+            }
+
         } break;
 
         default: case MPiece::NONE: break; // nothing to do!
@@ -760,7 +767,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnObstacle(const MPosition &
     return newMoveList;
 }
 
-MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const mCellList &moveList, QPoint from) const
+MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnCapture(const MPosition &pos, const mCellList &moveList, const QPoint &from, mMoveFlags &flags) const
 {
     MPiece *piece = pos.pieceAt(from);
 
@@ -771,6 +778,7 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnCapture(const MPosition &p
         currColour = piece->getColour();
     }
 
+    const QPoint enPassentCapture = pos.getPawnDoubleMove();
 
     for(mCellList::const_iterator iter = moveList.begin();
         iter != moveList.end();
@@ -793,6 +801,19 @@ MLogicAnalyzer::mCellList MLogicAnalyzer::applyConPawnCapture(const MPosition &p
         {
             newMoveList.append(cell);
             //std::cout << "added (" << cell.x() << "," << cell.y() << ")" << std::endl;
+        }
+    }
+
+    // allow capturing "en-passant"
+    if ((enPassentCapture.y() == from.y()) &&
+        (enPassentCapture.x() == (from.x() + 1) || enPassentCapture.x() == (from.x() - 1)))
+    {
+        MPiece *enPassentPawn = pos.pieceAt(enPassentCapture);
+        if (enPassentPawn && currColour != enPassentPawn->getColour())
+        {
+            newMoveList.append(QPoint(enPassentCapture.x(),
+                                      enPassentCapture.y() + ((MPiece::WHITE == currColour) ? -1 : 1)));
+            flags |= EN_PASSANT_ALLOWED;
         }
     }
 

@@ -35,6 +35,7 @@ mHalfMove(const MPosition& position)
   m_selected_piece(0),
   m_rook(0),
   m_rook_origin(QPoint(-1, -1)),
+  m_en_passant(0),
   m_logic_analyzer(0)
 {}
 
@@ -49,6 +50,7 @@ mHalfMove(const MPosition& position, const QPoint &origin, const QPoint &target)
   m_selected_piece(0),
   m_rook(0),
   m_rook_origin(QPoint(-1, -1)),
+  m_en_passant(0),
   m_logic_analyzer(0)
 {
     if(!select(origin))
@@ -134,7 +136,7 @@ apply()
         MPiece::updatePieceInView(m_position.movePiece(m_origin, m_target), m_target);
         m_selected_piece->showGhostAt(m_origin);
 
-        // logic analyzer forgets to run check checks after promotions!
+        // handle promotions
         if (MLogicAnalyzer::PROMOTION & move_result)
         {
             m_promotion = new MQueen(m_selected_piece->getColour());
@@ -149,6 +151,25 @@ apply()
 
             board_item->addPiece(m_promotion);
             m_selected_piece->hide();
+        }
+
+        // mark pawn double moves in position
+        if (MLogicAnalyzer::PAWN_DOUBLEMOVE & move_result)
+        {
+            m_position.setPawnDoubleMove(m_target);
+        }
+
+        // capture pawns en-passant - we know this flag means that the current piece is a pawn.
+        if ((MLogicAnalyzer::EN_PASSANT_ALLOWED & move_result) &&
+            (m_position.getPawnDoubleMove().x() == m_target.x()))
+        {
+            // m_en_passant != m_captured_piece because there can be situations
+            // where a player switches between capturing a piece the normal way
+            // and capturing via en_passant. It's the switching that causes us
+            // to remember m_en_passant separately.
+            m_en_passant = m_position.removePieceAt(m_position.getPawnDoubleMove());
+            Q_CHECK_PTR(m_en_passant); // crash here, not in some library call
+            m_en_passant->hide();
         }
 
         // TODO: make this generic, a board could be smaller/bigger than that!
@@ -211,6 +232,11 @@ undo()
             m_captured_piece = 0;
         }
 
+        if (m_en_passant)
+        {
+            m_en_passant->show();
+            m_en_passant = 0;
+        }
 
         // can be hidden due to promotion
         m_selected_piece->show();

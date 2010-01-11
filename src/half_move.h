@@ -98,6 +98,10 @@ private:
     MPiece *m_rook;
     QPoint m_rook_origin;
 
+    /* We need to remember en-passant captures separately from normal captures. */
+    // TODO: check whether auto_ptr would work here.
+    MPiece *m_en_passant;
+
     /* The logic analyzer validates moves and positions. */
     MLogicAnalyzer m_logic_analyzer;
 };

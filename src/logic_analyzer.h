@@ -47,7 +47,9 @@ public:
         CASTLE_KINGSIDE          = 0x008,
         CASTLE_KINGSIDE_ALLOWED  = 0x010,
         CASTLE_QUEENSIDE         = 0x020,
-        CASTLE_QUEENSIDE_ALLOWED = 0x040
+        CASTLE_QUEENSIDE_ALLOWED = 0x040,
+        PAWN_DOUBLEMOVE          = 0x080,
+        EN_PASSANT_ALLOWED       = 0x100
     };
     typedef QFlags<mMoveState> mMoveFlags;
 
@@ -84,7 +86,7 @@ private:
     mCellList applyConKingCastle(const MPosition &pos, const mCellList &moveList, const QPoint &from, mMoveFlags &flags) const;
     mCellList applyConPawnBaseline(const MPosition &pos, const mCellList &moveList, QPoint from) const;
     mCellList applyConPawnObstacle(const MPosition &pos, const mCellList &moveList, QPoint from) const;
-    mCellList applyConPawnCapture(const MPosition &pos, const mCellList &moveList, QPoint from) const;
+    mCellList applyConPawnCapture(const MPosition &pos, const mCellList &moveList, const QPoint &from, mMoveFlags &flags) const;
 };
 
 }
