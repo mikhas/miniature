@@ -93,6 +93,11 @@ private:
     // TODO: check whether auto_ptr would work here.
     MPiece *m_selected_piece;
 
+    /* We need to remember the rook's position after a castling, else we cannot undo */
+    // TODO: check whether auto_ptr would work here.
+    MPiece *m_rook;
+    QPoint m_rook_origin;
+
     /* The logic analyzer validates moves and positions. */
     MLogicAnalyzer m_logic_analyzer;
 };

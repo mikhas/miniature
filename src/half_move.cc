@@ -33,6 +33,8 @@ mHalfMove(const MPosition& position)
   m_captured_piece(0),
   m_promotion(0),
   m_selected_piece(0),
+  m_rook(0),
+  m_rook_origin(QPoint(-1, -1)),
   m_logic_analyzer(0)
 {}
 
@@ -45,6 +47,8 @@ mHalfMove(const MPosition& position, const QPoint &origin, const QPoint &target)
   m_captured_piece(0),
   m_promotion(0),
   m_selected_piece(0),
+  m_rook(0),
+  m_rook_origin(QPoint(-1, -1)),
   m_logic_analyzer(0)
 {
     if(!select(origin))
@@ -147,23 +151,27 @@ apply()
             m_selected_piece->hide();
         }
 
-        // TODO: undo for castling!
-        if (MLogicAnalyzer::CASTLE_KINGSIDE & move_result)
+        // TODO: make this generic, a board could be smaller/bigger than that!
+        if ((MLogicAnalyzer::CASTLE_KINGSIDE | MLogicAnalyzer::CASTLE_QUEENSIDE) & move_result)
         {
-            // let the rook jump! it would be cleaner if we stored the rook
-            // position in MPosition, right? Because this hack wont work for chess variants =)
-            QPoint rook_origin = QPoint(7, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
-            QPoint rook_target = QPoint(5, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
-            MPiece::updatePieceInView(m_position.movePiece(rook_origin, rook_target), rook_target);
-        }
+            const int rook_rank = (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0);
+            QPoint rook_target;
+            if (MLogicAnalyzer::CASTLE_KINGSIDE & move_result)
+            {
+                // will not work for chess-960
+                m_rook_origin = QPoint(7, rook_rank);
+                rook_target = QPoint(5, rook_rank);
+            }
 
-        if (MLogicAnalyzer::CASTLE_QUEENSIDE & move_result)
-        {
-            // let the rook jump! it would be cleaner if we stored the rook
-            // position in MPosition, right? Because this hack wont work for chess variants =)
-            QPoint rook_origin = QPoint(0, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
-            QPoint rook_target = QPoint(3, (MPiece::WHITE == m_selected_piece->getColour() ? 7 : 0));
-            MPiece::updatePieceInView(m_position.movePiece(rook_origin, rook_target), rook_target);
+            if (MLogicAnalyzer::CASTLE_QUEENSIDE & move_result)
+            {
+                // will not work for chess-960
+                m_rook_origin = QPoint(0, rook_rank);
+                rook_target = QPoint(3, rook_rank);
+            }
+
+            m_rook = m_position.movePiece(m_rook_origin, rook_target);
+            MPiece::updatePieceInView(m_rook, rook_target);
         }
 
         m_position.nextColour();
@@ -188,6 +196,13 @@ undo()
         m_promotion = 0;
     }
 
+    if (m_rook)
+    {
+        m_rook->moveTo(m_rook->mapFromCell(m_rook_origin));
+        m_rook = 0;
+        m_rook_origin = QPoint(-1, -1);
+    }
+
     if(m_selected_piece)
     {
         if (m_captured_piece)
@@ -195,6 +210,7 @@ undo()
             m_captured_piece->show();
             m_captured_piece = 0;
         }
+
 
         // can be hidden due to promotion
         m_selected_piece->show();
