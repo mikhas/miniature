@@ -40,12 +40,14 @@ public:
 
     enum mMoveState
     {
-        INVALID_MOVE     = 0x000,
-        VALID_MOVE       = 0x001,
-        CAPTURE          = 0x002,
-        PROMOTION        = 0x004,
-        CASTLE_KINGSIDE  = 0x008,
-        CASTLE_QUEENSIDE = 0x010
+        INVALID_MOVE             = 0x000,
+        VALID_MOVE               = 0x001,
+        CAPTURE                  = 0x002,
+        PROMOTION                = 0x004,
+        CASTLE_KINGSIDE          = 0x008,
+        CASTLE_KINGSIDE_ALLOWED  = 0x010,
+        CASTLE_QUEENSIDE         = 0x020,
+        CASTLE_QUEENSIDE_ALLOWED = 0x040
     };
     typedef QFlags<mMoveState> mMoveFlags;
 
@@ -55,7 +57,7 @@ public:
         VALID_POSITION   = 0x001,
         IN_CHECK         = 0x002,
         IN_CHECKMATE     = 0x004,
-        IN_STALEMATE     = 0x008,
+        IN_STALEMATE     = 0x008
     };
     typedef QFlags<mPositionState> mPositionFlags;
 
