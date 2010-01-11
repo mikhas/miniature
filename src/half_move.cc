@@ -172,6 +172,9 @@ apply()
             m_en_passant->hide();
         }
 
+        // invalidate last pawn double move, else it would stay in the system
+        m_position.setPawnDoubleMove(QPoint(-1, -1));
+
         // TODO: make this generic, a board could be smaller/bigger than that!
         if ((MLogicAnalyzer::CASTLE_KINGSIDE | MLogicAnalyzer::CASTLE_QUEENSIDE) & move_result)
         {
