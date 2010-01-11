@@ -1,3 +1,15 @@
+miniature (0.1.6-1) unstable; urgency=low
+
+  * Fixes b.m.o bug #7203 - "Game can continue with King being in check by Knight".
+  * Fixes b.m.o bug #7204 - "Pawn won't promote to Queen".
+  * Fixes b.m.o bug #7205 - "Castling doesn't work".
+  * Fixes b.m.o bug #7252 - "Miniature doesn't know about en-passant captures".
+  * Fixes b.m.o bug #7251 - "A Second Queen does not cause check".
+  * Fixes b.m.o bug #7253 - "Check! when there is actually no check".
+  * Fixes b.m.o bug #7255 - "Animations seem to get corrupted over time".
+
+ --
+
 miniature (0.1.5-1) unstable; urgency=low
 
   * Improve animation speed.
