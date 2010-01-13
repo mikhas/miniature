@@ -97,6 +97,9 @@ public:
     QPoint mapToCell() const;
     QPoint mapFromCell(const QPoint &cell) const;
 
+Q_SIGNALS:
+    void pieceClicked(MPiece *piece);
+
 public Q_SLOTS:
     void select();
     void deSelect();
@@ -119,6 +122,10 @@ protected:
     // Initialization of effects is optional.
     virtual void initializeEffects();
     virtual void applyRenderer(QSvgRenderer &renderer, int pieceSize);
+
+    // handle the mousePressEvent directly because Qt fucked up scene event
+    // propagation, yeah!
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
     MColour colour;
     MType type;

@@ -35,9 +35,7 @@ using namespace Miniature;
 MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
 : QGraphicsObject(parent),
   m_board_size(board_size)
-{
-    setFiltersChildEvents(true);
-}
+{}
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
 {}
@@ -51,17 +49,8 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     event->accept();
 
-    QGraphicsItem *clicked_item = (scene()->items(mapToScene(event->pos().x() - 1, event->pos().y() -1, 2, 2)))[0];
-    MPiece *piece = dynamic_cast<MPiece*>(clicked_item);
-    if (piece)
-    {
-        Q_EMIT pieceClicked(piece);
-    }
-    else
-    {
-        Q_EMIT targetClicked(QPoint(floor(event->pos().x() / getCellSize()),
-                                    floor(event->pos().y() / getCellSize())));
-    }
+    Q_EMIT targetClicked(QPoint(floor(event->pos().x() / getCellSize()),
+                                floor(event->pos().y() / getCellSize())));
 }
 
 QRectF MGraphicsBoardItem::boundingRect() const
@@ -93,6 +82,10 @@ void MGraphicsBoardItem::hidePieces()
 void MGraphicsBoardItem::addPiece(MPiece *const piece)
 {
     Q_CHECK_PTR(piece);
+
+    // Qt doesn't even get event propagation right =) But I can help out here!
+    connect(piece, SIGNAL(pieceClicked(MPiece *)),
+            this, SIGNAL(pieceClicked(MPiece *)));
 
     // Enable rotation for this piece.
     connect(this, SIGNAL(rotatePieces180()),

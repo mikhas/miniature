@@ -68,6 +68,9 @@ Q_SIGNALS:
     void rotatePieces0();
     void togglePieceRotations();
 
+public Q_SLOT:
+    void onMouseButtonPressed(QGraphicsSceneMouseEvent *event);
+
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 

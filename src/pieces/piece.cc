@@ -28,6 +28,7 @@
 #include <QTime>
 #include <QGraphicsRotation>
 #include <QGraphicsDropShadowEffect>
+#include <QGraphicsSceneMouseEvent>
 
 namespace Miniature
 {
@@ -309,6 +310,13 @@ void MPiece::
 toggleRotations()
 {
     enableRotations = !enableRotations;
+}
+
+void MPiece::
+mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept();
+    Q_EMIT pieceClicked(this);
 }
 
 } // namespace Miniature
