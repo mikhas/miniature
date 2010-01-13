@@ -63,8 +63,12 @@ public:
     bool apply();
     void undo();
 
+    // Checks integrity of the mHalfMove instance, *not* the stored move!
+    bool isValid() const;
     bool isValidOrigin() const;
     bool isValidTarget() const;
+    // Checks whether the piece at target was already selected.
+    bool isSelected(MPiece *piece) const;
 
 
 private:

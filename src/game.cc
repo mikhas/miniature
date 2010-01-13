@@ -52,6 +52,7 @@ MGame::MGame(MBoardView *view, QObject *parent)
 
     m_top_action_area.setText(QString("qgil"));
     m_bottom_action_area.setText(QString("kore"));
+    setActionAreaStates(MActionArea::NONE, MActionArea::NONE);
 
     // Enable rotation for action areas.
     connect(this, SIGNAL(turnOfTopPlayer()),
@@ -285,19 +286,25 @@ void MGame::onPieceClicked(MPiece *piece)
     MPosition position = m_game[m_half_move_index];
     if (piece && piece->getColour() == position.getColourToMove())
     {
+        const bool was_already_selected = m_trans_half_move.isSelected(piece);
         m_trans_half_move.undo();
         m_trans_half_move.deSelect();
-        m_trans_half_move = mHalfMove(position);
-        m_trans_half_move.select(piece->mapToCell());
 
-        setActionAreaStates(MActionArea::NONE, MActionArea::PIECE_SELECTED);
+        // Don't re-select the same piece - see b.m.o bug #7868.
+        if (!was_already_selected)
+        {
+            m_trans_half_move = mHalfMove(position);
+            m_trans_half_move.select(piece->mapToCell());
+        }
+
+        setActionAreaStates(MActionArea::NONE, MActionArea::TURN_STARTED);
     }
     // Must be an attempt to capture an enemy piece. Let's forward it then!
     // Note: From my current understanding, this is the only case where
     // onTargetClicked is called when target points to a piece. Usually,
     // onTargetClicked is always only called when target points to an empty
     // cell.
-    else if (piece)
+    else if (piece && m_trans_half_move.isValid())
     {
         onTargetClicked(piece->mapToCell());
     }
