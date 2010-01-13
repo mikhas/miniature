@@ -113,9 +113,18 @@ bool mHalfMove::
 apply()
 {
     // With m_selected_piece we also assume that select() was called on it.
-    Q_ASSERT(m_selected_piece && isValidOrigin() && isValidTarget());
+    // TODO: implement a integrity check for mHalfMove instances as a separate
+    // function? Because calling apply() in such a way that it would abort here
+    // is actually a logic bug, as the return value of apply() is meant to
+    // indicate whether for a selected piece, the move could be executed.
+    if (!(m_selected_piece && isValidOrigin() && isValidTarget()))
+    {
+        qWarning("Invalid mHalfMove instance!");
+        return false;
+    }
 
     undo();
+
     // Let's treat cancelling of a move as a special move that needs no logic check ...
     if (m_origin == m_target)
     {
@@ -215,7 +224,6 @@ apply()
 void mHalfMove::
 undo()
 {
-    Q_ASSERT(m_selected_piece && isValidOrigin() && isValidTarget());
 
     if (m_promotion)
     {
@@ -232,6 +240,8 @@ undo()
 
     if(m_selected_piece)
     {
+        Q_ASSERT(isValidOrigin());
+
         if (m_captured_piece)
         {
             m_captured_piece->show();

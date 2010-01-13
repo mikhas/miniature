@@ -65,7 +65,7 @@ MPosition::~MPosition()
 
 MPiece * MPosition::movePiece(const QPoint &origin, const QPoint &target)
 {
-    Q_ASSERT(*this != MPosition::invalid);
+    Q_ASSERT(!m_position.isEmpty()); // very weak assumption
 
     mStorage origin_storage = store(origin);
     MPiece *piece = origin_storage.piece;
