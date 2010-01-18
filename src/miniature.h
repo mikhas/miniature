@@ -23,15 +23,23 @@
 
 #include "game.h"
 #include "board_view.h"
-#include "miniature.ui.h"
-#include "about.ui.h"
 
 #include <QtGui>
 #include <QtDBus>
 
-#define SERVICE_NAME "org.maemo.miniature"
-#define SERVICE_PATH "/org/maemo/miniature"
+class mActions;
+class mDialogs;
 
+
+
+/*! \brief Miniature main view
+ *
+ *  This class represents Miniature's main view. It sets up the basic UI, the
+ *  menu and delegates further control to MGame.
+ *  The ctor implementation is platform-specific and therefore located in
+ *  separate .cc files. Automake is used to decide which file to include for
+ *  the given platform Miniature is compiled for.
+ */
 class MMainWindow
 : public QMainWindow
 {
@@ -41,35 +49,77 @@ public:
     MMainWindow();
     ~MMainWindow();
 
-    virtual void show();
+    /*!
+     *  Common initialization.
+     */
+    void setup();
+
+    /*!
+     *  Initializes the UI, similar to what UIC would do.
+     */
+    void setupUi();
+
+    /*!
+     *  Registers the main view actions in the menu, and connects them.
+     */
+    void registerActions();
+
+    /*!
+     *  Connects the main view actions to the game controller.
+     */
+    void connectActions();
 
 public Q_SLOTS:
-    void appendDebugOutput(QString msg);
+    /*!
+     *  This slot can be used to send debug output to be shown in the main
+     *  view. Useful when not run from a terminal.
+     * @param[in] The debug message.
+     */
+    void appendDebugOutput(const QString &msg);
+
+    /*!
+     *  This slot toggles whether the debug output is shown to the user at all.
+     */
     void toggleDebugOutput();
+
+    /*!
+     *  Shows the about dialog.
+     */
     void showAboutDialog();
 
 private:
-    Ui::MMainWindow m_ui;
-    Ui::AboutDialog m_about_dialog;
-
-    /* Our internal game controller */
-    Miniature::MGame* m_game;
+    Miniature::MGame *m_game;  /*!< The MGame instance, owned by MMainWindow. */
+    Miniature::MBoardView *m_view; /*!< The MBoardView instance, owned by MMainWindow. */
+    mActions *m_actions; /*!< The main actions used in the main view. */
+    mDialogs *m_dialogs; /*!< The dialogs used in the main view. */
+    QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */
 };
 
-class MDBusAdaptor
+/*! \brief D-Bus activation for Miniature
+ *
+ *  On Maemo, applications get started via D-Bus. Also, D-Bus will take care
+ *  that there is always only one application instance running. This class
+ *  provides the required D-Bus interface for Miniature.
+ *
+ *  For non-Maemo platforms the class' implementation will simply do nothing.
+ */
+class QDBusAppActivator
 : public QDBusAbstractAdaptor
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.maemo.miniature")
 
 public:
-    MDBusAdaptor(MMainWindow *window);
+    explicit QDBusAppActivator(MMainWindow *window);
 
 public Q_SLOTS:
+    /*!
+     *  This slot gets called via D-Bus.
+     */
     void top_application();
 
 private:
-    MMainWindow *m_window;
+    MMainWindow *m_window; /*!< A back pointer to the main view. */
 };
 
 #endif // MINIATURE_H__
