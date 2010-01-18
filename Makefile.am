@@ -12,6 +12,9 @@ src_miniature_LDADD = $(QT_LIBS)
 
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \
+			src/main.cc \
+			src/main.h \
+			src/main.moc.cc \
 			data/data.qrc \
 			data/data.qrc.cc \
 			src/board_view.cc \
@@ -32,42 +35,38 @@ src_miniature_SOURCES = \
 			src/action_area.cc \
 			src/action_area.h \
 			src/action_area.moc.cc \
-			src/miniature.cc \
-			src/miniature.h \
-			src/miniature.moc.cc \
 			src/about.ui.h \
 			src/miniature.ui.h \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
 			src/pieces/piece.moc.cc \
+			src/pieces/pawn.h \
+			src/pieces/pawn.cc \
 			src/pieces/rook.h \
 			src/pieces/rook.cc \
 			src/pieces/knight.h \
 			src/pieces/knight.cc \
 			src/pieces/bishop.h \
 			src/pieces/bishop.cc \
-			src/pieces/bishop.moc.cc \
 			src/pieces/queen.h \
 			src/pieces/queen.cc \
-			src/pieces/pawn.h \
-			src/pieces/pawn.cc \
 			src/pieces/king.h \
 			src/pieces/king.cc \
 			$(null)
 
-if IS_MINIATURE_PLATFORM_MAEMO5
+if MINIATURE_PLATFORM_MAEMO5
 src_miniature_SOURCES += \
-			src/platforms/maemo5.cc \
+			src/maemo5/main.cc \
 			$(null)
 else
-if IS_MINIATURE_PLATFORM_MAEMO6
+if MINIATURE_PLATFORM_MAEMO6
 src_miniature_SOURCES += \
-			src/platforms/maemo6.cc \
+			src/maemo5/main.cc \
 			$(null)
 else
 src_miniature_SOURCES += \
-			src/platforms/others.cc \
+			src/generic/main.cc \
 			$(null)
 endif
 endif
@@ -79,11 +78,10 @@ BUILT_SOURCES = \
 		src/game.moc.cc \
 		src/graphics_board_item.moc.cc \
 		src/action_area.moc.cc \
-		src/miniature.moc.cc \
+		src/main.moc.cc \
 		src/miniature.ui.h \
 		src/about.ui.h \
 		src/pieces/piece.moc.cc \
-		src/pieces/bishop.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
