@@ -5,7 +5,7 @@ ACLOCAL_AMFLAGS = -I build
 gamesdir = $(prefix)/games
 games_PROGRAMS = src/miniature
 
-src_miniature_CXXFLAGS = $(QT_CXXFLAGS) -Wall -Werror
+src_miniature_CXXFLAGS = $(QT_CXXFLAGS) -Wall -Werror -I./src
 src_miniature_CPPFLAGS = $(QT_CPPFLAGS)
 src_miniature_LDFLAGS  = $(QT_LDFLAGS)
 src_miniature_LDADD = $(QT_LIBS)
@@ -43,18 +43,34 @@ src_miniature_SOURCES = \
 			src/pieces/piece.moc.cc \
 			src/pieces/rook.h \
 			src/pieces/rook.cc \
- 			src/pieces/knight.h \
- 			src/pieces/knight.cc \
- 			src/pieces/bishop.h \
- 			src/pieces/bishop.cc \
- 			src/pieces/bishop.moc.cc \
- 			src/pieces/queen.h \
- 			src/pieces/queen.cc \
- 			src/pieces/pawn.h \
- 			src/pieces/pawn.cc \
- 			src/pieces/king.h \
- 			src/pieces/king.cc \
+			src/pieces/knight.h \
+			src/pieces/knight.cc \
+			src/pieces/bishop.h \
+			src/pieces/bishop.cc \
+			src/pieces/bishop.moc.cc \
+			src/pieces/queen.h \
+			src/pieces/queen.cc \
+			src/pieces/pawn.h \
+			src/pieces/pawn.cc \
+			src/pieces/king.h \
+			src/pieces/king.cc \
 			$(null)
+
+if IS_MINIATURE_PLATFORM_MAEMO5
+src_miniature_SOURCES += \
+			src/platforms/maemo5.cc \
+			$(null)
+else
+if IS_MINIATURE_PLATFORM_MAEMO6
+src_miniature_SOURCES += \
+			src/platforms/maemo6.cc \
+			$(null)
+else
+src_miniature_SOURCES += \
+			src/platforms/others.cc \
+			$(null)
+endif
+endif
 
 # list moc, uic, qrc files here, so that autrotroll can create them/clean them up
 BUILT_SOURCES = \
