@@ -33,8 +33,6 @@ namespace Miniature
 class MBishop
 : public MPiece
 {
-    Q_OBJECT
-
 public:
     MBishop(MColour colour, int width = 8, int height = 8);
     ~MBishop();
