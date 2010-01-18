@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include <miniature.h>
+#include <main.h>
 #include <about.ui.h>
 
 /*! \brief Container for Miniature main actions.

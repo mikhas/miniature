@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-#include "miniature.h"
+#include <config.h>
+#include <main.h>
 
 MMainWindow::~MMainWindow()
 {}

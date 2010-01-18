@@ -21,8 +21,8 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
-#include "game.h"
-#include "board_view.h"
+#include <game.h>
+#include <board_view.h>
 
 #include <QtGui>
 #include <QtDBus>
