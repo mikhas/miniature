@@ -29,3 +29,6 @@
 !build/autotroll.m4
 !build/autotroll.mk
 
+/docs
+!docs/Doxyfile
+
