@@ -21,8 +21,9 @@
 #ifndef BOARD_VIEW_H__
 #define BOARD_VIEW_H__
 
-#include "position.h"
-#include "graphics_board_item.h"
+#include <position.h>
+#include <graphics_board_item.h>
+#include <dashboard_item.h>
 
 #include <QGraphicsSvgItem>
 #include <QString>
@@ -37,9 +38,10 @@
 
 namespace Miniature
 {
-/* This class represents a board, using QGraphicsItems. Each figure is added as
- * a child to the board itself.
- * The state of this class should not be extended if possible.
+/*! \brief Miniature's scene view
+ *
+ *  This class' intent is to represent a chess board and the necessary UI
+ *  elements for one (P2P, online) or two players (local).
  */
 class MBoardView
 : public QGraphicsView
@@ -50,16 +52,49 @@ public:
     explicit MBoardView(QWidget *parent = 0);
     virtual ~MBoardView();
 
+    /*!
+     *  Overriden from QGraphicsView, performs the extra steps necessary
+     *  (setup of board background mainly).
+     *
+     *  @param[in] scene The scene graph instance to be shown in the view.
+     */
     virtual void setScene(QGraphicsScene* scene);
 
+    /*!
+     *  The board item is a special scene item, as it contains all MPieces and
+     *  is also reponsible for related event propagation. This method also
+     *  positions the the board item.
+     *
+     *  @param[in] item The board item instance.
+     */
     void addBoardItem(MGraphicsBoardItem *item);
 
-    /* Takes ownership of the proxy widget. */
+    /*!
+     *  The top action area is only used for local two-player mode. Its
+     *  elements are controlled by the MGame instance, but MBoardView still
+     *  takes ownership of the given proxy widget.
+     *
+     *  @param[in] proxy_widget The proxy widget for the top player UI.
+     */
     void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
-    /* Takes ownership of the proxy widget. */
+
+    /*!
+     *  The bottom action area is always active. Its elements are controlled by
+     *  the MGame instance, but MBoardView still takes ownership of the given
+     *  proxy widget.
+     *
+     *  @param[in] proxy_widget The proxy widget for the bottom player UI.
+     */
     void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
 
 protected:
+    /*!
+     *  Overriden from QGraphicsView, enables background caching.
+     *
+     *  @param[in] painter The painter used to draw the background.
+     *  @param[in] region The region in which the (partial!) background needs
+     *             to be drawn.
+     */
     virtual void drawBackground(QPainter *painter, const QRectF &region);
 
 private Q_SLOTS:
@@ -71,9 +106,10 @@ private:
     QWebPage* m_background_page;
     QImage* m_background_image;
 
-    // Indicates where to position the board item, and where to draw the board
-    // background.
     const int m_board_item_offset;
+
+    MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item.>*/
+    MDashboardItem *m_bottom_dashboard; /*<The bottom player's dashboard item.>*/
 };
 
 }; // namespace Miniature
