@@ -37,7 +37,7 @@ MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
   m_background_page(new QWebPage),
   m_background_image(0),
-  m_board_item_offset(80)
+  m_board_item_offset(140)
 {
     QGraphicsView::setScene(new QGraphicsScene(this));
 
@@ -103,6 +103,14 @@ void MBoardView::setup()
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
+
+    m_top_dashboard = new MDashboardItem;
+    scene()->addItem(m_top_dashboard);
+    m_top_dashboard->setRotation(180);
+
+    m_bottom_dashboard = new MDashboardItem;
+    scene()->addItem(m_bottom_dashboard);
+    m_bottom_dashboard->setPos(0, 620);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)
@@ -115,16 +123,20 @@ void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
 {
     Q_CHECK_PTR(proxy_widget);
 
+/*
     scene()->addItem(proxy_widget);
     proxy_widget->setPos(QPoint(0, 0));
+*/
 }
 
 void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
 {
     Q_CHECK_PTR(proxy_widget);
 
+/*
     scene()->addItem(proxy_widget);
     proxy_widget->setPos(QPoint(0, m_board_item_offset + 480 + 5));
+*/
 }
 
 void MBoardView::onLoadFinished(bool /*ok*/)
