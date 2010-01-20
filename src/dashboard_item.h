@@ -22,18 +22,55 @@
 #define DASHBOARD_ITEM_H__
 
 #include <QGraphicsObject>
+#include <QGraphicsPixmapItem>
 
 namespace Miniature
 {
 
 class MDashboardItem
-: QGraphicsObject
+: public QGraphicsObject
 {
     Q_OBJECT
 
 public:
     explicit MDashboardItem(QGraphicsItem* parent = 0);
     virtual ~MDashboardItem();
+
+    /*!
+     *  Overriden from QGraphicsItem, sets the effective size of the dashboard,
+     *  effectively.
+     */
+    virtual QRectF boundingRect() const;
+
+    /*!
+     *  Initializes the UI of the dashboard.
+     */
+    void setupUi();
+
+protected:
+
+    /*!
+     *  This item does not paint anything itself (yet).
+     */
+    virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
+
+private:
+    /*!
+     *  We create our own 'buttons' from the Maemo5 media player icons and QGraphicsPixmapItems.
+     */
+    void setupButton(QGraphicsPixmapItem *item, const QPoint &origin, const QPixmap &pixmap);
+
+    /*!
+     *  This method tried to wrap libosso-abook in order to get the avatar from
+     *  a given contact. Sadly, it won't compile with g++ so it probably needs
+     *  to be moved into a gcc-compiled object file of its own.
+     */
+    QPixmap * getContactsAvatar(const QString &nick);
+
+    QGraphicsPixmapItem *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
+    QGraphicsPixmapItem *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
+    QGraphicsPixmapItem *m_take_back; /*!< The 'back' button to ask for taking back a move. */
+    QGraphicsPixmapItem *m_avatar; /*!< The avatar from the contact list. */
 };
 
 } // namespace Miniature
