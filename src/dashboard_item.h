@@ -21,19 +21,60 @@
 #ifndef DASHBOARD_ITEM_H__
 #define DASHBOARD_ITEM_H__
 
-#include <QGraphicsObject>
+#include <QObject>
+#include <QPixmap>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsSceneMouseEvent>
 
 namespace Miniature
 {
 
+class MDashboardButton
+: public QObject, // we emit signals in our event handlers
+  public QGraphicsPixmapItem
+{
+    Q_OBJECT
+
+public:
+    explicit MDashboardButton(const QPixmap& pixmap, QGraphicsItem *item = 0, QObject *parent = 0);
+    virtual ~MDashboardButton();
+
+    /*!
+     *  Draws a circular-shaped background around your button pixmap. Purely
+     *  optional.
+     */
+    void setupButtonBackground();
+
+    /*!
+     *  Let's you change how the background of the button is drawn. Only makes
+     *  sense with transparent pixbufs, I think.
+     */
+    void setBackgroundBrush(const QBrush &brush);
+
+Q_SIGNALS:
+   void pressed();
+   void released();
+
+protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+private:
+    QGraphicsEllipseItem *m_background; /*!< The background item. Usage is
+                                             strictly optional. */
+};
+
+
+/*! This class represents the player's "dashboard", that is, the player's
+ *  controls. It replaces the former mActionAreas.
+ */
 class MDashboardItem
 : public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    explicit MDashboardItem(QGraphicsItem* parent = 0);
+    explicit MDashboardItem(QGraphicsItem *parent = 0);
     virtual ~MDashboardItem();
 
     /*!
@@ -47,6 +88,16 @@ public:
      */
     void setupUi();
 
+Q_SIGNALS:
+    void confirmButtonPressed();
+    void requestButtonPressed();
+    void takebackButtonPressed();
+    void avatarButtonPressed();
+
+public Q_SLOTS:
+    void enableConfirmButton();
+    void disableConfirmButton();
+
 protected:
 
     /*!
@@ -58,7 +109,7 @@ private:
     /*!
      *  We create our own 'buttons' from the Maemo5 media player icons and QGraphicsPixmapItems.
      */
-    void setupButton(QGraphicsPixmapItem *item, const QPoint &origin, const QPixmap &pixmap);
+    MDashboardButton * createButtonWithBackground(const QPoint &origin, const QPixmap &pixmap);
 
     /*!
      *  This method tried to wrap libosso-abook in order to get the avatar from
@@ -67,10 +118,10 @@ private:
      */
     QPixmap * getContactsAvatar(const QString &nick);
 
-    QGraphicsPixmapItem *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
-    QGraphicsPixmapItem *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
-    QGraphicsPixmapItem *m_take_back; /*!< The 'back' button to ask for taking back a move. */
-    QGraphicsPixmapItem *m_avatar; /*!< The avatar from the contact list. */
+    MDashboardButton *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
+    MDashboardButton *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
+    MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */
+    MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
 };
 
 } // namespace Miniature

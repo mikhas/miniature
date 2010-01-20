@@ -37,12 +37,82 @@ namespace {
     const int icon_size = 64;
 }
 
+MDashboardButton::
+MDashboardButton(const QPixmap& pixmap, QGraphicsItem *item, QObject *parent)
+: QObject(parent),
+  QGraphicsPixmapItem(pixmap, item),
+  m_background(0)
+{
+    setEnabled(true); // receive scene events
+}
+
+MDashboardButton::
+~MDashboardButton()
+{}
+
+void MDashboardButton::
+setupButtonBackground()
+{
+    const QRect ellipse_extent = QRect(0,0, icon_size, icon_size);
+    m_background = new QGraphicsEllipseItem(ellipse_extent, this);
+
+    QPen ellipse_border = QPen(Qt::white);
+    ellipse_border.setCosmetic(true);
+
+    m_background->setPen(ellipse_border);
+    m_background->setBrush(QBrush(Qt::transparent));
+    m_background->show();
+    m_background->setEnabled(false);
+    m_background->setFlags(QGraphicsItem::ItemStacksBehindParent);
+
+    QGraphicsBlurEffect *blur = new QGraphicsBlurEffect(this);
+    blur->setBlurRadius(2);
+    m_background->setGraphicsEffect(blur);
+}
+
+void MDashboardButton::
+setBackgroundBrush(const QBrush &brush)
+{
+    if (!m_background)
+        return; // nothing to do!
+
+    m_background->setBrush(brush);
+}
+
+void MDashboardButton::
+mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept(); // stop event propagation
+
+    if (m_background)
+    {
+        const QBrush flash = QBrush(Qt::red);
+        m_background->setBrush(flash);
+    }
+
+    Q_EMIT pressed();
+}
+
+void MDashboardButton::
+mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept(); // stop event propagation
+
+    if (m_background)
+    {
+        const QBrush trans = QBrush(Qt::transparent);
+        m_background->setBrush(trans);
+    }
+
+    Q_EMIT released();
+}
+
 MDashboardItem::
 MDashboardItem(QGraphicsItem *parent)
 : QGraphicsObject(parent),
   m_confirm(0),
   m_request(0),
-  m_take_back(0),
+  m_takeback(0),
   m_avatar(0)
 {
     setEnabled(false);
@@ -62,53 +132,53 @@ setupUi()
     const int centered_width  = (width  - icon_size) * 0.5;
     const int centered_height = (height - icon_size) * 0.5;
 
-    setupButton(m_confirm,
-                QPoint(centered_width, centered_height),
-                QPixmap("/usr/share/themes/alpha/mediaplayer/Play.png"));
+    m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
+                                           QPixmap("/usr/share/themes/alpha/mediaplayer/Play.png"));
 
-    setupButton(m_request,
-                QPoint(width - icon_size - col_right_width, centered_height), // right-aligned
-                QPixmap("/usr/share/themes/alpha/mediaplayer/Stop.png"));
+    // right-aligned
+    m_request = createButtonWithBackground(QPoint(width - icon_size - col_right_width, centered_height),
+                                           QPixmap("/usr/share/themes/alpha/mediaplayer/Stop.png"));
 
-    setupButton(m_take_back,
-                QPoint(col_left_width, centered_height), // left-aligned
-                QPixmap("/usr/share/themes/alpha/mediaplayer/Back.png"));
+    // left-aligned
+    m_takeback = createButtonWithBackground(QPoint(col_left_width, centered_height),
+                                            QPixmap("/usr/share/themes/alpha/mediaplayer/Back.png"));
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
+    QPixmap empty;
     if (avatar)
-        m_avatar = new QGraphicsPixmapItem(*avatar, this);
+        m_avatar = new MDashboardButton(*avatar, this, 0);
     else
-        m_avatar = new QGraphicsPixmapItem(this); // empty
+       m_avatar = new MDashboardButton(empty, this, 0);
 
     m_avatar->setPos(QPoint(0, 0)); // left-aligned
     m_avatar->show();
     m_avatar->setEnabled(true);
+
+    // now that the buttons exist we can connect their signals (or rather, forward them)
+    connect(m_confirm, SIGNAL(pressed()),
+            this, SIGNAL(confirmButtonPressed()));
+
+    connect(m_request, SIGNAL(pressed()),
+            this, SIGNAL(requestButtonPressed()));
+
+    connect(m_takeback, SIGNAL(pressed()),
+            this, SIGNAL(requestButtonPressed()));
+
+    connect(m_avatar, SIGNAL(pressed()),
+            this, SIGNAL(avatarButtonPressed()));
 }
 
-void MDashboardItem::
-setupButton(QGraphicsPixmapItem *item, const QPoint &origin, const QPixmap &pixmap)
+MDashboardButton * MDashboardItem::
+createButtonWithBackground(const QPoint &origin, const QPixmap &pixmap)
 {
-    item = new QGraphicsPixmapItem(pixmap, this);
-    item->setPos(origin);
-    item->show();
-    item->setEnabled(true);
-    item->setTransformationMode(Qt::SmoothTransformation);
+    MDashboardButton *button = new MDashboardButton(pixmap, this, 0);
+    button->setPos(origin);
+    button->show();
+    button->setEnabled(true);
+    button->setTransformationMode(Qt::SmoothTransformation);
+    button->setupButtonBackground();
 
-    const QRect ellipse_extent = QRect(0,0, icon_size, icon_size);
-    QGraphicsEllipseItem *ellipse = new QGraphicsEllipseItem(ellipse_extent, item);
-
-    QPen ellipse_border = QPen(Qt::white);
-    ellipse_border.setCosmetic(true);
-
-    ellipse->setPen(ellipse_border);
-    ellipse->setBrush(QBrush(Qt::transparent));
-    ellipse->show();
-    ellipse->setEnabled(false);
-    ellipse->setFlags(QGraphicsItem::ItemStacksBehindParent);
-
-    QGraphicsBlurEffect *blur = new QGraphicsBlurEffect(this);
-    blur->setBlurRadius(2);
-    ellipse->setGraphicsEffect(blur);
+    return button;
 }
 
 QPixmap * MDashboardItem::
@@ -134,4 +204,22 @@ QRectF MDashboardItem::
 boundingRect() const
 {
     return QRectF(QPoint(0,0), QPoint(width, height));
+}
+
+void MDashboardItem::
+enableConfirmButton()
+{
+    Q_CHECK_PTR(m_confirm);
+
+    m_confirm->setEnabled(true);
+    m_confirm->setBackgroundBrush(QBrush(Qt::green));
+}
+
+void MDashboardItem::
+disableConfirmButton()
+{
+    Q_CHECK_PTR(m_confirm);
+
+    m_confirm->setEnabled(false);
+    m_confirm->setBackgroundBrush(QBrush(Qt::transparent));
 }
