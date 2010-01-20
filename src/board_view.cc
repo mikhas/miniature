@@ -139,6 +139,16 @@ void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
 */
 }
 
+MDashboardItem * MBoardView::getTopDashboardItem() const
+{
+    return m_top_dashboard;
+}
+
+MDashboardItem * MBoardView::getBottomDashboardItem() const
+{
+    return m_bottom_dashboard;
+}
+
 void MBoardView::onLoadFinished(bool /*ok*/)
 {
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());

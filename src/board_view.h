@@ -87,6 +87,16 @@ public:
      */
     void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
 
+    /*!
+     *  Top dashboard item accessor.
+     */
+    MDashboardItem * getTopDashboardItem() const;
+
+    /*!
+     *  Bottom dashboard item accessor.
+     */
+    MDashboardItem * getBottomDashboardItem() const;
+
 protected:
     /*!
      *  Overriden from QGraphicsView, enables background caching.
