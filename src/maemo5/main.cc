@@ -113,7 +113,7 @@ void MMainWindow::setupUi()
 
     QSizePolicy v_expand(QSizePolicy::Preferred, QSizePolicy::Expanding);
     m_view->setSizePolicy(v_expand);
-    m_view->setMinimumSize(QSize(480, 650));
+    m_view->setMinimumSize(QSize(480, 760));
     m_view->setFrameShape(QFrame::NoFrame);
     m_view->setLineWidth(0);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
