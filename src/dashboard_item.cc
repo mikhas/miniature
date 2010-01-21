@@ -150,7 +150,7 @@ setupUi()
     else
        m_avatar = new MDashboardButton(empty, this, 0);
 
-    m_avatar->setPos(QPoint(0, 0)); // left-aligned
+    m_avatar->setPos(QPoint(10, centered_height)); // left-aligned
     m_avatar->show();
     m_avatar->setEnabled(true);
 
@@ -194,7 +194,7 @@ getContactsAvatar(const QString &nick)
     QImage image = QImage(static_cast<const uchar *>(gdk_pixbuf_get_pixels(pixbuf)), 20, 20, QImage::Format_ARGB32);
 */
 
-    pixmap = new QPixmap();
+    pixmap = new QPixmap(":/avatar_mockup.png");
 //    pixmap->fromImage(image);
 
     return pixmap;

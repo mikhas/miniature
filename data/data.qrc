@@ -29,4 +29,7 @@
   <file alias="timer_background.gif">timer_background.gif</file>
   <file alias="blackout.png">blackout.png</file>
 </qresource>
+<qresource>
+  <file alias="avatar_mockup.png">avatar_mockup.png</file>
+</qresource>
 </RCC>
