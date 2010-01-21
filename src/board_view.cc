@@ -105,10 +105,12 @@ void MBoardView::setup()
 #endif
 
     m_top_dashboard = new MDashboardItem;
+    m_top_dashboard->disableConfirmButton();
     scene()->addItem(m_top_dashboard);
     m_top_dashboard->setRotation(180);
 
     m_bottom_dashboard = new MDashboardItem;
+    m_bottom_dashboard->disableConfirmButton();
     scene()->addItem(m_bottom_dashboard);
     m_bottom_dashboard->setPos(0, 620);
 }
