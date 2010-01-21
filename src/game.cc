@@ -253,6 +253,9 @@ void MGame::onPieceClicked(MPiece *piece)
 
 void MGame::onTargetClicked(const QPoint &target)
 {
+    m_view->getTopDashboardItem()->disableConfirmButton();
+    m_view->getBottomDashboardItem()->disableConfirmButton();
+
     // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
     if (m_trans_half_move.applyToTarget(target))
