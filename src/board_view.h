@@ -70,24 +70,6 @@ public:
     void addBoardItem(MGraphicsBoardItem *item);
 
     /*!
-     *  The top action area is only used for local two-player mode. Its
-     *  elements are controlled by the MGame instance, but MBoardView still
-     *  takes ownership of the given proxy widget.
-     *
-     *  @param[in] proxy_widget The proxy widget for the top player UI.
-     */
-    void setTopActionArea(QGraphicsProxyWidget *proxy_widget);
-
-    /*!
-     *  The bottom action area is always active. Its elements are controlled by
-     *  the MGame instance, but MBoardView still takes ownership of the given
-     *  proxy widget.
-     *
-     *  @param[in] proxy_widget The proxy widget for the bottom player UI.
-     */
-    void setBottomActionArea(QGraphicsProxyWidget *proxy_widget);
-
-    /*!
      *  Top dashboard item accessor.
      */
     MDashboardItem * getTopDashboardItem() const;

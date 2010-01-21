@@ -41,34 +41,10 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    // Process state transition requests.
-    connect(&m_top_action_area, SIGNAL(moveConfirmed()),
-            this, SLOT(onMoveConfirmed()));
-    connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
-            this, SLOT(onMoveConfirmed()));
-
     connect(m_view->getTopDashboardItem(), SIGNAL(confirmButtonPressed()),
             this, SLOT(onMoveConfirmed()));
     connect(m_view->getBottomDashboardItem(), SIGNAL(confirmButtonPressed()),
             this, SLOT(onMoveConfirmed()));
-
-    m_view->setTopActionArea(m_top_action_area.getProxyWidget());
-    m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
-
-    m_top_action_area.setText(QString("qgil"));
-    m_bottom_action_area.setText(QString("kore"));
-    setActionAreaStates(MActionArea::NONE, MActionArea::NONE);
-
-    // Enable rotation for action areas.
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            &m_top_action_area, SLOT(rotate180()));
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            &m_bottom_action_area, SLOT(rotate180()));
-
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            &m_top_action_area, SLOT(rotate0()));
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            &m_bottom_action_area, SLOT(rotate0()));
 
     newGame();
 }
@@ -124,32 +100,26 @@ void MGame::newGame()
 {
     setupBoardItem();
     setupStartPosition();
-
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToStart()
 {
     setPositionTo(0);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::prevMove()
 {
     setPositionTo(m_half_move_index - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::nextMove()
 {
     setPositionTo(m_half_move_index + 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToEnd()
 {
     setPositionTo(m_game.size() - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::setupStartPosition()
@@ -219,34 +189,9 @@ void MGame::setPositionTo(int half_move)
 
         updatePlayerStatus(pos);
     }
-}
 
-void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal)
-{
-    // current mapping is white = bottom
-    if (isTurnOfBottomPlayer())
-    {
-        m_top_action_area.setState(s1);
-        m_bottom_action_area.setState(s2);
-
-        if (emit_turn_signal)
-        {
-            Q_EMIT turnOfBottomPlayer();
-        }
-    }
-    else
-    {
-        m_top_action_area.setState(s2);
-        m_bottom_action_area.setState(s1);
-
-        m_top_action_area.rotate(180);
-        m_bottom_action_area.rotate(180);
-
-        if (emit_turn_signal)
-        {
-            Q_EMIT turnOfTopPlayer();
-        }
-    }
+    m_view->getTopDashboardItem()->disableConfirmButton();
+    m_view->getBottomDashboardItem()->disableConfirmButton();
 }
 
 bool MGame::isTurnOfTopPlayer() const
@@ -262,22 +207,10 @@ bool MGame::isTurnOfBottomPlayer() const
 
 void MGame::updatePlayerStatus(const MPosition &position)
 {
+    Q_UNUSED(position);
+
     // assumption: white == bottom ...
-    if (position.inCheck() && MPiece::WHITE == position.getColourToMove())
-    {
-        m_bottom_action_area.setText(QString("kore (check)"));
-        m_top_action_area.setText(QString("qgil"));
-    }
-    else if (position.inCheck() && MPiece::BLACK == position.getColourToMove())
-    {
-        m_bottom_action_area.setText(QString("kore"));
-        m_top_action_area.setText(QString("qgil (check)"));
-    }
-    else
-    {
-        m_bottom_action_area.setText(QString("kore"));
-        m_top_action_area.setText(QString("qgil"));
-    }
+    // TODO: announce checks (killed when I removed MActionAreas)!
 }
 
 void MGame::onPieceClicked(MPiece *piece)
@@ -304,8 +237,6 @@ void MGame::onPieceClicked(MPiece *piece)
             m_trans_half_move = mHalfMove(position);
             m_trans_half_move.select(piece->mapToCell());
         }
-
-        setActionAreaStates(MActionArea::NONE, MActionArea::TURN_STARTED);
     }
     // Must be an attempt to capture an enemy piece. Let's forward it then!
     // Note: From my current understanding, this is the only case where
@@ -322,11 +253,10 @@ void MGame::onPieceClicked(MPiece *piece)
 
 void MGame::onTargetClicked(const QPoint &target)
 {
-    // Ignores invalid mouse clicks, updates/reset action areas when move was
+    // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
     if (m_trans_half_move.applyToTarget(target))
     {
-        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TARGET_SELECTED, true);
         if (isTurnOfBottomPlayer())
         {
             m_view->getBottomDashboardItem()->enableConfirmButton();
@@ -335,11 +265,6 @@ void MGame::onTargetClicked(const QPoint &target)
         {
             m_view->getTopDashboardItem()->enableConfirmButton();
         }
-    }
-    else
-    {
-        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
-
     }
 }
 
@@ -357,6 +282,10 @@ void MGame::onMoveConfirmed()
     ++m_half_move_index;
     m_game.insert(m_half_move_index, position);
 
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
     updatePlayerStatus(position);
+
+    if (isTurnOfBottomPlayer())
+        Q_EMIT turnOfBottomPlayer();
+    else
+        Q_EMIT turnOfTopPlayer();
 }

@@ -121,26 +121,6 @@ void MBoardView::addBoardItem(MGraphicsBoardItem *item)
     item->setPos(QPoint(0, m_board_item_offset));
 }
 
-void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
-{
-    Q_CHECK_PTR(proxy_widget);
-
-/*
-    scene()->addItem(proxy_widget);
-    proxy_widget->setPos(QPoint(0, 0));
-*/
-}
-
-void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
-{
-    Q_CHECK_PTR(proxy_widget);
-
-/*
-    scene()->addItem(proxy_widget);
-    proxy_widget->setPos(QPoint(0, m_board_item_offset + 480 + 5));
-*/
-}
-
 MDashboardItem * MBoardView::getTopDashboardItem() const
 {
     return m_top_dashboard;

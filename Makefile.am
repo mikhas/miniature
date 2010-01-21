@@ -35,9 +35,6 @@ src_miniature_SOURCES = \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
-			src/action_area.cc \
-			src/action_area.h \
-			src/action_area.moc.cc \
 			src/about.ui.h \
 			src/miniature.ui.h \
 			src/pieces.h \
@@ -81,7 +78,6 @@ BUILT_SOURCES = \
 		src/dashboard_item.moc.cc \
 		src/game.moc.cc \
 		src/graphics_board_item.moc.cc \
-		src/action_area.moc.cc \
 		src/main.moc.cc \
 		src/miniature.ui.h \
 		src/about.ui.h \

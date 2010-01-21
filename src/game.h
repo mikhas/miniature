@@ -24,7 +24,6 @@
 #include "position.h"
 #include "half_move.h"
 #include "board_view.h"
-#include "action_area.h"
 #include "graphics_board_item.h"
 
 #include <QList>
@@ -98,9 +97,6 @@ private:
      */
     bool isValidPosition(int half_move) const;
 
-    /* Sets both action area states in one go. */
-    void setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal = false);
-
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
 
@@ -125,12 +121,6 @@ private:
      * history. MGame takes ownership. */
     // TODO: I *think* this one got auto_ptr semantics, all this delete/assign 0 stuff.
     mHalfMove m_trans_half_move;
-
-    /* TODO: remove the silly assumption that white = bottom, black = top */
-    /* Each player has an action area outside of the board, the local player is
-     * always located at the bottom of the board. */
-    MActionArea m_top_action_area;
-    MActionArea m_bottom_action_area;
 
     bool m_is_bottom_player_white;
 };
