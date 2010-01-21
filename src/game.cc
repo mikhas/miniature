@@ -47,6 +47,11 @@ MGame::MGame(MBoardView *view, QObject *parent)
     connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
             this, SLOT(onMoveConfirmed()));
 
+    connect(m_view->getTopDashboardItem(), SIGNAL(confirmButtonPressed()),
+            this, SLOT(onMoveConfirmed()));
+    connect(m_view->getBottomDashboardItem(), SIGNAL(confirmButtonPressed()),
+            this, SLOT(onMoveConfirmed()));
+
     m_view->setTopActionArea(m_top_action_area.getProxyWidget());
     m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
 
@@ -277,6 +282,9 @@ void MGame::updatePlayerStatus(const MPosition &position)
 
 void MGame::onPieceClicked(MPiece *piece)
 {
+    m_view->getTopDashboardItem()->disableConfirmButton();
+    m_view->getBottomDashboardItem()->disableConfirmButton();
+
     // If invalid piece was selected => reset selection, purple flashing.
     // Currently, most piece selections are "valid" (because the logic analyzer
     // doesnt know how to handle that yet)
@@ -319,15 +327,27 @@ void MGame::onTargetClicked(const QPoint &target)
     if (m_trans_half_move.applyToTarget(target))
     {
         setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TARGET_SELECTED, true);
+        if (isTurnOfBottomPlayer())
+        {
+            m_view->getBottomDashboardItem()->enableConfirmButton();
+        }
+        else
+        {
+            m_view->getTopDashboardItem()->enableConfirmButton();
+        }
     }
     else
     {
         setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
+
     }
 }
 
 void MGame::onMoveConfirmed()
 {
+    m_view->getTopDashboardItem()->disableConfirmButton();
+    m_view->getBottomDashboardItem()->disableConfirmButton();
+
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
     MPosition position = MPosition(m_trans_half_move.getPosition());
