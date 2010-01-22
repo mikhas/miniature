@@ -5,9 +5,9 @@ ACLOCAL_AMFLAGS = -I build
 gamesdir = $(prefix)/games
 games_PROGRAMS = src/miniature
 
-src_miniature_CXXFLAGS = $(QT_CXXFLAGS) -Wall -Werror -I./src
+src_miniature_CXXFLAGS = $(QT_CXXFLAGS) -Wall -Werror -I./src $(AM_CXXFLAGS)
 src_miniature_CPPFLAGS = $(QT_CPPFLAGS)
-src_miniature_LDFLAGS  = $(QT_LDFLAGS)
+src_miniature_LDFLAGS  = $(QT_LDFLAGS) $(AM_LDFLAGS)
 src_miniature_LDADD = $(QT_LIBS)
 
 # for each binary, list the sources it depends on, inlucding headers and moc files
@@ -75,6 +75,8 @@ src_miniature_SOURCES = \
 			src/pregame.cc \
 			src/pregame.h \
 			src/pregame.moc.cc \
+			src/telepathy/tpaccountmanager.h \
+			src/telepathy/tpaccountmanager.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5
@@ -110,6 +112,7 @@ BUILT_SOURCES = \
 		src/network_game.moc.cc \
 		src/pieces/piece.moc.cc \
 		src/pregame.moc.cc \
+		src/telepathy/tpaccountmanager.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

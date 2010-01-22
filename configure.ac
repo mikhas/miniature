@@ -14,6 +14,19 @@ PKG_PROG_PKG_CONFIG
 
 AC_LANG([C++])
 
+LIBS="-ltelepathy-qt4 $LIBS"
+
+AC_ARG_WITH([telepathy],
+            [AS_HELP_STRING([--with-telepathy],
+                [try this for a non-standard install prefix of the Telepathy-Qt4 library])],
+            [TELEPATHYQT4PATHSET=1],
+            [TELEPATHYQT4PATHSET=0])
+
+#if test TELEPATHYPATHSET = 1; then
+    AM_CXXFLAGS="$AM_CXXFLAGS -I$with_telepathy/include/telepathy-1.0"
+    AM_LDFLAGS="$AM_LDFLAGS -L$with_telepathy/lib"
+#fi
+
 # phonon and xmlpatterns are webkit dependencies,
 # and we want the configure check to complain when they are missing.
 # TODO: how to remove the opengl dependency when configured without opengl?
@@ -29,6 +42,9 @@ AC_ARG_ENABLE(opengl,
 
 AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
 AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
+AC_SUBST([AM_CXXFLAGS])
+AC_SUBST([AM_LDFLAGS])
+AC_SUBST([LIBS])
 
 if test -z "x$desktopentrydir"; then
   AC_MSG_ERROR([Cannot find desktop entry file folder])
