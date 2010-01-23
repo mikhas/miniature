@@ -77,6 +77,7 @@ src_miniature_SOURCES = \
 			src/pregame.moc.cc \
 			src/telepathy/tpaccountmanager.h \
 			src/telepathy/tpaccountmanager.cc \
+			src/telepathy/tpaccountmanager.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5
