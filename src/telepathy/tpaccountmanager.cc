@@ -33,10 +33,9 @@
 #include <QDebug>
 #include <QString>
 #include <QtGlobal>
-#include <QtMaemo5/QtMaemo5>
+//#include <QtMaemo5/QtMaemo5>
 
-namespace Miniature
-{
+using namespace Miniature;
 
 TpAccountManager::TpAccountManager(QObject *parent)
     : QObject(parent)
@@ -44,7 +43,6 @@ TpAccountManager::TpAccountManager(QObject *parent)
     Tp::registerTypes();
     Tp::enableDebug(true);
     Tp::enableWarnings(true);
-
 }
 
 TpAccountManager::~TpAccountManager()
@@ -63,7 +61,8 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
 
     if(accountList.size() == 0)
     {
-        QMaemo5InformationBox::information(NULL, QString("Can't find valid accounts!"));
+        //QMaemo5InformationBox::information(NULL, QString("Can't find valid accounts!"));
+        qDebug("Can't find valid accounts!");
         return;
     }
 }
@@ -76,8 +75,3 @@ void TpAccountManager::chooseAccount()
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onAMReady(Tp::PendingOperation *)));
 }
-
-#include "tpaccountmanager.moc.cc"
-
-};
-
