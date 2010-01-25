@@ -39,7 +39,7 @@ MBoardView::MBoardView(QWidget *parent)
   m_background_image(0),
   m_board_item_offset(140)
 {
-    QGraphicsView::setScene(new QGraphicsScene(this));
+    QGraphicsView::setScene(new MScene(this));
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
@@ -108,11 +108,13 @@ void MBoardView::setup()
     m_top_dashboard->disableConfirmButton();
     scene()->addItem(m_top_dashboard);
     m_top_dashboard->setRotation(180);
+    m_top_dashboard->setZValue(1);
 
     m_bottom_dashboard = new MDashboardItem;
     m_bottom_dashboard->disableConfirmButton();
     scene()->addItem(m_bottom_dashboard);
-    m_bottom_dashboard->setPos(0, 620);
+    m_bottom_dashboard->setPos(0, 600);
+    m_bottom_dashboard->setZValue(1);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)

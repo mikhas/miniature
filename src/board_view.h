@@ -24,6 +24,7 @@
 #include <position.h>
 #include <graphics_board_item.h>
 #include <dashboard_item.h>
+#include <scene.h>
 
 #include <QGraphicsSvgItem>
 #include <QString>
