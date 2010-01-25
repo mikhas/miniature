@@ -59,6 +59,7 @@ public:
 
     bool select(const QPoint& origin);
     void deSelect();
+    bool isUndoRequest(const QPoint &target) const;
     bool applyToTarget(const QPoint &target);
     bool apply();
     void undo();
