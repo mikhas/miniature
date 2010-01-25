@@ -27,6 +27,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QStandardItemModel>
+#include <QGraphicsProxyWidget>
 
 namespace Miniature
 {
@@ -113,6 +114,11 @@ public:
      */
     void setupUi();
 
+    /*!
+     *  Resets the UI elements to the state *after* setupUi.
+     */
+    void resetUi();
+
 Q_SIGNALS:
     void confirmButtonPressed();
     void requestButtonPressed();
@@ -155,6 +161,7 @@ private:
     MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
     MDashboardButton *m_fullscreen; /*!< The 'toggle fullscreen' button. */
     bool m_fullscreen_enabled; /*!< The attribute to decide between fullscreen and windowed mode. */
+    QGraphicsProxyWidget *m_proxy_widget; /*!< The proxy widget to plug in normal QWidgets in the dashboard item. */
 };
 
 } // namespace Miniature

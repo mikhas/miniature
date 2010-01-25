@@ -19,14 +19,16 @@
  */
 
 #include <dashboard_item.h>
+#include <scene.h>
+
 #include <QGraphicsEllipseItem>
 #include <QGraphicsBlurEffect>
 #include <QPen>
 #include <QBrush>
-#include <QDialog>
-
-// platform-dependent!
-#include <QtMaemo5>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QTimer>
+#include <QApplication>
 
 //#include <glib.h>
 //#include <libosso-abook/osso-abook.h>
@@ -37,11 +39,11 @@ namespace
 {
 
 const int width = 480;
-const int height = 140;
+const int height = 160;
 const int col_left_width = 120;
 const int col_right_width = 120;
 const int icon_size = 64;
-const int flash_duration = 250;
+const int flash_duration = 200;
 const QColor flash_color = QColor(Qt::red);
 
 }
@@ -153,7 +155,8 @@ MDashboardItem(QGraphicsItem *parent)
   m_takeback(0),
   m_avatar(0),
   m_fullscreen(0),
-  m_fullscreen_enabled(false)
+  m_fullscreen_enabled(false),
+  m_proxy_widget(new QGraphicsProxyWidget(this))
 {
     setEnabled(false);
     setupUi();
@@ -172,6 +175,36 @@ setupUi()
     const int centered_width  = (width  - icon_size) * 0.5;
     const int centered_height = (height - icon_size) * 0.5;
 
+    QWidget *popup = new QWidget;
+    popup->setWindowTitle(tr("?? Choose a Game Resolution"));
+    popup->resize(width, height);
+
+    QPalette palette;
+    palette.setColor(QPalette::Window, Qt::black);
+    m_proxy_widget->setPalette(palette);
+    m_proxy_widget->setWidget(popup);
+    m_proxy_widget->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
+
+    QGridLayout *grid = new QGridLayout;
+    grid->setColumnMinimumWidth(0, width * 0.5 - 12);
+    grid->setColumnMinimumWidth(1, width * 0.5 - 12);
+    popup->setLayout(grid);
+
+    QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
+    grid->addWidget(pause_button, 0, 0);
+
+    QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
+    grid->addWidget(draw_button, 0, 1);
+
+    QPushButton *resign_button = new QPushButton(tr("?? Resign"));
+    grid->addWidget(resign_button, 1, 0);
+
+    QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
+    grid->addWidget(adjourn_button, 1, 1);
+
+    m_proxy_widget->setEnabled(false);
+    m_proxy_widget->hide();
+
     m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
                                            QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
 
@@ -184,7 +217,7 @@ setupUi()
                                             QIcon("/usr/share/themes/alpha/mediaplayer/Back.png"));
 
     m_fullscreen = new MDashboardButton(QIcon::fromTheme("general_fullsize"), this, 0);
-    m_fullscreen->setPos(QPoint(10, 76));
+    m_fullscreen->setPos(QPoint(10, 96));
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
@@ -193,7 +226,7 @@ setupUi()
     else
        m_avatar = new MDashboardButton(empty, this, 0);
 
-    m_avatar->setPos(QPoint(10, 6)); // left-aligned
+    m_avatar->setPos(QPoint(10, 26)); // left-aligned
     m_avatar->show();
     m_avatar->setEnabled(true);
 
@@ -218,6 +251,16 @@ setupUi()
 
     connect(this, SIGNAL(fullscreenButtonPressed()),
             this, SLOT(toggleFullscreen()));
+}
+
+void MDashboardItem::
+resetUi()
+{
+    m_proxy_widget->hide();
+
+    disableConfirmButton();
+    m_request->setBackgroundBrush(Qt::transparent);
+    m_takeback->setBackgroundBrush(Qt::transparent);
 }
 
 MDashboardButton * MDashboardItem::
@@ -279,25 +322,9 @@ disableConfirmButton()
 void MDashboardItem::
 showRequestsMenu()
 {
-    // TODO: this menu needs to be generated from the main menu actions, or not?
-
-    QMaemo5ValueButton *fullscreen_button = new QMaemo5ValueButton(QIcon::fromTheme("general_fullsize"), tr("?? Toggle Fullscreen Mode"));
-
-    QMaemo5ValueButton *new_p2p_game_button = new QMaemo5ValueButton(QIcon::fromTheme("general_default_avatar"), tr("?? New P2P Game"));
-
-    fullscreen_button->setValueLayout(QMaemo5ValueButton::ValueBesideText);
-    connect(fullscreen_button, SIGNAL(pressed()),
-            this, SIGNAL(toggleFullscreen()));
-
-    QDialog *dialog = new QDialog(QApplication::activeWindow());
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->setWindowTitle(tr("?? Choose a Game Resolution"));
-
-    QVBoxLayout *vbox = new QVBoxLayout;
-    dialog->setLayout(vbox);
-    vbox->addWidget(new_p2p_game_button);
-    vbox->addWidget(fullscreen_button);
-    dialog->show();
+    static_cast<MScene *>(scene())->setModalItem(m_proxy_widget);
+    m_proxy_widget->show();
+    m_proxy_widget->setEnabled(true);
 }
 
 void MDashboardItem::

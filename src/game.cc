@@ -124,6 +124,10 @@ void MGame::setupStartPosition()
     m_game = MPositionList();
     Q_ASSERT(m_game.empty());
 
+    Q_CHECK_PTR(m_view);
+    m_view->getTopDashboardItem()->resetUi();
+    m_view->getBottomDashboardItem()->resetUi();
+
     MPosition pos;
 
     addPieceToPositionAt(new MRook(MPiece::BLACK), &pos, QPoint(0,0));
@@ -186,8 +190,8 @@ void MGame::setPositionTo(int half_move)
         updatePlayerStatus(pos);
     }
 
-    m_view->getTopDashboardItem()->disableConfirmButton();
-    m_view->getBottomDashboardItem()->disableConfirmButton();
+    m_view->getTopDashboardItem()->resetUi();
+    m_view->getBottomDashboardItem()->resetUi();
 }
 
 bool MGame::isTurnOfTopPlayer() const
@@ -224,8 +228,8 @@ void MGame::onPieceClicked(MPiece *piece)
         m_trans_half_move.undo();
         m_trans_half_move.deSelect();
 
-        m_view->getTopDashboardItem()->disableConfirmButton();
-        m_view->getBottomDashboardItem()->disableConfirmButton();
+        m_view->getTopDashboardItem()->resetUi();
+        m_view->getBottomDashboardItem()->resetUi();
 
         // Don't re-select the same piece - see b.m.o bug #7868.
         if (!was_already_selected)
@@ -255,21 +259,21 @@ void MGame::onTargetClicked(const QPoint &target)
     if (m_trans_half_move.isUndoRequest(target))
     {
         m_trans_half_move.undo(); // but do not deselect!
-        m_view->getTopDashboardItem()->disableConfirmButton();
-        m_view->getBottomDashboardItem()->disableConfirmButton();
+        m_view->getTopDashboardItem()->resetUi();
+        m_view->getBottomDashboardItem()->resetUi();
     }
     else if (m_trans_half_move.applyToTarget(target))
     {
 
         if (isTurnOfBottomPlayer())
         {
-            m_view->getTopDashboardItem()->disableConfirmButton();
+            m_view->getTopDashboardItem()->resetUi();
             m_view->getBottomDashboardItem()->enableConfirmButton();
         }
         else
         {
             m_view->getTopDashboardItem()->enableConfirmButton();
-            m_view->getBottomDashboardItem()->disableConfirmButton();
+            m_view->getBottomDashboardItem()->resetUi();
         }
     }
     else
@@ -287,8 +291,8 @@ void MGame::onTargetClicked(const QPoint &target)
 
 void MGame::onMoveConfirmed()
 {
-    m_view->getTopDashboardItem()->disableConfirmButton();
-    m_view->getBottomDashboardItem()->disableConfirmButton();
+    m_view->getTopDashboardItem()->resetUi();
+    m_view->getBottomDashboardItem()->resetUi();
 
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.

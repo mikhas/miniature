@@ -129,8 +129,9 @@ apply()
     MLogicAnalyzer::mMoveFlags move_result = m_logic_analyzer.verifyMove(&m_position_origin, m_origin, m_target);
     if (MLogicAnalyzer::VALID_MOVE & move_result)
     {
-        // Apply the valid move to the restored m_position.
-        m_position = m_position_origin;
+        // Start from a clean state: Now that we checked this move is valid we
+        // can undo w/o losing critical meta information.
+        undo();
 
         // TODO: check for capture flag instead.
         MPiece *maybe_captured = m_position.pieceAt(m_target);
