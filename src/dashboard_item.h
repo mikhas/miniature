@@ -23,8 +23,10 @@
 
 #include <QObject>
 #include <QPixmap>
+#include <QIcon>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QStandardItemModel>
 
 namespace Miniature
 {
@@ -36,7 +38,7 @@ class MDashboardButton
     Q_OBJECT
 
 public:
-    explicit MDashboardButton(const QPixmap& pixmap, QGraphicsItem *item = 0, QObject *parent = 0);
+    explicit MDashboardButton(const QIcon &icon, QGraphicsItem *item = 0, QObject *parent = 0);
     virtual ~MDashboardButton();
 
     /*!
@@ -51,6 +53,17 @@ public:
      */
     void setBackgroundBrush(const QBrush &brush);
 
+    /*!
+     *  Sets the button either active or inactive. An inactive button cannot be
+     *  pressed.
+     */
+    void setActive(bool active);
+
+    /*!
+     *  Returns the active state of this button.
+     */
+    bool isActive() const;
+
 Q_SIGNALS:
    void pressed();
    void released();
@@ -62,6 +75,8 @@ protected:
 private:
     QGraphicsEllipseItem *m_background; /*!< The background item. Usage is
                                              strictly optional. */
+    QIcon m_icon; /*!< The icon used for the button. */
+    bool m_active; /*!< The attribute for the button's active state. */
 };
 
 
@@ -93,10 +108,13 @@ Q_SIGNALS:
     void requestButtonPressed();
     void takebackButtonPressed();
     void avatarButtonPressed();
+    void fullscreenButtonPressed();
 
 public Q_SLOTS:
     void enableConfirmButton();
     void disableConfirmButton();
+    void showRequestsMenu();
+    void toggleFullscreen();
 
 protected:
 
@@ -107,9 +125,11 @@ protected:
 
 private:
     /*!
-     *  We create our own 'buttons' from the Maemo5 media player icons and QGraphicsPixmapItems.
+     *  We create our own 'buttons' from the Maemo5 media player icons and
+     *  Maemo 5 stock icons. Both are put in the graphics view via
+     *  QGraphicsPixmapItems (which also handles the mouse events).
      */
-    MDashboardButton * createButtonWithBackground(const QPoint &origin, const QPixmap &pixmap);
+    MDashboardButton * createButtonWithBackground(const QPoint &origin, const QIcon &icon);
 
     /*!
      *  This method tried to wrap libosso-abook in order to get the avatar from
@@ -122,6 +142,8 @@ private:
     MDashboardButton *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
     MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */
     MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
+    MDashboardButton *m_fullscreen; /*!< The 'toggle fullscreen' button. */
+    bool m_fullscreen_enabled; /*!< The attribute to decide between fullscreen and windowed mode. */
 };
 
 } // namespace Miniature

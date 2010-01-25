@@ -23,25 +23,34 @@
 #include <QGraphicsBlurEffect>
 #include <QPen>
 #include <QBrush>
+#include <QDialog>
+
+// platform-dependent!
+#include <QtMaemo5>
 
 //#include <glib.h>
 //#include <libosso-abook/osso-abook.h>
 
 using namespace Miniature;
 
-namespace {
-    const int width = 480;
-    const int height = 140;
-    const int col_left_width = 120;
-    const int col_right_width = 120;
-    const int icon_size = 64;
+namespace
+{
+
+const int width = 480;
+const int height = 140;
+const int col_left_width = 120;
+const int col_right_width = 120;
+const int icon_size = 64;
+
 }
 
 MDashboardButton::
-MDashboardButton(const QPixmap& pixmap, QGraphicsItem *item, QObject *parent)
+MDashboardButton(const QIcon &icon, QGraphicsItem *item, QObject *parent)
 : QObject(parent),
-  QGraphicsPixmapItem(pixmap, item),
-  m_background(0)
+  QGraphicsPixmapItem(icon.pixmap(icon_size, icon_size), item),
+  m_background(0),
+  m_icon(icon),
+  m_active(true)
 {
     setEnabled(true); // receive scene events
 }
@@ -113,7 +122,9 @@ MDashboardItem(QGraphicsItem *parent)
   m_confirm(0),
   m_request(0),
   m_takeback(0),
-  m_avatar(0)
+  m_avatar(0),
+  m_fullscreen(0),
+  m_fullscreen_enabled(false)
 {
     setEnabled(false);
     setupUi();
@@ -133,15 +144,18 @@ setupUi()
     const int centered_height = (height - icon_size) * 0.5;
 
     m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
-                                           QPixmap("/usr/share/themes/alpha/mediaplayer/Play.png"));
+                                           QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
 
     // right-aligned
     m_request = createButtonWithBackground(QPoint(width - icon_size - col_right_width, centered_height),
-                                           QPixmap("/usr/share/themes/alpha/mediaplayer/Stop.png"));
+                                           QIcon("/usr/share/themes/alpha/mediaplayer/Stop.png"));
 
     // left-aligned
     m_takeback = createButtonWithBackground(QPoint(col_left_width, centered_height),
-                                            QPixmap("/usr/share/themes/alpha/mediaplayer/Back.png"));
+                                            QIcon("/usr/share/themes/alpha/mediaplayer/Back.png"));
+
+    m_fullscreen = createButtonWithBackground(QPoint(10, 76),
+                                              QIcon::fromTheme("general_fullsize"));
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
@@ -150,7 +164,7 @@ setupUi()
     else
        m_avatar = new MDashboardButton(empty, this, 0);
 
-    m_avatar->setPos(QPoint(10, centered_height)); // left-aligned
+    m_avatar->setPos(QPoint(10, 6)); // left-aligned
     m_avatar->show();
     m_avatar->setEnabled(true);
 
@@ -166,12 +180,21 @@ setupUi()
 
     connect(m_avatar, SIGNAL(pressed()),
             this, SIGNAL(avatarButtonPressed()));
+
+    connect(m_fullscreen, SIGNAL(pressed()),
+            this, SIGNAL(fullscreenButtonPressed()));
+
+    connect(this, SIGNAL(requestButtonPressed()),
+            this, SLOT(showRequestsMenu()));
+
+    connect(this, SIGNAL(fullscreenButtonPressed()),
+            this, SLOT(toggleFullscreen()));
 }
 
 MDashboardButton * MDashboardItem::
-createButtonWithBackground(const QPoint &origin, const QPixmap &pixmap)
+createButtonWithBackground(const QPoint &origin, const QIcon &icon)
 {
-    MDashboardButton *button = new MDashboardButton(pixmap, this, 0);
+    MDashboardButton *button = new MDashboardButton(icon, this, 0);
     button->setPos(origin);
     button->show();
     button->setEnabled(true);
@@ -222,4 +245,40 @@ disableConfirmButton()
 
     m_confirm->setEnabled(false);
     m_confirm->setBackgroundBrush(QBrush(Qt::transparent));
+}
+
+void MDashboardItem::
+showRequestsMenu()
+{
+    // TODO: this menu needs to be generated from the main menu actions, or not?
+
+    QMaemo5ValueButton *fullscreen_button = new QMaemo5ValueButton(QIcon::fromTheme("general_fullsize"), tr("?? Toggle Fullscreen Mode"));
+
+    QMaemo5ValueButton *new_p2p_game_button = new QMaemo5ValueButton(QIcon::fromTheme("general_default_avatar"), tr("?? New P2P Game"));
+
+    fullscreen_button->setValueLayout(QMaemo5ValueButton::ValueBesideText);
+    connect(fullscreen_button, SIGNAL(pressed()),
+            this, SIGNAL(toggleFullscreen()));
+
+    QDialog *dialog = new QDialog(QApplication::activeWindow());
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->setWindowTitle(tr("?? Choose a Game Resolution"));
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    dialog->setLayout(vbox);
+    vbox->addWidget(new_p2p_game_button);
+    vbox->addWidget(fullscreen_button);
+    dialog->show();
+}
+
+void MDashboardItem::
+toggleFullscreen()
+{
+    QWidget *window = QApplication::activeWindow();
+    const Qt::WindowStates states = window->windowState();
+
+    window->setWindowState(states & Qt::WindowFullScreen ? states & ~Qt::WindowFullScreen
+                                                         : states | Qt::WindowFullScreen);
+
+    m_fullscreen_enabled = !m_fullscreen_enabled;
 }
