@@ -64,6 +64,9 @@ public:
      */
     bool isActive() const;
 
+public Q_SLOTS:
+    void flash();
+
 Q_SIGNALS:
    void pressed();
    void released();
@@ -75,8 +78,15 @@ protected:
 private:
     QGraphicsEllipseItem *m_background; /*!< The background item. Usage is
                                              strictly optional. */
+    QBrush m_stored_background_brush; /*!< The stored background brush so that
+                                           we can restore it, e.g., after
+                                           flashing the background. */
     QIcon m_icon; /*!< The icon used for the button. */
     bool m_active; /*!< The attribute for the button's active state. */
+
+private Q_SLOTS:
+    void storeBackgroundBrush();
+    void restoreBackgroundBrush();
 };
 
 
@@ -115,6 +125,7 @@ public Q_SLOTS:
     void disableConfirmButton();
     void showRequestsMenu();
     void toggleFullscreen();
+    void flash();
 
 protected:
 

@@ -41,6 +41,8 @@ const int height = 140;
 const int col_left_width = 120;
 const int col_right_width = 120;
 const int icon_size = 64;
+const int flash_duration = 250;
+const QColor flash_color = QColor(Qt::red);
 
 }
 
@@ -49,6 +51,7 @@ MDashboardButton(const QIcon &icon, QGraphicsItem *item, QObject *parent)
 : QObject(parent),
   QGraphicsPixmapItem(icon.pixmap(icon_size, icon_size), item),
   m_background(0),
+  m_stored_background_brush(QBrush(Qt::transparent)),
   m_icon(icon),
   m_active(true)
 {
@@ -69,7 +72,7 @@ setupButtonBackground()
     ellipse_border.setCosmetic(true);
 
     m_background->setPen(ellipse_border);
-    m_background->setBrush(QBrush(Qt::transparent));
+    m_background->setBrush(m_stored_background_brush);
     m_background->show();
     m_background->setEnabled(false);
     m_background->setFlags(QGraphicsItem::ItemStacksBehindParent);
@@ -87,6 +90,32 @@ setBackgroundBrush(const QBrush &brush)
 
     m_background->setBrush(brush);
 }
+
+void MDashboardButton::
+storeBackgroundBrush()
+{
+    // Make sure to never store the brush's flash color, else triggering flash
+    // while a flash is already running becomes racy.
+    if (!m_background || flash_color ==  m_background->brush().color())
+        return; // nothing to do!
+
+    m_stored_background_brush = m_background->brush();
+}
+
+void MDashboardButton::
+restoreBackgroundBrush()
+{
+    setBackgroundBrush(m_stored_background_brush);
+}
+
+void MDashboardButton::
+flash()
+{
+    storeBackgroundBrush();
+    setBackgroundBrush(QBrush(flash_color));
+    QTimer::singleShot(flash_duration, this, SLOT(restoreBackgroundBrush()));
+}
+
 
 void MDashboardButton::
 mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -154,8 +183,8 @@ setupUi()
     m_takeback = createButtonWithBackground(QPoint(col_left_width, centered_height),
                                             QIcon("/usr/share/themes/alpha/mediaplayer/Back.png"));
 
-    m_fullscreen = createButtonWithBackground(QPoint(10, 76),
-                                              QIcon::fromTheme("general_fullsize"));
+    m_fullscreen = new MDashboardButton(QIcon::fromTheme("general_fullsize"), this, 0);
+    m_fullscreen->setPos(QPoint(10, 76));
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
@@ -281,4 +310,12 @@ toggleFullscreen()
                                                          : states | Qt::WindowFullScreen);
 
     m_fullscreen_enabled = !m_fullscreen_enabled;
+}
+
+void MDashboardItem::
+flash()
+{
+    m_confirm->flash();
+    m_takeback->flash();
+    m_request->flash();
 }

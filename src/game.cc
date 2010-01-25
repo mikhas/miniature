@@ -272,6 +272,17 @@ void MGame::onTargetClicked(const QPoint &target)
             m_view->getBottomDashboardItem()->disableConfirmButton();
         }
     }
+    else
+    {
+        if (isTurnOfBottomPlayer())
+        {
+            m_view->getBottomDashboardItem()->flash();
+        }
+        else
+        {
+            m_view->getTopDashboardItem()->flash();
+        }
+    }
 }
 
 void MGame::onMoveConfirmed()
