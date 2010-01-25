@@ -40,6 +40,9 @@ MBoardView::MBoardView(QWidget *parent)
   m_board_item_offset(140)
 {
     QGraphicsView::setScene(new MScene(this));
+    // Ignore the growing property of the scene graph and always only show a
+    // fixed area.
+    setSceneRect(QRect(0, 0, 480, 760));
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
