@@ -18,15 +18,11 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
-#include "position.h"
-#include "pieces.h"
+#include <game.h>
+#include <position.h>
+#include <pieces.h>
 
-#include <cmath>
 #include <QList>
-
-#include <iostream>
-#include <QTime>
 
 using namespace Miniature;
 
