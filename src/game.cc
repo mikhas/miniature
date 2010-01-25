@@ -215,9 +215,6 @@ void MGame::updatePlayerStatus(const MPosition &position)
 
 void MGame::onPieceClicked(MPiece *piece)
 {
-    m_view->getTopDashboardItem()->disableConfirmButton();
-    m_view->getBottomDashboardItem()->disableConfirmButton();
-
     // If invalid piece was selected => reset selection, purple flashing.
     // Currently, most piece selections are "valid" (because the logic analyzer
     // doesnt know how to handle that yet)
@@ -230,6 +227,9 @@ void MGame::onPieceClicked(MPiece *piece)
         const bool was_already_selected = m_trans_half_move.isSelected(piece);
         m_trans_half_move.undo();
         m_trans_half_move.deSelect();
+
+        m_view->getTopDashboardItem()->disableConfirmButton();
+        m_view->getBottomDashboardItem()->disableConfirmButton();
 
         // Don't re-select the same piece - see b.m.o bug #7868.
         if (!was_already_selected)
@@ -253,20 +253,27 @@ void MGame::onPieceClicked(MPiece *piece)
 
 void MGame::onTargetClicked(const QPoint &target)
 {
-    m_view->getTopDashboardItem()->disableConfirmButton();
-    m_view->getBottomDashboardItem()->disableConfirmButton();
-
     // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
-    if (m_trans_half_move.applyToTarget(target))
+
+    if (m_trans_half_move.isUndoRequest(target))
     {
+        m_trans_half_move.undo(); // but do not deselect!
+        m_view->getTopDashboardItem()->disableConfirmButton();
+        m_view->getBottomDashboardItem()->disableConfirmButton();
+    }
+    else if (m_trans_half_move.applyToTarget(target))
+    {
+
         if (isTurnOfBottomPlayer())
         {
+            m_view->getTopDashboardItem()->disableConfirmButton();
             m_view->getBottomDashboardItem()->enableConfirmButton();
         }
         else
         {
             m_view->getTopDashboardItem()->enableConfirmButton();
+            m_view->getBottomDashboardItem()->disableConfirmButton();
         }
     }
 }
