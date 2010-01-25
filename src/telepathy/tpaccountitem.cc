@@ -19,41 +19,35 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPACCOUNTMANAGER_H_
-#define TPACCOUNTMANAGER_H_
-
-#include <QObject>
-#include <QList>
-
 #include "tpaccountitem.h"
 
+#include <TelepathyQt4/Debug>
+#include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Types>
 
-namespace Tp {
-    class PendingOperation;
-}
+#include <TelepathyQt4/Account>
+#include <TelepathyQt4/AccountManager>
+#include <TelepathyQt4/PendingOperation>
+#include <TelepathyQt4/PendingReady>
+
+#include <QDebug>
+#include <QString>
+#include <QtGlobal>
+#include <QtMaemo5/QtMaemo5>
 
 namespace Miniature
 {
 
-class TpAccountManager : public QObject
+TpAccountItem::TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent) : QObject(parent), 
+            mAcc(Tp::Account::create(am->dbusConnection(), am->busName(), path))
 {
-    Q_OBJECT
-public:
-    TpAccountManager(QObject *parent = 0);
-    ~TpAccountManager();
+    QObject::connect(mAcc->becomeReady(), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
+}
 
-    void chooseAccount();
-
-public Q_SLOTS:
-    void onAMReady(Tp::PendingOperation *);
-
-private:
-    Tp::AccountManagerPtr m_AM;
-    QList<TpAccountItemPtr> m_Accounts;
-};
+TpAccountItem::~TpAccountItem()
+{
+}
 
 };
 
-#endif //TPACCOUNTMANAGER_H_
-
+#include "tpaccountitem.moc.cc"

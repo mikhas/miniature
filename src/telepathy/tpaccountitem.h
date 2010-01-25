@@ -19,13 +19,11 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPACCOUNTMANAGER_H_
-#define TPACCOUNTMANAGER_H_
+#ifndef TPACCOUNTITEM_H_
+#define TPACCOUNTITEM_H_
 
 #include <QObject>
-#include <QList>
-
-#include "tpaccountitem.h"
+#include <QSharedPointer>
 
 #include <TelepathyQt4/Types>
 
@@ -36,24 +34,19 @@ namespace Tp {
 namespace Miniature
 {
 
-class TpAccountManager : public QObject
+class TpAccountItem : public QObject
 {
     Q_OBJECT
 public:
-    TpAccountManager(QObject *parent = 0);
-    ~TpAccountManager();
-
-    void chooseAccount();
-
-public Q_SLOTS:
-    void onAMReady(Tp::PendingOperation *);
+    TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent = 0);
+    ~TpAccountItem();
 
 private:
-    Tp::AccountManagerPtr m_AM;
-    QList<TpAccountItemPtr> m_Accounts;
+    Tp::AccountPtr mACC;
 };
 
+typedef QSharedPointer<TpAccountItem> TpAccountItemPtr;
+
 };
 
-#endif //TPACCOUNTMANAGER_H_
-
+#endif // TPACCOUNTITEM_H_

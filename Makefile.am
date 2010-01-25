@@ -78,6 +78,8 @@ src_miniature_SOURCES = \
 			src/telepathy/tpaccountmanager.h \
 			src/telepathy/tpaccountmanager.cc \
 			src/telepathy/tpaccountmanager.moc.cc \
+			src/telepathy/tpaccountitem.h \
+			src/telepathy/tpaccountitem.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5
@@ -114,6 +116,7 @@ BUILT_SOURCES = \
 		src/pieces/piece.moc.cc \
 		src/pregame.moc.cc \
 		src/telepathy/tpaccountmanager.moc.cc \
+		src/telepathy/tpaccountitem.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

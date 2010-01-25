@@ -20,6 +20,7 @@
  */
 
 #include "tpaccountmanager.h"
+#include "tpaccountitem.h"
 
 #include <TelepathyQt4/Debug>
 #include <TelepathyQt4/Constants>
@@ -57,6 +58,14 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
         return;
     }
 
+    Q_FOREACH(const QString &path, m_AM->allAccountPaths())
+    {
+        TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(m_AM, path, this));
+        m_Accounts.push_back(account);
+    }
+
+    return;
+    
     QList<Tp::AccountPtr> accountList = m_AM->validAccounts();
 
     if(accountList.size() == 0)
