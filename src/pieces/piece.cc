@@ -44,12 +44,8 @@ MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int widt
   image(width, height, QImage::Format_ARGB32_Premultiplied),
   ghost(new QGraphicsPixmapItem(this)),
   dropShadow(new QGraphicsPixmapItem(this)),
-  rotated(false),
-  rotationAnimForward(new QPropertyAnimation(this, "rotation")),
-  rotationAnimForwardCcw(new QPropertyAnimation(this, "rotation")),
-  rotationAnimBackward(new QPropertyAnimation(this, "rotation")),
-  rotationAnimBackwardCcw(new QPropertyAnimation(this, "rotation")),
   ghostFadeOutTimer(new QTimeLine(250, this)),
+  rotated(false),
   enableRotations(true)
 {
     // Initialize QImage so that we dont get artifacts from previous images.
@@ -95,39 +91,6 @@ initializeEffects()
     dropShadow->setFlag(QGraphicsItem::ItemStacksBehindParent);
     dropShadow->setEnabled(false);
     dropShadow->hide();
-
-    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-
-    const int duration = 750;
-    QEasingCurve curve = QEasingCurve::OutQuart;
-
-    rotationAnimForward->setDuration(duration);
-    rotationAnimForward->setStartValue(0);
-    rotationAnimForward->setEndValue(180);
-    rotationAnimForward->setEasingCurve(curve);
-    connect(rotationAnimForward, SIGNAL(finished()),
-            this, SLOT(onRotationFinished()));
-
-    rotationAnimForwardCcw->setDuration(duration);
-    rotationAnimForwardCcw->setStartValue(0);
-    rotationAnimForwardCcw->setEndValue(-180);
-    rotationAnimForwardCcw->setEasingCurve(curve);
-    connect(rotationAnimForwardCcw, SIGNAL(finished()),
-            this, SLOT(onRotationFinished()));
-
-    rotationAnimBackward->setDuration(duration);
-    rotationAnimBackward->setStartValue(180);
-    rotationAnimBackward->setEndValue(360);
-    rotationAnimBackward->setEasingCurve(curve);
-    connect(rotationAnimBackward, SIGNAL(finished()),
-            this, SLOT(onRotationFinished()));
-
-    rotationAnimBackwardCcw->setDuration(duration);
-    rotationAnimBackwardCcw->setStartValue(180);
-    rotationAnimBackwardCcw->setEndValue(0);
-    rotationAnimBackwardCcw->setEasingCurve(curve);
-    connect(rotationAnimBackwardCcw, SIGNAL(finished()),
-            this, SLOT(onRotationFinished()));
 
     ghostFadeOutTimer->setDirection(QTimeLine::Backward);
     connect(ghostFadeOutTimer, SIGNAL(valueChanged(qreal)),
@@ -275,35 +238,11 @@ rotate(bool flip)
     }
 
     rotated = flip;
-    // Actually, we cheat with the angle here, we only know 0 and 180. But
-    // that's because the easing functions of the animations have been computed
-    // in the ctor already, to save time.
-
-    static const int flip_range = RAND_MAX / 2;
-    const bool direction_flipped = qrand() / flip_range;
 
     const int center = boundingRect().width() * 0.5;
     setTransformOriginPoint(center, center);
 
-    QGraphicsObject::setPos(QPoint(pos().x() + 3, pos().y() + 3));
-    dropShadow->setPos(QPoint(-5, -5));
-    dropShadow->show();
-
-    QPropertyAnimation *anim;
-    anim = (flip ? (direction_flipped ? rotationAnimForward
-                                      : rotationAnimForwardCcw)
-                 : (direction_flipped ? rotationAnimBackward
-                                      : rotationAnimBackwardCcw));
-
-
-    anim->start();
-}
-
-void MPiece::
-onRotationFinished()
-{
-    dropShadow->hide();
-    QGraphicsObject::setPos(QPoint(pos().x() - 3, pos().y() - 3));
+    setRotation(flip ? 180 : 0);
 }
 
 void MPiece::
