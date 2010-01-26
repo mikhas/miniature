@@ -24,6 +24,8 @@
 
 #include <QList>
 
+#include <QFontDatabase>
+
 using namespace Miniature;
 
 
@@ -207,10 +209,21 @@ bool MGame::isTurnOfBottomPlayer() const
 
 void MGame::updatePlayerStatus(const MPosition &position)
 {
-    Q_UNUSED(position);
+    m_view->getBottomDashboardItem()->hideStatus();
+    m_view->getTopDashboardItem()->hideStatus();
+    m_view->getBottomDashboardItem()->appendToLastMovesList(QString("42. Rc1"));
+    m_view->getTopDashboardItem()->appendToLastMovesList(QString("42. Rc1"));
 
-    // assumption: white == bottom ...
-    // TODO: announce checks (killed when I removed MActionAreas)!
+    QString status;
+    if (position.inCheck())
+        status = tr("Check!");
+    else
+        status = tr("Turn started");
+
+    if (isTurnOfBottomPlayer())
+        m_view->getBottomDashboardItem()->setStatusText(status);
+    else
+        m_view->getTopDashboardItem()->setStatusText(status);
 }
 
 void MGame::onPieceClicked(MPiece *piece)
