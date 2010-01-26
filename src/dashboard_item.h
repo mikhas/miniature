@@ -28,6 +28,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QStandardItemModel>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsTextItem>
+#include <QPropertyAnimation>
 
 namespace Miniature
 {
@@ -132,6 +134,10 @@ public Q_SLOTS:
     void showRequestsMenu();
     void toggleFullscreen();
     void flash();
+    void setStatusText(const QString &text);
+    void hideStatus();
+    void appendToLastMovesList(const QString &move_notation);
+    void fadeOutStatus();
 
 protected:
 
@@ -162,6 +168,9 @@ private:
     MDashboardButton *m_fullscreen; /*!< The 'toggle fullscreen' button. */
     bool m_fullscreen_enabled; /*!< The attribute to decide between fullscreen and windowed mode. */
     QGraphicsProxyWidget *m_proxy_widget; /*!< The proxy widget to plug in normal QWidgets in the dashboard item. */
+    QGraphicsTextItem *m_status; /*!< The status label below (ontop) the board. */
+    QPropertyAnimation *m_status_anim; /*!< The fade out animation for the status label. */
+    QGraphicsTextItem *m_last_moves; /*!< The text item that shows the last n moves of a player. */
 };
 
 } // namespace Miniature

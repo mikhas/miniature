@@ -23,6 +23,7 @@
 
 #include <QGraphicsEllipseItem>
 #include <QGraphicsBlurEffect>
+#include <QGraphicsRectItem>
 #include <QPen>
 #include <QBrush>
 #include <QPushButton>
@@ -44,6 +45,7 @@ const int col_left_width = 120;
 const int col_right_width = 120;
 const int icon_size = 64;
 const int flash_duration = 200;
+const int fadeout_duration = 500;
 const QColor flash_color = QColor(Qt::red);
 
 }
@@ -156,7 +158,10 @@ MDashboardItem(QGraphicsItem *parent)
   m_avatar(0),
   m_fullscreen(0),
   m_fullscreen_enabled(false),
-  m_proxy_widget(new QGraphicsProxyWidget(this))
+  m_proxy_widget(new QGraphicsProxyWidget(this)),
+  m_status(new QGraphicsTextItem(this)),
+  m_status_anim(new QPropertyAnimation(m_status, "opacity", this)),
+  m_last_moves(new QGraphicsTextItem(this))
 {
     setEnabled(false);
     setupUi();
@@ -171,16 +176,18 @@ MDashboardItem::
 void MDashboardItem::
 setupUi()
 {
+    // TODO: use anchor layouts, this is a fantastic playground for them!
+
     // Maemo5-specific icons, handle press states by replacing pixmap, or have two pixmap per item?
     const int centered_width  = (width  - icon_size) * 0.5;
-    const int centered_height = (height - icon_size) * 0.5;
+    const int centered_height = 60 + ((height - icon_size - 60) * 0.5); // there is a 1st row w/ 60 pixels.
 
     QWidget *popup = new QWidget;
     popup->setWindowTitle(tr("?? Choose a Game Resolution"));
     popup->resize(width, height);
 
     QPalette palette;
-    palette.setColor(QPalette::Window, Qt::black);
+    palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
     m_proxy_widget->setPalette(palette);
     m_proxy_widget->setWidget(popup);
     m_proxy_widget->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
@@ -204,6 +211,41 @@ setupUi()
 
     m_proxy_widget->setEnabled(false);
     m_proxy_widget->hide();
+
+    QFont font;
+    font.setWeight(QFont::Bold);
+    font.setPointSize(18);
+
+    // TODO: Clean up the colors mess. Since we draw on a yellow background,
+    // the status text is black. But the moves are shown on a black background
+    // again. Maybe replace with this contrast-finding color method.
+
+    m_status->hide();
+    m_status->setFont(font);
+    m_status->setDefaultTextColor(QColor(Qt::black));
+    m_status->setTextInteractionFlags(Qt::NoTextInteraction);
+    m_status->setTextWidth(width - col_left_width - col_right_width);
+    m_status->setPos(QPoint(col_left_width, 20)); // below the board, centered
+
+    QGraphicsRectItem *rect_status = new QGraphicsRectItem(m_status);
+    rect_status->setFlags(QGraphicsItem::ItemStacksBehindParent);
+    rect_status->setRect(QRect(0, 0, width - col_left_width - col_right_width, 40));
+    rect_status->setBrush(QBrush(Qt::yellow)); // TODO: how to get the notification bg color?
+    rect_status->show();
+
+    m_status_anim->setDuration(fadeout_duration);
+    m_status_anim->setStartValue(1.0);
+    m_status_anim->setEndValue(0.0);
+
+    connect(m_status_anim, SIGNAL(finished()),
+            this, SLOT(hideStatus()));
+
+    m_last_moves->show();
+    m_last_moves->setFont(font);
+    m_last_moves->setDefaultTextColor(QColor(Qt::white));
+    m_last_moves->setTextInteractionFlags(Qt::NoTextInteraction);
+    m_last_moves->setTextWidth(col_right_width);
+    m_last_moves->setPos(QPoint(width - col_right_width, 20)); // below the board, right-aligned
 
     m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
                                            QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
@@ -345,4 +387,36 @@ flash()
     m_confirm->flash();
     m_takeback->flash();
     m_request->flash();
+}
+
+void MDashboardItem::
+fadeOutStatus()
+{
+    m_status_anim->start();
+}
+
+void MDashboardItem::
+hideStatus()
+{
+    m_status->hide();
+}
+
+void MDashboardItem::
+setStatusText(const QString &text)
+{
+    m_status_anim->stop();
+    m_status->setOpacity(1.0);
+    QTimer::singleShot(3000, this, SLOT(fadeOutStatus()));
+
+    // Oh dont look at me! It's the borken HTML subset for Qt's rich text that made me use tables.
+    m_status->setHtml(QString("<table width=\"100%\" border=\"0\"><tr><td align=\"center\">%1</td></tr></table>").arg(text));
+    m_status->show();
+}
+
+void MDashboardItem::
+appendToLastMovesList(const QString &move_notation)
+{
+    // TODO: The idea is later to have a list of n moves to be shown in a
+    // deque, the newest arriving on top, removing the last.
+    m_last_moves->setHtml(move_notation);
 }
