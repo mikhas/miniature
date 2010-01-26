@@ -20,7 +20,8 @@
 
 #include <config.h>
 #include <main.h>
-#include <about.ui.h>
+
+#include <QtGui>
 
 /*! \brief Container for Miniature main actions.
  */
@@ -58,8 +59,6 @@ public:
 
     virtual ~mDialogs()
     {}
-
-    Ui::AboutDialog about_dialog;
 };
 
 const char* const dbus_service_name = "org.maemo.miniature";
@@ -180,11 +179,41 @@ void MMainWindow::connectActions()
 void MMainWindow::showAboutDialog()
 {
     QFont font = QFont("helvetica", 14, QFont::Normal);
-    QDialog dialog;
-    m_dialogs->about_dialog.setupUi(&dialog);
-    m_dialogs->about_dialog.slogan->setFont(font);
-    m_dialogs->about_dialog.version->setFont(font);
-    m_dialogs->about_dialog.version->setText(QString("%1: %2").arg(tr("Version"))
-                                                              .arg(PACKAGE_VERSION));
-    dialog.exec();
+    QDialog *dialog = new QDialog(QApplication::activeWindow());
+    dialog->setWindowTitle(tr("About Miniature"));
+
+    QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    policy.setHorizontalStretch(0);
+    policy.setVerticalStretch(1);
+
+    QVBoxLayout *vbox = new QVBoxLayout(dialog);
+
+    QLabel *slogan = new QLabel(dialog);
+    slogan->setText(tr("A chess board that always goes with you."));
+    slogan->setAlignment(Qt::AlignCenter);
+    vbox->addWidget(slogan);
+
+    QTextEdit *description = new QTextEdit(dialog);
+    description->setSizePolicy(policy);
+    description->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
+    description->setHtml(tr(
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head/><body>\n"
+"<div style=\"margin-bottom:1.5em;\">Miniature version: %1</div>\n"
+"<div style=\"margin-bottom:1.5em;\">Check the <a href=\"http://wiki.maemo.org/Miniature\">website</a> for more information,\n"
+"feedback and ways to get involved. Miniature is free software for you to enjoy\n"
+"(<a href=\"http://creativecommons.org/licenses/GPL/2.0/\">GPL2 or later</a>).\n"
+"<div>&#169; <a href=\"http://wiki.maemo.org/Miniature#Contributors\">Contributors</a>.</div>\n"
+"</body></html>"
+        ).arg(PACKAGE_VERSION));
+
+    vbox->addWidget(description);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(dialog);
+    buttons->setOrientation(Qt::Horizontal);
+    buttons->setStandardButtons(QDialogButtonBox::Close);
+    vbox->addWidget(buttons);
+
+    dialog->show();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }

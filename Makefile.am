@@ -38,8 +38,6 @@ src_miniature_SOURCES = \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
-			src/about.ui.h \
-			src/miniature.ui.h \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
@@ -83,8 +81,6 @@ BUILT_SOURCES = \
 		src/game.moc.cc \
 		src/graphics_board_item.moc.cc \
 		src/main.moc.cc \
-		src/miniature.ui.h \
-		src/about.ui.h \
 		src/pieces/piece.moc.cc \
 		$(null)
 
