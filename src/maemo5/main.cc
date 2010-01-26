@@ -181,6 +181,7 @@ void MMainWindow::showAboutDialog()
     QFont font = QFont("helvetica", 14, QFont::Normal);
     QDialog *dialog = new QDialog(QApplication::activeWindow());
     dialog->setWindowTitle(tr("About Miniature"));
+    dialog->resize(-1, 480);
 
     QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     policy.setHorizontalStretch(0);
@@ -193,12 +194,21 @@ void MMainWindow::showAboutDialog()
     slogan->setAlignment(Qt::AlignCenter);
     vbox->addWidget(slogan);
 
-    QTextEdit *description = new QTextEdit(dialog);
+    // TODO: Find correct color roles that are used in the QTextBrowser, and remove the HTML style hack.
+    QPalette lightBg;
+    lightBg.setColor(QPalette::Base, QColor(Qt::white));
+    lightBg.setColor(QPalette::WindowText, QColor(Qt::black));
+
+    QTextBrowser *description = new QTextBrowser(dialog);
+    description->setPalette(lightBg);
     description->setSizePolicy(policy);
+
     description->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
-    description->setHtml(tr(
+
+    description->setOpenExternalLinks(true);
+    description->setText(tr(
 "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head/><body>\n"
+"<html><head/><body style=\"color:black; background:white;\">\n"
 "<div style=\"margin-bottom:1.5em;\">Miniature version: %1</div>\n"
 "<div style=\"margin-bottom:1.5em;\">Check the <a href=\"http://wiki.maemo.org/Miniature\">website</a> for more information,\n"
 "feedback and ways to get involved. Miniature is free software for you to enjoy\n"
