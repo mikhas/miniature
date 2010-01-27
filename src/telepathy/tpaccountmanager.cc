@@ -22,6 +22,8 @@
 #include "tpaccountmanager.h"
 #include "tpaccountitem.h"
 
+#include <select_account.ui.h>
+
 #include <TelepathyQt4/Debug>
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Types>
@@ -58,11 +60,15 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
         return;
     }
 
+    m_Accounts.clear();
+
     Q_FOREACH(const QString &path, m_AM->allAccountPaths())
     {
         TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(m_AM, path, this));
         m_Accounts.push_back(account);
     }
+
+    selectAccount();
 
     return;
     
@@ -83,4 +89,11 @@ void TpAccountManager::chooseAccount()
      QObject::connect(m_AM->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onAMReady(Tp::PendingOperation *)));
+}
+
+void TpAccountManager::selectAccount()
+{
+    QDialog dialog;
+    m_select_account.setupUi(&dialog);
+    dialog.exec();
 }

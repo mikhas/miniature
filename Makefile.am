@@ -114,9 +114,13 @@ BUILT_SOURCES = \
 		src/main.moc.cc \
 		src/network_game.moc.cc \
 		src/pieces/piece.moc.cc \
+<<<<<<< HEAD:Makefile.am
 		src/pregame.moc.cc \
 		src/telepathy/tpaccountmanager.moc.cc \
 		src/telepathy/tpaccountitem.moc.cc \
+=======
+		src/select_account.ui.h \
+>>>>>>> Add account selection dialog:Makefile.am
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
