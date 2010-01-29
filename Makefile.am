@@ -54,6 +54,9 @@ src_miniature_SOURCES = \
 			src/pieces/queen.cc \
 			src/pieces/king.h \
 			src/pieces/king.cc \
+			src/pregame.cc \
+			src/pregame.h \
+			src/pregame.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5
@@ -82,6 +85,7 @@ BUILT_SOURCES = \
 		src/graphics_board_item.moc.cc \
 		src/main.moc.cc \
 		src/pieces/piece.moc.cc \
+		src/pregame.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
