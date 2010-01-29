@@ -118,7 +118,7 @@ onStartScreenRequested()
     connect(new_game, SIGNAL(pressed()),
             this, SLOT(onNewGameRequested()));
 
-    connect(new_game, SIGNAL(pressed()),
+    connect(new_p2p_game, SIGNAL(pressed()),
             this, SLOT(onNewP2PGameRequested()));
 }
 
