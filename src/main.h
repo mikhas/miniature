@@ -30,8 +30,6 @@
 class mActions;
 class mDialogs;
 
-
-
 /*! \brief Miniature main view
  *
  *  This class represents Miniature's main view. It sets up the basic UI, the
@@ -50,14 +48,14 @@ public:
     ~MMainWindow();
 
     /*!
-     *  Common initialization.
+     *  Initializes the pre-game UI.
      */
-    void setup();
+    static void setupPreGameUi(QMainWindow *window, QWidget *subview);
 
     /*!
-     *  Initializes the UI, similar to what UIC would do.
+     *  Initializes the normal game mode UI.
      */
-    void setupUi();
+    static void setupGameUi(QMainWindow *window, QGraphicsView *subview);
 
     /*!
      *  Registers the main view actions in the menu, and connects them.
@@ -88,8 +86,6 @@ public Q_SLOTS:
     void showAboutDialog();
 
 private:
-    Miniature::MGame *m_game;  /*!< The MGame instance, owned by MMainWindow. */
-    Miniature::MBoardView *m_view; /*!< The MBoardView instance, owned by MMainWindow. */
     mActions *m_actions; /*!< The main actions used in the main view. */
     mDialogs *m_dialogs; /*!< The dialogs used in the main view. */
     QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */
