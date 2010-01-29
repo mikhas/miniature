@@ -21,6 +21,7 @@
 
 #include "tpaccountmanager.h"
 #include "tpaccountitem.h"
+#include "accountselectiondlg.h"
 
 #include <select_account.ui.h>
 
@@ -36,9 +37,10 @@
 #include <QDebug>
 #include <QString>
 #include <QtGlobal>
-//#include <QtMaemo5/QtMaemo5>
+#include <QtMaemo5/QtMaemo5>
 
-using namespace Miniature;
+namespace Miniature
+{
 
 TpAccountManager::TpAccountManager(QObject *parent)
     : QObject(parent)
@@ -50,6 +52,7 @@ TpAccountManager::TpAccountManager(QObject *parent)
 
 TpAccountManager::~TpAccountManager()
 {
+
 }
 
 void TpAccountManager::onAMReady(Tp::PendingOperation *o)
@@ -69,17 +72,6 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
     }
 
     selectAccount();
-
-    return;
-    
-    QList<Tp::AccountPtr> accountList = m_AM->validAccounts();
-
-    if(accountList.size() == 0)
-    {
-        //QMaemo5InformationBox::information(NULL, QString("Can't find valid accounts!"));
-        qDebug("Can't find valid accounts!");
-        return;
-    }
 }
 
 void TpAccountManager::chooseAccount()
@@ -93,7 +85,8 @@ void TpAccountManager::chooseAccount()
 
 void TpAccountManager::selectAccount()
 {
-    QDialog dialog;
-    m_select_account.setupUi(&dialog);
-    dialog.exec();
+    m_select_account.setAccounts(m_Accounts);
+    m_select_account.exec();
 }
+
+};

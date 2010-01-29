@@ -26,7 +26,7 @@
 #include <QList>
 
 #include "tpaccountitem.h"
-#include "select_account.ui.h"
+#include "accountselectiondlg.h"
 
 #include <TelepathyQt4/Types>
 
@@ -46,15 +46,14 @@ public:
 
     void chooseAccount();
 
-public Q_SLOTS:
+private Q_SLOTS:
     void onAMReady(Tp::PendingOperation *);
 
 private:
     void selectAccount();
-
     Tp::AccountManagerPtr m_AM;
     QList<TpAccountItemPtr> m_Accounts;
-    Ui::SelectAccountDialog m_select_account;
+    AccountSelectionDlg m_select_account;
 };
 
 };

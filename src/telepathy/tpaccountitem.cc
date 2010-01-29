@@ -48,6 +48,24 @@ TpAccountItem::~TpAccountItem()
 {
 }
 
+void TpAccountItem::onReady(Tp::PendingOperation *o)
+{
+    if(o->isError())
+    {
+        qDebug() << "Account ready error.";
+        return;
+    }
+}
+
+void TpAccountItem::getDisplayName()
+{
+    if(mAcc->isReady())
+    {
+        QString dName = mAcc->displayName();
+        Q_EMIT displayName(dName);
+    }
+}
+
 };
 
 #include "tpaccountitem.moc.cc"

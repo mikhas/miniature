@@ -19,42 +19,37 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPACCOUNTITEM_H_
-#define TPACCOUNTITEM_H_
+#include "accountselectiondlg.h"
 
-#include <QObject>
-#include <QSharedPointer>
+#include <TelepathyQt4/Account>
 
-#include <TelepathyQt4/Types>
-
-namespace Tp {
-    class PendingOperation;
-}
+#include <QtDebug>
 
 namespace Miniature
 {
 
-class TpAccountItem : public QObject
+AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
-    Q_OBJECT
-public:
-    TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent = 0);
-    ~TpAccountItem();
+    ui.setupUi(this);
+}
 
-    void getDisplayName();
+AccountSelectionDlg::~AccountSelectionDlg()
+{
+}
 
-Q_SIGNALS:
-    void displayName(const QString &);
+void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
+{
+    mAccounts = accounts;
 
-private Q_SLOTS:
-    void onReady(Tp::PendingOperation *);
+    Q_FOREACH(TpAccountItemPtr acc, mAccounts)
+    {
 
-private:
-    Tp::AccountPtr mACC;
+    }
+}
+
+void AccountSelectionDlg::onAccountDisplayName(const QString &displayName)
+{
+    QString bla = displayName;
+}
+
 };
-
-typedef QSharedPointer<TpAccountItem> TpAccountItemPtr;
-
-};
-
-#endif // TPACCOUNTITEM_H_
