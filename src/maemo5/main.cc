@@ -103,7 +103,7 @@ void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
 
     window->setAttribute(Qt::WA_Maemo5StackedWindow);
     window->setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
-    window->setWindowState(window->windowState() & Qt::WindowFullScreen);
+    window->setWindowState(window->windowState() | Qt::WindowFullScreen);
 
     QWidget *central = new QWidget(window);
     window->setCentralWidget(central);
