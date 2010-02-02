@@ -18,46 +18,35 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <main.h>
-#include <iconic_button.h>
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
 /*!
- *  This class controls the start screen and forwards control to the correct
- *  MGame controller once the user made a choice
+ *  A helper class to create clickable images. Using pixmaps on push buttons
+ *  doesn't quite yield the desired effect.
  */
-class MPreGame
-: public QObject
+class MIconicButton
+: public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MPreGame(QObject *parent = 0);
-    virtual ~MPreGame();
+    explicit MIconicButton(const QPixmap &pixmap, const QString &label, QWidget *parent = 0);
+    virtual ~MIconicButton();
+    virtual QSize sizeHint() const;
 
-public Q_SLOTS:
-    /*!
-     *  Shows the start screen where the user can choose one of the available game modi.
-     *  In the near future, this method will also initialize the prerendering
-     *  of all the needed QImages in a separate thread.
-     *  @param[in] view the view where we place the start screen into.
-     */
-    void onStartScreenRequested();
+Q_SIGNALS:
+    void pressed();
 
-    /*!
-     *  Starts a game in "pub mode"
-     */
-    void onNewGameRequested();
-
-    /*!
-     *  Starts a new P2P game.
-     */
-    void onNewP2PGameRequested();
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
 
 private:
-  MMainWindow *m_main_window;
-
+    QPixmap m_pixmap;
+    QString m_label;
 };
 
-} // namespace Miniature
+}

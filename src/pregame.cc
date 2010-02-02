@@ -26,57 +26,6 @@
 
 using namespace Miniature;
 
-MIconicButton::
-MIconicButton(const QPixmap &pixmap, const QString &label, QWidget *parent)
-: QWidget(parent),
-  m_pixmap(pixmap),
-  m_label(label)
-{
-    resize(sizeHint());
-    QSizePolicy fixed = QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setSizePolicy(fixed);
-}
-
-MIconicButton::
-~MIconicButton()
-{}
-
-QSize MIconicButton::
-sizeHint() const
-{
-    return QSize(m_pixmap.width(), m_pixmap.height() + 30);
-}
-
-void MIconicButton::
-paintEvent (QPaintEvent *event)
-{
-    event->accept();
-    QPainter painter(this);
-
-    painter.drawPixmap(QRect(event->rect().x(),
-                             event->rect().y(),
-                             m_pixmap.width(),
-                             m_pixmap.height()),
-                       m_pixmap, m_pixmap.rect());
-
-    QFont font;
-    font.setPixelSize(20);
-    font.setWeight(QFont::Bold);
-    painter.setPen(QColor(Qt::white));
-    painter.drawText(QRect(event->rect().x(),
-                           event->rect().y() + m_pixmap.height(),
-                           m_pixmap.width(),
-                           30),
-                     Qt::AlignCenter, m_label);
-}
-
-void MIconicButton::
-mouseReleaseEvent(QMouseEvent *event)
-{
-    event->accept();
-    Q_EMIT pressed();
-}
-
 MPreGame::
 MPreGame(QObject *parent)
 : QObject(parent),
