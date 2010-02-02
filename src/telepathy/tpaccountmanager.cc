@@ -71,6 +71,7 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
         m_Accounts.push_back(account);
     }
 
+    m_select_account.setAccounts(m_Accounts);
     m_select_account.exec();
 }
 

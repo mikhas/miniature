@@ -21,7 +21,7 @@
 
 #include "tpaccountlistmodel.h"
 
-#include <QtDebug>
+#include <QtGlobal>
 
 namespace Miniature
 {
@@ -33,14 +33,15 @@ TpAccountListModel::TpAccountListModel(QObject *parent) : QAbstractListModel(par
 
 int TpAccountListModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    qDebug() << "Accounts size:" << mAccounts.size();
     return mAccounts.size();
 }
 
 QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
 {
+
     if(index.isValid() && role == Qt::DisplayRole)
     {
+        qDebug() << mAccounts[index.row()]->getDisplayName();
         return QVariant(mAccounts[index.row()]->getDisplayName());
     }
     else
@@ -51,7 +52,6 @@ QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
 
 void TpAccountListModel::setAccounts(const QList<TpAccountItemPtr> &accounts)
 {
-    qDebug() << "Accouts model reset";
     mAccounts = accounts;
     reset();
 }

@@ -30,7 +30,6 @@
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
 
-#include <QDebug>
 #include <QString>
 #include <QtGlobal>
 #include <QtMaemo5/QtMaemo5>
@@ -66,10 +65,9 @@ void TpAccountItem::onReady(Tp::PendingOperation *o)
 
 QString TpAccountItem::getDisplayName()
 {
-    qDebug();
     if(mAcc->isReady())
     {
-        return mAcc->displayName();
+        return mAcc->normalizedName();
     }
 
     return QString();
