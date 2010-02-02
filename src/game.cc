@@ -39,10 +39,30 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    connect(m_view->getTopDashboardItem(), SIGNAL(confirmButtonPressed()),
+    MDashboardItem *top_item = m_view->getTopDashboardItem();
+    MDashboardItem *bottom_item = m_view->getBottomDashboardItem();
+
+    // Connect move confirmation
+    connect(top_item, SIGNAL(confirmButtonPressed()),
             this, SLOT(onMoveConfirmed()));
-    connect(m_view->getBottomDashboardItem(), SIGNAL(confirmButtonPressed()),
+    connect(top_item, SIGNAL(confirmButtonPressed()),
             this, SLOT(onMoveConfirmed()));
+
+    // Connect draw requests
+    connect(top_item, SIGNAL(drawButtonPressed()),
+            bottom_item, SLOT(drawOffered()));
+    connect(bottom_item, SIGNAL(drawButtonPressed()),
+            top_item, SLOT(drawOffered()));
+
+    // Connect the draw acceptance
+    connect(top_item, SIGNAL(drawAccepted()),
+            bottom_item, SLOT(onDrawAccepted()));
+    connect(top_item, SIGNAL(drawAccepted()),
+            top_item, SLOT(onDrawAccepted()));
+    connect(bottom_item, SIGNAL(drawAccepted()),
+            top_item, SLOT(onDrawAccepted()));
+    connect(bottom_item, SIGNAL(drawAccepted()),
+            bottom_item, SLOT(onDrawAccepted()));
 
     newGame();
 }
