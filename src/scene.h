@@ -47,6 +47,11 @@ public:
      */
     void setModalItem(QGraphicsItem *item);
 
+    /*!
+     *  Convenience method for setModalItem(0).
+     */
+    void resetModalItem();
+
 protected:
     /*!
      *  Overriden to check against modal regions.
@@ -54,9 +59,16 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    /*!
+     *  Common initialization goes here.
+     */
+    void setup();
+
     QGraphicsItem *m_modal_item; /*!< The modal item. If non-zero, each click
                                       will be checked against the modal region
                                       set. */
+    QGraphicsPixmapItem *m_blur_item; /*!< The item for the blurred vision of
+                                           the view. */
 };
 
 } // namespace Miniature

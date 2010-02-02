@@ -299,6 +299,8 @@ getContactsAvatar(const QString &nick)
 void MDashboardItem::
 showConfirmationDialog(const QString &title, QPushButton *button)
 {
+    static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
+
     QWidget *dialog = new QWidget;
     dialog->resize(width, height);
 
@@ -318,8 +320,6 @@ showConfirmationDialog(const QString &title, QPushButton *button)
     m_offers_dialog->setWidget(dialog);
     m_offers_dialog->show();
     m_offers_dialog->setEnabled(true);
-
-    static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
 }
 
 // MDashboardItem protected:
@@ -349,6 +349,7 @@ disableConfirmButton()
 
     m_confirm->setEnabled(false);
     m_confirm->setBackgroundBrush(QBrush(Qt::transparent));
+    m_confirm->storeBackgroundBrush();
 }
 
 void MDashboardItem::
@@ -371,6 +372,8 @@ disableRequestsButton()
 void MDashboardItem::
 showRequestsMenu()
 {
+    static_cast<MScene *>(scene())->setModalItem(m_requests_dialog);
+
     if(!m_requests_dialog->widget())
     {
         QWidget *dialog = new QWidget;
@@ -404,7 +407,6 @@ showRequestsMenu()
 
     m_requests_dialog->show();
     m_requests_dialog->setEnabled(true);
-    static_cast<MScene *>(scene())->setModalItem(m_requests_dialog);
 }
 
 void MDashboardItem::
@@ -481,6 +483,9 @@ hideStatus()
 void MDashboardItem::
 setStatusText(const QString &text)
 {
+    // Resetting the blur effect is quite hackish - we rely on moves setting a
+    // status etc. TODO: find a better place!
+    static_cast<MScene *>(scene())->resetModalItem();
     m_status_anim->stop();
     m_status->setOpacity(1.0);
     QTimer::singleShot(3000, this, SLOT(fadeOutStatus()));

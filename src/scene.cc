@@ -20,36 +20,70 @@
 
 #include <scene.h>
 
-#include <QGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
+#include <QtCore>
+#include <QtGui>
 
 using namespace Miniature;
 
 MScene::
 MScene(QObject *parent)
 : QGraphicsScene(parent),
-  m_modal_item(0)
-{}
+  m_modal_item(0),
+  m_blur_item(new QGraphicsPixmapItem)
+{
+    setup();
+}
 
 MScene::
 MScene(const QRectF &region, QObject *parent)
 : QGraphicsScene(region, parent),
-  m_modal_item(0)
-{}
+  m_modal_item(0),
+  m_blur_item(new QGraphicsPixmapItem)
+{
+    setup();
+}
 
 MScene::
 ~MScene()
 {}
 
 void MScene::
+setup()
+{
+    QGraphicsBlurEffect *effect = new QGraphicsBlurEffect;
+    effect->setBlurRadius(12);
+    effect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
+    m_blur_item->setGraphicsEffect(effect);
+    addItem(m_blur_item);
+    m_blur_item->hide();
+}
+
+void MScene::
 setModalItem(QGraphicsItem *item)
 {
+    m_blur_item->hide();
+
     if(m_modal_item)
     {
         m_modal_item->hide();
     }
 
     m_modal_item = item;
+
+    QGraphicsView *view = views()[0];
+    if (m_modal_item && view)
+    {
+        view->repaint();
+        QRectF r = view->rect();
+        m_blur_item->setPixmap(QPixmap::grabWindow(view->winId(), r.x(), r.y(), r.width(), r.height()));
+        m_blur_item->show();
+    }
+}
+
+void MScene::
+resetModalItem()
+{
+    setModalItem(0);
 }
 
 void MScene::
@@ -69,6 +103,7 @@ mousePressEvent(QGraphicsSceneMouseEvent *event)
         event->accept();
         m_modal_item->hide();
         m_modal_item = 0;
+        m_blur_item->hide();
     }
     else
     {
