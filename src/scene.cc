@@ -55,21 +55,26 @@ setModalItem(QGraphicsItem *item)
 void MScene::
 mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    // It is neccessary to call this first, else the event position is not updated.
-    QGraphicsScene::mousePressEvent(event);
-
-    QPointF target = event->pos();
+    QPointF target = event->scenePos();
 
     // If another item holds the mouse already, we know that the coords are in
     // that item's coords, hence we need to translate it to scene coords.
     if (mouseGrabberItem())
     {
-        target = mouseGrabberItem()->mapToScene(event->pos());
+        target = mouseGrabberItem()->mapToScene(event->scenePos());
     }
 
     if(m_modal_item && !(m_modal_item->boundingRect().contains(m_modal_item->mapFromScene(target))))
     {
+        event->accept();
         m_modal_item->hide();
         m_modal_item = 0;
     }
+    else
+    {
+        // Needs to be the last method call since it could lead to signal emission,
+        // therefore become racy w.r.t m_modal_item (might get replaced etc.)
+        QGraphicsScene::mousePressEvent(event);
+    }
+
 }
