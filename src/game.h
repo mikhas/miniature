@@ -100,6 +100,14 @@ private:
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
 
+    /*!
+     *  Helper method to activate the interaction between the two dashboard items.
+     *  To connect the items in both ways, call the method with swapped parameters.
+     *  @param[in] first the first dashboard item
+     *  @param[in] second the second dashboard item
+     */
+    void connectDashboardItems(MDashboardItem *first, MDashboardItem *second);
+
     void updatePlayerStatus(const MPosition &position);
 
     /* A reference to the board view, we do not take ownership. */

@@ -39,30 +39,11 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    MDashboardItem *top_item = m_view->getTopDashboardItem();
-    MDashboardItem *bottom_item = m_view->getBottomDashboardItem();
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
 
-    // Connect move confirmation
-    connect(top_item, SIGNAL(confirmButtonPressed()),
-            this, SLOT(onMoveConfirmed()));
-    connect(top_item, SIGNAL(confirmButtonPressed()),
-            this, SLOT(onMoveConfirmed()));
-
-    // Connect draw requests
-    connect(top_item, SIGNAL(drawButtonPressed()),
-            bottom_item, SLOT(drawOffered()));
-    connect(bottom_item, SIGNAL(drawButtonPressed()),
-            top_item, SLOT(drawOffered()));
-
-    // Connect the draw acceptance
-    connect(top_item, SIGNAL(drawAccepted()),
-            bottom_item, SLOT(onDrawAccepted()));
-    connect(top_item, SIGNAL(drawAccepted()),
-            top_item, SLOT(onDrawAccepted()));
-    connect(bottom_item, SIGNAL(drawAccepted()),
-            top_item, SLOT(onDrawAccepted()));
-    connect(bottom_item, SIGNAL(drawAccepted()),
-            bottom_item, SLOT(onDrawAccepted()));
+    connectDashboardItems(top, bottom);
+    connectDashboardItems(bottom, top);
 
     newGame();
 }
@@ -147,8 +128,17 @@ void MGame::setupStartPosition()
     Q_ASSERT(m_game.empty());
 
     Q_CHECK_PTR(m_view);
-    m_view->getTopDashboardItem()->resetUi();
-    m_view->getBottomDashboardItem()->resetUi();
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
+
+    top->disableRequestsButton();
+    bottom->enableRequestsButton();
 
     MPosition pos;
 
@@ -197,6 +187,7 @@ bool MGame::isValidPosition(int half_move) const
 void MGame::setPositionTo(int half_move)
 {
     Q_CHECK_PTR(m_board_item);
+    Q_CHECK_PTR(m_view);
 
     if (isValidPosition(half_move))
     {
@@ -212,8 +203,25 @@ void MGame::setPositionTo(int half_move)
         updatePlayerStatus(pos);
     }
 
-    m_view->getTopDashboardItem()->resetUi();
-    m_view->getBottomDashboardItem()->resetUi();
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
+
+    if (isTurnOfTopPlayer())
+    {
+        top->enableRequestsButton();
+        bottom->disableRequestsButton();
+    }
+    else
+    {
+        top->disableRequestsButton();
+        bottom->enableRequestsButton();
+    }
 }
 
 bool MGame::isTurnOfTopPlayer() const
@@ -225,6 +233,33 @@ bool MGame::isTurnOfTopPlayer() const
 bool MGame::isTurnOfBottomPlayer() const
 {
     return (m_half_move_index % 2 == (m_is_bottom_player_white ? 0 : 1));
+}
+
+void MGame::connectDashboardItems(MDashboardItem *first, MDashboardItem *second)
+{
+    // Connect move confirmation
+    connect(first, SIGNAL(confirmButtonPressed()), this, SLOT(onMoveConfirmed()));
+
+    // Connect draw requests
+    connect(first,  SIGNAL(drawButtonPressed()), second, SLOT(drawOffered()));
+
+    // Connect adjourn requests
+    connect(first,  SIGNAL(adjournButtonPressed()), second, SLOT(adjournOffered()));
+
+    // Connect adjourn requests
+    connect(first,  SIGNAL(resignButtonPressed()), first, SLOT(showResignConfirmation()));
+
+    // Connect the draw acceptance
+    connect(first, SIGNAL(drawAccepted()), second, SLOT(onDrawAccepted()));
+    connect(first, SIGNAL(drawAccepted()), first,  SLOT(onDrawAccepted()));
+
+    // Connect the adjourn game acceptance
+    connect(first, SIGNAL(adjournAccepted()), second, SLOT(onAdjournAccepted()));
+    connect(first, SIGNAL(adjournAccepted()), first,  SLOT(onAdjournAccepted()));
+
+    // Connect resigned game
+    connect(first, SIGNAL(resignConfirmed()), second, SLOT(onGameWon()));
+    connect(first, SIGNAL(resignConfirmed()), first,  SLOT(onGameLost()));
 }
 
 void MGame::updatePlayerStatus(const MPosition &position)
@@ -261,8 +296,14 @@ void MGame::onPieceClicked(MPiece *piece)
         m_trans_half_move.undo();
         m_trans_half_move.deSelect();
 
-        m_view->getTopDashboardItem()->resetUi();
-        m_view->getBottomDashboardItem()->resetUi();
+        MDashboardItem *top = m_view->getTopDashboardItem();
+        MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+        top->resetUi();
+        bottom->resetUi();
+
+        top->disableConfirmButton();
+        bottom->disableConfirmButton();
 
         // Don't re-select the same piece - see b.m.o bug #7868.
         if (!was_already_selected)
@@ -289,43 +330,44 @@ void MGame::onTargetClicked(const QPoint &target)
     // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
 
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
     if (m_trans_half_move.isUndoRequest(target))
     {
         m_trans_half_move.undo(); // but do not deselect!
-        m_view->getTopDashboardItem()->resetUi();
-        m_view->getBottomDashboardItem()->resetUi();
+        top->disableConfirmButton();
+        bottom->disableConfirmButton();
     }
     else if (m_trans_half_move.applyToTarget(target))
     {
-
         if (isTurnOfBottomPlayer())
-        {
-            m_view->getTopDashboardItem()->resetUi();
-            m_view->getBottomDashboardItem()->enableConfirmButton();
-        }
+            bottom->enableConfirmButton();
         else
-        {
-            m_view->getTopDashboardItem()->enableConfirmButton();
-            m_view->getBottomDashboardItem()->resetUi();
-        }
+            top->enableConfirmButton();
     }
     else
     {
         if (isTurnOfBottomPlayer())
-        {
-            m_view->getBottomDashboardItem()->flash();
-        }
+            bottom->flash();
         else
-        {
-            m_view->getTopDashboardItem()->flash();
-        }
+            top->flash();
     }
 }
 
 void MGame::onMoveConfirmed()
 {
-    m_view->getTopDashboardItem()->resetUi();
-    m_view->getBottomDashboardItem()->resetUi();
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
 
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
@@ -338,8 +380,16 @@ void MGame::onMoveConfirmed()
 
     updatePlayerStatus(position);
 
-    if (isTurnOfBottomPlayer())
-        Q_EMIT turnOfBottomPlayer();
-    else
+    if (isTurnOfTopPlayer())
+    {
+        top->enableRequestsButton();
+        bottom->disableRequestsButton();
         Q_EMIT turnOfTopPlayer();
+    }
+    else
+    {
+        top->disableRequestsButton();
+        bottom->enableRequestsButton();
+        Q_EMIT turnOfBottomPlayer();
+    }
 }
