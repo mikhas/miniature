@@ -21,18 +21,12 @@
 #ifndef DASHBOARD_ITEM_H__
 #define DASHBOARD_ITEM_H__
 
-#include <QObject>
-#include <QPixmap>
-#include <QIcon>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsSceneMouseEvent>
-#include <QStandardItemModel>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsTextItem>
-#include <QPropertyAnimation>
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
+
 
 class MDashboardButton
 : public QObject, // we emit signals in our event handlers
@@ -69,6 +63,8 @@ public:
 
 public Q_SLOTS:
     void flash();
+    void storeBackgroundBrush();
+    void restoreBackgroundBrush();
 
 Q_SIGNALS:
    void pressed();
@@ -86,10 +82,6 @@ private:
                                            flashing the background. */
     QIcon m_icon; /*!< The icon used for the button. */
     bool m_active; /*!< The attribute for the button's active state. */
-
-private Q_SLOTS:
-    void storeBackgroundBrush();
-    void restoreBackgroundBrush();
 };
 
 
@@ -122,24 +114,42 @@ public:
     void resetUi();
 
 Q_SIGNALS:
-    void confirmButtonPressed();
-    void requestButtonPressed();
-    void takebackButtonPressed();
-    void avatarButtonPressed();
-    void drawButtonPressed();
-    void drawAccepted();
+    void confirmButtonPressed();  /*!< confirmed a move >*/
+    void requestsButtonPressed(); /*!< wants to open requests dialog >*/
+    void takebackButtonPressed(); /*!< wants to take back a move >*/
+    void avatarButtonPressed();   /*!< (n/a) >*/
+    void drawButtonPressed();     /*!< wants to propose a draw >*/
+    void drawAccepted();          /*!< accepted a draw >*/
+    void adjournButtonPressed();  /*!< wants to adjourn the game >*/
+    void adjournAccepted();       /*!< accepted to adjourn the game >*/
+    void resignButtonPressed();   /*!< the player wants to give up >*/
+    void resignConfirmed();        /*!< the player gave up >*/
 
 public Q_SLOTS:
     void enableConfirmButton();
     void disableConfirmButton();
+
+    void enableRequestsButton();
+    void disableRequestsButton();
     void showRequestsMenu();
+
     void drawOffered();
     void onDrawAccepted();
-    void flash();
+
+    void adjournOffered();
+    void onAdjournAccepted();
+
+    void showResignConfirmation();
+
+    void onGameWon();
+    void onGameLost();
+
     void setStatusText(const QString &text);
     void hideStatus();
-    void appendToLastMovesList(const QString &move_notation);
     void fadeOutStatus();
+
+    void flash();
+    void appendToLastMovesList(const QString &move_notation);
 
 protected:
 
@@ -157,6 +167,12 @@ private:
     MDashboardButton * createButtonWithBackground(const QPoint &origin, const QIcon &icon);
 
     /*!
+     *  Helper method to create the acceptance dialogs when sth. was offered.
+     *  @param[in] title the title of the dialog
+     *  @param[in] button the button to use, can be null
+     */
+    void showConfirmationDialog(const QString &title, QPushButton *button);
+    /*!
      *  This method tried to wrap libosso-abook in order to get the avatar from
      *  a given contact. Sadly, it won't compile with g++ so it probably needs
      *  to be moved into a gcc-compiled object file of its own.
@@ -164,7 +180,7 @@ private:
     QPixmap * getContactsAvatar(const QString &nick);
 
     MDashboardButton *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
-    MDashboardButton *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
+    MDashboardButton *m_requests; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
     MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */
     MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
     QGraphicsProxyWidget *m_requests_dialog; /*!< The proxy widget for the resolution menu that allows a player to send a request. */

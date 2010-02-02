@@ -21,9 +21,6 @@
 #include <dashboard_item.h>
 #include <scene.h>
 
-#include <QtCore>
-#include <QtGui>
-
 //#include <glib.h>
 //#include <libosso-abook/osso-abook.h>
 
@@ -146,7 +143,7 @@ MDashboardItem::
 MDashboardItem(QGraphicsItem *parent)
 : QGraphicsObject(parent),
   m_confirm(0),
-  m_request(0),
+  m_requests(0),
   m_takeback(0),
   m_avatar(0),
   m_requests_dialog(new QGraphicsProxyWidget(this)),
@@ -174,48 +171,17 @@ setupUi()
     const int centered_width  = (width  - icon_size) * 0.5;
     const int centered_height = 60 + ((height - icon_size - 60) * 0.5); // there is a 1st row w/ 60 pixels.
 
-    QWidget *request_widget = new QWidget;
-    request_widget->setWindowTitle(tr("?? Choose a Game Resolution"));
-    request_widget->resize(width, height);
-
-    QWidget *offers_widget = new QWidget;
-    offers_widget->setWindowTitle(tr("?? Accept Offer?"));
-    offers_widget->resize(width, height);
-
     QPalette palette;
     palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
     m_requests_dialog->setPalette(palette);
-    m_requests_dialog->setWidget(request_widget);
     m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
     m_requests_dialog->setEnabled(false);
     m_requests_dialog->hide();
 
     m_offers_dialog->setPalette(palette);
-    m_offers_dialog->setWidget(offers_widget);
     m_offers_dialog->setZValue(1);
     m_offers_dialog->setEnabled(false);
     m_offers_dialog->hide();
-
-    QGridLayout *grid = new QGridLayout;
-    grid->setColumnMinimumWidth(0, width * 0.5 - 12);
-    grid->setColumnMinimumWidth(1, width * 0.5 - 12);
-    request_widget->setLayout(grid);
-
-    QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
-    grid->addWidget(pause_button, 0, 0);
-
-    QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
-    grid->addWidget(draw_button, 0, 1);
-    connect(draw_button, SIGNAL(pressed()),
-            this, SIGNAL(drawButtonPressed()));
-    connect(draw_button, SIGNAL(pressed()),
-            request_widget, SLOT(hide()));
-
-    QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
-    grid->addWidget(adjourn_button, 1, 0);
-
-    QPushButton *resign_button = new QPushButton(tr("?? Resign"));
-    grid->addWidget(resign_button, 1, 1);
 
     QFont font;
     font.setWeight(QFont::Bold);
@@ -256,7 +222,7 @@ setupUi()
                                            QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
 
     // right-aligned
-    m_request = createButtonWithBackground(QPoint(width - icon_size - col_right_width, centered_height),
+    m_requests = createButtonWithBackground(QPoint(width - icon_size - col_right_width, centered_height),
                                            QIcon("/usr/share/themes/alpha/mediaplayer/Stop.png"));
 
     // left-aligned
@@ -275,30 +241,25 @@ setupUi()
     m_avatar->setEnabled(true);
 
     // now that the buttons exist we can connect their signals (or rather, forward them)
-    connect(m_confirm, SIGNAL(pressed()),
-            this, SIGNAL(confirmButtonPressed()));
+    connect(m_confirm, SIGNAL(pressed()), this, SIGNAL(confirmButtonPressed()));
 
-    connect(m_request, SIGNAL(pressed()),
-            this, SIGNAL(requestButtonPressed()));
+    connect(m_requests, SIGNAL(pressed()), this, SIGNAL(requestsButtonPressed()));
+    connect(m_requests, SIGNAL(pressed()), this, SLOT(showRequestsMenu()));
 
-    connect(m_takeback, SIGNAL(pressed()),
-            this, SIGNAL(requestButtonPressed()));
+    connect(m_takeback, SIGNAL(pressed()), this, SIGNAL(takebackButtonPressed()));
 
-    connect(m_avatar, SIGNAL(pressed()),
-            this, SIGNAL(avatarButtonPressed()));
-
-    connect(this, SIGNAL(requestButtonPressed()),
-            this, SLOT(showRequestsMenu()));
+    connect(m_avatar, SIGNAL(pressed()), this, SIGNAL(avatarButtonPressed()));
 }
 
 void MDashboardItem::
 resetUi()
 {
     m_requests_dialog->hide();
+    m_offers_dialog->hide();
 
-    disableConfirmButton();
-    m_request->setBackgroundBrush(Qt::transparent);
-    m_takeback->setBackgroundBrush(Qt::transparent);
+    m_confirm->restoreBackgroundBrush();
+    m_requests->restoreBackgroundBrush();
+    m_takeback->restoreBackgroundBrush();
 }
 
 MDashboardButton * MDashboardItem::
@@ -313,6 +274,8 @@ createButtonWithBackground(const QPoint &origin, const QIcon &icon)
 
     return button;
 }
+
+// MDashboardItem private:
 
 QPixmap * MDashboardItem::
 getContactsAvatar(const QString &nick)
@@ -333,11 +296,41 @@ getContactsAvatar(const QString &nick)
     return pixmap;
 }
 
+void MDashboardItem::
+showConfirmationDialog(const QString &title, QPushButton *button)
+{
+    QWidget *dialog = new QWidget;
+    dialog->resize(width, height);
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    dialog->setLayout(vbox);
+
+    QLabel *label = new QLabel(title);
+    label->setAlignment(Qt::AlignCenter);
+    vbox->addWidget(label);
+
+    if (button)
+    {
+        vbox->addWidget(button);
+        connect(button, SIGNAL(pressed()), dialog, SLOT(hide()));
+    }
+
+    m_offers_dialog->setWidget(dialog);
+    m_offers_dialog->show();
+    m_offers_dialog->setEnabled(true);
+
+    static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
+}
+
+// MDashboardItem protected:
+
 QRectF MDashboardItem::
 boundingRect() const
 {
     return QRectF(QPoint(0,0), QPoint(width, height));
 }
+
+// MDashboardItem public Q_SLOTS:
 
 void MDashboardItem::
 enableConfirmButton()
@@ -346,6 +339,7 @@ enableConfirmButton()
 
     m_confirm->setEnabled(true);
     m_confirm->setBackgroundBrush(QBrush(Qt::green));
+    m_confirm->storeBackgroundBrush();
 }
 
 void MDashboardItem::
@@ -358,35 +352,68 @@ disableConfirmButton()
 }
 
 void MDashboardItem::
+enableRequestsButton()
+{
+    Q_CHECK_PTR(m_requests);
+
+    m_requests->setEnabled(true);
+}
+
+void MDashboardItem::
+disableRequestsButton()
+{
+    Q_CHECK_PTR(m_requests);
+
+    m_requests->setEnabled(false);
+    m_requests->setBackgroundBrush(Qt::transparent);
+}
+
+void MDashboardItem::
 showRequestsMenu()
 {
-    static_cast<MScene *>(scene())->setModalItem(m_requests_dialog);
+    if(!m_requests_dialog->widget())
+    {
+        QWidget *dialog = new QWidget;
+
+        QGridLayout *grid = new QGridLayout;
+        grid->setColumnMinimumWidth(0, width * 0.5 - 12);
+        grid->setColumnMinimumWidth(1, width * 0.5 - 12);
+        dialog->setLayout(grid);
+
+        QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
+        grid->addWidget(pause_button, 0, 0);
+
+        QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
+        connect(draw_button, SIGNAL(pressed()), this, SIGNAL(drawButtonPressed()));
+        connect(draw_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        grid->addWidget(draw_button, 0, 1);
+
+        QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
+        connect(adjourn_button, SIGNAL(pressed()), this, SIGNAL(adjournButtonPressed()));
+        connect(adjourn_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        grid->addWidget(adjourn_button, 1, 0);
+
+        QPushButton *resign_button = new QPushButton(tr("?? Resign"));
+        connect(resign_button, SIGNAL(pressed()), this, SIGNAL(resignButtonPressed()));
+        connect(resign_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        grid->addWidget(resign_button, 1, 1);
+
+        m_requests_dialog->setWidget(dialog);
+        dialog->show();
+    }
+
     m_requests_dialog->show();
     m_requests_dialog->setEnabled(true);
+    static_cast<MScene *>(scene())->setModalItem(m_requests_dialog);
 }
 
 void MDashboardItem::
 drawOffered()
 {
-    static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
-    m_offers_dialog->show();
-    m_offers_dialog->setEnabled(true);
-
-    QVBoxLayout *vbox = new QVBoxLayout;
-    m_offers_dialog->widget()->setLayout(vbox);
-
-    QLabel *label = new QLabel(tr("?? Your opponent offered to draw."));
-    label->setAlignment(Qt::AlignCenter);
-    vbox->addWidget(label);
-
     QPushButton *accept_button = new QPushButton(tr("?? Accept Draw"));
-    vbox->addWidget(accept_button);
+    showConfirmationDialog(tr("?? Draw offered"), accept_button);
 
-    connect(accept_button, SIGNAL(pressed()),
-            this, SIGNAL(drawAccepted()));
-
-    connect(accept_button, SIGNAL(pressed()),
-            m_offers_dialog->widget(), SLOT(hide()));
+    connect(accept_button, SIGNAL(pressed()), this, SIGNAL(drawAccepted()));
 }
 
 void MDashboardItem::
@@ -396,11 +423,47 @@ onDrawAccepted()
 }
 
 void MDashboardItem::
+adjournOffered()
+{
+    QPushButton *accept_button = new QPushButton(tr("?? Adjourn Game"));
+    showConfirmationDialog(tr("?? Request to Adjourn the Game"), accept_button);
+
+    connect(accept_button, SIGNAL(pressed()), this, SIGNAL(adjournAccepted()));
+}
+
+void MDashboardItem::
+onAdjournAccepted()
+{
+    setStatusText(tr("Game was adjourned"));
+}
+
+void MDashboardItem::
+showResignConfirmation()
+{
+    QPushButton *confirm_button = new QPushButton(tr("?? Resign"));
+    showConfirmationDialog(tr("?? Do you want to resign?"), confirm_button);
+
+    connect(confirm_button, SIGNAL(pressed()), this, SIGNAL(resignConfirmed()));
+}
+
+void MDashboardItem::
+onGameWon()
+{
+    setStatusText(tr("Game won!"));
+}
+
+void MDashboardItem::
+onGameLost()
+{
+    setStatusText(tr("Game lost!"));
+}
+
+void MDashboardItem::
 flash()
 {
     m_confirm->flash();
     m_takeback->flash();
-    m_request->flash();
+    m_requests->flash();
 }
 
 void MDashboardItem::
