@@ -41,10 +41,11 @@ public:
     TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent = 0);
     ~TpAccountItem();
 
-    void getDisplayName();
+    QString getDisplayName();
+    void initialize();
 
 Q_SIGNALS:
-    void displayName(const QString &);
+    void initialized();
 
 private Q_SLOTS:
     void onReady(Tp::PendingOperation *);

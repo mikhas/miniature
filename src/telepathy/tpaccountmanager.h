@@ -50,7 +50,6 @@ private Q_SLOTS:
     void onAMReady(Tp::PendingOperation *);
 
 private:
-    void selectAccount();
     Tp::AccountManagerPtr m_AM;
     QList<TpAccountItemPtr> m_Accounts;
     AccountSelectionDlg m_select_account;

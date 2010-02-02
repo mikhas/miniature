@@ -27,6 +27,7 @@
 #include <QStringListModel>
 
 #include "tpaccountitem.h"
+#include "tpaccountlistmodel.h"
 #include "select_account.ui.h"
 
 namespace Miniature
@@ -42,12 +43,12 @@ public:
     void setAccounts(QList<TpAccountItemPtr>);
 
 private Q_SLOTS:
-    void onAccountDisplayName(const QString &);
+    void onAccountInitialized();
 
 private:
     QList<TpAccountItemPtr> mAccounts;
     Ui::SelectAccountDialog ui;
-    QStringListModel mlistModel;
+    TpAccountListModel *m_accountListModel;
 };
 
 };

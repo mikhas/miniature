@@ -41,11 +41,16 @@ namespace Miniature
 TpAccountItem::TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent) : QObject(parent), 
             mAcc(Tp::Account::create(am->dbusConnection(), am->busName(), path))
 {
-    QObject::connect(mAcc->becomeReady(), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
+
 }
 
 TpAccountItem::~TpAccountItem()
 {
+}
+
+void TpAccountItem::initialize()
+{
+    QObject::connect(mAcc->becomeReady(), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
 }
 
 void TpAccountItem::onReady(Tp::PendingOperation *o)
@@ -55,15 +60,19 @@ void TpAccountItem::onReady(Tp::PendingOperation *o)
         qDebug() << "Account ready error.";
         return;
     }
+
+    Q_EMIT initialized();
 }
 
-void TpAccountItem::getDisplayName()
+QString TpAccountItem::getDisplayName()
 {
+    qDebug();
     if(mAcc->isReady())
     {
-        QString dName = mAcc->displayName();
-        Q_EMIT displayName(dName);
+        return mAcc->displayName();
     }
+
+    return QString();
 }
 
 };

@@ -84,6 +84,9 @@ src_miniature_SOURCES = \
 			src/telepathy/accountselectiondlg.h \
 			src/telepathy/accountselectiondlg.cc \
 			src/telepathy/accountselectiondlg.moc.cc \
+			src/telepathy/tpaccountlistmodel.h \
+			src/telepathy/tpaccountlistmodel.cc \
+			src/telepathy/tpaccountlistmodel.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5

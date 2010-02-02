@@ -19,47 +19,31 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "accountselectiondlg.h"
+#ifndef TPACCOUNTLISTMODEL_H
+#define TPACCOUNTLISTMODEL_H
+
 #include "tpaccountitem.h"
 
-#include <TelepathyQt4/Account>
-
-#include <QtDebug>
+#include <QAbstractListModel>
 
 namespace Miniature
 {
 
-AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f), m_accountListModel(NULL)
+class TpAccountListModel : public QAbstractListModel
 {
-    ui.setupUi(this);
-}
+    Q_OBJECT
+public:
+    TpAccountListModel(QObject *parent = 0);
 
-AccountSelectionDlg::~AccountSelectionDlg()
-{
-}
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 
-void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
-{
-    mAccounts = accounts;
+    void setAccounts(const QList<TpAccountItemPtr> &);
 
-    Q_FOREACH(TpAccountItemPtr acc, mAccounts)
-    {
-        acc->disconnect();
-        QObject::connect(acc.data(), SIGNAL(initialized()), this, SLOT(onAccountInitialized()));
-        acc->initialize();
-    }
-}
-
-void AccountSelectionDlg::onAccountInitialized()
-{
-    if(m_accountListModel == NULL)
-    {
-        m_accountListModel = new TpAccountListModel();
-    }
-
-    m_accountListModel->setAccounts(mAccounts);
-    ui.listView->setModel(m_accountListModel);
-}
-
+private:
+    QList<TpAccountItemPtr> mAccounts;
+};
 
 };
+
+#endif // TPACCOUNTLISTMODEL_H

@@ -71,7 +71,7 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
         m_Accounts.push_back(account);
     }
 
-    selectAccount();
+    m_select_account.exec();
 }
 
 void TpAccountManager::chooseAccount()
@@ -81,12 +81,6 @@ void TpAccountManager::chooseAccount()
      QObject::connect(m_AM->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onAMReady(Tp::PendingOperation *)));
-}
-
-void TpAccountManager::selectAccount()
-{
-    m_select_account.setAccounts(m_Accounts);
-    m_select_account.exec();
 }
 
 };
