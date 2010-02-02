@@ -21,15 +21,8 @@
 #include <dashboard_item.h>
 #include <scene.h>
 
-#include <QGraphicsEllipseItem>
-#include <QGraphicsBlurEffect>
-#include <QGraphicsRectItem>
-#include <QPen>
-#include <QBrush>
-#include <QPushButton>
-#include <QGridLayout>
-#include <QTimer>
-#include <QApplication>
+#include <QtCore>
+#include <QtGui>
 
 //#include <glib.h>
 //#include <libosso-abook/osso-abook.h>
@@ -156,9 +149,8 @@ MDashboardItem(QGraphicsItem *parent)
   m_request(0),
   m_takeback(0),
   m_avatar(0),
-  m_fullscreen(0),
-  m_fullscreen_enabled(false),
-  m_proxy_widget(new QGraphicsProxyWidget(this)),
+  m_requests_dialog(new QGraphicsProxyWidget(this)),
+  m_offers_dialog(new QGraphicsProxyWidget(this)),
   m_status(new QGraphicsTextItem(this)),
   m_status_anim(new QPropertyAnimation(m_status, "opacity", this)),
   m_last_moves(new QGraphicsTextItem(this))
@@ -182,35 +174,48 @@ setupUi()
     const int centered_width  = (width  - icon_size) * 0.5;
     const int centered_height = 60 + ((height - icon_size - 60) * 0.5); // there is a 1st row w/ 60 pixels.
 
-    QWidget *popup = new QWidget;
-    popup->setWindowTitle(tr("?? Choose a Game Resolution"));
-    popup->resize(width, height);
+    QWidget *request_widget = new QWidget;
+    request_widget->setWindowTitle(tr("?? Choose a Game Resolution"));
+    request_widget->resize(width, height);
+
+    QWidget *offers_widget = new QWidget;
+    offers_widget->setWindowTitle(tr("?? Accept Offer?"));
+    offers_widget->resize(width, height);
 
     QPalette palette;
     palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
-    m_proxy_widget->setPalette(palette);
-    m_proxy_widget->setWidget(popup);
-    m_proxy_widget->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
+    m_requests_dialog->setPalette(palette);
+    m_requests_dialog->setWidget(request_widget);
+    m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
+    m_requests_dialog->setEnabled(false);
+    m_requests_dialog->hide();
+
+    m_offers_dialog->setPalette(palette);
+    m_offers_dialog->setWidget(offers_widget);
+    m_offers_dialog->setZValue(1);
+    m_offers_dialog->setEnabled(false);
+    m_offers_dialog->hide();
 
     QGridLayout *grid = new QGridLayout;
     grid->setColumnMinimumWidth(0, width * 0.5 - 12);
     grid->setColumnMinimumWidth(1, width * 0.5 - 12);
-    popup->setLayout(grid);
+    request_widget->setLayout(grid);
 
     QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
     grid->addWidget(pause_button, 0, 0);
 
     QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
     grid->addWidget(draw_button, 0, 1);
-
-    QPushButton *resign_button = new QPushButton(tr("?? Resign"));
-    grid->addWidget(resign_button, 1, 0);
+    connect(draw_button, SIGNAL(pressed()),
+            this, SIGNAL(drawButtonPressed()));
+    connect(draw_button, SIGNAL(pressed()),
+            request_widget, SLOT(hide()));
 
     QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
-    grid->addWidget(adjourn_button, 1, 1);
+    grid->addWidget(adjourn_button, 1, 0);
 
-    m_proxy_widget->setEnabled(false);
-    m_proxy_widget->hide();
+    QPushButton *resign_button = new QPushButton(tr("?? Resign"));
+    grid->addWidget(resign_button, 1, 1);
 
     QFont font;
     font.setWeight(QFont::Bold);
@@ -258,9 +263,6 @@ setupUi()
     m_takeback = createButtonWithBackground(QPoint(col_left_width, centered_height),
                                             QIcon("/usr/share/themes/alpha/mediaplayer/Back.png"));
 
-    m_fullscreen = new MDashboardButton(QIcon::fromTheme("general_fullsize"), this, 0);
-    m_fullscreen->setPos(QPoint(10, 96));
-
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
     if (avatar)
@@ -268,7 +270,7 @@ setupUi()
     else
        m_avatar = new MDashboardButton(empty, this, 0);
 
-    m_avatar->setPos(QPoint(10, 26)); // left-aligned
+    m_avatar->setPos(QPoint(10, centered_height)); // left-aligned
     m_avatar->show();
     m_avatar->setEnabled(true);
 
@@ -285,20 +287,14 @@ setupUi()
     connect(m_avatar, SIGNAL(pressed()),
             this, SIGNAL(avatarButtonPressed()));
 
-    connect(m_fullscreen, SIGNAL(pressed()),
-            this, SIGNAL(fullscreenButtonPressed()));
-
     connect(this, SIGNAL(requestButtonPressed()),
             this, SLOT(showRequestsMenu()));
-
-    connect(this, SIGNAL(fullscreenButtonPressed()),
-            this, SLOT(toggleFullscreen()));
 }
 
 void MDashboardItem::
 resetUi()
 {
-    m_proxy_widget->hide();
+    m_requests_dialog->hide();
 
     disableConfirmButton();
     m_request->setBackgroundBrush(Qt::transparent);
@@ -364,21 +360,39 @@ disableConfirmButton()
 void MDashboardItem::
 showRequestsMenu()
 {
-    static_cast<MScene *>(scene())->setModalItem(m_proxy_widget);
-    m_proxy_widget->show();
-    m_proxy_widget->setEnabled(true);
+    static_cast<MScene *>(scene())->setModalItem(m_requests_dialog);
+    m_requests_dialog->show();
+    m_requests_dialog->setEnabled(true);
 }
 
 void MDashboardItem::
-toggleFullscreen()
+drawOffered()
 {
-    QWidget *window = QApplication::activeWindow();
-    const Qt::WindowStates states = window->windowState();
+    static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
+    m_offers_dialog->show();
+    m_offers_dialog->setEnabled(true);
 
-    window->setWindowState(states & Qt::WindowFullScreen ? states & ~Qt::WindowFullScreen
-                                                         : states | Qt::WindowFullScreen);
+    QVBoxLayout *vbox = new QVBoxLayout;
+    m_offers_dialog->widget()->setLayout(vbox);
 
-    m_fullscreen_enabled = !m_fullscreen_enabled;
+    QLabel *label = new QLabel(tr("?? Your opponent offered to draw."));
+    label->setAlignment(Qt::AlignCenter);
+    vbox->addWidget(label);
+
+    QPushButton *accept_button = new QPushButton(tr("?? Accept Draw"));
+    vbox->addWidget(accept_button);
+
+    connect(accept_button, SIGNAL(pressed()),
+            this, SIGNAL(drawAccepted()));
+
+    connect(accept_button, SIGNAL(pressed()),
+            m_offers_dialog->widget(), SLOT(hide()));
+}
+
+void MDashboardItem::
+onDrawAccepted()
+{
+    setStatusText(tr("Game ended in a draw"));
 }
 
 void MDashboardItem::

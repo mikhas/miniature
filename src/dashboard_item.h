@@ -126,13 +126,15 @@ Q_SIGNALS:
     void requestButtonPressed();
     void takebackButtonPressed();
     void avatarButtonPressed();
-    void fullscreenButtonPressed();
+    void drawButtonPressed();
+    void drawAccepted();
 
 public Q_SLOTS:
     void enableConfirmButton();
     void disableConfirmButton();
     void showRequestsMenu();
-    void toggleFullscreen();
+    void drawOffered();
+    void onDrawAccepted();
     void flash();
     void setStatusText(const QString &text);
     void hideStatus();
@@ -165,9 +167,8 @@ private:
     MDashboardButton *m_request; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
     MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */
     MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
-    MDashboardButton *m_fullscreen; /*!< The 'toggle fullscreen' button. */
-    bool m_fullscreen_enabled; /*!< The attribute to decide between fullscreen and windowed mode. */
-    QGraphicsProxyWidget *m_proxy_widget; /*!< The proxy widget to plug in normal QWidgets in the dashboard item. */
+    QGraphicsProxyWidget *m_requests_dialog; /*!< The proxy widget for the resolution menu that allows a player to send a request. */
+    QGraphicsProxyWidget *m_offers_dialog; /*!< The proxy widget for the dialog to either accept or decline an offer. */
     QGraphicsTextItem *m_status; /*!< The status label below (ontop) the board. */
     QPropertyAnimation *m_status_anim; /*!< The fade out animation for the status label. */
     QGraphicsTextItem *m_last_moves; /*!< The text item that shows the last n moves of a player. */
