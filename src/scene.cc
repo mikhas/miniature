@@ -52,7 +52,6 @@ setup()
 {
     QGraphicsBlurEffect *effect = new QGraphicsBlurEffect;
     effect->setBlurRadius(12);
-    effect->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
     m_blur_item->setGraphicsEffect(effect);
     addItem(m_blur_item);
     m_blur_item->hide();
