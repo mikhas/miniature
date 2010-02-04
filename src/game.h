@@ -24,7 +24,6 @@
 #include "position.h"
 #include "half_move.h"
 #include "board_view.h"
-#include "action_area.h"
 #include "graphics_board_item.h"
 
 #include <QList>
@@ -60,6 +59,7 @@ public Q_SLOTS:
     void prevMove();
     void nextMove();
     void jumpToEnd();
+    void abortGame();
 
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
@@ -98,11 +98,16 @@ private:
      */
     bool isValidPosition(int half_move) const;
 
-    /* Sets both action area states in one go. */
-    void setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal = false);
-
     bool isTurnOfTopPlayer() const;
     bool isTurnOfBottomPlayer() const;
+
+    /*!
+     *  Helper method to activate the interaction between the two dashboard items.
+     *  To connect the items in both ways, call the method with swapped parameters.
+     *  @param[in] first the first dashboard item
+     *  @param[in] second the second dashboard item
+     */
+    void connectDashboardItems(MDashboardItem *first, MDashboardItem *second);
 
     void updatePlayerStatus(const MPosition &position);
 
@@ -125,12 +130,6 @@ private:
      * history. MGame takes ownership. */
     // TODO: I *think* this one got auto_ptr semantics, all this delete/assign 0 stuff.
     mHalfMove m_trans_half_move;
-
-    /* TODO: remove the silly assumption that white = bottom, black = top */
-    /* Each player has an action area outside of the board, the local player is
-     * always located at the bottom of the board. */
-    MActionArea m_top_action_area;
-    MActionArea m_bottom_action_area;
 
     bool m_is_bottom_player_white;
 };

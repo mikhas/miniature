@@ -37,9 +37,14 @@ MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
   m_background_page(new QWebPage),
   m_background_image(0),
-  m_board_item_offset(80)
+  m_board_item_offset(160)
 {
-    QGraphicsView::setScene(new QGraphicsScene(this));
+    QGraphicsView::setScene(new MScene(this));
+    // Ignore the growing property of the scene graph and always only show a
+    // fixed area. Also, assume we run in fullscreen (therefore, only works for
+    // pub mode.). 
+    // TODO: make this view reusable for other game modes, too.
+    setSceneRect(QRect(0, 0, 480, 800));
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
@@ -103,6 +108,18 @@ void MBoardView::setup()
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
+
+    m_top_dashboard = new MDashboardItem;
+    m_top_dashboard->disableConfirmButton();
+    scene()->addItem(m_top_dashboard);
+    m_top_dashboard->setRotation(180);
+    m_top_dashboard->setZValue(1);
+
+    m_bottom_dashboard = new MDashboardItem;
+    m_bottom_dashboard->disableConfirmButton();
+    scene()->addItem(m_bottom_dashboard);
+    m_bottom_dashboard->setPos(0, 640);
+    m_bottom_dashboard->setZValue(1);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)
@@ -111,20 +128,14 @@ void MBoardView::addBoardItem(MGraphicsBoardItem *item)
     item->setPos(QPoint(0, m_board_item_offset));
 }
 
-void MBoardView::setTopActionArea(QGraphicsProxyWidget *proxy_widget)
+MDashboardItem * MBoardView::getTopDashboardItem() const
 {
-    Q_CHECK_PTR(proxy_widget);
-
-    scene()->addItem(proxy_widget);
-    proxy_widget->setPos(QPoint(0, 0));
+    return m_top_dashboard;
 }
 
-void MBoardView::setBottomActionArea(QGraphicsProxyWidget *proxy_widget)
+MDashboardItem * MBoardView::getBottomDashboardItem() const
 {
-    Q_CHECK_PTR(proxy_widget);
-
-    scene()->addItem(proxy_widget);
-    proxy_widget->setPos(QPoint(0, m_board_item_offset + 480 + 5));
+    return m_bottom_dashboard;
 }
 
 void MBoardView::onLoadFinished(bool /*ok*/)

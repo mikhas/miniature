@@ -20,15 +20,10 @@
 
 #include <config.h>
 #include <main.h>
+#include <pregame.h>
 
 MMainWindow::~MMainWindow()
 {}
-
-void MMainWindow::setup()
-{
-    m_view = new Miniature::MBoardView(this);
-    m_game = new Miniature::MGame(m_view, this);
-}
 
 void MMainWindow::appendDebugOutput(const QString &msg)
 {
@@ -55,10 +50,10 @@ int main(int argc, char ** argv)
 {
     // raster backend is faster than native, but not as disruptive as opengl
     QApplication::setGraphicsSystem(QString("raster"));
-
     QApplication app(argc, argv);
-    MMainWindow window;
-    window.show();
+
+    Miniature::MPreGame pre_game;
+    pre_game.onStartScreenRequested();
 
     return app.exec();
 }

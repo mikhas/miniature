@@ -29,7 +29,6 @@
 #include <QSvgRenderer>
 #include <QGraphicsRectItem>
 #include <QGraphicsPixmapItem>
-#include <QPropertyAnimation>
 #include <QImage>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
@@ -112,7 +111,6 @@ public Q_SLOTS:
     void rotate0();
     void rotate180();
     void rotate(bool flip);
-    void onRotationFinished();
 
     void toggleRotations();
 
@@ -143,16 +141,10 @@ protected:
     QGraphicsPixmapItem *ghost;
     QGraphicsPixmapItem *dropShadow;
 
-    // Flipping a piece, animated.
-    bool rotated;
-    QPropertyAnimation *rotationAnimForward;
-    QPropertyAnimation *rotationAnimForwardCcw;
-    QPropertyAnimation *rotationAnimBackward;
-    QPropertyAnimation *rotationAnimBackwardCcw;
-
     // Fade out the ghost piece ... somehow, QPropertyAnimations did not work
     QTimeLine *ghostFadeOutTimer;
 
+    bool rotated;
     bool enableRotations;
 };
 

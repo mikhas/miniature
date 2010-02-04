@@ -20,9 +20,18 @@ src_miniature_SOURCES = \
 			src/board_view.cc \
 			src/board_view.h \
 			src/board_view.moc.cc \
+			src/scene.cc \
+			src/scene.h \
+			src/scene.moc.cc \
+			src/dashboard_item.cc \
+			src/dashboard_item.h \
+			src/dashboard_item.moc.cc \
 			src/game.cc \
 			src/game.h \
 			src/game.moc.cc \
+			src/iconic_button.cc \
+			src/iconic_button.h \
+			src/iconic_button.moc.cc \
 			src/logic_analyzer.cc \
 			src/logic_analyzer.h \
 			src/position.cc \
@@ -32,11 +41,6 @@ src_miniature_SOURCES = \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
-			src/action_area.cc \
-			src/action_area.h \
-			src/action_area.moc.cc \
-			src/about.ui.h \
-			src/miniature.ui.h \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
@@ -53,6 +57,9 @@ src_miniature_SOURCES = \
 			src/pieces/queen.cc \
 			src/pieces/king.h \
 			src/pieces/king.cc \
+			src/pregame.cc \
+			src/pregame.h \
+			src/pregame.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5
@@ -75,13 +82,14 @@ endif
 BUILT_SOURCES = \
 		data/data.qrc.cc \
 		src/board_view.moc.cc \
+		src/scene.moc.cc \
+		src/dashboard_item.moc.cc \
 		src/game.moc.cc \
 		src/graphics_board_item.moc.cc \
-		src/action_area.moc.cc \
+		src/iconic_button.moc.cc \
 		src/main.moc.cc \
-		src/miniature.ui.h \
-		src/about.ui.h \
 		src/pieces/piece.moc.cc \
+		src/pregame.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

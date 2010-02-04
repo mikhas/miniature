@@ -103,6 +103,12 @@ deSelect()
 }
 
 bool mHalfMove::
+isUndoRequest(const QPoint &target) const
+{
+    return (m_origin == target);
+}
+
+bool mHalfMove::
 applyToTarget(const QPoint &target)
 {
     m_target = target;
@@ -120,20 +126,13 @@ apply()
         return false;
     }
 
-    // Let's treat cancelling of a move as a special move that needs no logic check ...
-    if (m_origin == m_target)
-    {
-        undo();
-        return false;
-    }
-    else
-    {
-        m_position = m_position_origin;
-    }
-
-    MLogicAnalyzer::mMoveFlags move_result = m_logic_analyzer.verifyMove(&m_position, m_origin, m_target);
+    MLogicAnalyzer::mMoveFlags move_result = m_logic_analyzer.verifyMove(&m_position_origin, m_origin, m_target);
     if (MLogicAnalyzer::VALID_MOVE & move_result)
     {
+        // Start from a clean state: Now that we checked this move is valid we
+        // can undo w/o losing critical meta information.
+        undo();
+
         // TODO: check for capture flag instead.
         MPiece *maybe_captured = m_position.pieceAt(m_target);
         if (maybe_captured)

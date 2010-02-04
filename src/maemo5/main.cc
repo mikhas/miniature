@@ -20,7 +20,8 @@
 
 #include <config.h>
 #include <main.h>
-#include <about.ui.h>
+
+#include <QtGui>
 
 /*! \brief Container for Miniature main actions.
  */
@@ -31,21 +32,13 @@ public:
      *  @param[in] owner The owner of the contained actions.
      */
     explicit mActions(QObject *owner)
-    : new_game(new QAction(owner)),
-      next_move(new QAction(owner)),
-      prev_move(new QAction(owner)),
-      show_about_dialog(new QAction(owner)),
-      toggle_rotation(new QAction(owner))
+    :  show_about_dialog(new QAction(owner))
     {}
 
     virtual ~mActions()
     {}
 
-    QAction* new_game;
-    QAction* next_move;
-    QAction* prev_move;
     QAction* show_about_dialog;
-    QAction* toggle_rotation;
 };
 
 /*! \brief Container for Miniature dialogs.
@@ -58,8 +51,6 @@ public:
 
     virtual ~mDialogs()
     {}
-
-    Ui::AboutDialog about_dialog;
 };
 
 const char* const dbus_service_name = "org.maemo.miniature";
@@ -67,8 +58,6 @@ const char* const dbus_service_path = "/org/maemo/miniature";
 
 MMainWindow::MMainWindow()
 : QMainWindow(),
-  m_game(0),
-  m_view(0),
   m_actions(new mActions(this)),
   m_session(QDBusConnection::sessionBus())
 {
@@ -92,33 +81,45 @@ MMainWindow::MMainWindow()
 
     new QDBusAppActivator(this);
 
-    setup();
-    setupUi();
     registerActions();
     connectActions();
-
-    m_actions->new_game->trigger();
 }
 
-void MMainWindow::setupUi()
+void MMainWindow::setupPreGameUi(QMainWindow *window, QWidget *subview)
 {
-    setWindowTitle(tr("Miniature"));
-    resize(480, 800);
+    window->setWindowTitle(tr("Miniature"));
+    window->resize(800, 480);
 
-    QWidget *central = new QWidget(this);
-    setCentralWidget(central);
+    window->setAttribute(Qt::WA_Maemo5StackedWindow);
+    window->setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, true);
+
+    window->setCentralWidget(subview);
+}
+
+void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
+{
+    window->setWindowTitle(tr("Miniature"));
+    window->resize(480, 800);
+
+    window->setAttribute(Qt::WA_DeleteOnClose);
+    window->setAttribute(Qt::WA_Maemo5StackedWindow);
+    window->setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
+    window->setWindowState(window->windowState() | Qt::WindowFullScreen);
+
+    QWidget *central = new QWidget(window);
+    window->setCentralWidget(central);
 
     QVBoxLayout *vbox = new QVBoxLayout(central);
     vbox->setContentsMargins(0, 0, 0, 0);
 
     QSizePolicy v_expand(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    m_view->setSizePolicy(v_expand);
-    m_view->setMinimumSize(QSize(480, 650));
-    m_view->setFrameShape(QFrame::NoFrame);
-    m_view->setLineWidth(0);
-    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    vbox->addWidget(m_view);
+    subview->setSizePolicy(v_expand);
+    subview->setMinimumSize(QSize(480, 800));
+    subview->setFrameShape(QFrame::NoFrame);
+    subview->setLineWidth(0);
+    subview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    subview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    vbox->addWidget(subview);
 
     QSpacerItem *v_spacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     vbox->addItem(v_spacer);
@@ -126,30 +127,11 @@ void MMainWindow::setupUi()
 
 void MMainWindow::registerActions()
 {
-    m_actions->new_game->setText(tr("New Game"));
-    m_actions->new_game->setShortcut(tr("Ctrl+N"));
-
-    m_actions->next_move->setText(tr("Next Move"));
-    m_actions->next_move->setShortcut(tr("Right"));
-
-    m_actions->prev_move->setText(tr("Previous Move"));
-    m_actions->prev_move->setShortcut(tr("Left"));
-
-    m_actions->toggle_rotation->setText(tr("Toggle Rotation"));
-    m_actions->toggle_rotation->setShortcut(tr("Ctrl+R"));
-
     m_actions->show_about_dialog->setText(tr("About"));
     m_actions->show_about_dialog->setShortcut(tr("Ctrl+?"));
 
     QMenuBar *menu_bar = new QMenuBar(this);
     menu_bar->setGeometry(QRect(0, 0, 480, 25));
-
-    QMenu *menu = new QMenu(menu_bar);
-    menu_bar->addAction(menu->menuAction());
-    menu->addAction(m_actions->new_game);
-    menu->addAction(m_actions->next_move);
-    menu->addAction(m_actions->prev_move);
-    menu->addAction(m_actions->toggle_rotation);
 
     QMenu *help = new QMenu(menu_bar);
     menu_bar->addAction(help->menuAction());
@@ -160,19 +142,6 @@ void MMainWindow::registerActions()
 
 void MMainWindow::connectActions()
 {
-    // Connect actions with MGame controller.
-    connect(m_actions->new_game, SIGNAL(triggered()),
-            m_game, SLOT(newGame()));
-    connect(m_actions->next_move, SIGNAL(triggered()),
-            m_game, SLOT(nextMove()));
-    connect(m_actions->prev_move, SIGNAL(triggered()),
-            m_game, SLOT(prevMove()));
-    connect(m_actions->toggle_rotation, SIGNAL(triggered()),
-            m_game, SIGNAL(togglePieceRotations()));
-
-    // Connect action to show about dialog
-    // TODO: find out why the QDialog crashes in sbox! gdb reports instances of
-    // QDialog as struct*, so it is probably a linker issue.
     connect(m_actions->show_about_dialog, SIGNAL(triggered()),
             this, SLOT(showAboutDialog()));
 }
@@ -180,11 +149,51 @@ void MMainWindow::connectActions()
 void MMainWindow::showAboutDialog()
 {
     QFont font = QFont("helvetica", 14, QFont::Normal);
-    QDialog dialog;
-    m_dialogs->about_dialog.setupUi(&dialog);
-    m_dialogs->about_dialog.slogan->setFont(font);
-    m_dialogs->about_dialog.version->setFont(font);
-    m_dialogs->about_dialog.version->setText(QString("%1: %2").arg(tr("Version"))
-                                                              .arg(PACKAGE_VERSION));
-    dialog.exec();
+    QDialog *dialog = new QDialog(QApplication::activeWindow());
+    dialog->setWindowTitle(tr("About Miniature"));
+    dialog->resize(-1, 480);
+
+    QSizePolicy policy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    policy.setHorizontalStretch(0);
+    policy.setVerticalStretch(1);
+
+    QVBoxLayout *vbox = new QVBoxLayout(dialog);
+
+    QLabel *slogan = new QLabel(dialog);
+    slogan->setText(tr("A chess board that always goes with you."));
+    slogan->setAlignment(Qt::AlignCenter);
+    vbox->addWidget(slogan);
+
+    // TODO: Find correct color roles that are used in the QTextBrowser, and remove the HTML style hack.
+    QPalette lightBg;
+    lightBg.setColor(QPalette::Base, QColor(Qt::white));
+    lightBg.setColor(QPalette::WindowText, QColor(Qt::black));
+
+    QTextBrowser *description = new QTextBrowser(dialog);
+    description->setPalette(lightBg);
+    description->setSizePolicy(policy);
+
+    description->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
+
+    description->setOpenExternalLinks(true);
+    description->setText(tr(
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head/><body style=\"color:black; background:white;\">\n"
+"<div style=\"margin-bottom:1.5em;\">Miniature version: %1</div>\n"
+"<div style=\"margin-bottom:1.5em;\">Check the <a href=\"http://wiki.maemo.org/Miniature\">website</a> for more information,\n"
+"feedback and ways to get involved. Miniature is free software for you to enjoy\n"
+"(<a href=\"http://creativecommons.org/licenses/GPL/2.0/\">GPL2 or later</a>).\n"
+"<div>&#169; <a href=\"http://wiki.maemo.org/Miniature#Contributors\">Contributors</a>.</div>\n"
+"</body></html>"
+        ).arg(PACKAGE_VERSION));
+
+    vbox->addWidget(description);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(dialog);
+    buttons->setOrientation(Qt::Horizontal);
+    buttons->setStandardButtons(QDialogButtonBox::Close);
+    vbox->addWidget(buttons);
+
+    dialog->show();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }

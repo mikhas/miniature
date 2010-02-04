@@ -18,15 +18,13 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
-#include "position.h"
-#include "pieces.h"
+#include <game.h>
+#include <position.h>
+#include <pieces.h>
 
-#include <cmath>
 #include <QList>
 
-#include <iostream>
-#include <QTime>
+#include <QFontDatabase>
 
 using namespace Miniature;
 
@@ -41,29 +39,11 @@ MGame::MGame(MBoardView *view, QObject *parent)
 {
     Q_ASSERT(m_view);
 
-    // Process state transition requests.
-    connect(&m_top_action_area, SIGNAL(moveConfirmed()),
-            this, SLOT(onMoveConfirmed()));
-    connect(&m_bottom_action_area, SIGNAL(moveConfirmed()),
-            this, SLOT(onMoveConfirmed()));
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
 
-    m_view->setTopActionArea(m_top_action_area.getProxyWidget());
-    m_view->setBottomActionArea(m_bottom_action_area.getProxyWidget());
-
-    m_top_action_area.setText(QString("qgil"));
-    m_bottom_action_area.setText(QString("kore"));
-    setActionAreaStates(MActionArea::NONE, MActionArea::NONE);
-
-    // Enable rotation for action areas.
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            &m_top_action_area, SLOT(rotate180()));
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            &m_bottom_action_area, SLOT(rotate180()));
-
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            &m_top_action_area, SLOT(rotate0()));
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            &m_bottom_action_area, SLOT(rotate0()));
+    connectDashboardItems(top, bottom);
+    connectDashboardItems(bottom, top);
 
     newGame();
 }
@@ -119,32 +99,31 @@ void MGame::newGame()
 {
     setupBoardItem();
     setupStartPosition();
-
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToStart()
 {
     setPositionTo(0);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::prevMove()
 {
     setPositionTo(m_half_move_index - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::nextMove()
 {
     setPositionTo(m_half_move_index + 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
 }
 
 void MGame::jumpToEnd()
 {
     setPositionTo(m_game.size() - 1);
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
+}
+
+void MGame::abortGame()
+{
+    parent()->deleteLater();
 }
 
 void MGame::setupStartPosition()
@@ -152,6 +131,19 @@ void MGame::setupStartPosition()
     m_game.clear();
     m_game = MPositionList();
     Q_ASSERT(m_game.empty());
+
+    Q_CHECK_PTR(m_view);
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
+
+    top->disableRequestsButton();
+    bottom->enableRequestsButton();
 
     MPosition pos;
 
@@ -200,6 +192,7 @@ bool MGame::isValidPosition(int half_move) const
 void MGame::setPositionTo(int half_move)
 {
     Q_CHECK_PTR(m_board_item);
+    Q_CHECK_PTR(m_view);
 
     if (isValidPosition(half_move))
     {
@@ -214,33 +207,25 @@ void MGame::setPositionTo(int half_move)
 
         updatePlayerStatus(pos);
     }
-}
 
-void MGame::setActionAreaStates(MActionArea::State s1, MActionArea::State s2, bool emit_turn_signal)
-{
-    // current mapping is white = bottom
-    if (isTurnOfBottomPlayer())
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
+
+    if (isTurnOfTopPlayer())
     {
-        m_top_action_area.setState(s1);
-        m_bottom_action_area.setState(s2);
-
-        if (emit_turn_signal)
-        {
-            Q_EMIT turnOfBottomPlayer();
-        }
+        top->enableRequestsButton();
+        bottom->disableRequestsButton();
     }
     else
     {
-        m_top_action_area.setState(s2);
-        m_bottom_action_area.setState(s1);
-
-        m_top_action_area.rotate(180);
-        m_bottom_action_area.rotate(180);
-
-        if (emit_turn_signal)
-        {
-            Q_EMIT turnOfTopPlayer();
-        }
+        top->disableRequestsButton();
+        bottom->enableRequestsButton();
     }
 }
 
@@ -255,24 +240,56 @@ bool MGame::isTurnOfBottomPlayer() const
     return (m_half_move_index % 2 == (m_is_bottom_player_white ? 0 : 1));
 }
 
+void MGame::connectDashboardItems(MDashboardItem *first, MDashboardItem *second)
+{
+    // Connect move confirmation
+    connect(first, SIGNAL(confirmButtonPressed()), this, SLOT(onMoveConfirmed()));
+
+    // Connect draw requests
+    connect(first,  SIGNAL(drawButtonPressed()), second, SLOT(drawOffered()));
+
+    // Connect adjourn requests
+    connect(first,  SIGNAL(adjournButtonPressed()), second, SLOT(adjournOffered()));
+
+    // Connect resign requests
+    connect(first,  SIGNAL(resignButtonPressed()), first, SLOT(showResignConfirmation()));
+
+    // Connect abort game requests
+    connect(first,  SIGNAL(abortGameButtonPressed()), first, SLOT(showAbortGameConfirmation()));
+
+    // Connect the draw acceptance
+    connect(first, SIGNAL(drawAccepted()), second, SLOT(onDrawAccepted()));
+    connect(first, SIGNAL(drawAccepted()), first,  SLOT(onDrawAccepted()));
+
+    // Connect the adjourn game acceptance
+    connect(first, SIGNAL(adjournAccepted()), second, SLOT(onAdjournAccepted()));
+    connect(first, SIGNAL(adjournAccepted()), first,  SLOT(onAdjournAccepted()));
+
+    // Connect resigned game
+    connect(first, SIGNAL(resignConfirmed()), second, SLOT(onGameWon()));
+    connect(first, SIGNAL(resignConfirmed()), first,  SLOT(onGameLost()));
+
+    // Connect aborted game
+    connect(first, SIGNAL(abortGameConfirmed()), this, SLOT(abortGame()));
+}
+
 void MGame::updatePlayerStatus(const MPosition &position)
 {
-    // assumption: white == bottom ...
-    if (position.inCheck() && MPiece::WHITE == position.getColourToMove())
-    {
-        m_bottom_action_area.setText(QString("kore (check)"));
-        m_top_action_area.setText(QString("qgil"));
-    }
-    else if (position.inCheck() && MPiece::BLACK == position.getColourToMove())
-    {
-        m_bottom_action_area.setText(QString("kore"));
-        m_top_action_area.setText(QString("qgil (check)"));
-    }
+    m_view->getBottomDashboardItem()->hideStatus();
+    m_view->getTopDashboardItem()->hideStatus();
+    m_view->getBottomDashboardItem()->appendToLastMovesList(QString("42. Rc1"));
+    m_view->getTopDashboardItem()->appendToLastMovesList(QString("42. Rc1"));
+
+    QString status;
+    if (position.inCheck())
+        status = tr("Check!");
     else
-    {
-        m_bottom_action_area.setText(QString("kore"));
-        m_top_action_area.setText(QString("qgil"));
-    }
+        status = tr("Turn started");
+
+    if (isTurnOfBottomPlayer())
+        m_view->getBottomDashboardItem()->setStatusText(status);
+    else
+        m_view->getTopDashboardItem()->setStatusText(status);
 }
 
 void MGame::onPieceClicked(MPiece *piece)
@@ -290,14 +307,21 @@ void MGame::onPieceClicked(MPiece *piece)
         m_trans_half_move.undo();
         m_trans_half_move.deSelect();
 
+        MDashboardItem *top = m_view->getTopDashboardItem();
+        MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+        top->resetUi();
+        bottom->resetUi();
+
+        top->disableConfirmButton();
+        bottom->disableConfirmButton();
+
         // Don't re-select the same piece - see b.m.o bug #7868.
         if (!was_already_selected)
         {
             m_trans_half_move = mHalfMove(position);
             m_trans_half_move.select(piece->mapToCell());
         }
-
-        setActionAreaStates(MActionArea::NONE, MActionArea::TURN_STARTED);
     }
     // Must be an attempt to capture an enemy piece. Let's forward it then!
     // Note: From my current understanding, this is the only case where
@@ -314,20 +338,48 @@ void MGame::onPieceClicked(MPiece *piece)
 
 void MGame::onTargetClicked(const QPoint &target)
 {
-    // Ignores invalid mouse clicks, updates/reset action areas when move was
+    // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
-    if (m_trans_half_move.applyToTarget(target))
+
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    if (m_trans_half_move.isUndoRequest(target))
     {
-        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TARGET_SELECTED, true);
+        m_trans_half_move.undo(); // but do not deselect!
+        top->disableConfirmButton();
+        bottom->disableConfirmButton();
+    }
+    else if (m_trans_half_move.applyToTarget(target))
+    {
+        if (isTurnOfBottomPlayer())
+            bottom->enableConfirmButton();
+        else
+            top->enableConfirmButton();
     }
     else
     {
-        setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
+        if (isTurnOfBottomPlayer())
+            bottom->flash();
+        else
+            top->flash();
     }
 }
 
 void MGame::onMoveConfirmed()
 {
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    top->resetUi();
+    bottom->resetUi();
+
+    top->disableConfirmButton();
+    bottom->disableConfirmButton();
+
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
     MPosition position = MPosition(m_trans_half_move.getPosition());
@@ -337,6 +389,18 @@ void MGame::onMoveConfirmed()
     ++m_half_move_index;
     m_game.insert(m_half_move_index, position);
 
-    setActionAreaStates(MActionArea::TURN_ENDED, MActionArea::TURN_STARTED, true);
     updatePlayerStatus(position);
+
+    if (isTurnOfTopPlayer())
+    {
+        top->enableRequestsButton();
+        bottom->disableRequestsButton();
+        Q_EMIT turnOfTopPlayer();
+    }
+    else
+    {
+        top->disableRequestsButton();
+        bottom->enableRequestsButton();
+        Q_EMIT turnOfBottomPlayer();
+    }
 }
