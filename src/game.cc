@@ -121,6 +121,11 @@ void MGame::jumpToEnd()
     setPositionTo(m_game.size() - 1);
 }
 
+void MGame::abortGame()
+{
+    parent()->deleteLater();
+}
+
 void MGame::setupStartPosition()
 {
     m_game.clear();
@@ -246,8 +251,11 @@ void MGame::connectDashboardItems(MDashboardItem *first, MDashboardItem *second)
     // Connect adjourn requests
     connect(first,  SIGNAL(adjournButtonPressed()), second, SLOT(adjournOffered()));
 
-    // Connect adjourn requests
+    // Connect resign requests
     connect(first,  SIGNAL(resignButtonPressed()), first, SLOT(showResignConfirmation()));
+
+    // Connect abort game requests
+    connect(first,  SIGNAL(abortGameButtonPressed()), first, SLOT(showAbortGameConfirmation()));
 
     // Connect the draw acceptance
     connect(first, SIGNAL(drawAccepted()), second, SLOT(onDrawAccepted()));
@@ -260,6 +268,9 @@ void MGame::connectDashboardItems(MDashboardItem *first, MDashboardItem *second)
     // Connect resigned game
     connect(first, SIGNAL(resignConfirmed()), second, SLOT(onGameWon()));
     connect(first, SIGNAL(resignConfirmed()), first,  SLOT(onGameLost()));
+
+    // Connect aborted game
+    connect(first, SIGNAL(abortGameConfirmed()), this, SLOT(abortGame()));
 }
 
 void MGame::updatePlayerStatus(const MPosition &position)

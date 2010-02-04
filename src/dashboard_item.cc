@@ -147,6 +147,7 @@ MDashboardItem(QGraphicsItem *parent)
   m_takeback(0),
   m_avatar(0),
   m_requests_dialog(new QGraphicsProxyWidget(this)),
+  m_game_dialog(new QGraphicsProxyWidget(this)),
   m_offers_dialog(new QGraphicsProxyWidget(this)),
   m_status(new QGraphicsTextItem(this)),
   m_status_anim(new QPropertyAnimation(m_status, "opacity", this)),
@@ -169,7 +170,7 @@ setupUi()
 
     // Maemo5-specific icons, handle press states by replacing pixmap, or have two pixmap per item?
     const int centered_width  = (width  - icon_size) * 0.5;
-    const int centered_height = 60 + ((height - icon_size - 60) * 0.5); // there is a 1st row w/ 60 pixels.
+    const int centered_height = 40 + ((height - icon_size - 40) * 0.5); // there is a 1st row w/ 40 pixels.
 
     QPalette palette;
     palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
@@ -177,6 +178,11 @@ setupUi()
     m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
     m_requests_dialog->setEnabled(false);
     m_requests_dialog->hide();
+
+    m_game_dialog->setPalette(palette);
+    m_game_dialog->setZValue(1);
+    m_game_dialog->setEnabled(false);
+    m_game_dialog->hide();
 
     m_offers_dialog->setPalette(palette);
     m_offers_dialog->setZValue(1);
@@ -196,7 +202,7 @@ setupUi()
     m_status->setDefaultTextColor(QColor(Qt::black));
     m_status->setTextInteractionFlags(Qt::NoTextInteraction);
     m_status->setTextWidth(width - col_left_width - col_right_width);
-    m_status->setPos(QPoint(col_left_width, 20)); // below the board, centered
+    m_status->setPos(QPoint(col_left_width, 0)); // below the board, centered
 
     QGraphicsRectItem *rect_status = new QGraphicsRectItem(m_status);
     rect_status->setFlags(QGraphicsItem::ItemStacksBehindParent);
@@ -216,7 +222,7 @@ setupUi()
     m_last_moves->setDefaultTextColor(QColor(Qt::white));
     m_last_moves->setTextInteractionFlags(Qt::NoTextInteraction);
     m_last_moves->setTextWidth(col_right_width);
-    m_last_moves->setPos(QPoint(width - col_right_width, 20)); // below the board, right-aligned
+    m_last_moves->setPos(QPoint(width - col_right_width, 0)); // below the board, right-aligned
 
     m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
                                            QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
@@ -249,6 +255,7 @@ setupUi()
     connect(m_takeback, SIGNAL(pressed()), this, SIGNAL(takebackButtonPressed()));
 
     connect(m_avatar, SIGNAL(pressed()), this, SIGNAL(avatarButtonPressed()));
+    connect(m_avatar, SIGNAL(pressed()), this, SLOT(showGameMenu()));
 }
 
 void MDashboardItem::
@@ -322,6 +329,34 @@ showConfirmationDialog(const QString &title, QPushButton *button)
     m_offers_dialog->setEnabled(true);
 }
 
+void MDashboardItem::
+showEndGameUi()
+{
+    //resetUi();
+
+    // Hide all buttons
+    m_confirm->hide();
+    m_requests->hide();
+    m_takeback->hide();
+    m_avatar->hide();
+
+    // Show a single button to end the game
+    QGraphicsProxyWidget *dialog_proxy = new QGraphicsProxyWidget(this);
+    QWidget *dialog = new QWidget;
+    dialog->resize(width, height - 60);
+    dialog_proxy->setWidget(dialog);
+    dialog_proxy->show();
+    dialog_proxy->setPos(QPoint(0, 60));
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    dialog->setLayout(vbox);
+
+    QPushButton *end_game = new QPushButton("End game");
+    vbox->addWidget(end_game);
+
+    connect(end_game, SIGNAL(pressed()), this, SIGNAL(abortGameConfirmed()));
+}
+
 // MDashboardItem protected:
 
 QRectF MDashboardItem::
@@ -377,11 +412,22 @@ showRequestsMenu()
     if(!m_requests_dialog->widget())
     {
         QWidget *dialog = new QWidget;
+        dialog->resize(width, height + 60);
+
+        QVBoxLayout *vbox = new QVBoxLayout;
+        dialog->setLayout(vbox);
+
+        QLabel *title = new QLabel(tr("?? Request Menu"));
+        title->setAlignment(Qt::AlignCenter);
+        vbox->addWidget(title);
+
+        QWidget *grid_widget = new QWidget;
+        vbox->addWidget(grid_widget);
 
         QGridLayout *grid = new QGridLayout;
         grid->setColumnMinimumWidth(0, width * 0.5 - 12);
         grid->setColumnMinimumWidth(1, width * 0.5 - 12);
-        dialog->setLayout(grid);
+        grid_widget->setLayout(grid);
 
         QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
         grid->addWidget(pause_button, 0, 0);
@@ -406,7 +452,39 @@ showRequestsMenu()
     }
 
     m_requests_dialog->show();
+    m_requests_dialog->setPos(QPoint(0, -60));
     m_requests_dialog->setEnabled(true);
+}
+
+void MDashboardItem::
+showGameMenu()
+{
+    static_cast<MScene *>(scene())->setModalItem(m_game_dialog);
+
+    if(!m_game_dialog->widget())
+    {
+        QWidget *dialog = new QWidget;
+        dialog->resize(width, height);
+
+        QVBoxLayout *vbox = new QVBoxLayout;
+        dialog->setLayout(vbox);
+
+        QLabel *title = new QLabel(tr("?? Game Menu"));
+        title->setAlignment(Qt::AlignCenter);
+        vbox->addWidget(title);
+
+        QPushButton *abort_game_button = new QPushButton(tr("?? Abort Game"));
+        vbox->addWidget(abort_game_button);
+
+        connect(abort_game_button, SIGNAL(pressed()), this, SIGNAL(abortGameButtonPressed()));
+        connect(abort_game_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+
+        m_game_dialog->setWidget(dialog);
+        dialog->show();
+    }
+
+    m_game_dialog->show();
+    m_game_dialog->setEnabled(true);
 }
 
 void MDashboardItem::
@@ -421,7 +499,8 @@ drawOffered()
 void MDashboardItem::
 onDrawAccepted()
 {
-    setStatusText(tr("Game ended in a draw"));
+    setStatusText(tr("Game drawed"));
+    showEndGameUi();
 }
 
 void MDashboardItem::
@@ -442,22 +521,33 @@ onAdjournAccepted()
 void MDashboardItem::
 showResignConfirmation()
 {
-    QPushButton *confirm_button = new QPushButton(tr("?? Resign"));
+    QPushButton *confirm_button = new QPushButton(tr("?? Yes, resign"));
     showConfirmationDialog(tr("?? Do you want to resign?"), confirm_button);
 
     connect(confirm_button, SIGNAL(pressed()), this, SIGNAL(resignConfirmed()));
 }
 
 void MDashboardItem::
+showAbortGameConfirmation()
+{
+    QPushButton *confirm_button = new QPushButton(tr("?? Yes, abort game"));
+    showConfirmationDialog(tr("?? Do you want to abort the game?"), confirm_button);
+
+    connect(confirm_button, SIGNAL(pressed()), this, SIGNAL(abortGameConfirmed()));
+}
+
+void MDashboardItem::
 onGameWon()
 {
     setStatusText(tr("Game won!"));
+    showEndGameUi();
 }
 
 void MDashboardItem::
 onGameLost()
 {
     setStatusText(tr("Game lost!"));
+    showEndGameUi();
 }
 
 void MDashboardItem::

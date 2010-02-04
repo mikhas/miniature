@@ -114,7 +114,7 @@ void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
 
     QSizePolicy v_expand(QSizePolicy::Preferred, QSizePolicy::Expanding);
     subview->setSizePolicy(v_expand);
-    subview->setMinimumSize(QSize(480, 760));
+    subview->setMinimumSize(QSize(480, 800));
     subview->setFrameShape(QFrame::NoFrame);
     subview->setLineWidth(0);
     subview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

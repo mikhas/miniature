@@ -114,16 +114,18 @@ public:
     void resetUi();
 
 Q_SIGNALS:
-    void confirmButtonPressed();  /*!< confirmed a move >*/
-    void requestsButtonPressed(); /*!< wants to open requests dialog >*/
-    void takebackButtonPressed(); /*!< wants to take back a move >*/
-    void avatarButtonPressed();   /*!< (n/a) >*/
-    void drawButtonPressed();     /*!< wants to propose a draw >*/
-    void drawAccepted();          /*!< accepted a draw >*/
-    void adjournButtonPressed();  /*!< wants to adjourn the game >*/
-    void adjournAccepted();       /*!< accepted to adjourn the game >*/
-    void resignButtonPressed();   /*!< the player wants to give up >*/
+    void confirmButtonPressed();   /*!< confirmed a move >*/
+    void requestsButtonPressed();  /*!< wants to open requests dialog >*/
+    void takebackButtonPressed();  /*!< wants to take back a move >*/
+    void avatarButtonPressed();    /*!< (n/a) >*/
+    void drawButtonPressed();      /*!< wants to propose a draw >*/
+    void drawAccepted();           /*!< accepted a draw >*/
+    void adjournButtonPressed();   /*!< wants to adjourn the game >*/
+    void adjournAccepted();        /*!< accepted to adjourn the game >*/
+    void resignButtonPressed();    /*!< the player wants to give up >*/
     void resignConfirmed();        /*!< the player gave up >*/
+    void abortGameButtonPressed(); /*!< the player wants to end the game >*/
+    void abortGameConfirmed();     /*!< the player aborted the game >*/
 
 public Q_SLOTS:
     void enableConfirmButton();
@@ -133,6 +135,8 @@ public Q_SLOTS:
     void disableRequestsButton();
     void showRequestsMenu();
 
+    void showGameMenu();
+
     void drawOffered();
     void onDrawAccepted();
 
@@ -140,6 +144,7 @@ public Q_SLOTS:
     void onAdjournAccepted();
 
     void showResignConfirmation();
+    void showAbortGameConfirmation();
 
     void onGameWon();
     void onGameLost();
@@ -172,6 +177,13 @@ private:
      *  @param[in] button the button to use, can be null
      */
     void showConfirmationDialog(const QString &title, QPushButton *button);
+
+    /*
+     *  Changes the UI after a game ended. Players can only abort the game from
+     *  that point on, but my choose to discuss the chess position still.
+     */
+    void showEndGameUi();
+
     /*!
      *  This method tried to wrap libosso-abook in order to get the avatar from
      *  a given contact. Sadly, it won't compile with g++ so it probably needs
@@ -184,6 +196,7 @@ private:
     MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */
     MDashboardButton *m_avatar; /*!< The avatar from the contact list. */
     QGraphicsProxyWidget *m_requests_dialog; /*!< The proxy widget for the resolution menu that allows a player to send a request. */
+    QGraphicsProxyWidget *m_game_dialog; /*!< The proxy widget for the game menu that allows a player to leave the current screen. */
     QGraphicsProxyWidget *m_offers_dialog; /*!< The proxy widget for the dialog to either accept or decline an offer. */
     QGraphicsTextItem *m_status; /*!< The status label below (ontop) the board. */
     QPropertyAnimation *m_status_anim; /*!< The fade out animation for the status label. */

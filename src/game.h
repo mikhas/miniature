@@ -59,6 +59,7 @@ public Q_SLOTS:
     void prevMove();
     void nextMove();
     void jumpToEnd();
+    void abortGame();
 
     /* If a game was started, sets position to the turn specified by half_move
      * (one full move: white and black moved, hence half moves). If half_move
