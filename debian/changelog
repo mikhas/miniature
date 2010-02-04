@@ -1,3 +1,10 @@
+miniature (0.1.7-0) unstable; urgency=low
+
+  * New pre-game screen added to choose between game modes.
+  * In local games, both player have their own dashboard now, fullscreened.
+
+ --
+
 miniature (0.1.6-1) unstable; urgency=low
 
   * Fixes b.m.o bug #7203 - "Game can continue with King being in check by Knight".
