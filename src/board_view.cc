@@ -37,12 +37,14 @@ MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
   m_background_page(new QWebPage),
   m_background_image(0),
-  m_board_item_offset(140)
+  m_board_item_offset(160)
 {
     QGraphicsView::setScene(new MScene(this));
     // Ignore the growing property of the scene graph and always only show a
-    // fixed area.
-    setSceneRect(QRect(0, 0, 480, 760));
+    // fixed area. Also, assume we run in fullscreen (therefore, only works for
+    // pub mode.). 
+    // TODO: make this view reusable for other game modes, too.
+    setSceneRect(QRect(0, 0, 480, 800));
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
@@ -116,7 +118,7 @@ void MBoardView::setup()
     m_bottom_dashboard = new MDashboardItem;
     m_bottom_dashboard->disableConfirmButton();
     scene()->addItem(m_bottom_dashboard);
-    m_bottom_dashboard->setPos(0, 600);
+    m_bottom_dashboard->setPos(0, 640);
     m_bottom_dashboard->setZValue(1);
 }
 
