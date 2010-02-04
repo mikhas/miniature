@@ -74,6 +74,10 @@ onStartScreenRequested()
 void MPreGame::
 onNewGameRequested()
 {
+    // Prevent further signal emission.
+    QWidget *source = static_cast<QWidget *>(sender());
+    source->hide();
+
     QMainWindow *window = new QMainWindow(m_main_window);
 
     MBoardView *view = new MBoardView(window);
@@ -82,11 +86,18 @@ onNewGameRequested()
 
     MMainWindow::setupGameUi(window, view);
     window->show();
+
+    // Allow signal emission only after this window is gone.
+    connect(window, SIGNAL(destroyed()), source, SLOT(show()));
 }
 
 void MPreGame::
 onNewP2PGameRequested()
 {
+    // Prevent further signal emission.
+    QWidget *source = static_cast<QWidget *>(sender());
+    source->hide();
+
     QMainWindow *window = new QMainWindow(m_main_window);
 
     MBoardView *view = new MBoardView(window);
@@ -99,4 +110,7 @@ onNewP2PGameRequested()
 
     MMainWindow::setupGameUi(window, view);
     window->show();
+
+    // Allow signal emission only after this window is gone.
+    connect(window, SIGNAL(destroyed()), source, SLOT(show()));
 }

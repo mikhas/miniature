@@ -101,6 +101,7 @@ void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
     window->setWindowTitle(tr("Miniature"));
     window->resize(480, 800);
 
+    window->setAttribute(Qt::WA_DeleteOnClose);
     window->setAttribute(Qt::WA_Maemo5StackedWindow);
     window->setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
     window->setWindowState(window->windowState() | Qt::WindowFullScreen);
