@@ -31,15 +31,20 @@ namespace Miniature
 
 AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f), m_accountListModel(NULL)
 {
+    qDebug() << "AccountSelectionDlg::AccountSelectionDlg()";
+
     ui.setupUi(this);
 }
 
 AccountSelectionDlg::~AccountSelectionDlg()
 {
+    qDebug() << "AccountSelectionDlg::~AccountSelectionDlg()";
 }
 
 void AccountSelectionDlg::showEvent(QShowEvent *event)
 {
+    qDebug() << "AccountSelectionDlg::showEvent()";
+
     ui.chooseButton->setEnabled(false);
     ui.chooseButton->setText(QObject::tr("Choose account"));
     QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseAccountClicked(bool)));
@@ -50,6 +55,8 @@ void AccountSelectionDlg::showEvent(QShowEvent *event)
 
 void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
 {
+    qDebug() << "AccountSelectionDlg::setAccounts()";
+
     mAccounts = accounts;
 
     Q_FOREACH(TpAccountItemPtr acc, mAccounts)
@@ -62,6 +69,8 @@ void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
 
 void AccountSelectionDlg::onAccountInitialized()
 {
+    qDebug() << "AccountSelectionDlg::onAccountInitialized()";
+
     if(m_accountListModel == NULL)
     {
         m_accountListModel = new TpAccountListModel();
@@ -71,24 +80,41 @@ void AccountSelectionDlg::onAccountInitialized()
     ui.listView->setModel(m_accountListModel);
 }
 
-void AccountSelectionDlg::listItemClicked(const QModelIndex &)
+void AccountSelectionDlg::listItemClicked(const QModelIndex &index)
 {
+    qDebug() << "AccountSelectionDlg::listItemClicked()";
+
     ui.chooseButton->setEnabled(true);
+    lastItemIndex = index;
 }
 
 void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
 {
+    qDebug() << "AccountSelectionDlg::chooseAccountClicked()";
+
     ui.chooseButton->disconnect();
     ui.chooseButton->setText(QObject::tr("Choose contact"));
     ui.chooseButton->setEnabled(false);
     QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseContactClicked(bool)));
 
     ui.listView->clearSelection();
+
+    QString normalizedName = lastItemIndex.data().toString();
+    qDebug() << "chooseAccountClicked normalizedName:" << normalizedName;
+
+    Q_FOREACH(TpAccountItemPtr acc, mAccounts)
+    {
+        if(acc->getDisplayName() != normalizedName)
+            continue;
+
+        acc->ensureContactsList();
+        // connect with backing contacts list
+    }
 }
 
 void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)
 {
-
+    qDebug() << "AccountSelectionDlg::chooseContactClicked()";
 }
 
 };

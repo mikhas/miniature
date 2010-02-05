@@ -41,7 +41,6 @@ QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
 
     if(index.isValid() && role == Qt::DisplayRole)
     {
-        qDebug() << mAccounts[index.row()]->getDisplayName();
         return QVariant(mAccounts[index.row()]->getDisplayName());
     }
     else

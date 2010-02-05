@@ -24,7 +24,7 @@
 
 #include <QDialog>
 #include <QList>
-#include <QStringListModel>
+#include <QPersistentModelIndex>
 
 #include "tpaccountitem.h"
 #include "tpaccountlistmodel.h"
@@ -55,6 +55,7 @@ private:
     QList<TpAccountItemPtr> mAccounts;
     Ui::SelectAccountDialog ui;
     TpAccountListModel *m_accountListModel;
+    QPersistentModelIndex lastItemIndex;
 };
 
 };

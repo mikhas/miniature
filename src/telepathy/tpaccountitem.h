@@ -42,6 +42,7 @@ public:
     ~TpAccountItem();
 
     QString getDisplayName();
+    void ensureContactsList();
     void initialize();
 
 Q_SIGNALS:
@@ -49,9 +50,14 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onReady(Tp::PendingOperation *);
+    void onSetEnabledFinished(Tp::PendingOperation *);
+    void onConnectionReady(Tp::PendingOperation *);
 
 private:
-    Tp::AccountPtr mACC;
+    void connectionReady();
+
+    Tp::AccountPtr mAcc;
+    Tp::ConnectionPtr mConnection;
 };
 
 typedef QSharedPointer<TpAccountItem> TpAccountItemPtr;
