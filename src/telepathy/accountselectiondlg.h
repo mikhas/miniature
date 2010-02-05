@@ -42,8 +42,14 @@ public:
 
     void setAccounts(QList<TpAccountItemPtr>);
 
+protected:
+    virtual void showEvent(QShowEvent *event);
+
 private Q_SLOTS:
     void onAccountInitialized();
+    void listItemClicked(const QModelIndex &);
+    void chooseAccountClicked(bool checked = false);
+    void chooseContactClicked(bool checked = false);
 
 private:
     QList<TpAccountItemPtr> mAccounts;

@@ -38,6 +38,16 @@ AccountSelectionDlg::~AccountSelectionDlg()
 {
 }
 
+void AccountSelectionDlg::showEvent(QShowEvent *event)
+{
+    ui.chooseButton->setEnabled(false);
+    ui.chooseButton->setText(QObject::tr("Choose account"));
+    QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseAccountClicked(bool)));
+    QObject::connect(ui.listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(listItemClicked(const QModelIndex &)));
+
+    QDialog::showEvent(event);
+}
+
 void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
 {
     mAccounts = accounts;
@@ -61,5 +71,24 @@ void AccountSelectionDlg::onAccountInitialized()
     ui.listView->setModel(m_accountListModel);
 }
 
+void AccountSelectionDlg::listItemClicked(const QModelIndex &)
+{
+    ui.chooseButton->setEnabled(true);
+}
+
+void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
+{
+    ui.chooseButton->disconnect();
+    ui.chooseButton->setText(QObject::tr("Choose contact"));
+    ui.chooseButton->setEnabled(false);
+    QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseContactClicked(bool)));
+
+    ui.listView->clearSelection();
+}
+
+void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)
+{
+
+}
 
 };

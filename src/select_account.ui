@@ -45,6 +45,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="chooseButton">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButton">
          <property name="text">
           <string>Close</string>
