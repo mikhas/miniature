@@ -100,7 +100,7 @@ onNewP2PGameRequested()
 
     QMainWindow *window = new QMainWindow(m_main_window);
 
-    MBoardView *view = new MBoardView(window);
+    //MBoardView *view = new MBoardView(window);
 
     QMessageBox::critical(window, tr("Not implemented yet!"), tr("Sorry, but this feature is currently missing ..."));
 
@@ -108,9 +108,9 @@ onNewP2PGameRequested()
     //MGame *game = new Miniature::MGame(view, window);
     //game->newP2PGame();
 
-    MMainWindow::setupGameUi(window, view);
-    window->show();
+    //MMainWindow::setupGameUi(window, view);
+    //window->show();
 
     // Allow signal emission only after this window is gone.
-    connect(window, SIGNAL(destroyed()), source, SLOT(show()));
+    //connect(window, SIGNAL(destroyed()), source, SLOT(show()));
 }
