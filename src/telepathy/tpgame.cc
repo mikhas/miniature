@@ -19,39 +19,24 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPACCOUNTMANAGER_H_
-#define TPACCOUNTMANAGER_H_
-
-#include <QObject>
-#include <QList>
-
-#include "tpaccountitem.h"
-
-#include <TelepathyQt4/Types>
-
-namespace Tp {
-    class PendingOperation;
-}
+#include "tpgame.h"
 
 namespace Miniature
 {
 
-class TpAccountManager : public QObject
+TpGame::TpGame(QObject *parent) : QObject(parent)
 {
-    Q_OBJECT
-public:
-    TpAccountManager(QObject *parent = 0);
-    ~TpAccountManager();
+    mTpAccountManager = new TpAccountManager(this);
+}
 
-private Q_SLOTS:
-    void onAMReady(Tp::PendingOperation *);
+void TpGame::hostGame()
+{
+    Q_EMIT initialized();
+}
 
-private:
-    Tp::AccountManagerPtr mAM;
-    QList<TpAccountItemPtr> mAccounts;
+void TpGame::joinGame()
+{
+    Q_EMIT initialized();
+}
+
 };
-
-};
-
-#endif //TPACCOUNTMANAGER_H_
-

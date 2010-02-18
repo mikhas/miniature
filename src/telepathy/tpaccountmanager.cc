@@ -48,6 +48,12 @@ TpAccountManager::TpAccountManager(QObject *parent)
     Tp::registerTypes();
     Tp::enableDebug(true);
     Tp::enableWarnings(true);
+
+    mAM = Tp::AccountManager::create();
+
+    QObject::connect(mAM->becomeReady(),
+           SIGNAL(finished(Tp::PendingOperation *)),
+           SLOT(onAMReady(Tp::PendingOperation *)));
 }
 
 TpAccountManager::~TpAccountManager()
@@ -63,25 +69,13 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
         return;
     }
 
-    m_Accounts.clear();
+    mAccounts.clear();
 
-    Q_FOREACH(const QString &path, m_AM->allAccountPaths())
+    Q_FOREACH(const QString &path, mAM->allAccountPaths())
     {
-        TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(m_AM, path, this));
-        m_Accounts.push_back(account);
+        TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(mAM, path, this));
+        mAccounts.push_back(account);
     }
-
-    m_select_account.setAccounts(m_Accounts);
-    m_select_account.exec();
-}
-
-void TpAccountManager::chooseAccount()
-{
-     m_AM = Tp::AccountManager::create();
-
-     QObject::connect(m_AM->becomeReady(),
-            SIGNAL(finished(Tp::PendingOperation *)),
-            SLOT(onAMReady(Tp::PendingOperation *)));
 }
 
 };

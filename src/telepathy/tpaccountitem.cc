@@ -175,11 +175,6 @@ void TpAccountItem::onConnectionReady(Tp::PendingOperation *o)
     Tp::ContactManager *contactManager = mConnection->contactManager();
     Tp::Contacts contactsList = contactManager->allKnownContacts();
 
-    Q_FOREACH(Tp::ContactPtr contact, contactsList)
-    {
-        qDebug() << contact->id();
-    }
-
     Q_EMIT contactsForAccount(contactsList);
 }
 
