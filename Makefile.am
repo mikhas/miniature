@@ -90,6 +90,9 @@ src_miniature_SOURCES = \
 			src/telepathy/tpcontactslistmodel.h \
 			src/telepathy/tpcontactslistmodel.cc \
 			src/telepathy/tpcontactslistmodel.moc.cc \
+			src/telepathy/tpgame.h \
+			src/telepathy/tpgame.cc \
+			src/telepathy/tpgame.moc.cc \
 			src/pregame.cc \
 			src/pregame.h \
 			src/pregame.moc.cc \
