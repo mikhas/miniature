@@ -21,6 +21,7 @@
 
 #include "accountselectiondlg.h"
 #include "tpaccountitem.h"
+#include "tpaccountmanager.h"
 
 #include <TelepathyQt4/Account>
 
@@ -29,17 +30,32 @@
 namespace Miniature
 {
 
-AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f)
-    : QDialog(parent, f), m_accountListModel(NULL), m_contactsListModel(NULL)
+AccountSelectionDlg::AccountSelectionDlg(TpAccountManager *accountManager, QWidget *parent, Qt::WindowFlags f)
+    : QDialog(parent, f), mAccMgr(accountManager), mAccountListModel(NULL), mContactsListModel(NULL)
 {
     qDebug() << "AccountSelectionDlg::AccountSelectionDlg()";
 
     ui.setupUi(this);
+
+    QObject::connect(mAccMgr, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
 }
 
 AccountSelectionDlg::~AccountSelectionDlg()
 {
     qDebug() << "AccountSelectionDlg::~AccountSelectionDlg()";
+}
+
+void AccountSelectionDlg::onAccountNameListChanged(const QList<QString> accountNameList)
+{
+    qDebug() << "AccountSelectionDlg::onAccountListChanged()";
+
+    if(mAccountListModel == NULL)
+    {
+        mAccountListModel = new TpAccountListModel();
+    }
+
+    mAccountListModel->setAccounts(accountNameList);
+    ui.listView->setModel(mAccountListModel);
 }
 
 void AccountSelectionDlg::showEvent(QShowEvent *event)
@@ -51,34 +67,9 @@ void AccountSelectionDlg::showEvent(QShowEvent *event)
     QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseAccountClicked(bool)));
     QObject::connect(ui.listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(listItemClicked(const QModelIndex &)));
 
+    mAccMgr->ensureAccountNameList();
+
     QDialog::showEvent(event);
-}
-
-void AccountSelectionDlg::setAccounts(QList<TpAccountItemPtr> accounts)
-{
-    qDebug() << "AccountSelectionDlg::setAccounts()";
-
-    mAccounts = accounts;
-
-    Q_FOREACH(TpAccountItemPtr acc, mAccounts)
-    {
-        acc->disconnect();
-        QObject::connect(acc.data(), SIGNAL(initialized()), this, SLOT(onAccountInitialized()));
-        acc->initialize();
-    }
-}
-
-void AccountSelectionDlg::onAccountInitialized()
-{
-    qDebug() << "AccountSelectionDlg::onAccountInitialized()";
-
-    if(m_accountListModel == NULL)
-    {
-        m_accountListModel = new TpAccountListModel();
-    }
-
-    m_accountListModel->setAccounts(mAccounts);
-    ui.listView->setModel(m_accountListModel);
 }
 
 void AccountSelectionDlg::listItemClicked(const QModelIndex &index)
@@ -99,30 +90,24 @@ void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
     QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseContactClicked(bool)));
 
     ui.listView->clearSelection();
+    ui.listView->setDisabled(true);
 
-    if(m_contactsListModel == NULL)
-    {
-        m_contactsListModel = new TpContactsListModel();
-    }
-    ui.listView->setModel(m_contactsListModel);
-
-    QString normalizedName = lastItemIndex.data().toString();
-    qDebug() << "chooseAccountClicked normalizedName:" << normalizedName;
-
-    Q_FOREACH(TpAccountItemPtr acc, mAccounts)
-    {
-        if(acc->getDisplayName() != normalizedName)
-            continue;
-
-        acc->ensureContactsList();
-
-        QObject::connect(acc.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SLOT(onContactsForAccount(const Tp::Contacts)));
-    }
+    QObject::connect(mAccMgr, SIGNAL(onContactsForAccount(const Tp::Contacts)), this, SLOT(onContactsForAccount(const Tp::Contacts)));
+    QString accountName = lastItemIndex.data().toString();
+    mAccMgr->ensureContactListForAccount(accountName);
 }
 
 void AccountSelectionDlg::onContactsForAccount(const Tp::Contacts c)
 {
-    m_contactsListModel->setContacts(c);
+    if(mContactsListModel == NULL)
+    {
+        mContactsListModel = new TpContactsListModel();
+    }
+
+    mContactsListModel->setContacts(c);
+    ui.listView->setModel(mContactsListModel);
+    ui.listView->setEnabled(true);
+    ui.label->setText(QObject::tr("Select contact:"));
 }
 
 void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)

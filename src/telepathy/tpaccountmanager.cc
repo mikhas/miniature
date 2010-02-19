@@ -74,7 +74,42 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
     Q_FOREACH(const QString &path, mAM->allAccountPaths())
     {
         TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(mAM, path, this));
+        QObject::connect(account.data(), SIGNAL(initialized()), this, SLOT(onAccountInitialized()));
+        account->initialize();
         mAccounts.push_back(account);
+    }
+}
+
+void TpAccountManager::onAccountInitialized()
+{
+    QList<QString> accountNamesList;
+
+    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    {
+        if(accItem->isInitialized())
+        {
+            accountNamesList.push_back(accItem->getDisplayName());
+        }
+    }
+
+    Q_EMIT onAccountNameListChanged(accountNamesList);
+}
+
+void TpAccountManager::ensureAccountNameList()
+{
+    onAccountInitialized();
+}
+
+void TpAccountManager::ensureContactListForAccount(QString accountName)
+{
+    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    {
+        if(accountName == accItem->getDisplayName())
+        {
+            accItem.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
+            QObject::connect(accItem.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SIGNAL(onContactsForAccount(const Tp::Contacts)));
+            accItem->ensureContactsList();
+        }
     }
 }
 

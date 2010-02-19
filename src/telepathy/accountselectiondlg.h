@@ -36,20 +36,20 @@
 namespace Miniature
 {
 
+class TpAccountManager;
+
 class AccountSelectionDlg : public QDialog
 {
     Q_OBJECT
 public:
-    AccountSelectionDlg(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    AccountSelectionDlg(TpAccountManager *, QWidget *parent = 0, Qt::WindowFlags f = 0);
     ~AccountSelectionDlg();
-
-    void setAccounts(QList<TpAccountItemPtr>);
 
 protected:
     virtual void showEvent(QShowEvent *event);
 
 private Q_SLOTS:
-    void onAccountInitialized();
+    void onAccountNameListChanged(const QList<QString>);
     void listItemClicked(const QModelIndex &);
     void chooseAccountClicked(bool checked = false);
     void chooseContactClicked(bool checked = false);
@@ -58,8 +58,9 @@ private Q_SLOTS:
 private:
     QList<TpAccountItemPtr> mAccounts;
     Ui::SelectAccountDialog ui;
-    TpAccountListModel *m_accountListModel;
-    TpContactsListModel *m_contactsListModel;
+    TpAccountManager *mAccMgr;
+    TpAccountListModel *mAccountListModel;
+    TpContactsListModel *mContactsListModel;
     QPersistentModelIndex lastItemIndex;
 };
 

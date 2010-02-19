@@ -45,6 +45,7 @@ public:
     QString getDisplayName();
     void ensureContactsList();
     void initialize();
+    bool isInitialized();
 
 Q_SIGNALS:
     void initialized();

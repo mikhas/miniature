@@ -52,6 +52,11 @@ TpAccountItem::~TpAccountItem()
         mAcc->disconnect();
 }
 
+bool TpAccountItem::isInitialized()
+{
+    return mAcc->isReady() && mAcc->isValid();
+}
+
 void TpAccountItem::initialize()
 {
     qDebug() << "TpAccountItem::initialize()";

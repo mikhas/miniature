@@ -43,8 +43,16 @@ public:
     TpAccountManager(QObject *parent = 0);
     ~TpAccountManager();
 
+    void ensureAccountNameList();
+    void ensureContactListForAccount(QString);
+
+Q_SIGNALS:
+    void onAccountNameListChanged(const QList<QString>);
+    void onContactsForAccount(const Tp::Contacts);
+
 private Q_SLOTS:
     void onAMReady(Tp::PendingOperation *);
+    void onAccountInitialized();
 
 private:
     Tp::AccountManagerPtr mAM;

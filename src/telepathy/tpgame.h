@@ -23,6 +23,7 @@
 #define TPGAME_H
 
 #include "tpaccountmanager.h"
+#include "accountselectiondlg.h"
 
 #include <QObject>
 
@@ -44,6 +45,7 @@ Q_SIGNALS:
 
 private:
     TpAccountManager *mTpAccountManager;
+    AccountSelectionDlg *mAccountsDialog;
 };
 
 };

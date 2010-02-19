@@ -40,7 +40,7 @@ QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
 {
     if(index.isValid() && role == Qt::DisplayRole)
     {
-        return QVariant(mAccounts[index.row()]->getDisplayName());
+        return QVariant(mAccounts[index.row()]);
     }
     else
     {
@@ -48,7 +48,7 @@ QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
     }
 }
 
-void TpAccountListModel::setAccounts(const QList<TpAccountItemPtr> &accounts)
+void TpAccountListModel::setAccounts(const QList<QString> &accounts)
 {
     mAccounts = accounts;
     reset();

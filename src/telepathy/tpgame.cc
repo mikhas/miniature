@@ -27,15 +27,20 @@ namespace Miniature
 TpGame::TpGame(QObject *parent) : QObject(parent)
 {
     mTpAccountManager = new TpAccountManager(this);
+    mAccountsDialog = new AccountSelectionDlg(mTpAccountManager);
 }
 
 void TpGame::hostGame()
 {
+    mAccountsDialog->show();
+
     Q_EMIT initialized();
 }
 
 void TpGame::joinGame()
 {
+    mAccountsDialog->show();
+
     Q_EMIT initialized();
 }
 

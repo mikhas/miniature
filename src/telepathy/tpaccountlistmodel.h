@@ -38,10 +38,10 @@ public:
     int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 
-    void setAccounts(const QList<TpAccountItemPtr> &);
+    void setAccounts(const QList<QString> &);
 
 private:
-    QList<TpAccountItemPtr> mAccounts;
+    QList<QString> mAccounts;
 };
 
 };
