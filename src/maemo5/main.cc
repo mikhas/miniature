@@ -62,8 +62,8 @@ MMainWindow::MMainWindow()
   m_session(QDBusConnection::sessionBus())
 {
     // TODO: query orientation before
-    setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
-    setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, false);
+    //setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    //setAttribute(Qt::WA_Maemo5LandscapeOrientation, false);
 
     if (!m_session.registerService(dbus_service_name))
     {
@@ -91,7 +91,7 @@ void MMainWindow::setupPreGameUi(QMainWindow *window, QWidget *subview)
     window->resize(800, 480);
 
     window->setAttribute(Qt::WA_Maemo5StackedWindow);
-    window->setAttribute(Qt::WA_Maemo5ForceLandscapeOrientation, true);
+    window->setAttribute(Qt::WA_Maemo5LandscapeOrientation, true);
 
     window->setCentralWidget(subview);
 }
@@ -103,7 +103,7 @@ void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
 
     window->setAttribute(Qt::WA_DeleteOnClose);
     window->setAttribute(Qt::WA_Maemo5StackedWindow);
-    window->setAttribute(Qt::WA_Maemo5ForcePortraitOrientation, true);
+    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
     window->setWindowState(window->windowState() | Qt::WindowFullScreen);
 
     QWidget *central = new QWidget(window);
