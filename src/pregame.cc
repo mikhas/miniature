@@ -76,7 +76,7 @@ onNewGameRequested()
 {
     // Prevent further signal emission.
     QWidget *source = static_cast<QWidget *>(sender());
-    source->hide();
+    source->setEnabled(false);
 
     QMainWindow *window = new QMainWindow(m_main_window);
 
@@ -86,9 +86,15 @@ onNewGameRequested()
 
     MMainWindow::setupGameUi(window, view);
     window->show();
+    //m_main_window->hide();
+
+    connect(window, SIGNAL(destroyed()), m_main_window, SLOT(show()));
 
     // Allow signal emission only after this window is gone.
-    connect(window, SIGNAL(destroyed()), source, SLOT(show()));
+    QSignalMapper *map = new QSignalMapper(window);
+    connect(window, SIGNAL(destroyed()), map, SLOT(map()));
+    map->setMapping(window, source);
+    connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
 }
 
 void MPreGame::
@@ -96,7 +102,7 @@ onNewP2PGameRequested()
 {
     // Prevent further signal emission.
     QWidget *source = static_cast<QWidget *>(sender());
-    source->hide();
+    source->setEnabled(false);
 
     QMainWindow *window = new QMainWindow(m_main_window);
 
@@ -110,7 +116,19 @@ onNewP2PGameRequested()
 
     //MMainWindow::setupGameUi(window, view);
     //window->show();
+    //m_main_window->hide();
+
+    //connect(window, SIGNAL(destroyed()), m_main_window, SLOT(show()));
 
     // Allow signal emission only after this window is gone.
-    //connect(window, SIGNAL(destroyed()), source, SLOT(show()));
+    //QSignalMapper *map = new QSignalMapper(window);
+    //connect(window, SIGNAL(destroyed()), map, SLOT(map()));
+    //map->setMapping(window, source);
+    //connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
+}
+
+void MPreGame::
+enableWidget(QWidget *widget)
+{
+    widget->setEnabled(true);
 }

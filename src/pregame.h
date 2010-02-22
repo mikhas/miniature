@@ -56,7 +56,13 @@ public Q_SLOTS:
     void onNewP2PGameRequested();
 
 private:
-  MMainWindow *m_main_window;
+    MMainWindow *m_main_window;
+
+private Q_SLOTS:
+    /*!
+     *  Helper slots since QSignalMapper cannot map booleans.
+     */
+    void enableWidget(QWidget *widget);
 
 };
 
