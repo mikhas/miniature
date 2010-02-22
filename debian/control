@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Michael Hasselmann <michael@taschenorakel.de>
 Uploaders: Mathias Hasselmann <mathias.hasselmann@maemo.org>
 Build-Depends: debhelper (>= 5.0.0), cdbs,
- libqt4-maemo5-dev (>= 4.6.0~git20091105), libqt4-maemo5-dbus,
+ libqt4-maemo5-dev, libqt4-maemo5-dbus,
  libqt4-maemo5-network, libqt4-maemo5-phonon, libqt4-maemo5-svg,
  libqt4-maemo5-webkit, libqt4-maemo5-xmlpatterns, libqt4-maemo5-opengl,
  osso-af-settings (>= 0.9.2), libgconf2-dev, libsqlite3-dev,
