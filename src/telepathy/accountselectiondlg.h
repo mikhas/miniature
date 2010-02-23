@@ -45,6 +45,9 @@ public:
     AccountSelectionDlg(TpAccountManager *, QWidget *parent = 0, Qt::WindowFlags f = 0);
     ~AccountSelectionDlg();
 
+Q_SIGNALS:
+    void ensureChannel(QString, QString);
+
 protected:
     virtual void showEvent(QShowEvent *event);
 
@@ -62,6 +65,7 @@ private:
     TpAccountListModel *mAccountListModel;
     TpContactsListModel *mContactsListModel;
     QPersistentModelIndex lastItemIndex;
+    QString mAccountName;
 };
 
 };

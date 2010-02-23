@@ -29,6 +29,7 @@
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
+#include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/ContactManager>
 
 #include <QString>
@@ -183,6 +184,21 @@ void TpAccountItem::onConnectionReady(Tp::PendingOperation *o)
     Q_EMIT contactsForAccount(contactsList);
 }
 
-};
+void TpAccountItem::ensureChannel(const QVariantMap req)
+{
+    QObject::connect(mAcc->ensureChannel(req), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onEnsureChannel(Tp::PendingOperation *)));
+}
+
+void TpAccountItem::onEnsureChannel(Tp::PendingOperation *o)
+{
+    qDebug() << "TpAccountItem::onEnsureChannel()";
+
+    if(o->isError())
+    {
+        qDebug() << "Cannot create stream tube channel" << o->errorName() << o->errorMessage();
+        return;
+    }
+}
 
 #include "tpaccountitem.moc.cc"
+};

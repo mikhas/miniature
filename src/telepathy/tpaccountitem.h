@@ -46,6 +46,7 @@ public:
     void ensureContactsList();
     void initialize();
     bool isInitialized();
+    void ensureChannel(const QVariantMap req);
 
 Q_SIGNALS:
     void initialized();
@@ -57,6 +58,7 @@ private Q_SLOTS:
     void onAccountSetEnabled(Tp::PendingOperation *);
     void onConnectsAutomatically(Tp::PendingOperation *);
     void onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
+    void onEnsureChannel(Tp::PendingOperation *);
 
 private:
     void connectionReady();

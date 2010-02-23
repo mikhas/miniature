@@ -33,6 +33,7 @@
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
+#include <TelepathyQt4/ReferencedHandles>
 
 #include <QDebug>
 #include <QString>
@@ -109,8 +110,58 @@ void TpAccountManager::ensureContactListForAccount(QString accountName)
             accItem.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
             QObject::connect(accItem.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SIGNAL(onContactsForAccount(const Tp::Contacts)));
             accItem->ensureContactsList();
+            break;
         }
     }
+}
+
+void TpAccountManager::onEnsureChannel(QString accountName, QString contactName)
+{
+    mContactName = contactName;
+
+    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    {
+        if(accountName == accItem->getDisplayName())
+        {
+            accItem.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
+            QObject::connect(accItem.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SLOT(ensureContactsForAccount(const Tp::Contacts)));
+            accItem->ensureContactsList();
+            mAccount = accItem;
+            break;
+        }
+    }
+}
+
+void TpAccountManager::ensureContactsForAccount(const Tp::Contacts contacts)
+{
+    qDebug();
+
+    Q_FOREACH(Tp::ContactPtr contact, contacts)
+    {
+        if(contact->id() == mContactName)
+        {
+            createChannel(contact);
+            break;
+        }
+    }
+}
+
+void TpAccountManager::createChannel(const Tp::ContactPtr contact)
+{
+    qDebug();
+
+    QVariantMap req;
+
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".ChannelType"),
+               TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE);
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
+               Tp::HandleTypeContact);
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle"),
+               contact->handle()[0]);
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"),
+               "Miniature");
+
+    mAccount->ensureChannel(req);
 }
 
 };

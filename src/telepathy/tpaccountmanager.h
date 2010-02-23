@@ -53,10 +53,15 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onAMReady(Tp::PendingOperation *);
     void onAccountInitialized();
+    void onEnsureChannel(QString, QString);
+    void ensureContactsForAccount(const Tp::Contacts);
+    void createChannel(const Tp::ContactPtr);
 
 private:
     Tp::AccountManagerPtr mAM;
     QList<TpAccountItemPtr> mAccounts;
+    TpAccountItemPtr mAccount;
+    QString mContactName;
 };
 
 };

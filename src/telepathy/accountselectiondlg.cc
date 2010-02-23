@@ -38,6 +38,7 @@ AccountSelectionDlg::AccountSelectionDlg(TpAccountManager *accountManager, QWidg
     ui.setupUi(this);
 
     QObject::connect(mAccMgr, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
+    QObject::connect(this, SIGNAL(ensureChannel(QString,QString)), mAccMgr, SLOT(onEnsureChannel(QString,QString)));
 }
 
 AccountSelectionDlg::~AccountSelectionDlg()
@@ -93,8 +94,8 @@ void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
     ui.listView->setDisabled(true);
 
     QObject::connect(mAccMgr, SIGNAL(onContactsForAccount(const Tp::Contacts)), this, SLOT(onContactsForAccount(const Tp::Contacts)));
-    QString accountName = lastItemIndex.data().toString();
-    mAccMgr->ensureContactListForAccount(accountName);
+    mAccountName = lastItemIndex.data().toString();
+    mAccMgr->ensureContactListForAccount(mAccountName);
 }
 
 void AccountSelectionDlg::onContactsForAccount(const Tp::Contacts c)
@@ -113,6 +114,8 @@ void AccountSelectionDlg::onContactsForAccount(const Tp::Contacts c)
 void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)
 {
     qDebug() << "AccountSelectionDlg::chooseContactClicked()";
+
+    Q_EMIT ensureChannel(mAccountName, lastItemIndex.data().toString());
 }
 
 };
