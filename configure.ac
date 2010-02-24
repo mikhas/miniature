@@ -14,18 +14,10 @@ PKG_PROG_PKG_CONFIG
 
 AC_LANG([C++])
 
-LIBS="-ltelepathy-qt4 $LIBS"
-
-AC_ARG_WITH([telepathy],
-            [AS_HELP_STRING([--with-telepathy],
-                [try this for a non-standard install prefix of the Telepathy-Qt4 library])],
-            [TELEPATHYQT4PATHSET=1],
-            [TELEPATHYQT4PATHSET=0])
-
-#if test TELEPATHYPATHSET = 1; then
-    AM_CXXFLAGS="$AM_CXXFLAGS -I$with_telepathy/include/telepathy-1.0"
-    AM_LDFLAGS="$AM_LDFLAGS -L$with_telepathy/lib"
-#fi
+PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
+PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0])
+AC_SUBST([MINIATURE_CFLAGS])
+AC_SUBST([MINIATURE_LIBS])
 
 # phonon and xmlpatterns are webkit dependencies,
 # and we want the configure check to complain when they are missing.
@@ -33,7 +25,7 @@ AC_ARG_WITH([telepathy],
 AT_WITH_QT([core dbus gui network svg opengl maemo5],[debug no_keywords])
 AT_REQUIRE_QT_VERSION([4.6])
 
-PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
+
 AC_ARG_ENABLE(opengl,
     [Enable OpenGL to be used as the Qt graphics system.],
     [AC_DEFINE(HAVE_MINIATURE_OPENGL, [1], [Define to enable Qt's OpenGL graphics system])]
