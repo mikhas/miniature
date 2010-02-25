@@ -29,6 +29,9 @@ src_miniature_SOURCES = \
 			src/game.cc \
 			src/game.h \
 			src/game.moc.cc \
+			src/game_log.cc \
+			src/game_log.h \
+			src/game_log.moc.cc \
 			src/iconic_button.cc \
 			src/iconic_button.h \
 			src/iconic_button.moc.cc \
@@ -85,6 +88,7 @@ BUILT_SOURCES = \
 		src/scene.moc.cc \
 		src/dashboard_item.moc.cc \
 		src/game.moc.cc \
+		src/game_log.moc.cc \
 		src/graphics_board_item.moc.cc \
 		src/iconic_button.moc.cc \
 		src/main.moc.cc \
