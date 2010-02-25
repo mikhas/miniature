@@ -21,6 +21,7 @@
 #include <config.h>
 #include <main.h>
 
+#include <QtCore>
 #include <QtGui>
 
 /*! \brief Container for Miniature main actions.
@@ -32,13 +33,15 @@ public:
      *  @param[in] owner The owner of the contained actions.
      */
     explicit mActions(QObject *owner)
-    :  show_about_dialog(new QAction(owner))
+    :  show_about_dialog(new QAction(owner)),
+       show_game_log(new QAction(owner))
     {}
 
     virtual ~mActions()
     {}
 
     QAction* show_about_dialog;
+    QAction* show_game_log;
 };
 
 /*! \brief Container for Miniature dialogs.
@@ -56,8 +59,9 @@ public:
 const char* const dbus_service_name = "org.maemo.miniature";
 const char* const dbus_service_path = "/org/maemo/miniature";
 
-MMainWindow::MMainWindow()
-: QMainWindow(),
+MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
+: QMainWindow(parent),
+  m_log(log),
   m_actions(new mActions(this)),
   m_session(QDBusConnection::sessionBus())
 {
@@ -130,18 +134,28 @@ void MMainWindow::registerActions()
     m_actions->show_about_dialog->setText(tr("About"));
     m_actions->show_about_dialog->setShortcut(tr("Ctrl+?"));
 
+    m_actions->show_game_log->setText(tr("Show Game Log"));
+    m_actions->show_game_log->setShortcut(tr("Ctrl+L"));
+
     QMenuBar *menu_bar = new QMenuBar(this);
     menu_bar->setGeometry(QRect(0, 0, 480, 25));
 
-    QMenu *help = new QMenu(menu_bar);
-    menu_bar->addAction(help->menuAction());
-    help->addAction(m_actions->show_about_dialog);
+    QMenu *main = new QMenu(menu_bar);
+    menu_bar->addAction(main->menuAction());
+    main->addAction(m_actions->show_game_log);
+    main->addAction(m_actions->show_about_dialog);
 
     setMenuBar(menu_bar);
 }
 
 void MMainWindow::connectActions()
 {
+    QSignalMapper *mapper = new QSignalMapper(this);
+    mapper->setMapping(m_actions->show_game_log, this);
+    connect(m_actions->show_game_log, SIGNAL(triggered()),
+            mapper, SLOT(map()));
+    connect(mapper, SIGNAL(mapped(QWidget *)),
+            m_log, SLOT(showLog(QWidget *)));
     connect(m_actions->show_about_dialog, SIGNAL(triggered()),
             this, SLOT(showAboutDialog()));
 }
@@ -150,6 +164,7 @@ void MMainWindow::showAboutDialog()
 {
     QFont font = QFont("helvetica", 14, QFont::Normal);
     QDialog *dialog = new QDialog(QApplication::activeWindow());
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setWindowTitle(tr("About Miniature"));
     dialog->resize(-1, 480);
 
@@ -195,5 +210,4 @@ void MMainWindow::showAboutDialog()
     vbox->addWidget(buttons);
 
     dialog->show();
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }

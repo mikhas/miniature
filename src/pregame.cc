@@ -29,7 +29,8 @@ using namespace Miniature;
 MPreGame::
 MPreGame(QObject *parent)
 : QObject(parent),
-  m_main_window(new MMainWindow)
+  m_log(new MGameLog(this)),
+  m_main_window(new MMainWindow(m_log))
 {
     m_main_window->registerActions();
     m_main_window->connectActions();
@@ -37,7 +38,9 @@ MPreGame(QObject *parent)
 
 MPreGame::
 ~MPreGame()
-{}
+{
+    delete m_main_window;
+}
 
 void MPreGame::
 onStartScreenRequested()
@@ -69,6 +72,8 @@ onStartScreenRequested()
 
     connect(new_p2p_game, SIGNAL(pressed()),
             this, SLOT(onNewP2PGameRequested()));
+
+    m_log->append("Miniature started.", MGameLog::INFO);
 }
 
 void MPreGame::
@@ -86,7 +91,6 @@ onNewGameRequested()
 
     MMainWindow::setupGameUi(window, view);
     window->show();
-    //m_main_window->hide();
 
     connect(window, SIGNAL(destroyed()), m_main_window, SLOT(show()));
 
@@ -95,6 +99,8 @@ onNewGameRequested()
     connect(window, SIGNAL(destroyed()), map, SLOT(map()));
     map->setMapping(window, source);
     connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
+
+    m_log->append("New game started.", MGameLog::INFO);
 }
 
 void MPreGame::

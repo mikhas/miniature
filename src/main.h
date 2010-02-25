@@ -23,6 +23,7 @@
 
 #include <game.h>
 #include <board_view.h>
+#include <game_log.h>
 
 #include <QtGui>
 #include <QtDBus>
@@ -44,8 +45,8 @@ class MMainWindow
     Q_OBJECT
 
 public:
-    MMainWindow();
-    ~MMainWindow();
+    explicit MMainWindow(MGameLog *log, QWidget *parent = 0);
+    virtual ~MMainWindow();
 
     /*!
      *  Initializes the pre-game UI.
@@ -76,6 +77,12 @@ public Q_SLOTS:
     void appendDebugOutput(const QString &msg);
 
     /*!
+     *  This slot can be used to fill the game log. It can also contain debug
+     *  output.
+     */
+    //void appendToGameLog(const QString &msg, const LogLevelFlags &log_level);
+
+    /*!
      *  This slot toggles whether the debug output is shown to the user at all.
      */
     void toggleDebugOutput();
@@ -86,6 +93,7 @@ public Q_SLOTS:
     void showAboutDialog();
 
 private:
+    MGameLog *m_log; /*<! The game log which is used for the game log window. */
     mActions *m_actions; /*!< The main actions used in the main view. */
     mDialogs *m_dialogs; /*!< The dialogs used in the main view. */
     QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */

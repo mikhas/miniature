@@ -18,6 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <game_log.h>
 #include <main.h>
 #include <iconic_button.h>
 
@@ -35,6 +36,11 @@ class MPreGame
 public:
     explicit MPreGame(QObject *parent = 0);
     virtual ~MPreGame();
+
+    /*!
+     *  Returns the MGameLog used internally.
+     */
+    MGameLog * getLog() const;
 
 public Q_SLOTS:
     /*!
@@ -56,6 +62,7 @@ public Q_SLOTS:
     void onNewP2PGameRequested();
 
 private:
+    MGameLog *m_log;
     MMainWindow *m_main_window;
 
 private Q_SLOTS:
