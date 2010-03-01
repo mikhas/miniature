@@ -31,10 +31,7 @@ MPreGame(QObject *parent)
 : QObject(parent),
   m_log(new MGameLog(this)),
   m_main_window(new MMainWindow(m_log))
-{
-    m_main_window->registerActions();
-    m_main_window->connectActions();
-}
+{}
 
 MPreGame::
 ~MPreGame()

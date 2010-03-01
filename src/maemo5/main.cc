@@ -152,12 +152,15 @@ void MMainWindow::connectActions()
 {
     QSignalMapper *mapper = new QSignalMapper(this);
     mapper->setMapping(m_actions->show_game_log, this);
+
     connect(m_actions->show_game_log, SIGNAL(triggered()),
-            mapper, SLOT(map()));
+            mapper,                   SLOT(map()));
+
     connect(mapper, SIGNAL(mapped(QWidget *)),
-            m_log, SLOT(showLog(QWidget *)));
+            m_log,  SLOT(showLog(QWidget *)));
+
     connect(m_actions->show_about_dialog, SIGNAL(triggered()),
-            this, SLOT(showAboutDialog()));
+            this,                         SLOT(showAboutDialog()));
 }
 
 void MMainWindow::showAboutDialog()
