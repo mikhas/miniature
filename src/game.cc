@@ -298,7 +298,9 @@ void MGame::updatePlayerStatus(const MPosition &position)
     else
         m_view->getTopDashboardItem()->setStatusText(status);
 
-    m_log->append(position.asFen(), MGameLog::INFO);
+    m_log->append(QString("%1 %2 - FEN %3").arg(tr("half move #"))
+                                           .arg(m_half_move_index)
+                                           .arg(position.asFen()), MGameLog::INFO);
 }
 
 void MGame::onPieceClicked(MPiece *piece)

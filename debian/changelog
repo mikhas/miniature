@@ -4,6 +4,7 @@ miniature (0.1.7-1) unstable; urgency=low
   * In local games, both player have their own dashboard now, fullscreened. It
     demoes the (incomplete) user interaction proposed here:
     http://wiki.maemo.org/Miniature/Development/Phase_1.0:_Offline_chess_basics#New_UX_proposal
+  * Game log screen allows for easier bug reporting.
 
  -- Michael Hasselmann <michael@taschenorakel.de>  Tue, 09 Feb 2010 00:46:45 +0100
 
