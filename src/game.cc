@@ -29,9 +29,10 @@
 using namespace Miniature;
 
 
-MGame::MGame(MBoardView *view, QObject *parent)
+MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
 : QObject(parent),
   m_view(view),
+  m_log(log),
   m_board_item(0),
   m_half_move_index(-1),
   m_trans_half_move(MPosition()),
@@ -257,6 +258,12 @@ void MGame::connectDashboardItems(MDashboardItem *first, MDashboardItem *second)
     // Connect abort game requests
     connect(first,  SIGNAL(abortGameButtonPressed()), first, SLOT(showAbortGameConfirmation()));
 
+    // Connect game log requests
+    QSignalMapper *mapper = new QSignalMapper(this);
+    mapper->setMapping(first, QApplication::activeWindow());
+    connect(first,  SIGNAL(showGameLogButtonPressed()), mapper, SLOT(map()));
+    connect(mapper, SIGNAL(mapped(QWidget *)), m_log, SLOT(showLog(QWidget *)));
+
     // Connect the draw acceptance
     connect(first, SIGNAL(drawAccepted()), second, SLOT(onDrawAccepted()));
     connect(first, SIGNAL(drawAccepted()), first,  SLOT(onDrawAccepted()));
@@ -290,6 +297,8 @@ void MGame::updatePlayerStatus(const MPosition &position)
         m_view->getBottomDashboardItem()->setStatusText(status);
     else
         m_view->getTopDashboardItem()->setStatusText(status);
+
+    m_log->append(position.asFen(), MGameLog::INFO);
 }
 
 void MGame::onPieceClicked(MPiece *piece)

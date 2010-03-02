@@ -83,7 +83,7 @@ onNewGameRequested()
     QMainWindow *window = new QMainWindow(m_main_window);
 
     MBoardView *view = new MBoardView(window);
-    MGame *game = new Miniature::MGame(view, window);
+    MGame *game = new Miniature::MGame(view, m_log, window);
     game->newGame();
 
     MMainWindow::setupGameUi(window, view);

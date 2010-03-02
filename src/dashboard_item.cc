@@ -433,18 +433,18 @@ showRequestsMenu()
         grid->addWidget(pause_button, 0, 0);
 
         QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
-        connect(draw_button, SIGNAL(pressed()), this, SIGNAL(drawButtonPressed()));
         connect(draw_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(draw_button, SIGNAL(pressed()), this, SIGNAL(drawButtonPressed()));
         grid->addWidget(draw_button, 0, 1);
 
         QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
-        connect(adjourn_button, SIGNAL(pressed()), this, SIGNAL(adjournButtonPressed()));
         connect(adjourn_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(adjourn_button, SIGNAL(pressed()), this, SIGNAL(adjournButtonPressed()));
         grid->addWidget(adjourn_button, 1, 0);
 
         QPushButton *resign_button = new QPushButton(tr("?? Resign"));
-        connect(resign_button, SIGNAL(pressed()), this, SIGNAL(resignButtonPressed()));
         connect(resign_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(resign_button, SIGNAL(pressed()), this, SIGNAL(resignButtonPressed()));
         grid->addWidget(resign_button, 1, 1);
 
         m_requests_dialog->setWidget(dialog);
@@ -476,8 +476,14 @@ showGameMenu()
         QPushButton *abort_game_button = new QPushButton(tr("?? Abort Game"));
         vbox->addWidget(abort_game_button);
 
-        connect(abort_game_button, SIGNAL(pressed()), this, SIGNAL(abortGameButtonPressed()));
         connect(abort_game_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(abort_game_button, SIGNAL(pressed()), this, SIGNAL(abortGameButtonPressed()));
+
+        QPushButton *show_game_log_button = new QPushButton(tr("?? Show Game Log"));
+        vbox->addWidget(show_game_log_button);
+
+        connect(show_game_log_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(show_game_log_button, SIGNAL(pressed()), this, SIGNAL(showGameLogButtonPressed()));
 
         m_game_dialog->setWidget(dialog);
         dialog->show();

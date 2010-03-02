@@ -25,6 +25,7 @@
 #include "half_move.h"
 #include "board_view.h"
 #include "graphics_board_item.h"
+#include "game_log.h"
 
 #include <QList>
 #include <QGraphicsView>
@@ -48,7 +49,7 @@ class MGame
 public:
     typedef QList<MPosition> MPositionList;
 
-    explicit MGame(MBoardView* view, QObject* parent = 0);
+    explicit MGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
     virtual ~MGame();
 
 public Q_SLOTS:
@@ -113,6 +114,8 @@ private:
 
     /* A reference to the board view, we do not take ownership. */
     MBoardView *m_view;
+
+    MGameLog *m_log;
 
     /* A container for all pieces in the scene graph, useful for coord mapping. */
     MGraphicsBoardItem *m_board_item;

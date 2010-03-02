@@ -114,18 +114,19 @@ public:
     void resetUi();
 
 Q_SIGNALS:
-    void confirmButtonPressed();   /*!< confirmed a move >*/
-    void requestsButtonPressed();  /*!< wants to open requests dialog >*/
-    void takebackButtonPressed();  /*!< wants to take back a move >*/
-    void avatarButtonPressed();    /*!< (n/a) >*/
-    void drawButtonPressed();      /*!< wants to propose a draw >*/
-    void drawAccepted();           /*!< accepted a draw >*/
-    void adjournButtonPressed();   /*!< wants to adjourn the game >*/
-    void adjournAccepted();        /*!< accepted to adjourn the game >*/
-    void resignButtonPressed();    /*!< the player wants to give up >*/
-    void resignConfirmed();        /*!< the player gave up >*/
-    void abortGameButtonPressed(); /*!< the player wants to end the game >*/
-    void abortGameConfirmed();     /*!< the player aborted the game >*/
+    void confirmButtonPressed();     /*!< confirmed a move >*/
+    void requestsButtonPressed();    /*!< wants to open requests dialog >*/
+    void takebackButtonPressed();    /*!< wants to take back a move >*/
+    void avatarButtonPressed();      /*!< (n/a) >*/
+    void drawButtonPressed();        /*!< wants to propose a draw >*/
+    void drawAccepted();             /*!< accepted a draw >*/
+    void adjournButtonPressed();     /*!< wants to adjourn the game >*/
+    void adjournAccepted();          /*!< accepted to adjourn the game >*/
+    void resignButtonPressed();      /*!< the player wants to give up >*/
+    void resignConfirmed();          /*!< the player gave up >*/
+    void abortGameButtonPressed();   /*!< the player wants to end the game >*/
+    void abortGameConfirmed();       /*!< the player aborted the game >*/
+    void showGameLogButtonPressed(); /*!< the player wants to see the game log >*/
 
 public Q_SLOTS:
     void enableConfirmButton();
