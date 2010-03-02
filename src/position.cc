@@ -389,3 +389,66 @@ void MPosition::print() const
     cout << "\n" << "pawn double move: (" << m_pawn_double_move.x() << ", " << m_pawn_double_move.y() << ")\n----\n";
     cout.flush();
 }
+
+QString MPosition::asFen() const
+{
+    QString buf;
+    QTextStream out(&buf);
+
+    int i = 0;
+    int empty_cells = 0;
+    for(MPieces::const_iterator iter = m_position.begin();
+        iter != m_position.end();
+        ++iter)
+    {
+         MPiece *piece = *iter;
+         if (!piece)
+         {
+             ++empty_cells;
+         }
+         else
+         {
+             MPiece::MType t = piece->getType();
+
+             if (0 < empty_cells && MPiece::NONE != t)
+             {
+                 out << empty_cells;
+                 empty_cells = 0;
+             }
+
+             switch(piece->getType())
+             {
+                 case MPiece::PAWN:   out << (piece->getColour() == MPiece::WHITE ? "P" : "p"); break;
+                 case MPiece::KNIGHT: out << (piece->getColour() == MPiece::WHITE ? "N" : "n"); break;
+                 case MPiece::ROOK:   out << (piece->getColour() == MPiece::WHITE ? "R" : "r"); break;
+                 case MPiece::BISHOP: out << (piece->getColour() == MPiece::WHITE ? "B" : "b"); break;
+                 case MPiece::QUEEN:  out << (piece->getColour() == MPiece::WHITE ? "Q" : "q"); break;
+                 case MPiece::KING:   out << (piece->getColour() == MPiece::WHITE ? "K" : "k"); break;
+
+                 default: break;
+             }
+
+
+         }
+
+         if (7 == i % 8)
+         {
+             if (0 < empty_cells)
+             {
+                 out << empty_cells;
+             }
+
+             empty_cells = 0;
+
+             if (i < 64)
+             {
+                 out << "/";
+             }
+
+             ++i;
+         }
+    }
+
+    return buf;
+}
+

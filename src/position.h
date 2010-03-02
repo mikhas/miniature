@@ -122,6 +122,7 @@ public:
 
     // Print the position, for debugging purposes.
     void print() const;
+    QString asFen() const;
 
 private:
     QString getDefaultStartPosition() const;
