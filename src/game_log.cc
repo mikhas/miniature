@@ -111,7 +111,7 @@ print(const mLogLevelFlags &flags) const
     {
         if (iter->getLogLevelFlags() & flags)
         {
-            m_log_widget->textCursor().insertText(QString("%1 - %2").arg(iter->getTime())
+            m_log_widget->textCursor().insertText(QString("%1 - %2\n").arg(iter->getTime())
                                                                     .arg(iter->getMessage()));
         }
     }
