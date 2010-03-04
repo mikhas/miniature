@@ -54,7 +54,9 @@ showLog(QWidget *parent)
     QMainWindow *game_log = new QMainWindow(parent);
 
     game_log->setWindowTitle(tr("Game Log"));
+#if defined(Q_WS_MAEMO_5)
     game_log->setAttribute(Qt::WA_Maemo5StackedWindow);
+#endif
     game_log->setAttribute(Qt::WA_DeleteOnClose);
     connect(game_log, SIGNAL(destroyed()), parent, SLOT(show()));
 
