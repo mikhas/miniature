@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -46,9 +46,10 @@ namespace Miniature
 TpAccountManager::TpAccountManager(QObject *parent)
     : QObject(parent)
 {
-    Tp::registerTypes();
-    Tp::enableDebug(true);
+    Tp::enableDebug(false);
     Tp::enableWarnings(true);
+
+    Tp::registerTypes();
 
     mAM = Tp::AccountManager::create();
 
@@ -148,7 +149,8 @@ void TpAccountManager::ensureContactsForAccount(const Tp::Contacts contacts)
 
 void TpAccountManager::createChannel(const Tp::ContactPtr contact)
 {
-    qDebug();
+    qDebug() << "TpAccountManager::createChannel()";
+    qDebug() << "!!!! CREATING CHANNEL for" << contact->id() << " !!!";
 
     QVariantMap req;
 
@@ -157,7 +159,7 @@ void TpAccountManager::createChannel(const Tp::ContactPtr contact)
     req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
                Tp::HandleTypeContact);
     req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle"),
-               contact->handle()[0]);
+               contact->handle().at(0));
     req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"),
                "Miniature");
 

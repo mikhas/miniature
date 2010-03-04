@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -19,52 +19,33 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPACCOUNTMANAGER_H_
-#define TPACCOUNTMANAGER_H_
+#ifndef TPCONTACTSLISTMODEL_H
+#define TPCONTACTSLISTMODEL_H
 
-#include <QObject>
+#include <QAbstractListModel>
 #include <QList>
 
-#include "tpaccountitem.h"
-
 #include <TelepathyQt4/Types>
-
-namespace Tp {
-    class PendingOperation;
-}
+#include <TelepathyQt4/Contact>
 
 namespace Miniature
 {
 
-class TpAccountManager : public QObject
+class TpContactsListModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    TpAccountManager(QObject *parent = 0);
-    ~TpAccountManager();
+    TpContactsListModel(QObject *parent = 0);
 
-    void ensureAccountNameList();
-    void ensureContactListForAccount(QString);
+    int rowCount(const QModelIndex & parent = QModelIndex()) const;
+    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
 
-Q_SIGNALS:
-    void onAccountNameListChanged(const QList<QString>);
-    void onContactsForAccount(const Tp::Contacts);
-
-private Q_SLOTS:
-    void onAMReady(Tp::PendingOperation *);
-    void onAccountInitialized();
-    void onEnsureChannel(QString, QString);
-    void ensureContactsForAccount(const Tp::Contacts);
-    void createChannel(const Tp::ContactPtr);
+    void setContacts(const Tp::Contacts);
 
 private:
-    Tp::AccountManagerPtr mAM;
-    QList<TpAccountItemPtr> mAccounts;
-    TpAccountItemPtr mAccount;
-    QString mContactName;
+    QList<Tp::ContactPtr> mContacts;
 };
 
 };
 
-#endif //TPACCOUNTMANAGER_H_
-
+#endif // TPCONTACTSLISTMODEL_H

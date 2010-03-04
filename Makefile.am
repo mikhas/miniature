@@ -93,6 +93,17 @@ src_miniature_SOURCES = \
 			src/telepathy/tpgame.h \
 			src/telepathy/tpgame.cc \
 			src/telepathy/tpgame.moc.cc \
+			src/telepathy/tptubesclienthandler.h \
+			src/telepathy/tptubesclienthandler.cc \
+			src/telepathy/tptubesclienthandler.moc.cc \
+			src/telepathy/tpapprovermanager.h \
+			src/telepathy/tpapprovermanager.cc \
+			src/telepathy/tpapprovermanager.moc.cc \
+			src/telepathy/tpapprover.h \
+			src/telepathy/tpapprover.cc \
+			src/telepathy/tpapprover.moc.cc \
+			src/telepathy/tphelpers.h \
+			src/telepathy/tphelpers.cc \
 			src/pregame.cc \
 			src/pregame.h \
 			src/pregame.moc.cc \

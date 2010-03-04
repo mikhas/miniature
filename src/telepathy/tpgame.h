@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -25,6 +25,8 @@
 #include "tpaccountmanager.h"
 #include "accountselectiondlg.h"
 
+#include <TelepathyQt4/ClientRegistrar>
+
 #include <QObject>
 
 namespace Miniature
@@ -43,9 +45,13 @@ public Q_SLOTS:
 Q_SIGNALS:
     void initialized();
 
+private Q_SLOTS:
+    void onAccountNameListChanged(const QList<QString>);
+
 private:
     TpAccountManager *mTpAccountManager;
     AccountSelectionDlg *mAccountsDialog;
+    Tp::ClientRegistrarPtr mClientRegistrar;
 };
 
 };

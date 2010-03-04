@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -20,6 +20,8 @@
  */
 
 #include "tpgame.h"
+#include "tpapprovermanager.h"
+#include "tptubesclienthandler.h"
 
 namespace Miniature
 {
@@ -28,11 +30,30 @@ TpGame::TpGame(QObject *parent) : QObject(parent)
 {
     mTpAccountManager = new TpAccountManager(this);
     mAccountsDialog = new AccountSelectionDlg(mTpAccountManager);
+
+    qDebug() << "Registering client handler.";
+    mClientRegistrar = Tp::ClientRegistrar::create();
+    Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
+
+    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
+
+//    Tp::SharedPtr<TpApproverManager> approverManager;
+//    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
+//    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "miniature_approver");
 }
 
 void TpGame::hostGame()
 {
-    mAccountsDialog->show();
+    mTpAccountManager->disconnect();
+    QObject::connect(mTpAccountManager, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
+}
+
+void TpGame::onAccountNameListChanged(const QList<QString> accounts)
+{
+    Q_FOREACH(QString accountName, accounts)
+    {
+        mTpAccountManager->ensureContactListForAccount(accountName);
+    }
 
     Q_EMIT initialized();
 }

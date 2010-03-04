@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -27,6 +27,7 @@
 
 #include <TelepathyQt4/Types>
 #include <TelepathyQt4/Connection>
+#include <TelepathyQt4/PendingChannelRequest>
 
 namespace Tp {
     class PendingOperation;
@@ -46,7 +47,7 @@ public:
     void ensureContactsList();
     void initialize();
     bool isInitialized();
-    void ensureChannel(const QVariantMap req);
+    void ensureChannel(const QVariantMap &req);
 
 Q_SIGNALS:
     void initialized();
@@ -58,13 +59,15 @@ private Q_SLOTS:
     void onAccountSetEnabled(Tp::PendingOperation *);
     void onConnectsAutomatically(Tp::PendingOperation *);
     void onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
-    void onEnsureChannel(Tp::PendingOperation *);
+    void onEnsureChannelFinished(Tp::PendingOperation *);
 
 private:
     void connectionReady();
 
     Tp::AccountPtr mAcc;
     Tp::ConnectionPtr mConnection;
+    Tp::PendingChannelRequest *mPendingChannelRequest;
+    Tp::ChannelRequestPtr mChannelRequest;
 };
 
 typedef QSharedPointer<TpAccountItem> TpAccountItemPtr;

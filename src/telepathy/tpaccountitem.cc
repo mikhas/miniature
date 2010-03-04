@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -29,7 +29,7 @@
 #include <TelepathyQt4/AccountManager>
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
-#include <TelepathyQt4/PendingChannelRequest>
+#include <TelepathyQt4/ChannelRequest>
 #include <TelepathyQt4/ContactManager>
 
 #include <QString>
@@ -184,18 +184,22 @@ void TpAccountItem::onConnectionReady(Tp::PendingOperation *o)
     Q_EMIT contactsForAccount(contactsList);
 }
 
-void TpAccountItem::ensureChannel(const QVariantMap req)
+void TpAccountItem::ensureChannel(const QVariantMap &req)
 {
-    QObject::connect(mAcc->ensureChannel(req), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onEnsureChannel(Tp::PendingOperation *)));
+    qDebug() << "TpAccountItem::ensureChannel()";
+
+    qDebug() << req;
+
+    QObject::connect(mAcc->ensureChannel(req), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onEnsureChannelFinished(Tp::PendingOperation *)));
 }
 
-void TpAccountItem::onEnsureChannel(Tp::PendingOperation *o)
+void TpAccountItem::onEnsureChannelFinished(Tp::PendingOperation *o)
 {
-    qDebug() << "TpAccountItem::onEnsureChannel()";
+    qDebug() << "TpAccountItem::onEnsureChannelFinished()";
 
     if(o->isError())
     {
-        qDebug() << "Cannot create stream tube channel" << o->errorName() << o->errorMessage();
+        qDebug() << "Ensure channel failed: " << o->errorName() << o->errorMessage();
         return;
     }
 }

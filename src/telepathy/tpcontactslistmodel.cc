@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -19,28 +19,26 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "tpaccountlistmodel.h"
-
-#include <QtGlobal>
+#include "tpcontactslistmodel.h"
 
 namespace Miniature
 {
 
-
-TpAccountListModel::TpAccountListModel(QObject *parent) : QAbstractListModel(parent)
+TpContactsListModel::TpContactsListModel(QObject *parent)
+    : QAbstractListModel(parent)
 {
 }
 
-int TpAccountListModel::rowCount(const QModelIndex & /*parent*/) const
+int TpContactsListModel::rowCount(const QModelIndex &) const
 {
-    return mAccounts.size();
+    return mContacts.size();
 }
 
-QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
+QVariant TpContactsListModel::data(const QModelIndex & index, int role) const
 {
     if(index.isValid() && role == Qt::DisplayRole)
     {
-        return QVariant(mAccounts[index.row()]);
+        return QVariant(mContacts[index.row()]->id());
     }
     else
     {
@@ -48,10 +46,11 @@ QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
     }
 }
 
-void TpAccountListModel::setAccounts(const QList<QString> &accounts)
+void TpContactsListModel::setContacts(const Tp::Contacts c)
 {
-    mAccounts = accounts;
+    mContacts = c.toList();
     reset();
 }
 
 };
+
