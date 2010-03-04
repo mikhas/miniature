@@ -34,7 +34,6 @@
 
 #include <QString>
 #include <QtGlobal>
-#include <QtMaemo5/QtMaemo5>
 
 namespace Miniature
 {
