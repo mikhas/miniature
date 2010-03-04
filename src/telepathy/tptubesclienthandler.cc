@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Collabora Ltd. <http://www.collabora.co.uk/>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
  *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
@@ -20,10 +20,13 @@
  */
 
 #include "tptubesclienthandler.h"
+#include "tphelpers.h"
 
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Debug>
 #include <TelepathyQt4/Channel>
+#include <TelepathyQt4/Account>
+#include <TelepathyQt4/PendingReady>
 
 #include <QDBusVariant>
 
@@ -37,15 +40,17 @@ static inline Tp::ChannelClassList channelClassList()
     filter0[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] =
             QDBusVariant(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE);
     filter0[TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"] = QDBusVariant("Miniature");
-    filter0[TELEPATHY_INTERFACE_CHANNEL ".Requested"] = QDBusVariant(true);
 
     return Tp::ChannelClassList() << Tp::ChannelClass(filter0);
 }
 
-TpTubesClientHandler::TpTubesClientHandler()
-    : Tp::AbstractClientHandler(channelClassList(), false)
+TpTubesClientHandler::TpTubesClientHandler(QObject *parent)
+    : QObject(parent),
+    Tp::AbstractClientHandler(channelClassList(), false)
 {
-    Tp::enableDebug(true);
+    qDebug() << "TpTubesClientHandler::TpTubesClientHandler()";
+
+    Tp::enableDebug(false);
     Tp::enableWarnings(true);
 
     Tp::registerTypes();
@@ -53,11 +58,13 @@ TpTubesClientHandler::TpTubesClientHandler()
 
 TpTubesClientHandler::~TpTubesClientHandler()
 {
-
+    qDebug() << "TpTubesClientHandler::~TpTubesClientHandler()";
 }
 
 bool TpTubesClientHandler::bypassApproval() const
 {
+    qDebug() << "TpTubesClientHandler::bypassApproval()";
+
     return false;
 }
 
@@ -69,6 +76,8 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
                                           const QDateTime &userActionTime,
                                           const QVariantMap &handlerInfo)
 {
+    qDebug() << "TpTubesClientHandler::handleChannels()";
+
     Q_UNUSED(account);
     Q_UNUSED(connection);
     Q_UNUSED(requestedSatisfied);
@@ -77,18 +86,74 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
 
     Q_FOREACH(const Tp::ChannelPtr &channel, channels)
     {
-        qDebug() << "Incoming channel: " << channel;
+        qDebug() << "!!! Channel: " << channel;
 
         QVariantMap properties = channel->immutableProperties();
 
         if(properties[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] ==
             TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE)
         {
-            qDebug() << "Channel is a stream tube. Handling: " << channel;
+            qDebug() << "!!! Channel is a stream tube. Handling: " << channel;
+
+            if(properties[TELEPATHY_INTERFACE_CHANNEL ".Requested"].toBool())
+            {
+                qDebug() << "Outgoing channel !";
+            }
+            else
+            {
+                qDebug() << "Incoming channel !";
+            }
+
+            mChannel = channel;
+
+            Tp::Features features;
+            features << Tp::Channel::FeatureCore;
+            connect(mChannel->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onChannelReady(Tp::PendingOperation *)));
         }
     }
 
     context->setFinished();
+
+    qDebug() << "!!! handleChannels DONE !!!";
+}
+
+void TpTubesClientHandler::onChannelReady(Tp::PendingOperation *op)
+{
+    qDebug() << "TpTubesClientHandler::onChannelReady()";
+
+    if(op->isError())
+    {
+        qDebug() << "Channel ready error: " << op->errorName() << op->errorMessage();
+        return;
+    }
+
+    Tp::Contacts contacts = mChannel->groupContacts();
+
+    Q_FOREACH(Tp::ContactPtr contact, contacts)
+    {
+        qDebug() << contact->id();
+    }
+
+    Tp::Client::ChannelTypeStreamTubeInterface *streamTubeInterface = mChannel->streamTubeInterface();
+    Tp::Client::ChannelInterfaceTubeInterface *tubeInterface = mChannel->tubeInterface();
+
+    if(streamTubeInterface && tubeInterface)
+    {
+        qDebug() << "We have tube control interfaces. Continue.";
+
+        QDBusVariant ret = streamTubeInterface->Accept(
+                Tp::SocketAddressTypeIPv4,
+                Tp::SocketAccessControlLocalhost,
+                QDBusVariant(""));
+
+        StreamTubeAddress streamTubeAddress = qdbus_cast<StreamTubeAddress>(ret.variant());
+        qDebug () << "Stream tube address:"
+                << streamTubeAddress.address
+                << ":"
+                << streamTubeAddress.port;
+    }
+
+    qDebug() << "? ERROR ?";
 }
 
 };

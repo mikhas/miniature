@@ -19,38 +19,44 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPTUBESCLIENTHANDLER_H
-#define TPTUBESCLIENTHANDLER_H
+#ifndef TPAPPROVER_H
+#define TPAPPROVER_H
 
-#include <TelepathyQt4/AbstractClientHandler>
-#include <TelepathyQt4/PendingOperation>
+#include <QObject>
+
+#include <TelepathyQt4/Channel>
 
 namespace Miniature
 {
 
-class TpTubesClientHandler : public QObject, public Tp::AbstractClientHandler
+class TpApprover : public QObject
 {
     Q_OBJECT
-public:
-    TpTubesClientHandler(QObject *parent = 0);
-    virtual ~TpTubesClientHandler();
+    Q_DISABLE_COPY(TpApprover)
 
-    virtual bool bypassApproval() const;
-    virtual void handleChannels(const Tp::MethodInvocationContextPtr<> &context,
-                                const Tp::AccountPtr &account,
-                                const Tp::ConnectionPtr &connection,
-                                const QList<Tp::ChannelPtr> &channels,
-                                const QList<Tp::ChannelRequestPtr> &requestedSatisfied,
-                                const QDateTime &userActionTime,
-                                const QVariantMap &handlerInfo);
+public:
+    ~TpApprover();
 
 private Q_SLOTS:
-    void onChannelReady(Tp::PendingOperation *);
+    void onDispatchOperationReady(Tp::PendingOperation* );
+
+Q_SIGNALS:
+    void finished();
 
 private:
-    Tp::ChannelPtr mChannel;
+    TpApprover(const Tp::MethodInvocationContextPtr<> &context,
+               const QList<Tp::ChannelPtr> &channels,
+               const Tp::ChannelDispatchOperationPtr &dispatchOperation,
+               QObject *parent);
+
+private:
+    Tp::MethodInvocationContextPtr<> mContext;
+    QList<Tp::ChannelPtr> mChannels;
+    Tp::ChannelDispatchOperationPtr mDispatchOp;
+
+    friend class TpApproverManager;
 };
 
 };
 
-#endif // TPTUBESCLIENTHANDLER_H
+#endif // TPAPPROVER_H
