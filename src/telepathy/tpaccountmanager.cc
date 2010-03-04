@@ -38,7 +38,10 @@
 #include <QDebug>
 #include <QString>
 #include <QtGlobal>
+
+#if defined(Q_WS_MAEMO_5)
 #include <QtMaemo5/QtMaemo5>
+#endif
 
 namespace Miniature
 {
