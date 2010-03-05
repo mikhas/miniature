@@ -24,9 +24,14 @@
 
 #include <TelepathyQt4/AbstractClientHandler>
 #include <TelepathyQt4/PendingOperation>
+#include <TelepathyQt4/Channel>
+
+#include <QTcpSocket>
 
 namespace Miniature
 {
+
+class TpOutgoingTube;
 
 class TpTubesClientHandler : public QObject, public Tp::AbstractClientHandler
 {
@@ -44,11 +49,14 @@ public:
                                 const QDateTime &userActionTime,
                                 const QVariantMap &handlerInfo);
 
+Q_SIGNALS:
+    void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &);
+
 private Q_SLOTS:
-    void onChannelReady(Tp::PendingOperation *);
+    void deleteOutgoingTube();
 
 private:
-    Tp::ChannelPtr mChannel;
+    QList<TpOutgoingTube*> mOutgoingTubes;
 };
 
 };

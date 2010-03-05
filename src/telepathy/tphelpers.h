@@ -6,7 +6,7 @@
 struct StreamTubeAddress
 {
     QString address;
-    int port;
+    uint port;
 };
 
 Q_DECLARE_METATYPE(StreamTubeAddress);

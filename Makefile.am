@@ -104,6 +104,9 @@ src_miniature_SOURCES = \
 			src/telepathy/tpapprover.moc.cc \
 			src/telepathy/tphelpers.h \
 			src/telepathy/tphelpers.cc \
+			src/telepathy/tpoutgoingtube.h \
+			src/telepathy/tpoutgoingtube.cc \
+			src/telepathy/tpoutgoingtube.moc.cc \
 			src/pregame.cc \
 			src/pregame.h \
 			src/pregame.moc.cc \

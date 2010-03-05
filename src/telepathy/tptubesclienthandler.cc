@@ -21,10 +21,10 @@
 
 #include "tptubesclienthandler.h"
 #include "tphelpers.h"
+#include "tpoutgoingtube.h"
 
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Debug>
-#include <TelepathyQt4/Channel>
 #include <TelepathyQt4/Account>
 #include <TelepathyQt4/PendingReady>
 
@@ -98,17 +98,20 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
             if(properties[TELEPATHY_INTERFACE_CHANNEL ".Requested"].toBool())
             {
                 qDebug() << "Outgoing channel !";
+                TpOutgoingTube *tube = new TpOutgoingTube(channel);
+                connect(tube,
+                        SIGNAL(tubeReady(QTcpSocket *, const Tp::ContactPtr &)),
+                        SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)));
+                connect(tube,
+                        SIGNAL(readyToBeDeleted()),
+                        SLOT(deleteOutgoingTube()));
+
+                mOutgoingTubes.append(tube);
             }
             else
             {
                 qDebug() << "Incoming channel !";
             }
-
-            mChannel = channel;
-
-            Tp::Features features;
-            features << Tp::Channel::FeatureCore;
-            connect(mChannel->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onChannelReady(Tp::PendingOperation *)));
         }
     }
 
@@ -117,43 +120,14 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
     qDebug() << "!!! handleChannels DONE !!!";
 }
 
-void TpTubesClientHandler::onChannelReady(Tp::PendingOperation *op)
+void TpTubesClientHandler::deleteOutgoingTube()
 {
-    qDebug() << "TpTubesClientHandler::onChannelReady()";
+    qDebug() << "TpTubesClientHandler::deleteOutgoingTube()";
 
-    if(op->isError())
-    {
-        qDebug() << "Channel ready error: " << op->errorName() << op->errorMessage();
-        return;
-    }
+    TpOutgoingTube *tube = qobject_cast<TpOutgoingTube*>(sender());
 
-    Tp::Contacts contacts = mChannel->groupContacts();
-
-    Q_FOREACH(Tp::ContactPtr contact, contacts)
-    {
-        qDebug() << contact->id();
-    }
-
-    Tp::Client::ChannelTypeStreamTubeInterface *streamTubeInterface = mChannel->streamTubeInterface();
-    Tp::Client::ChannelInterfaceTubeInterface *tubeInterface = mChannel->tubeInterface();
-
-    if(streamTubeInterface && tubeInterface)
-    {
-        qDebug() << "We have tube control interfaces. Continue.";
-
-        QDBusVariant ret = streamTubeInterface->Accept(
-                Tp::SocketAddressTypeIPv4,
-                Tp::SocketAccessControlLocalhost,
-                QDBusVariant(""));
-
-        StreamTubeAddress streamTubeAddress = qdbus_cast<StreamTubeAddress>(ret.variant());
-        qDebug () << "Stream tube address:"
-                << streamTubeAddress.address
-                << ":"
-                << streamTubeAddress.port;
-    }
-
-    qDebug() << "? ERROR ?";
+    mOutgoingTubes.removeOne(tube);
+    tube->deleteLater();
 }
 
 };
