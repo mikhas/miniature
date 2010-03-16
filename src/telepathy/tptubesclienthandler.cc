@@ -22,6 +22,7 @@
 #include "tptubesclienthandler.h"
 #include "tphelpers.h"
 #include "tpoutgoingtube.h"
+#include "tpincomingtube.h"
 
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Debug>
@@ -98,6 +99,7 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
             if(properties[TELEPATHY_INTERFACE_CHANNEL ".Requested"].toBool())
             {
                 qDebug() << "Outgoing channel !";
+
                 TpOutgoingTube *tube = new TpOutgoingTube(channel);
                 connect(tube,
                         SIGNAL(tubeReady(QTcpSocket *, const Tp::ContactPtr &)),
@@ -111,6 +113,16 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
             else
             {
                 qDebug() << "Incoming channel !";
+
+                TpIncomingTube *tube = new TpIncomingTube(channel);
+                connect(tube,
+                        SIGNAL(tubeReady(QTcpSocket*, const Tp::ContactPtr &)),
+                        SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)));
+                connect(tube,
+                        SIGNAL(readyToBeDeleted()),
+                        SLOT(deleteIncomingTube()));
+
+                mIncomingTubes.append(tube);
             }
         }
     }
@@ -126,7 +138,29 @@ void TpTubesClientHandler::deleteOutgoingTube()
 
     TpOutgoingTube *tube = qobject_cast<TpOutgoingTube*>(sender());
 
+    if(!tube)
+    {
+        qDebug() << "Wrong outgoing tube?";
+        return;
+    }
+
     mOutgoingTubes.removeOne(tube);
+    tube->deleteLater();
+}
+
+void TpTubesClientHandler::deleteIncomingTube()
+{
+    qDebug() << "TpTubesClientHandler::deleteIncomingTube()";
+
+    TpIncomingTube *tube = qobject_cast<TpIncomingTube*>(sender());
+
+    if(!tube)
+    {
+        qDebug() << "Wrong incoming tube?";
+        return;
+    }
+
+    mIncomingTubes.removeOne(tube);
     tube->deleteLater();
 }
 

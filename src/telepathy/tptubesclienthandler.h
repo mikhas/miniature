@@ -32,6 +32,7 @@ namespace Miniature
 {
 
 class TpOutgoingTube;
+class TpIncomingTube;
 
 class TpTubesClientHandler : public QObject, public Tp::AbstractClientHandler
 {
@@ -54,9 +55,11 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void deleteOutgoingTube();
+    void deleteIncomingTube();
 
 private:
     QList<TpOutgoingTube*> mOutgoingTubes;
+    QList<TpIncomingTube*> mIncomingTubes;
 };
 
 };
