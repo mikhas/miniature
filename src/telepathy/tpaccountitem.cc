@@ -203,5 +203,9 @@ void TpAccountItem::onEnsureChannelFinished(Tp::PendingOperation *o)
     }
 }
 
-#include "tpaccountitem.moc.cc"
-};
+Tp::AccountPtr TpAccountItem::getInternal()
+{
+    return mAcc;
+}
+
+}

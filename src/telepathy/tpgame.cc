@@ -22,6 +22,7 @@
 #include "tpgame.h"
 #include "tpapprovermanager.h"
 #include "tptubesclienthandler.h"
+#include "tptextclienthandler.h"
 
 namespace Miniature
 {
@@ -33,9 +34,12 @@ TpGame::TpGame(QObject *parent) : QObject(parent)
 
     qDebug() << "Registering client handler.";
     mClientRegistrar = Tp::ClientRegistrar::create();
+    
     Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
-
     mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
+
+    Tp::SharedPtr<TpTextClientHandler> textClient = Tp::SharedPtr<TpTextClientHandler>(new TpTextClientHandler(0));
+    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
 
 //    Tp::SharedPtr<TpApproverManager> approverManager;
 //    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
@@ -44,12 +48,15 @@ TpGame::TpGame(QObject *parent) : QObject(parent)
 
 void TpGame::hostGame()
 {
+    qDebug() << "TpGame::hostGame()";
     mTpAccountManager->disconnect();
     QObject::connect(mTpAccountManager, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
 }
 
 void TpGame::onAccountNameListChanged(const QList<QString> accounts)
 {
+    qDebug() << "TpGame::onAccountNameListChanged()";
+    
     Q_FOREACH(QString accountName, accounts)
     {
         mTpAccountManager->ensureContactListForAccount(accountName);
@@ -60,6 +67,7 @@ void TpGame::onAccountNameListChanged(const QList<QString> accounts)
 
 void TpGame::joinGame()
 {
+    qDebug() << "TpGame::joingGame()";
     mAccountsDialog->show();
 
     Q_EMIT initialized();

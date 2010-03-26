@@ -101,7 +101,7 @@ void TpIncomingTube::onChannelReady(Tp::PendingOperation *op)
 
 void TpIncomingTube::onTubeChannelStateChanged(uint state)
 {
-    qDebug() << "TpIncomingTube::onTubeChannelStateChanged()";
+    qDebug() << "TpIncomingTube::onTubeChannelStateChanged()" << state;
 
     if(state != Tp::TubeStateOpen)
         return;

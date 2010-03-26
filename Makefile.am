@@ -110,6 +110,12 @@ src_miniature_SOURCES = \
 			src/telepathy/tpincomingtube.h \
 			src/telepathy/tpincomingtube.cc \
 			src/telepathy/tpincomingtube.moc.cc \
+			src/telepathy/tptextclienthandler.h \
+			src/telepathy/tptextclienthandler.cc \
+			src/telepathy/tptextclienthandler.moc.cc \
+			src/telepathy/tpchatsession.h \
+			src/telepathy/tpchatsession.cc \
+			src/telepathy/tpchatsession.moc.cc \
 			src/pregame.cc \
 			src/pregame.h \
 			src/pregame.moc.cc \

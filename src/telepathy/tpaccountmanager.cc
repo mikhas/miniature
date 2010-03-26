@@ -22,6 +22,7 @@
 #include "tpaccountmanager.h"
 #include "tpaccountitem.h"
 #include "accountselectiondlg.h"
+#include "tpchatsession.h"
 
 #include <select_account.ui.h>
 
@@ -49,6 +50,8 @@ namespace Miniature
 TpAccountManager::TpAccountManager(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << "TpAccountManager::TpAccountManager()";
+    
     Tp::enableDebug(false);
     Tp::enableWarnings(true);
 
@@ -63,11 +66,13 @@ TpAccountManager::TpAccountManager(QObject *parent)
 
 TpAccountManager::~TpAccountManager()
 {
-
+    qDebug() << "TpAccountManager::~TpAccountManager()";
 }
 
 void TpAccountManager::onAMReady(Tp::PendingOperation *o)
 {
+    qDebug() << "TpAccountManager::onAMReady()";
+    
     if(o->isError())
     {
         qDebug() << "Account Manager error";
@@ -87,6 +92,8 @@ void TpAccountManager::onAMReady(Tp::PendingOperation *o)
 
 void TpAccountManager::onAccountInitialized()
 {
+    qDebug() << "TpAccountManager::onAccountInitialized ()";
+    
     QList<QString> accountNamesList;
 
     Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
@@ -102,11 +109,14 @@ void TpAccountManager::onAccountInitialized()
 
 void TpAccountManager::ensureAccountNameList()
 {
+    qDebug() << "TpAccountManager::ensureAccountNameList ()";
     onAccountInitialized();
 }
 
 void TpAccountManager::ensureContactListForAccount(QString accountName)
 {
+    qDebug() << "TpAccountManager::ensureContactListForAccount ()" << accountName;
+    
     Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
     {
         if(accountName == accItem->getDisplayName())
@@ -121,6 +131,8 @@ void TpAccountManager::ensureContactListForAccount(QString accountName)
 
 void TpAccountManager::onEnsureChannel(QString accountName, QString contactName)
 {
+    qDebug() << "TpAccountManager::onEnsureChannel ()" << accountName << contactName;
+    
     mContactName = contactName;
 
     Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
@@ -138,13 +150,15 @@ void TpAccountManager::onEnsureChannel(QString accountName, QString contactName)
 
 void TpAccountManager::ensureContactsForAccount(const Tp::Contacts contacts)
 {
-    qDebug();
+    qDebug() << "TpAccountManager::ensureContactsForAccount()" << contacts;
 
     Q_FOREACH(Tp::ContactPtr contact, contacts)
     {
         if(contact->id() == mContactName)
         {
             createChannel(contact);
+            // TODO hook up properly 
+            createChatSession(contact);
             break;
         }
     }
@@ -167,6 +181,20 @@ void TpAccountManager::createChannel(const Tp::ContactPtr contact)
                "Miniature");
 
     mAccount->ensureChannel(req);
+}
+
+void TpAccountManager::createChatSession(const Tp::ContactPtr contact)
+{
+    qDebug() << "TpAccountManager::createChatSession()";
+    qDebug() << "!!!! CREATING TEXT SESSION for" << contact->id() << " !!!";
+
+    TpChatSession * chatSession = new TpChatSession(qobject_cast<QObject*> (this), mAccount->getInternal());
+    if (!chatSession) {
+        qWarning() << "Chat sessuon could not be created";
+        return;
+    }
+
+    chatSession->createTextChannel(contact);    
 }
 
 };

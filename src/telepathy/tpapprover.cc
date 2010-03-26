@@ -39,6 +39,8 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
     mChannels(channels),
     mDispatchOp(dispatchOperation)
 {
+    qDebug() << "TpApprover::TpApprover()";
+    
     connect(mDispatchOp->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));

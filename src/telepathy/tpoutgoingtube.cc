@@ -33,6 +33,8 @@ TpOutgoingTube::TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
     : QObject(parent),
     mChannel(channel)
 {
+    qDebug() << "TpOutgoingTube::TpOutgoingTube()";
+    
     qDBusRegisterMetaType<StreamTubeAddress>();
 
     Tp::Features features;
@@ -44,7 +46,7 @@ TpOutgoingTube::TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
 
 TpOutgoingTube::~TpOutgoingTube()
 {
-
+    qDebug() << "TpOutgoingTube::~TpOutgoingTube()";
 }
 
 void TpOutgoingTube::onChannelReady(Tp::PendingOperation *op)

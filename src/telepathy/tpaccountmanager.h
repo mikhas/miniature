@@ -56,6 +56,7 @@ private Q_SLOTS:
     void onEnsureChannel(QString, QString);
     void ensureContactsForAccount(const Tp::Contacts);
     void createChannel(const Tp::ContactPtr);
+    void createChatSession(const Tp::ContactPtr contact);
 
 private:
     Tp::AccountManagerPtr mAM;

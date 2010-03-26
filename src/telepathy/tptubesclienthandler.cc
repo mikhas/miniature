@@ -51,7 +51,7 @@ TpTubesClientHandler::TpTubesClientHandler(QObject *parent)
 {
     qDebug() << "TpTubesClientHandler::TpTubesClientHandler()";
 
-    Tp::enableDebug(false);
+    Tp::enableDebug(true);
     Tp::enableWarnings(true);
 
     Tp::registerTypes();

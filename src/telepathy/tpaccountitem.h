@@ -61,6 +61,12 @@ private Q_SLOTS:
     void onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
     void onEnsureChannelFinished(Tp::PendingOperation *);
 
+protected:
+
+    friend class TpAccountManager;
+    
+    Tp::AccountPtr getInternal();
+    
 private:
     void connectionReady();
 
