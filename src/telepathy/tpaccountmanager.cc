@@ -188,13 +188,16 @@ void TpAccountManager::createChatSession(const Tp::ContactPtr contact)
     qDebug() << "TpAccountManager::createChatSession()";
     qDebug() << "!!!! CREATING TEXT SESSION for" << contact->id() << " !!!";
 
-    TpChatSession * chatSession = new TpChatSession(qobject_cast<QObject*> (this), mAccount->getInternal());
-    if (!chatSession) {
-        qWarning() << "Chat sessuon could not be created";
-        return;
-    }
+    QVariantMap req;
 
-    chatSession->createTextChannel(contact);    
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".ChannelType"),
+               TELEPATHY_INTERFACE_CHANNEL_TYPE_TEXT);
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
+               Tp::HandleTypeContact);
+    req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle"),
+               contact->handle().at(0));
+
+    mAccount->ensureChannel(req);
 }
 
 };

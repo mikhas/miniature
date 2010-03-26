@@ -23,6 +23,7 @@
 #include "tphelpers.h"
 #include "tpoutgoingtube.h"
 #include "tpincomingtube.h"
+#include "tpchatsession.h"
 
 #include <TelepathyQt4/Constants>
 #include <TelepathyQt4/Debug>
@@ -114,25 +115,13 @@ void TpTextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> 
             contactId = properties[TELEPATHY_INTERFACE_CHANNEL ".InitiatorID"].toString();
 
         qDebug() << "Handling step1:" << contactId;
-        
+
+        QObject * parent = qobject_cast<QObject*>(account.data());        
+        TpChatSession * chatSession = new TpChatSession(parent, account);
+
         Tp::TextChannelPtr textChannel =
-            Tp::TextChannelPtr(qobject_cast<Tp::TextChannel*>(channel.data()));
-
-        qDebug() << "textChannel = isNUll" << textChannel.isNull() << textChannel;
-
-#if 0
-        // testing
-        if (!textChannel.isNull()) {
-            qDebug() << "saying hello";
-            QString msg("hello");
-            textChannel->send(msg);
-            qDebug() << "message sent " << msg;
-        } else {
-            qDebug() << "error not saying hello";
-        }
-#endif
-
-        // TODO create TelepathyChatSession, calling setTextChannel
+            Tp::TextChannelPtr(qobject_cast<Tp::TextChannel*>(channel.data()));        
+        chatSession->setTextChannel(textChannel);
         
         context->setFinished();
         

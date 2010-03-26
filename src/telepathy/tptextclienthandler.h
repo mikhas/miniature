@@ -49,6 +49,7 @@ public:
                                 const QList<Tp::ChannelRequestPtr> &requestedSatisfied,
                                 const QDateTime &userActionTime,
                                 const QVariantMap &handlerInfo);
+    
 };
 
 };

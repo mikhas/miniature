@@ -38,15 +38,10 @@ class TpChatSession : public QObject
 public:
     TpChatSession(QObject *parent, Tp::AccountPtr account);
     virtual ~TpChatSession();
+
+    void setTextChannel(/*Tp::ContactPtr contact,*/const Tp::TextChannelPtr &textChannel);
     
-    void createTextChannel(Tp::ContactPtr contact);
-    Tp::ChannelRequestPtr channelRequest();
-    Tp::PendingChannelRequest *pendingChannelRequest();
-
-    void setTextChannel(Tp::ContactPtr contact, const Tp::TextChannelPtr &textChannel);
-
 private Q_SLOTS:
-    void onEnsureChannelFinished(Tp::PendingOperation *op);
     void onTextChannelReady(Tp::PendingOperation *op);
 
     void sendMessage(const QString &message);
@@ -60,9 +55,7 @@ private Q_SLOTS:
 private:
     Tp::AccountPtr m_account;
     Tp::ContactPtr m_contact;
-    Tp::ChannelRequestPtr m_channelRequest;
     Tp::TextChannelPtr m_textChannel;
-    Tp::PendingChannelRequest *m_pendingChannelRequest;
 };
 
 };

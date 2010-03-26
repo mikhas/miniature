@@ -37,51 +37,6 @@ TpChatSession::TpChatSession(QObject *parent, Tp::AccountPtr account) :
     qDebug() << "TpChatSession::TpChatSession()";
 }
 
-#if 0
-TpChatSession::TpChatSession(const Kopete::Contact *user, Kopete::ContactPtrList others, Kopete::Protocol *protocol)
-        : Kopete::ChatSession(user, others, protocol),
-        m_pendingChannelRequest(0)
-{
-    kDebug();
-    Kopete::ChatSessionManager::self()->registerChatSession(this);
-
-    QObject::connect(this,
-                     SIGNAL(messageSent(Kopete::Message&, Kopete::ChatSession*)),
-                     SLOT(sendMessage(Kopete::Message&)));
-
-    setComponentData (protocol->componentData ());
-
-    // HACK: This breaks on 1-many chats.
-    // Set the m_contact to be the target contact's Tp::ContactPtr.
-    if (others.size() <= 0) {
-        kWarning() << "Invalid number of people in the chat. Aborting share-my-desktop.";
-        return;
-    }
-
-    if (others.size() > 1) {
-        kWarning() << "Share-My-Desktop only supports 1-1 chats at the moment.";
-        return;
-    }
-
-    // Cast the only member of the chat to a TelepathyContact.
-    TelepathyContact *tpContact = qobject_cast<TelepathyContact*>(others.at(0));
-
-    // Check the member really is a telepathy contact.
-    if (!tpContact) {
-        kWarning() << "Chat member is not a telepathy contact. Aborting share-my-desktop.";
-        return;
-    }
-
-    // Get the internal Tp::Contact and save it as a member variable.
-    m_contact = tpContact->internalContact();
-
-    connect(m_contact.data(), SIGNAL(simplePresenceChanged(const QString &, uint, const QString &)),
-            this, SLOT(onContactPresenceChanged(const QString &, uint, const QString &)));
-    // Only at this point do we allow the share-my-desktop button to be shown.
-    setXMLFile ("telepathychatui.rc");
-}
-#endif
-
 TpChatSession::~TpChatSession()
 {
     qDebug() << "TpChatSession::~TpChatSession()";
@@ -95,50 +50,6 @@ TpChatSession::~TpChatSession()
     }
 }
 
-void TpChatSession::createTextChannel(Tp::ContactPtr contact)
-{
-    qDebug() << "TpChatSession::createTextChannel()";
-
-    if (contact.isNull()) {
-        qWarning() << "Null contact. Fail.";
-        return;
-    }
-    m_contact = contact;
-    
-    QString preferredHandler("org.freedesktop.Telepathy.Client.miniature_text_handler");
-
-    if (m_account.isNull()) {
-        qWarning() << "Null account. Fail.";
-        return;
-    }
-
-    connect(m_contact.data(), SIGNAL(simplePresenceChanged(const QString &, uint, const QString &)),
-            this, SLOT(onContactPresenceChanged(const QString &, uint, const QString &)));        
-
-    m_pendingChannelRequest =
-            m_account->ensureTextChat(m_contact, QDateTime::currentDateTime(), preferredHandler);
-
-    m_channelRequest = m_pendingChannelRequest->channelRequest();
-    qDebug() << "m_channelRequest:" << m_channelRequest.data();
-
-    connect(m_pendingChannelRequest,
-            SIGNAL(finished(Tp::PendingOperation*)),
-            SLOT(onEnsureChannelFinished(Tp::PendingOperation*)));
-}
-
-void TpChatSession::onEnsureChannelFinished(Tp::PendingOperation* op)
-{
-    qDebug() << "TpChatSession::onEnsureChannelFinished()";
-
-    if (op->isError()) {
-        qWarning() << "Ensuring Channel Failed:" << op->errorName() << op->errorMessage();
-        return;
-    }
-
-    m_channelRequest = m_pendingChannelRequest->channelRequest();
-    m_pendingChannelRequest = 0;
-}
-
 void TpChatSession::sendMessage(const QString &message)
 {
     qDebug() << "TpChatSession::sendMessage()" << message;
@@ -147,11 +58,7 @@ void TpChatSession::sendMessage(const QString &message)
         qWarning() << "Message not sent because channel does not yet exist.";
 
         // TODO Indicate that the message sending failed.
-        // message.setState(Kopete::Message::StateError);
-        // appendMessage(message);
-
-        // FIXME: Only call messageSucceeded() if there are no messages in the process of being sent.
-        //messageSucceeded();
+        
         return;
     }
 
@@ -167,25 +74,8 @@ void TpChatSession::messageSent(const Tp::Message &message,
     Q_UNUSED(flags);
     Q_UNUSED(sentMessageToken);
     Q_UNUSED(message);
-    
-    // FIXME: We need to process outgoing messages better, so we can display when they fail etc
 
-    //Kopete::Message::MessageType messageType = Kopete::Message::TypeNormal;
-    /*
-     if(message.messageType() == Tp::ChannelTypeMessageAction)
-     {
-      messageType = Kopete::Message::TypeAction;
-     }
-    */
-#if 0
-    Kopete::Message newMessage(myself(), members());
-    newMessage.setPlainBody(message.text());
-    newMessage.setDirection(Kopete::Message::Outbound);
-    newMessage.setType(messageType);
-
-    appendMessage(newMessage);
-    messageSucceeded();
-#endif    
+    // TODO process outgoing messages with status ...
 }
 
 void TpChatSession::messageReceived(const Tp::ReceivedMessage &message)
@@ -193,34 +83,21 @@ void TpChatSession::messageReceived(const Tp::ReceivedMessage &message)
     qDebug() << "TpChatSession::messageReceived" << message.text();
 
     Q_UNUSED(message);
-    
-#if 0
-    Kopete::Message::MessageType messageType = Kopete::Message::TypeNormal;
 
-    Kopete::Message newMessage(members().first(), myself());
-    newMessage.setPlainBody(message.text());
-    newMessage.setDirection(Kopete::Message::Inbound);
-    newMessage.setType(messageType);
+    // TODO process received message
 
-    appendMessage(newMessage);
-#endif    
-
-    // Acknowledge the receipt of this message, so it won't be redespatched to us when we close
-    // the channel.
+    // Acknowledge the receipt of this message, 
+    // so it won't be redespatched to us when we close the channel.
     m_textChannel->acknowledge(QList<Tp::ReceivedMessage>() << message);
 }
 
-Tp::ChannelRequestPtr TpChatSession::channelRequest()
-{
-    qDebug() << " TpChatSession::channelRequest";
-    
-    return m_channelRequest;
-}
-
-void TpChatSession::setTextChannel(Tp::ContactPtr contact, const Tp::TextChannelPtr &textChannel)
+void TpChatSession::setTextChannel(/*Tp::ContactPtr contact, */const Tp::TextChannelPtr &textChannel)
 {
     qDebug() << "TpChatSession::setTextChannel";
 
+#if 0
+    // TOOD watch for contact presence
+    
     if (contact.isNull()) {
         qWarning() << "Null contact. Fail.";
         return;
@@ -229,6 +106,7 @@ void TpChatSession::setTextChannel(Tp::ContactPtr contact, const Tp::TextChannel
 
     connect(m_contact.data(), SIGNAL(simplePresenceChanged(const QString &, uint, const QString &)),
             this, SLOT(onContactPresenceChanged(const QString &, uint, const QString &)));        
+#endif
     
     m_textChannel = textChannel;
 
@@ -267,6 +145,7 @@ void TpChatSession::onTextChannelReady(Tp::PendingOperation *op)
                      SIGNAL(messageSent(const Tp::Message &, Tp::MessageSendingFlags, const QString &)),
                      this,
                      SLOT(messageSent(const Tp::Message &, Tp::MessageSendingFlags, const QString &)));
+    
     QObject::connect(m_textChannel.data(),
                      SIGNAL(messageReceived(const Tp::ReceivedMessage &)),
                      this,
@@ -276,15 +155,19 @@ void TpChatSession::onTextChannelReady(Tp::PendingOperation *op)
     Q_FOREACH (const Tp::ReceivedMessage &message, m_textChannel->messageQueue()) {
         messageReceived(message);
     }
-}
 
-Tp::PendingChannelRequest *TpChatSession::pendingChannelRequest()
-{
-    qDebug() << "TpChatSession::pendingChannelRequest";
-    
-    return m_pendingChannelRequest;
+#if 1
+    // JUST FOR TESTING
+    if (!m_textChannel.isNull()) {
+        qDebug() << "saying hello";
+        QString msg("hello");
+        m_textChannel->send(msg);
+        qDebug() << "message sent " << msg;
+    } else {
+        qDebug() << "error not saying hello";
+    }
+#endif
 }
-
 
 void TpChatSession::onContactPresenceChanged(const QString &, uint type, const QString &)
 {
@@ -292,7 +175,9 @@ void TpChatSession::onContactPresenceChanged(const QString &, uint type, const Q
 
     Q_UNUSED(type);
 #if 0
-    if(!account()->isConnected() || type == Tp::ConnectionPresenceTypeOffline)
+    if(!account()->isConnected() || type == Tp::ConnectionPresenceTypeOffline) {
+        // TODO tell player about the other player leaved chat session 
+    }
 #endif    
 }
 
