@@ -19,45 +19,30 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPGAME_H
-#define TPGAME_H
+#ifndef TPTUBECLIENT_H
+#define TPTUBECLIENT_H
 
-#include "tpaccountmanager.h"
-#include "accountselectiondlg.h"
-
-#include <TelepathyQt4/ClientRegistrar>
-
-#include <QObject>
+#include <QTcpSocket>
 
 namespace Miniature
 {
 
-class QTcpSocket;
-
-class TpGame : public QObject
+class TpTubeClient : public QTcpSocket
 {
     Q_OBJECT
 public:
-    TpGame(QObject *parent = 0);
-
-public Q_SLOTS:
-    void hostGame();
-    void joinGame();
+    TpTubeClient(QObject *parent = 0);
 
 Q_SIGNALS:
-    void initialized();
+
+public Q_SLOTS:
+    void startNewGame();
+    void newGameStarted();
 
 private Q_SLOTS:
-    void onAccountNameListChanged(const QList<QString>);
-    void newIncomingTube(QTcpSocket *, const Tp::ContactPtr &);
-    void newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &);
-
-private:
-    TpAccountManager *mTpAccountManager;
-    AccountSelectionDlg *mAccountsDialog;
-    Tp::ClientRegistrarPtr mClientRegistrar;
+    void readyToTransfer();
 };
 
 };
 
-#endif // TPGAME_H
+#endif // TPTUBECLIENT_H

@@ -30,6 +30,8 @@
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/Constants>
 
+#include "tptubeserver.h"
+
 namespace Miniature
 {
 
@@ -56,6 +58,7 @@ private:
     Tp::ChannelPtr mChannel;
     Tp::Client::ChannelInterfaceTubeInterface *mTubeInterface;
     Tp::Client::ChannelTypeStreamTubeInterface *mStreamTubeInterface;
+    TpTubeServer server;
 };
 
 };

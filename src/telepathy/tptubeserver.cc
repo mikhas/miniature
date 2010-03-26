@@ -19,45 +19,43 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TPGAME_H
-#define TPGAME_H
-
-#include "tpaccountmanager.h"
-#include "accountselectiondlg.h"
-
-#include <TelepathyQt4/ClientRegistrar>
-
-#include <QObject>
+#include "tptubeserver.h"
+#include "tptubeclient.h"
 
 namespace Miniature
 {
 
-class QTcpSocket;
-
-class TpGame : public QObject
+TpTubeServer::TpTubeServer(QObject *parent)
+    : QTcpServer(parent)
 {
-    Q_OBJECT
-public:
-    TpGame(QObject *parent = 0);
+    qDebug() << "TpTubeServer::TpTubeServer()";
+}
 
-public Q_SLOTS:
-    void hostGame();
-    void joinGame();
+void TpTubeServer::incomingConnection(int socketDescriptor)
+{
+    qDebug() << "TpTubeServer::incomingConnection()";
 
-Q_SIGNALS:
-    void initialized();
+    TpTubeClient *client = new TpTubeClient(this);
+    if(client->setSocketDescriptor(socketDescriptor))
+    {
+        QObject::connect(client,
+            SIGNAL(error(QAbstractSocket::SocketError)),
+            SLOT(removeClient()));
+        clients << client;
+        return;
+    }
 
-private Q_SLOTS:
-    void onAccountNameListChanged(const QList<QString>);
-    void newIncomingTube(QTcpSocket *, const Tp::ContactPtr &);
-    void newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &);
+    client->abort();
+    delete client;
+}
 
-private:
-    TpAccountManager *mTpAccountManager;
-    AccountSelectionDlg *mAccountsDialog;
-    Tp::ClientRegistrarPtr mClientRegistrar;
+void TpTubeServer::removeClient()
+{
+    qDebug() << "TpTubeServer::removeClient()";
+
+    TpTubeClient *client = qobject_cast<TpTubeClient*>(sender());
+    client->deleteLater();
+    clients.removeAll(client);
+}
+
 };
-
-};
-
-#endif // TPGAME_H

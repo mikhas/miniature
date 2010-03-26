@@ -24,6 +24,8 @@
 #include "tptubesclienthandler.h"
 #include "tptextclienthandler.h"
 
+#include <QTcpSocket>
+
 namespace Miniature
 {
 
@@ -36,6 +38,16 @@ TpGame::TpGame(QObject *parent) : QObject(parent)
     mClientRegistrar = Tp::ClientRegistrar::create();
     
     Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
+
+    QObject::connect(client.data(),
+                     SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
+                     this,
+                     SLOT(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)));
+    QObject::connect(client.data(),
+                     SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
+                     this,
+                     SLOT(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)));
+
     mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
 
     Tp::SharedPtr<TpTextClientHandler> textClient = Tp::SharedPtr<TpTextClientHandler>(new TpTextClientHandler(0));
@@ -71,6 +83,16 @@ void TpGame::joinGame()
     mAccountsDialog->show();
 
     Q_EMIT initialized();
+}
+
+void TpGame::newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)
+{
+    qDebug() << "TpGame::newIncomingTube()";
+}
+
+void TpGame::newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)
+{
+    qDebug() << "TpGame::newOutgoingTube()";
 }
 
 };

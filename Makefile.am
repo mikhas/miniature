@@ -116,9 +116,12 @@ src_miniature_SOURCES = \
 			src/telepathy/tpchatsession.h \
 			src/telepathy/tpchatsession.cc \
 			src/telepathy/tpchatsession.moc.cc \
-			src/pregame.cc \
-			src/pregame.h \
-			src/pregame.moc.cc \
+			src/telepathy/tptubeserver.h \
+			src/telepathy/tptubeserver.cc \
+			src/telepathy/tptubeserver.moc.cc \
+			src/telepathy/tptubeclient.h \
+			src/telepathy/tptubeclient.cc \
+			src/telepathy/tptubeclient.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5

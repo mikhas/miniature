@@ -25,6 +25,7 @@
 #include <TelepathyQt4/PendingReady>
 
 #include <QHostAddress>
+#include <QNetworkInterface>
 
 namespace Miniature
 {
@@ -34,7 +35,6 @@ TpOutgoingTube::TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
     mChannel(channel)
 {
     qDebug() << "TpOutgoingTube::TpOutgoingTube()";
-    
     qDBusRegisterMetaType<StreamTubeAddress>();
 
     Tp::Features features;
@@ -82,11 +82,31 @@ void TpOutgoingTube::onChannelReady(Tp::PendingOperation *op)
                 SIGNAL(TubeChannelStateChanged(uint)),
                 SLOT(onTubeStateChanged(uint)));
 
+        if(!server.listen())
+        {
+            qDebug() << "Error server listening";
+            return;
+        }
+
         QVariantMap parameters;
 
+        QString ipAddress;
+        QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+        // use the first non-localhost IPv4 address
+        for (int i = 0; i < ipAddressesList.size(); ++i) {
+            if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
+                ipAddressesList.at(i).toIPv4Address()) {
+                ipAddress = ipAddressesList.at(i).toString();
+                break;
+            }
+        }
+        // if we did not find one, use IPv4 localhost
+        if (ipAddress.isEmpty())
+            ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
+
         StreamTubeAddress streamTubeAddress;
-        streamTubeAddress.address = QHostAddress(QHostAddress::LocalHost).toString();
-        streamTubeAddress.port = 1234;
+        streamTubeAddress.address = ipAddress;
+        streamTubeAddress.port = server.serverPort();
 
         qDebug() << "Server address:" << streamTubeAddress.address << "port:" << streamTubeAddress.port;
 
@@ -151,9 +171,9 @@ void TpOutgoingTube::onNewRemoteConnection(uint handle, QDBusVariant connectionP
     QVariant v = connectionParam.variant();
     qDebug() << "variant =" << v << "handle:" << handle << "connectionId:" << connectionId;
 
-    Tp::SocketAddressIPv4 ipv4address = qdbus_cast<Tp::SocketAddressIPv4>(v);
+    //Tp::SocketAddressIPv4 ipv4address = qdbus_cast<Tp::SocketAddressIPv4>(v);
 
-    qDebug() << "NewRemoteConnection:" << ipv4address.port << ipv4address.address;
+    //qDebug() << "NewRemoteConnection:" << ipv4address.port << ipv4address.address;
 
     // \todo:
     // Start server listening!

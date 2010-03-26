@@ -33,6 +33,8 @@
 namespace Miniature
 {
 
+class TpTubeClient;
+
 class TpIncomingTube : public QObject
 {
     Q_OBJECT
@@ -58,6 +60,7 @@ private:
     Tp::ContactPtr mContact;
     QTcpSocket *mTcpSocket;
     StreamTubeAddress mStreamTubeAddress;
+    TpTubeClient *mClient;
 };
 
 };

@@ -20,6 +20,7 @@
  */
 
 #include "tpincomingtube.h"
+#include "tptubeclient.h"
 
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
@@ -32,7 +33,8 @@ TpIncomingTube::TpIncomingTube(const Tp::ChannelPtr &channel, QObject *parent)
     mChannel(channel),
     mStreamTubeInterface(0),
     mTubeInterface(0),
-    mTcpSocket(0)
+    mTcpSocket(0),
+    mClient(0)
 {
     qDebug() << "TpIncomingTube::TpIncomingTube()";
 
@@ -85,7 +87,8 @@ void TpIncomingTube::onChannelReady(Tp::PendingOperation *op)
              << mStreamTubeAddress.port;
 
     mTcpSocket = new QTcpSocket;
-
+    mClient  = new TpTubeClient(this);
+/*
     connect(mTcpSocket,
             SIGNAL(connected()),
             SLOT(onTcpSocketConnected()));
@@ -97,21 +100,38 @@ void TpIncomingTube::onChannelReady(Tp::PendingOperation *op)
             SLOT(onTcpSocketDisconnected()));
 
     mTcpSocket->connectToHost(mStreamTubeAddress.address, mStreamTubeAddress.port);
+*/
+
+    connect(mClient,
+            SIGNAL(connected()),
+            SLOT(onTcpSocketConnected()));
+    connect(mClient,
+            SIGNAL(error(QAbstractSocket::SocketError)),
+            SLOT(onTcpSocketError(QAbstractSocket::SocketError)));
+    connect(mClient,
+            SIGNAL(disconnected()),
+            SLOT(onTcpSocketDisconnected()));
+
+    mClient->connectToHost(mStreamTubeAddress.address, mStreamTubeAddress.port);
 }
 
 void TpIncomingTube::onTubeChannelStateChanged(uint state)
 {
-    qDebug() << "TpIncomingTube::onTubeChannelStateChanged()" << state;
+    qDebug() << "TpIncomingTube::onTubeChannelStateChanged()";
+    qDebug() << "Tube state changed:" << state;
 
     if(state != Tp::TubeStateOpen)
         return;
 
     Q_EMIT tubeReady(mTcpSocket, mContact);
+
+    mClient->startNewGame();
 }
 
 void TpIncomingTube::onTcpSocketConnected()
 {
     qDebug() << "TpIncomingTube::onTcpSocketConnected()";
+
 }
 
 void TpIncomingTube::onTcpSocketError(QAbstractSocket::SocketError error)
@@ -120,7 +140,7 @@ void TpIncomingTube::onTcpSocketError(QAbstractSocket::SocketError error)
 
     qDebug() << "TpIncomingtube::onTcpSocketError()";
 
-    qDebug() << "Tcp socket error:" << mTcpSocket->errorString();
+    qDebug() << "Tcp socket error:" << mClient->errorString();
 
     Q_EMIT readyToBeDeleted();
 }
