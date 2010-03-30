@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QMap>
 #include <QComboBox>
 #include <QTextEdit>
 #include <QMainWindow>
@@ -41,17 +42,20 @@ class MGameLog
     Q_OBJECT
 
 public:
-    enum mLogLevel
+    enum mLogDomain
     {
         ERROR    = 0x000,
-        CRITICAL = 0x001,
-        WARNING  = 0x002,
-        MESSAGE  = 0x004,
-        INFO     = 0x008,
-        DEBUG    = 0x010
+        ENGINE   = 0x001,
+        GRAPHICS = 0x002,
+        PREGAME  = 0x004,
+        GAME     = 0x008,
+        P2P      = 0x010,
+        FICS     = 0x020,
+        CHAT     = 0x040
     };
 
-    typedef QFlags<mLogLevel> mLogLevelFlags;
+    typedef QFlags<mLogDomain> mLogDomainFlags;
+    typedef QMap<mLogDomain, QString> mLogDomainMap;
 
 private:
     class mLogItem;
@@ -67,7 +71,7 @@ public Q_SLOTS:
     /*!
      *  Creates a log item from the message and the flags and appends it to the log.
      */
-    void append(const QString &msg, const mLogLevelFlags &flags);
+    void append(const QString &msg, const mLogDomainFlags &flags);
 
     /*!
      *  Shows the log window, in the context of parent.
@@ -80,9 +84,11 @@ public Q_SLOTS:
     void onFilterChanged(int filter_index);
 
 private:
-    void print(const mLogLevelFlags &flags) const;
+    mLogDomainFlags getAllLogDomainFlags() const;
+    void print(const mLogDomainFlags &flags) const;
 
     mLogList m_log; /*!< The list that contains all log items. >*/
+    mLogDomainMap m_log_domain_lookup; /*!< Stores the display names of log domains. >*/
     QComboBox *m_log_filter; /*!< The combo box used for filtering. >*/
     QTextEdit *m_log_widget; /*!< The widget used to print the log list. >*/
 
@@ -92,17 +98,17 @@ private:
     class mLogItem
     {
     public:
-        explicit mLogItem(const QString &msg, const mLogLevelFlags &flags);
+        explicit mLogItem(const QString &msg, const mLogDomainFlags &flags);
         virtual ~mLogItem();
 
         QString getTime() const;
         QString getMessage() const;
-        mLogLevelFlags getLogLevelFlags() const;
+        mLogDomainFlags getLogDomainFlags() const;
 
     private:
         QTime m_time;
         QString m_message;
-        mLogLevelFlags m_log_level_flags;
+        mLogDomainFlags m_log_domain_flags;
     };
 };
 

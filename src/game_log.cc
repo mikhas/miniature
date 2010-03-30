@@ -27,14 +27,22 @@ MGameLog(QObject *parent)
 : QObject(parent),
   m_log_filter(0),
   m_log_widget(0)
-{}
+{
+    m_log_domain_lookup[ERROR]    = QString("Error log");
+    m_log_domain_lookup[ENGINE]   = QString("Game engine log");
+    m_log_domain_lookup[GRAPHICS] = QString("Game graphics log");
+    m_log_domain_lookup[GAME]     = QString("Game log");
+    m_log_domain_lookup[P2P]      = QString("P2P log");
+    m_log_domain_lookup[FICS]     = QString("FICS log");
+    m_log_domain_lookup[CHAT]     = QString("Chat log");
+}
 
 MGameLog::
 ~MGameLog()
 {}
 
 void MGameLog::
-append(const QString &msg, const mLogLevelFlags &flags)
+append(const QString &msg, const mLogDomainFlags &flags)
 {
     m_log.append(mLogItem(msg, flags));
 }
@@ -53,12 +61,19 @@ showLog(QWidget *parent)
 
     m_log_filter = new QComboBox;
     m_log_filter->setWindowTitle("Select log level to show");
-    m_log_filter->insertItem(-1, QString("Show errors"), QVariant(static_cast<int>(MGameLog::ERROR)));
-    m_log_filter->insertItem(-1, QString("Show critical warnings"), QVariant(static_cast<int>(MGameLog::CRITICAL)));
-    m_log_filter->insertItem(-1, QString("Show warnings"), QVariant(static_cast<int>(MGameLog::WARNING)));
-    m_log_filter->insertItem(-1, QString("Show information"), QVariant(static_cast<int>(MGameLog::INFO)));
-    m_log_filter->insertItem(-1, QString("Show all"), QVariant(-1));
+
+    for (mLogDomainMap::const_iterator iter = m_log_domain_lookup.constBegin();
+         iter != m_log_domain_lookup.constEnd();
+         ++iter)
+    {
+        m_log_filter->insertItem(m_log_domain_lookup.size(),
+                                 iter.value(),
+                                 QVariant(static_cast<int>(iter.key())));
+    }
+
+    m_log_filter->insertItem(-1, QString("Show all log entries"), QVariant(-1));
     m_log_filter->setCurrentIndex(0);
+
     connect(m_log_filter, SIGNAL(currentIndexChanged(int)), this, SLOT(onFilterChanged(int)));
 
     vbox->addWidget(m_log_filter);
@@ -85,23 +100,36 @@ showLog(QWidget *parent)
 void MGameLog::
 onFilterChanged(int filter_index)
 {
-    mLogLevelFlags flags;
+    mLogDomainFlags flags;
     QVariant val = m_log_filter->itemData(filter_index).toInt();
 
     if (-1 == val.toInt())
     {
-        flags = mLogLevelFlags(ERROR | CRITICAL | WARNING | MESSAGE | INFO | DEBUG);
+        flags = getAllLogDomainFlags();
     }
     else
     {
-        flags = static_cast<MGameLog::mLogLevel>(m_log_filter->itemData(filter_index).toInt());
+        flags = static_cast<MGameLog::mLogDomain>(m_log_filter->itemData(filter_index).toInt());
     }
 
     print(flags);
 }
 
+MGameLog::mLogDomainFlags MGameLog::
+getAllLogDomainFlags() const
+{
+    mLogDomainFlags flags;
+    for (mLogDomainMap::const_iterator iter = m_log_domain_lookup.constBegin();
+         iter != m_log_domain_lookup.constEnd();
+         ++iter)
+    {
+        flags |= iter.key();
+    }
+    return flags;
+}
+
 void MGameLog::
-print(const mLogLevelFlags &flags) const
+print(const mLogDomainFlags &flags) const
 {
     m_log_widget->clear();
 
@@ -109,7 +137,7 @@ print(const mLogLevelFlags &flags) const
          iter != m_log.end();
          ++iter)
     {
-        if (iter->getLogLevelFlags() & flags)
+        if (iter->getLogDomainFlags() & flags)
         {
             m_log_widget->textCursor().insertText(QString("%1 - %2\n").arg(iter->getTime())
                                                                     .arg(iter->getMessage()));
@@ -118,10 +146,10 @@ print(const mLogLevelFlags &flags) const
 }
 
 MGameLog::mLogItem::
-mLogItem(const QString &msg, const mLogLevelFlags &flags)
+mLogItem(const QString &msg, const mLogDomainFlags &flags)
 : m_time(QTime::currentTime()),
   m_message(msg),
-  m_log_level_flags(flags)
+  m_log_domain_flags(flags)
 {}
 
 MGameLog::mLogItem::
@@ -140,8 +168,8 @@ getMessage() const
     return m_message;
 }
 
-MGameLog::mLogLevelFlags MGameLog::mLogItem::
-getLogLevelFlags() const
+MGameLog::mLogDomainFlags MGameLog::mLogItem::
+getLogDomainFlags() const
 {
-    return m_log_level_flags;
+    return m_log_domain_flags;
 }

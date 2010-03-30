@@ -70,7 +70,7 @@ onStartScreenRequested()
     connect(new_p2p_game, SIGNAL(pressed()),
             this, SLOT(onNewP2PGameRequested()));
 
-    m_log->append("Miniature started.", MGameLog::INFO);
+    m_log->append("Miniature started.", MGameLog::PREGAME);
 }
 
 void MPreGame::
@@ -97,7 +97,7 @@ onNewGameRequested()
     map->setMapping(window, source);
     connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
 
-    m_log->append("New game started.", MGameLog::INFO);
+    m_log->append("New game started.", MGameLog::GAME);
 }
 
 void MPreGame::

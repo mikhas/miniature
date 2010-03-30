@@ -300,7 +300,7 @@ void MGame::updatePlayerStatus(const MPosition &position)
 
     m_log->append(QString("%1 %2 - FEN %3").arg(tr("half move #"))
                                            .arg(m_half_move_index)
-                                           .arg(position.asFen()), MGameLog::INFO);
+                                           .arg(position.asFen()), MGameLog::GAME);
 }
 
 void MGame::onPieceClicked(MPiece *piece)
