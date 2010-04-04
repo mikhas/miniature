@@ -35,36 +35,20 @@ class MDashboardButton
     Q_OBJECT
 
 public:
-    explicit MDashboardButton(const QIcon &icon, QGraphicsItem *item = 0, QObject *parent = 0);
+    explicit MDashboardButton(const QPoint &origin, const QPixmap &active, const QPixmap &inactive,
+                              const QPixmap &pressed, const QPixmap &flash, QGraphicsItem *item = 0,
+                              QObject *parent = 0);
     virtual ~MDashboardButton();
 
-    /*!
-     *  Draws a circular-shaped background around your button pixmap. Purely
-     *  optional.
-     */
-    void setupButtonBackground();
-
-    /*!
-     *  Let's you change how the background of the button is drawn. Only makes
-     *  sense with transparent pixbufs, I think.
-     */
-    void setBackgroundBrush(const QBrush &brush);
-
-    /*!
-     *  Sets the button either active or inactive. An inactive button cannot be
-     *  pressed.
-     */
+    //! \brief Sets the button either active or inactive. An inactive button cannot be pressed.
     void setActive(bool active);
 
-    /*!
-     *  Returns the active state of this button.
-     */
+    //! \brief Returns whether the button is active (true) or inactive (false).
     bool isActive() const;
 
 public Q_SLOTS:
     void flash();
-    void storeBackgroundBrush();
-    void restoreBackgroundBrush();
+    void restore();
 
 Q_SIGNALS:
    void pressed();
@@ -75,13 +59,11 @@ protected:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    QGraphicsEllipseItem *m_background; /*!< The background item. Usage is
-                                             strictly optional. */
-    QBrush m_stored_background_brush; /*!< The stored background brush so that
-                                           we can restore it, e.g., after
-                                           flashing the background. */
-    QIcon m_icon; /*!< The icon used for the button. */
-    bool m_active; /*!< The attribute for the button's active state. */
+    const QPixmap m_active_pixmap;
+    const QPixmap m_inactive_pixmap;
+    const QPixmap m_pressed_pixmap;
+    const QPixmap m_flash_pixmap;
+    bool m_active;
 };
 
 
@@ -165,13 +147,6 @@ protected:
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
 
 private:
-    /*!
-     *  We create our own 'buttons' from the Maemo5 media player icons and
-     *  Maemo 5 stock icons. Both are put in the graphics view via
-     *  QGraphicsPixmapItems (which also handles the mouse events).
-     */
-    MDashboardButton * createButtonWithBackground(const QPoint &origin, const QIcon &icon);
-
     /*!
      *  Helper method to create the acceptance dialogs when sth. was offered.
      *  @param[in] title the title of the dialog

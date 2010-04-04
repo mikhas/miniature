@@ -41,15 +41,19 @@ const QColor flash_color = QColor(Qt::red);
 }
 
 MDashboardButton::
-MDashboardButton(const QIcon &icon, QGraphicsItem *item, QObject *parent)
+MDashboardButton(const QPoint &origin, const QPixmap &active, const QPixmap &inactive, const QPixmap &pressed,
+                 const QPixmap &flash, QGraphicsItem *item, QObject *parent)
 : QObject(parent),
-  QGraphicsPixmapItem(icon.pixmap(icon_size, icon_size), item),
-  m_background(0),
-  m_stored_background_brush(QBrush(Qt::transparent)),
-  m_icon(icon),
+  QGraphicsPixmapItem(active, item),
+  m_active_pixmap(active),
+  m_inactive_pixmap(inactive),
+  m_pressed_pixmap(pressed),
+  m_flash_pixmap(flash),
   m_active(true)
 {
     setEnabled(true); // receive scene events
+    setPos(origin);
+    show();
 }
 
 MDashboardButton::
@@ -57,86 +61,40 @@ MDashboardButton::
 {}
 
 void MDashboardButton::
-setupButtonBackground()
+setActive(bool active)
 {
-    const QRect ellipse_extent = QRect(0,0, icon_size, icon_size);
-    m_background = new QGraphicsEllipseItem(ellipse_extent, this);
-
-    QPen ellipse_border = QPen(Qt::white);
-    ellipse_border.setCosmetic(true);
-
-    m_background->setPen(ellipse_border);
-    m_background->setBrush(m_stored_background_brush);
-    m_background->show();
-    m_background->setEnabled(false);
-    m_background->setFlags(QGraphicsItem::ItemStacksBehindParent);
-
-    QGraphicsBlurEffect *blur = new QGraphicsBlurEffect(this);
-    blur->setBlurRadius(2);
-    m_background->setGraphicsEffect(blur);
-}
-
-void MDashboardButton::
-setBackgroundBrush(const QBrush &brush)
-{
-    if (!m_background)
-        return; // nothing to do!
-
-    m_background->setBrush(brush);
-}
-
-void MDashboardButton::
-storeBackgroundBrush()
-{
-    // Make sure to never store the brush's flash color, else triggering flash
-    // while a flash is already running becomes racy.
-    if (!m_background || flash_color ==  m_background->brush().color())
-        return; // nothing to do!
-
-    m_stored_background_brush = m_background->brush();
-}
-
-void MDashboardButton::
-restoreBackgroundBrush()
-{
-    setBackgroundBrush(m_stored_background_brush);
+    setEnabled(active);
+    m_active = active;
+    restore();
 }
 
 void MDashboardButton::
 flash()
 {
-    storeBackgroundBrush();
-    setBackgroundBrush(QBrush(flash_color));
-    QTimer::singleShot(flash_duration, this, SLOT(restoreBackgroundBrush()));
+    setPixmap(m_flash_pixmap);
+    QTimer::singleShot(flash_duration, this, SLOT(restore()));
+}
+
+void MDashboardButton::
+restore()
+{
+    setPixmap((m_active ? m_active_pixmap : m_inactive_pixmap));
 }
 
 
 void MDashboardButton::
 mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    event->accept(); // stop event propagation
-
-    if (m_background)
-    {
-        const QBrush flash = QBrush(Qt::red);
-        m_background->setBrush(flash);
-    }
-
-    Q_EMIT pressed();
+    event->accept();
+    setPixmap(m_pressed_pixmap);
 }
 
 void MDashboardButton::
 mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    event->accept(); // stop event propagation
-
-    if (m_background)
-    {
-        const QBrush trans = QBrush(Qt::transparent);
-        m_background->setBrush(trans);
-    }
-
-    Q_EMIT released();
+    event->accept();
+    restore();
+    Q_EMIT pressed();
 }
 
 MDashboardItem::
@@ -224,27 +182,38 @@ setupUi()
     m_last_moves->setTextWidth(col_right_width);
     m_last_moves->setPos(QPoint(width - col_right_width, 0)); // below the board, right-aligned
 
-    m_confirm = createButtonWithBackground(QPoint(centered_width, centered_height),
-                                           QIcon("/usr/share/themes/alpha/mediaplayer/Play.png"));
+    m_confirm = new MDashboardButton(QPoint(centered_width - 16, centered_height - 16),
+                                     QPixmap(":/icons/96x96/play.png"),
+                                     QPixmap(":/icons/96x96/play-inactive.png"),
+                                     QPixmap(":/icons/96x96/play-pressed.png"),
+                                     QPixmap(":/icons/96x96/play-flash.png"),
+                                     this);
 
     // right-aligned
-    m_requests = createButtonWithBackground(QPoint(width - icon_size - col_right_width, centered_height),
-                                           QIcon("/usr/share/themes/alpha/mediaplayer/Stop.png"));
+    m_requests = new MDashboardButton(QPoint(width - icon_size - col_right_width, centered_height),
+                                      QPixmap(":/icons/64x64/stop.png"),
+                                      QPixmap(":/icons/64x64/stop-inactive.png"),
+                                      QPixmap(":/icons/64x64/stop-pressed.png"),
+                                      QPixmap(":/icons/64x64/stop-flash.png"),
+                                      this);
 
     // left-aligned
-    m_takeback = createButtonWithBackground(QPoint(col_left_width, centered_height),
-                                            QIcon("/usr/share/themes/alpha/mediaplayer/Back.png"));
+    m_takeback = new MDashboardButton(QPoint(col_left_width, centered_height),
+                                      QPixmap(":/icons/64x64/rewind.png"),
+                                      QPixmap(":/icons/64x64/rewind-inactive.png"),
+                                      QPixmap(":/icons/64x64/rewind-pressed.png"),
+                                      QPixmap(":/icons/64x64/rewind-flash.png"),
+                                      this);
+    m_takeback->setActive(false); // TODO: not implemented yet
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
     if (avatar)
-        m_avatar = new MDashboardButton(*avatar, this, 0);
+        m_avatar = new MDashboardButton(QPoint(10, centered_height),
+                                        *avatar, *avatar, *avatar, *avatar, this, 0);
     else
-       m_avatar = new MDashboardButton(empty, this, 0);
-
-    m_avatar->setPos(QPoint(10, centered_height)); // left-aligned
-    m_avatar->show();
-    m_avatar->setEnabled(true);
+       m_avatar = new MDashboardButton(QPoint(10, centered_height),
+                                       empty, empty, empty, empty, this, 0);
 
     // now that the buttons exist we can connect their signals (or rather, forward them)
     connect(m_confirm, SIGNAL(pressed()), this, SIGNAL(confirmButtonPressed()));
@@ -264,26 +233,13 @@ resetUi()
     m_requests_dialog->hide();
     m_offers_dialog->hide();
 
-    m_confirm->restoreBackgroundBrush();
-    m_requests->restoreBackgroundBrush();
-    m_takeback->restoreBackgroundBrush();
+    m_confirm->restore();
+    m_requests->restore();
+    m_takeback->restore();
 }
 
-MDashboardButton * MDashboardItem::
-createButtonWithBackground(const QPoint &origin, const QIcon &icon)
-{
-    MDashboardButton *button = new MDashboardButton(icon, this, 0);
-    button->setPos(origin);
-    button->show();
-    button->setEnabled(true);
-    button->setTransformationMode(Qt::SmoothTransformation);
-    button->setupButtonBackground();
-
-    return button;
-}
 
 // MDashboardItem private:
-
 QPixmap * MDashboardItem::
 getContactsAvatar(const QString &nick)
 {
@@ -372,9 +328,7 @@ enableConfirmButton()
 {
     Q_CHECK_PTR(m_confirm);
 
-    m_confirm->setEnabled(true);
-    m_confirm->setBackgroundBrush(QBrush(Qt::green));
-    m_confirm->storeBackgroundBrush();
+    m_confirm->setActive(true);
 }
 
 void MDashboardItem::
@@ -382,9 +336,7 @@ disableConfirmButton()
 {
     Q_CHECK_PTR(m_confirm);
 
-    m_confirm->setEnabled(false);
-    m_confirm->setBackgroundBrush(QBrush(Qt::transparent));
-    m_confirm->storeBackgroundBrush();
+    m_confirm->setActive(false);
 }
 
 void MDashboardItem::
@@ -392,7 +344,7 @@ enableRequestsButton()
 {
     Q_CHECK_PTR(m_requests);
 
-    m_requests->setEnabled(true);
+    m_requests->setActive(true);
 }
 
 void MDashboardItem::
@@ -400,8 +352,7 @@ disableRequestsButton()
 {
     Q_CHECK_PTR(m_requests);
 
-    m_requests->setEnabled(false);
-    m_requests->setBackgroundBrush(Qt::transparent);
+    m_requests->setActive(false);
 }
 
 void MDashboardItem::
