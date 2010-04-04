@@ -1,35 +1,49 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/pieces/black">
-  <file alias="bishop.svg">pieces/black/bishop.svg</file>
-  <file alias="king.svg">pieces/black/king.svg</file>
-  <file alias="knight.svg">pieces/black/knight.svg</file>
-  <file alias="pawn.svg">pieces/black/pawn.svg</file>
-  <file alias="queen.svg">pieces/black/queen.svg</file>
-  <file alias="rook.svg">pieces/black/rook.svg</file>
-</qresource>
-<qresource prefix="/pieces/white">
-  <file alias="bishop.svg">pieces/white/bishop.svg</file>
-  <file alias="king.svg">pieces/white/king.svg</file>
-  <file alias="knight.svg">pieces/white/knight.svg</file>
-  <file alias="pawn.svg">pieces/white/pawn.svg</file>
-  <file alias="queen.svg">pieces/white/queen.svg</file>
-  <file alias="rook.svg">pieces/white/rook.svg</file>
-</qresource>
-<qresource prefix="/icons/48x48">
-  <file alias="miniature.png">icons/48x48/miniature.png</file>
-</qresource>
-<qresource prefix="/icons/scalable">
-  <file alias="minature.svg">icons/scalable/miniature.svg</file>
-</qresource>
-<qresource prefix="/boards">
-  <file alias="default.png">boards/default.png</file>
-  <file alias="glossy.svg">boards/glossy.svg</file>
-</qresource>
-<qresource>
-  <file alias="timer_background.gif">timer_background.gif</file>
-  <file alias="blackout.png">blackout.png</file>
-</qresource>
-<qresource>
-  <file alias="avatar_mockup.png">avatar_mockup.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/pieces/black">
+        <file alias="bishop.svg">pieces/black/bishop.svg</file>
+        <file alias="king.svg">pieces/black/king.svg</file>
+        <file alias="knight.svg">pieces/black/knight.svg</file>
+        <file alias="pawn.svg">pieces/black/pawn.svg</file>
+        <file alias="queen.svg">pieces/black/queen.svg</file>
+        <file alias="rook.svg">pieces/black/rook.svg</file>
+    </qresource>
+    <qresource prefix="/pieces/white">
+        <file alias="bishop.svg">pieces/white/bishop.svg</file>
+        <file alias="king.svg">pieces/white/king.svg</file>
+        <file alias="knight.svg">pieces/white/knight.svg</file>
+        <file alias="pawn.svg">pieces/white/pawn.svg</file>
+        <file alias="queen.svg">pieces/white/queen.svg</file>
+        <file alias="rook.svg">pieces/white/rook.svg</file>
+    </qresource>
+    <qresource prefix="/icons/48x48">
+        <file alias="miniature.png">icons/48x48/miniature.png</file>
+    </qresource>
+    <qresource prefix="/icons/scalable">
+        <file alias="minature.svg">icons/scalable/miniature.svg</file>
+    </qresource>
+    <qresource prefix="/boards">
+        <file alias="default.png">boards/default.png</file>
+        <file alias="glossy.svg">boards/glossy.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="timer_background.gif">timer_background.gif</file>
+        <file alias="blackout.png">blackout.png</file>
+        <file alias="avatar_mockup.png">avatar_mockup.png</file>
+    </qresource>
+    <qresource prefix="/icons/96x96">
+        <file alias="play.png">icons/96x96/play.png</file>
+        <file alias="play-inactive.png">icons/96x96/play-inactive.png</file>
+        <file alias="play-flash.png">icons/96x96/play-flash.png</file>
+        <file alias="play-pressed.png">icons/96x96/play-pressed.png</file>
+    </qresource>
+    <qresource prefix="/icons/64x64">
+        <file alias="rewind.png">icons/64x64/rewind.png</file>
+        <file alias="rewind-flash.png">icons/64x64/rewind-flash.png</file>
+        <file alias="rewind-inactive.png">icons/64x64/rewind-inactive.png</file>
+        <file alias="rewind-pressed.png">icons/64x64/rewind-pressed.png</file>
+        <file alias="stop.png">icons/64x64/stop.png</file>
+        <file alias="stop-flash.png">icons/64x64/stop-flash.png</file>
+        <file alias="stop-inactive.png">icons/64x64/stop-inactive.png</file>
+        <file alias="stop-pressed.png">icons/64x64/stop-pressed.png</file>
+    </qresource>
 </RCC>
