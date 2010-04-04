@@ -27,45 +27,7 @@
 namespace Miniature
 {
 
-
-class MDashboardButton
-: public QObject, // we emit signals in our event handlers
-  public QGraphicsPixmapItem
-{
-    Q_OBJECT
-
-public:
-    explicit MDashboardButton(const QPoint &origin, const QPixmap &active, const QPixmap &inactive,
-                              const QPixmap &pressed, const QPixmap &flash, QGraphicsItem *item = 0,
-                              QObject *parent = 0);
-    virtual ~MDashboardButton();
-
-    //! \brief Sets the button either active or inactive. An inactive button cannot be pressed.
-    void setActive(bool active);
-
-    //! \brief Returns whether the button is active (true) or inactive (false).
-    bool isActive() const;
-
-public Q_SLOTS:
-    void flash();
-    void restore();
-
-Q_SIGNALS:
-   void pressed();
-   void released();
-
-protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
-private:
-    const QPixmap m_active_pixmap;
-    const QPixmap m_inactive_pixmap;
-    const QPixmap m_pressed_pixmap;
-    const QPixmap m_flash_pixmap;
-    bool m_active;
-};
-
+class MDashboardButton;
 
 /*! This class represents the player's "dashboard", that is, the player's
  *  controls. It replaces the former mActionAreas.

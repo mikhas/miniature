@@ -19,6 +19,7 @@
  */
 
 #include <dashboard_item.h>
+#include <dashboard_button.h>
 #include <scene.h>
 
 //#include <glib.h>
@@ -34,67 +35,9 @@ const int height = 160;
 const int col_left_width = 120;
 const int col_right_width = 120;
 const int icon_size = 64;
-const int flash_duration = 200;
 const int fadeout_duration = 500;
 const QColor flash_color = QColor(Qt::red);
 
-}
-
-MDashboardButton::
-MDashboardButton(const QPoint &origin, const QPixmap &active, const QPixmap &inactive, const QPixmap &pressed,
-                 const QPixmap &flash, QGraphicsItem *item, QObject *parent)
-: QObject(parent),
-  QGraphicsPixmapItem(active, item),
-  m_active_pixmap(active),
-  m_inactive_pixmap(inactive),
-  m_pressed_pixmap(pressed),
-  m_flash_pixmap(flash),
-  m_active(true)
-{
-    setEnabled(true); // receive scene events
-    setPos(origin);
-    show();
-}
-
-MDashboardButton::
-~MDashboardButton()
-{}
-
-void MDashboardButton::
-setActive(bool active)
-{
-    setEnabled(active);
-    m_active = active;
-    restore();
-}
-
-void MDashboardButton::
-flash()
-{
-    setPixmap(m_flash_pixmap);
-    QTimer::singleShot(flash_duration, this, SLOT(restore()));
-}
-
-void MDashboardButton::
-restore()
-{
-    setPixmap((m_active ? m_active_pixmap : m_inactive_pixmap));
-}
-
-
-void MDashboardButton::
-mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    event->accept();
-    setPixmap(m_pressed_pixmap);
-}
-
-void MDashboardButton::
-mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    event->accept();
-    restore();
-    Q_EMIT pressed();
 }
 
 MDashboardItem::

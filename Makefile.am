@@ -23,6 +23,9 @@ src_miniature_SOURCES = \
 			src/scene.cc \
 			src/scene.h \
 			src/scene.moc.cc \
+			src/dashboard_button.cc \
+			src/dashboard_button.h \
+			src/dashboard_button.moc.cc \
 			src/dashboard_item.cc \
 			src/dashboard_item.h \
 			src/dashboard_item.moc.cc \
@@ -86,6 +89,7 @@ BUILT_SOURCES = \
 		data/data.qrc.cc \
 		src/board_view.moc.cc \
 		src/scene.moc.cc \
+		src/dashboard_button.moc.cc \
 		src/dashboard_item.moc.cc \
 		src/game.moc.cc \
 		src/game_log.moc.cc \
