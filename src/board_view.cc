@@ -33,8 +33,16 @@
 
 using namespace Miniature;
 
+namespace
+{
+
+    const QSize extent = QSize(480, 800);
+
+}
+
 MBoardView::MBoardView(QWidget *parent)
 : QGraphicsView(parent),
+  m_central(0),
   m_background_page(new QWebPage),
   m_background_image(0),
   m_board_item_offset(160)
@@ -42,9 +50,15 @@ MBoardView::MBoardView(QWidget *parent)
     QGraphicsView::setScene(new MScene(this));
     // Ignore the growing property of the scene graph and always only show a
     // fixed area. Also, assume we run in fullscreen (therefore, only works for
-    // pub mode.). 
+    // pub mode.).
     // TODO: make this view reusable for other game modes, too.
-    setSceneRect(QRect(0, 0, 480, 800));
+    setSceneRect(QRect(QPoint(0, 0), extent));
+    scene()->addItem(m_central = new QGraphicsWidget(0, Qt::Widget));
+    m_central->setPreferredSize(extent);
+
+    QGraphicsAnchorLayout *layout = 0;
+    m_central->setLayout(layout = new QGraphicsAnchorLayout);
+    layout->setSpacing(0);
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
@@ -109,23 +123,24 @@ void MBoardView::setup()
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
 
-    m_top_dashboard = new MDashboardItem;
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    m_top_dashboard = new MDashboardItem(layout, m_central);
+    layout->addAnchor(m_top_dashboard, Qt::AnchorTop, layout, Qt::AnchorTop);
     m_top_dashboard->disableConfirmButton();
-    scene()->addItem(m_top_dashboard);
     m_top_dashboard->setRotation(180);
     m_top_dashboard->setZValue(1);
 
-    m_bottom_dashboard = new MDashboardItem;
+    m_bottom_dashboard = new MDashboardItem(layout, m_central);
+    layout->addAnchor(m_bottom_dashboard, Qt::AnchorBottom, layout, Qt::AnchorBottom);
     m_bottom_dashboard->disableConfirmButton();
-    scene()->addItem(m_bottom_dashboard);
-    m_bottom_dashboard->setPos(0, 640);
     m_bottom_dashboard->setZValue(1);
 }
 
 void MBoardView::addBoardItem(MGraphicsBoardItem *item)
 {
-    scene()->addItem(item);
-    item->setPos(QPoint(0, m_board_item_offset));
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    layout->addAnchor(m_top_dashboard, Qt::AnchorBottom, item, Qt::AnchorTop);
+    //layout->addAnchor(m_bottom_dashboard, Qt::AnchorTop, item, Qt::AnchorBottom);
 }
 
 MDashboardItem * MBoardView::getTopDashboardItem() const

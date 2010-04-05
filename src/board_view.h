@@ -96,13 +96,14 @@ private Q_SLOTS:
 private:
     void setup();
 
+    QGraphicsWidget *m_central;
     QWebPage* m_background_page;
     QImage* m_background_image;
 
     const int m_board_item_offset;
 
-    MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item.>*/
-    MDashboardItem *m_bottom_dashboard; /*<The bottom player's dashboard item.>*/
+    MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/
+    MDashboardItem *m_bottom_dashboard; /*!< The bottom player's dashboard item. >*/
 };
 
 }; // namespace Miniature

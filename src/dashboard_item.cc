@@ -32,17 +32,21 @@ namespace
 
 const int width = 480;
 const int height = 160;
+const QSize extent = QSize(width, height);
+
 const int col_left_width = 120;
 const int col_right_width = 120;
 const int icon_size = 64;
+
 const int fadeout_duration = 500;
 const QColor flash_color = QColor(Qt::red);
 
 }
 
 MDashboardItem::
-MDashboardItem(QGraphicsItem *parent)
-: QGraphicsObject(parent),
+MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent, Qt::WindowFlags flags)
+: QGraphicsWidget(parent, flags),
+  m_layout(layout),
   m_confirm(0),
   m_requests(0),
   m_takeback(0),
@@ -67,7 +71,7 @@ MDashboardItem::
 void MDashboardItem::
 setupUi()
 {
-    // TODO: use anchor layouts, this is a fantastic playground for them!
+    setPreferredSize(extent);
 
     // Maemo5-specific icons, handle press states by replacing pixmap, or have two pixmap per item?
     const int centered_width  = (width  - icon_size) * 0.5;
@@ -78,16 +82,23 @@ setupUi()
     m_requests_dialog->setPalette(palette);
     m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
     m_requests_dialog->setEnabled(false);
+    m_layout->addAnchor(this,              Qt::AnchorBottom,
+                        m_requests_dialog, Qt::AnchorBottom);
+
     m_requests_dialog->hide();
 
     m_game_dialog->setPalette(palette);
     m_game_dialog->setZValue(1);
     m_game_dialog->setEnabled(false);
+    m_layout->addAnchor(this,          Qt::AnchorBottom,
+                        m_game_dialog, Qt::AnchorBottom);
     m_game_dialog->hide();
 
     m_offers_dialog->setPalette(palette);
     m_offers_dialog->setZValue(1);
     m_offers_dialog->setEnabled(false);
+    m_layout->addAnchor(this,            Qt::AnchorBottom,
+                        m_offers_dialog, Qt::AnchorBottom);
     m_offers_dialog->hide();
 
     QFont font;
@@ -207,23 +218,31 @@ showConfirmationDialog(const QString &title, QPushButton *button)
 {
     static_cast<MScene *>(scene())->setModalItem(m_offers_dialog);
 
-    QWidget *dialog = new QWidget;
-    dialog->resize(width, height);
-
-    QVBoxLayout *vbox = new QVBoxLayout;
-    dialog->setLayout(vbox);
-
-    QLabel *label = new QLabel(title);
-    label->setAlignment(Qt::AlignCenter);
-    vbox->addWidget(label);
-
-    if (button)
+    if (!m_offers_dialog->widget())
     {
-        vbox->addWidget(button);
-        connect(button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        QWidget *dialog = new QWidget;
+        dialog->resize(width, height);
+
+        QVBoxLayout *vbox = new QVBoxLayout;
+        dialog->setLayout(vbox);
+
+        QLabel *label = new QLabel(title);
+        label->setAlignment(Qt::AlignCenter);
+        vbox->addWidget(label);
+
+        if (button)
+        {
+            vbox->addWidget(button);
+            connect(button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        }
+
+        m_offers_dialog->setWidget(dialog);
     }
 
-    m_offers_dialog->setWidget(dialog);
+    // Need to manually transform proxy widgets, since the parent is a QGraphicsWidget
+    // (managed by a layout), and this is wonderfully borken.
+    m_offers_dialog->setTransformOriginPoint(m_offers_dialog->boundingRect().center());
+    m_offers_dialog->setRotation(rotation());
     m_offers_dialog->show();
     m_offers_dialog->setEnabled(true);
 }
@@ -244,8 +263,12 @@ showEndGameUi()
     QWidget *dialog = new QWidget;
     dialog->resize(width, height - 60);
     dialog_proxy->setWidget(dialog);
+
+    // Need to manually transform proxy widgets, since the parent is a QGraphicsWidget
+    // (managed by a layout), and this is wonderfully borken.
+    dialog_proxy->setTransformOriginPoint(dialog_proxy->boundingRect().center());
+    dialog_proxy->setRotation(rotation());
     dialog_proxy->show();
-    dialog_proxy->setPos(QPoint(0, 60));
 
     QVBoxLayout *vbox = new QVBoxLayout;
     dialog->setLayout(vbox);
@@ -345,8 +368,11 @@ showRequestsMenu()
         dialog->show();
     }
 
+    // Need to manually transform proxy widgets, since the parent is a QGraphicsWidget
+    // (managed by a layout), and this is wonderfully borken.
+    m_requests_dialog->setTransformOriginPoint(m_requests_dialog->boundingRect().center());
+    m_requests_dialog->setRotation(rotation());
     m_requests_dialog->show();
-    m_requests_dialog->setPos(QPoint(0, -60));
     m_requests_dialog->setEnabled(true);
 }
 
@@ -383,6 +409,10 @@ showGameMenu()
         dialog->show();
     }
 
+    // Need to manually transform proxy widgets, since the parent is a QGraphicsWidget
+    // (managed by a layout), and this is wonderfully borken.
+    m_game_dialog->setTransformOriginPoint(m_game_dialog->boundingRect().center());
+    m_game_dialog->setRotation(rotation());
     m_game_dialog->show();
     m_game_dialog->setEnabled(true);
 }

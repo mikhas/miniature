@@ -25,6 +25,7 @@
 #include "position.h"
 
 #include <QGraphicsItem>
+#include <QGraphicsWidget>
 #include <QGraphicsSvgItem>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
@@ -37,16 +38,16 @@ namespace Miniature
 
 /* This class represents the board. It's our primary item in the scene graph,
  * as it not only renders the board but also controls the mouse event handling
- * (= fingertouch handling on Maemo) for all pieces. 
+ * (= fingertouch handling on Maemo) for all pieces.
  * We use the QGraphicsObject so that we can use signals and slots.
  */
 class MGraphicsBoardItem
-: public QGraphicsObject
+: public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
-    MGraphicsBoardItem(int board_size = 480, QGraphicsObject *parent = 0);
+    MGraphicsBoardItem(int size = 480, QGraphicsItem *parent = 0, Qt::WindowFlags flags = Qt::Widget);
     ~MGraphicsBoardItem();
 
     // TODO: rename to cellSize(), more qt-ish

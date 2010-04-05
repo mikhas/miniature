@@ -33,12 +33,12 @@ class MDashboardButton;
  *  controls. It replaces the former mActionAreas.
  */
 class MDashboardItem
-: public QGraphicsObject
+: public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
-    explicit MDashboardItem(QGraphicsItem *parent = 0);
+    explicit MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent = 0, Qt::WindowFlags flags = Qt::Widget);
     virtual ~MDashboardItem();
 
     /*!
@@ -129,6 +129,7 @@ private:
      */
     QPixmap * getContactsAvatar(const QString &nick);
 
+    QGraphicsAnchorLayout* m_layout; /*!< The graphics layout for all UI elements. */
     MDashboardButton *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
     MDashboardButton *m_requests; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
     MDashboardButton *m_takeback; /*!< The 'rewind' button to ask for taking back a move. */

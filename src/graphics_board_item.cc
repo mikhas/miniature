@@ -32,10 +32,12 @@
 
 using namespace Miniature;
 
-MGraphicsBoardItem::MGraphicsBoardItem(int board_size, QGraphicsObject *parent)
-: QGraphicsObject(parent),
-  m_board_size(board_size)
-{}
+MGraphicsBoardItem::MGraphicsBoardItem(int size, QGraphicsItem *parent, Qt::WindowFlags flags)
+: QGraphicsWidget(parent, flags),
+  m_board_size(size)
+{
+    setPreferredSize(QSize(size, size));
+}
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
 {}

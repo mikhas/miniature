@@ -363,6 +363,7 @@ void MGame::onPieceClicked(MPiece *piece)
 
 void MGame::onTargetClicked(const QPoint &target)
 {
+    QString msg = QString("Target clicked: (%1, %2)").arg(target.x()).arg(target.y());
     // Ignores invalid mouse clicks, updates/reset dashboard items when move was
     // valid/invalid.
 
@@ -377,6 +378,8 @@ void MGame::onTargetClicked(const QPoint &target)
         m_trans_half_move.undo(); // but do not deselect!
         top->disableConfirmButton();
         bottom->disableConfirmButton();
+
+        msg = QString("%1 - UNDO").arg(msg);
     }
     else if (m_trans_half_move.applyToTarget(target))
     {
@@ -384,6 +387,8 @@ void MGame::onTargetClicked(const QPoint &target)
             bottom->enableConfirmButton();
         else
             top->enableConfirmButton();
+
+        msg = QString("%1 - APPLY").arg(msg);
     }
     else
     {
@@ -391,7 +396,11 @@ void MGame::onTargetClicked(const QPoint &target)
             bottom->flash();
         else
             top->flash();
+
+        msg = QString("%1 - FLASH").arg(msg);
     }
+
+    m_log->append(msg, MGameLog::ENGINE);
 }
 
 void MGame::onMoveConfirmed()
