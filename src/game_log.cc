@@ -35,6 +35,7 @@ MGameLog(QObject *parent)
     m_log_domain_lookup[P2P]      = QString("P2P log");
     m_log_domain_lookup[FICS]     = QString("FICS log");
     m_log_domain_lookup[CHAT]     = QString("Chat log");
+    m_log_domain_lookup[FEN]      = QString("FEN log");
 }
 
 MGameLog::

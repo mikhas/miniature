@@ -51,7 +51,8 @@ public:
         GAME     = 0x008,
         P2P      = 0x010,
         FICS     = 0x020,
-        CHAT     = 0x040
+        CHAT     = 0x040,
+        FEN      = 0x800
     };
 
     typedef QFlags<mLogDomain> mLogDomainFlags;
