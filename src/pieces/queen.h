@@ -34,10 +34,10 @@ class MQueen
 : public MPiece
 {
 public:
-    MQueen(MColour colour, int width = 8, int height = 8);
-    ~MQueen();
+    explicit MQueen(MColour colour);
+    virtual ~MQueen();
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const;
     virtual QChar getLetter() const;
 
 private:

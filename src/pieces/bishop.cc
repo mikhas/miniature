@@ -19,7 +19,7 @@
  */
 
 #include "bishop.h"
-#include <iostream>
+#include <position.h>
 
 namespace Miniature
 {
@@ -28,8 +28,8 @@ bool MBishop::hasFinishedLoading = false;
 QSvgRenderer MBishop::blackRenderer;
 QSvgRenderer MBishop::whiteRenderer;
 
-MBishop::MBishop(MColour colour, int width, int height)
-: MPiece(colour, BISHOP, width, height)
+MBishop::MBishop(MColour colour)
+: MPiece(colour, BISHOP)
 {
     loadFromSvgFile();
 }
@@ -37,39 +37,39 @@ MBishop::MBishop(MColour colour, int width, int height)
 MBishop::~MBishop()
 {}
 
-QList<QPoint> MBishop::getPossibleSquares(QPoint point) const
+QList<QPoint> MBishop::getPossibleSquares(const MPosition &pos, const QPoint &origin) const
 {
     QList<QPoint> possibleSquares;
 
     // north-east
     int i = 1;
-    while ((point.x() + i < xDim) && (point.y() - i >= 0))
+    while ((origin.x() + i < pos.getWidth()) && (origin.y() - i >= 0))
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y() - i));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y() - i));
         ++i;
     }
 
     // south-east
     i = 1;
-    while ((point.x() + i < xDim) && (point.y() + i < yDim))
+    while ((origin.x() + i < pos.getWidth()) && (origin.y() + i < pos.getHeight()))
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y() + i));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y() + i));
         ++i;
     }
 
     // south-west
     i = 1;
-    while ((point.x() - i >= 0) && (point.y() + i < yDim))
+    while ((origin.x() - i >= 0) && (origin.y() + i < pos.getHeight()))
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y() + i));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y() + i));
         ++i;
     }
 
     // north-west
     i = 1;
-    while ((point.x() - i >= 0) && (point.y() - i >= 0))
+    while ((origin.x() - i >= 0) && (origin.y() - i >= 0))
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y() - i));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y() - i));
         ++i;
     }
 

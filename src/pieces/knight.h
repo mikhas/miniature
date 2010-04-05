@@ -33,10 +33,10 @@ namespace Miniature
 class MKnight: public MPiece
 {
 public:
-    MKnight(MColour colour, int width=8, int length=8);
-    ~MKnight();
+    explicit MKnight(MColour colour);
+    virtual ~MKnight();
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const;
     virtual QChar getLetter() const;
 
 private:

@@ -19,7 +19,7 @@
  */
 
 #include "king.h"
-#include <iostream>
+#include <position.h>
 
 namespace Miniature
 {
@@ -28,8 +28,8 @@ bool MKing::hasFinishedLoading = false;
 QSvgRenderer MKing::blackRenderer;
 QSvgRenderer MKing::whiteRenderer;
 
-MKing::MKing(MColour colour, int width, int height)
-: MPiece(colour, KING, width, height),
+MKing::MKing(MColour colour)
+: MPiece(colour, KING),
   castle(true)
 {
     loadFromSvgFile();
@@ -38,60 +38,60 @@ MKing::MKing(MColour colour, int width, int height)
 MKing::~MKing()
 {}
 
-QList<QPoint> MKing::getPossibleSquares(QPoint point) const
+QList<QPoint> MKing::getPossibleSquares(const MPosition &pos, const QPoint &origin) const
 {
     QList<QPoint> possibleSquares;
 
     // north-west, north and north-east
-    if (point.y() + 1 < yDim)
+    if (origin.y() + 1 < pos.getHeight())
     {
-        possibleSquares.append(QPoint(point.x(), point.y() + 1));
-        if (point.x() - 1 >= 0)
+        possibleSquares.append(QPoint(origin.x(), origin.y() + 1));
+        if (origin.x() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 1, point.y() + 1));
+            possibleSquares.append(QPoint(origin.x() - 1, origin.y() + 1));
         }
-        if (point.x() + 1 < xDim)
+        if (origin.x() + 1 < pos.getWidth())
         {
-            possibleSquares.append(QPoint(point.x() + 1, point.y() + 1));
+            possibleSquares.append(QPoint(origin.x() + 1, origin.y() + 1));
         }
     }
 
     // east
-    if (point.x() + 1 < xDim)
+    if (origin.x() + 1 < pos.getWidth())
     {
-        possibleSquares.append(QPoint(point.x() + 1, point.y()));
+        possibleSquares.append(QPoint(origin.x() + 1, origin.y()));
     }
 
     // south-east, south, south-west
-    if (point.y() - 1 >= 0)
+    if (origin.y() - 1 >= 0)
     {
-        possibleSquares.append(QPoint(point.x(), point.y() - 1));
-        if (point.x() - 1 >= 0)
+        possibleSquares.append(QPoint(origin.x(), origin.y() - 1));
+        if (origin.x() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 1, point.y() - 1));
+            possibleSquares.append(QPoint(origin.x() - 1, origin.y() - 1));
         }
-        if (point.x() + 1 < xDim)
+        if (origin.x() + 1 < pos.getWidth())
         {
-            possibleSquares.append(QPoint(point.x() + 1, point.y() - 1));
+            possibleSquares.append(QPoint(origin.x() + 1, origin.y() - 1));
         }
     }
 
     // west
-    if (point.x() - 1 >= 0)
+    if (origin.x() - 1 >= 0)
     {
-        possibleSquares.append(QPoint(point.x() - 1, point.y()));
+        possibleSquares.append(QPoint(origin.x() - 1, origin.y()));
     }
 
     // castling
     if (castle)
     {
-        if (point.x() + 2 < xDim)
+        if (origin.x() + 2 < pos.getWidth())
         {
-            possibleSquares.append(QPoint(point.x() + 2, point.y()));
+            possibleSquares.append(QPoint(origin.x() + 2, origin.y()));
         }
-        if (point.x() - 2 >= 0)
+        if (origin.x() - 2 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 2, point.y()));
+            possibleSquares.append(QPoint(origin.x() - 2, origin.y()));
         }
     }
 

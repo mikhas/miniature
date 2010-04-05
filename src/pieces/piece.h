@@ -37,24 +37,7 @@
 namespace Miniature
 {
 
-/* QGV items are quite inconistent: Some are QObjects (SvgItem, QGO, ...), others aren't. */
-/*
-class MGraphicsPixmapObject
-: public QObject,
-  public QGraphicsPixmapItem
-{
-    Q_OBJECT
-
-public:
-    explicit MGraphicsPixmapObject(QGraphicsItem *item, QObject *parent = 0)
-    : QObject(parent),
-      QGraphicsPixmapItem(item)
-    {}
-
-    ~MGraphicsPixmapObject()
-    {}
-};
-*/
+class MPosition;
 
 /* Abstract base class for all pieces. Each piece animation is a member of
  * piece (at some point, there should be a piece animation class), and
@@ -70,13 +53,13 @@ public:
     enum MType {ROOK, KNIGHT, BISHOP, QUEEN, KING, PAWN, NONE};
     enum MColour {BLACK, WHITE};
 
-    MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int width = 60, int height = 60);
+    explicit MPiece(MColour colour, MType pieceType, int width = 60, int height = 60);
     virtual ~MPiece();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     virtual QRectF boundingRect() const;
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const = 0;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const = 0;
     virtual QChar getLetter() const = 0;
 
     MType getType() const;
@@ -127,8 +110,6 @@ protected:
 
     MColour colour;
     MType type;
-    int xDim;
-    int yDim;
 
     // Disable setPos(.) API - use moveTo(.) instead!
     void setPos(const QPointF &pos);

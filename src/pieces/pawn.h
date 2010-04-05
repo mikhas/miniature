@@ -34,10 +34,10 @@ class MPawn
 : public MPiece
 {
 public:
-    MPawn(MColour colour, int width = 8, int height = 8);
-    ~MPawn();
+    explicit MPawn(MColour colour);
+    virtual ~MPawn();
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const;
     virtual QChar getLetter() const;
 
 private:

@@ -19,7 +19,7 @@
  */
 
 #include "knight.h"
-#include <iostream>
+#include <position.h>
 
 namespace Miniature
 {
@@ -28,8 +28,8 @@ bool MKnight::hasFinishedLoading = false;
 QSvgRenderer MKnight::blackRenderer;
 QSvgRenderer MKnight::whiteRenderer;
 
-MKnight::MKnight(MColour colour, int width, int height)
-: MPiece(colour, KNIGHT, width, height)
+MKnight::MKnight(MColour colour)
+: MPiece(colour, KNIGHT)
 {
     loadFromSvgFile();
 }
@@ -37,63 +37,63 @@ MKnight::MKnight(MColour colour, int width, int height)
 MKnight::~MKnight()
 {}
 
-QList<QPoint> MKnight::getPossibleSquares(QPoint point) const
+QList<QPoint> MKnight::getPossibleSquares(const MPosition &pos, const QPoint &origin) const
 {
     QList<QPoint> possibleSquares;
 
     // north
-    if (point.y() + 2 < yDim)
+    if (origin.y() + 2 < pos.getHeight())
     {
-        if (point.x() + 1 < xDim)
+        if (origin.x() + 1 < pos.getWidth())
         {
-            possibleSquares.append(QPoint(point.x() + 1, point.y() + 2));
+            possibleSquares.append(QPoint(origin.x() + 1, origin.y() + 2));
         }
 
-        if (point.x() - 1 >= 0)
+        if (origin.x() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 1, point.y() + 2));
+            possibleSquares.append(QPoint(origin.x() - 1, origin.y() + 2));
         }
     }
 
     // east
-    if (point.x() + 2 < xDim)
+    if (origin.x() + 2 < pos.getWidth())
     {
-        if (point.y() + 1 < yDim)
+        if (origin.y() + 1 < pos.getHeight())
         {
-            possibleSquares.append(QPoint(point.x() + 2, point.y() + 1));
+            possibleSquares.append(QPoint(origin.x() + 2, origin.y() + 1));
         }
 
-        if (point.y() - 1 >= 0)
+        if (origin.y() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() + 2, point.y() - 1));
+            possibleSquares.append(QPoint(origin.x() + 2, origin.y() - 1));
         }
     }
 
     // south
-    if (point.y() - 2 >= 0)
+    if (origin.y() - 2 >= 0)
     {
-        if (point.x() + 1 < xDim)
+        if (origin.x() + 1 < pos.getWidth())
         {
-            possibleSquares.append(QPoint(point.x() + 1, point.y() - 2));
+            possibleSquares.append(QPoint(origin.x() + 1, origin.y() - 2));
         }
 
-        if (point.x() - 1 >= 0)
+        if (origin.x() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 1, point.y() - 2));
+            possibleSquares.append(QPoint(origin.x() - 1, origin.y() - 2));
         }
     }
 
     // west
-    if (point.x() - 2 >= 0)
+    if (origin.x() - 2 >= 0)
     {
-        if (point.y() + 1 < yDim)
+        if (origin.y() + 1 < pos.getHeight())
         {
-            possibleSquares.append(QPoint(point.x() - 2, point.y() + 1));
+            possibleSquares.append(QPoint(origin.x() - 2, origin.y() + 1));
         }
 
-        if (point.y() - 1 >= 0)
+        if (origin.y() - 1 >= 0)
         {
-            possibleSquares.append(QPoint(point.x() - 2, point.y() - 1));
+            possibleSquares.append(QPoint(origin.x() - 2, origin.y() - 1));
         }
     }
 

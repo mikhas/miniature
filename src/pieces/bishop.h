@@ -34,10 +34,10 @@ class MBishop
 : public MPiece
 {
 public:
-    MBishop(MColour colour, int width = 8, int height = 8);
-    ~MBishop();
+    explicit MBishop(MColour colour);
+    virtual ~MBishop();
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const;
     virtual QChar getLetter() const;
 
 private:

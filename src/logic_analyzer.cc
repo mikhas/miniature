@@ -65,7 +65,7 @@ MLogicAnalyzer::mMoveFlags MLogicAnalyzer::verifyMove(MPosition * const position
 
     // This switch should be rewritten using polymorphism. Each piece should
     // know its list of contraints, IMO.
-    mCellList list = piece->getPossibleSquares(origin);
+    mCellList list = piece->getPossibleSquares(*position, origin);
     switch(piece->getType())
     {
         case MPiece::ROOK:
@@ -181,7 +181,7 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
     {
         // Attacked by a queen?
         MQueen piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
+        mCellList list = piece.getPossibleSquares(position, cell);
         list = applyConStraight(position, list, cell);
         list = applyConDiagonal(position, list, cell);
 
@@ -192,7 +192,7 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
     {
         // Attacked by a rook?
         MRook piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
+        mCellList list = piece.getPossibleSquares(position, cell);
         list = applyConStraight(position, list, cell);
 
         if (isPieceInList(position, piece, list))
@@ -202,7 +202,7 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
     {
         // Attacked by a bishop?
         MBishop piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
+        mCellList list = piece.getPossibleSquares(position, cell);
         list = applyConDiagonal(position, list, cell);
 
         if (isPieceInList(position, piece, list))
@@ -212,7 +212,7 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
     {
         // Attacked by a knight?
         MKnight piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
+        mCellList list = piece.getPossibleSquares(position, cell);
         list = applyConKnight(position, list, cell);
 
         if (isPieceInList(position, piece, list))
@@ -241,7 +241,7 @@ bool MLogicAnalyzer::cellUnderAttack(const MPosition &position, const QPoint &ce
     {
         // Attacked by a king?
         MKing piece(oppositeColor);
-        mCellList list = piece.getPossibleSquares(cell);
+        mCellList list = piece.getPossibleSquares(position, cell);
         list = applyConKing(position, list, cell);
 
         if (isPieceInList(position, piece, list))

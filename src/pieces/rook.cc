@@ -19,7 +19,7 @@
  */
 
 #include "rook.h"
-#include <iostream>
+#include <position.h>
 
 namespace Miniature
 {
@@ -28,8 +28,8 @@ bool MRook::hasFinishedLoading = false;
 QSvgRenderer MRook::blackRenderer;
 QSvgRenderer MRook::whiteRenderer;
 
-MRook::MRook(MColour colour, int width, int height)
-: MPiece(colour, ROOK, width, height),
+MRook::MRook(MColour colour)
+: MPiece(colour, ROOK),
   castle(true)
 {
     loadFromSvgFile();
@@ -38,39 +38,39 @@ MRook::MRook(MColour colour, int width, int height)
 MRook::~MRook()
 {}
 
-QList<QPoint> MRook::getPossibleSquares(QPoint point) const
+QList<QPoint> MRook::getPossibleSquares(const MPosition &pos, const QPoint &origin) const
 {
     QList<QPoint> possibleSquares;
 
     // north
     int i = 1;
-    while (point.y() + i < yDim)
+    while (origin.y() + i < pos.getHeight())
     {
-        possibleSquares.append(QPoint(point.x(), point.y() + i));
+        possibleSquares.append(QPoint(origin.x(), origin.y() + i));
         ++i;
     }
 
     // east
     i = 1;
-    while (point.x() + i < xDim)
+    while (origin.x() + i < pos.getWidth())
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y()));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y()));
         ++i;
     }
 
     // south
     i = 1;
-    while (point.y() - i >= 0)
+    while (origin.y() - i >= 0)
     {
-        possibleSquares.append(QPoint(point.x(), point.y() - i));
+        possibleSquares.append(QPoint(origin.x(), origin.y() - i));
         ++i;
     }
 
     // west
     i = 1;
-    while (point.x() - i >= 0)
+    while (origin.x() - i >= 0)
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y()));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y()));
         ++i;
     }
 

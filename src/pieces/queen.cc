@@ -19,7 +19,7 @@
  */
 
 #include "queen.h"
-#include <iostream>
+#include <position.h>
 
 namespace Miniature
 {
@@ -28,8 +28,8 @@ bool MQueen::hasFinishedLoading = false;
 QSvgRenderer MQueen::blackRenderer;
 QSvgRenderer MQueen::whiteRenderer;
 
-MQueen::MQueen(MColour colour, int width, int height)
-: MPiece(colour, QUEEN, width, height)
+MQueen::MQueen(MColour colour)
+: MPiece(colour, QUEEN)
 {
     loadFromSvgFile();
 }
@@ -37,71 +37,71 @@ MQueen::MQueen(MColour colour, int width, int height)
 MQueen::~MQueen()
 {}
 
-QList<QPoint> MQueen::getPossibleSquares(QPoint point) const
+QList<QPoint> MQueen::getPossibleSquares(const MPosition &pos, const QPoint &origin) const
 {
     QList<QPoint> possibleSquares;
 
     // north
     int i = 1;
-    while (point.y() + i < yDim)
+    while (origin.y() + i < pos.getHeight())
     {
-        possibleSquares.append(QPoint(point.x(), point.y() + i));
+        possibleSquares.append(QPoint(origin.x(), origin.y() + i));
         ++i;
     }
 
     // north-east
     i = 1;
-    while ((point.x() + i < xDim) && (point.y() + i < yDim))
+    while ((origin.x() + i < pos.getWidth()) && (origin.y() + i < pos.getHeight()))
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y() + i));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y() + i));
         ++i;
     }
 
     // east
     i = 1;
-    while (point.x() + i < xDim)
+    while (origin.x() + i < pos.getWidth())
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y()));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y()));
         ++i;
     }
 
     // south-east
     i = 1;
-    while ((point.x() + i < xDim) && (point.y() - i >= 0))
+    while ((origin.x() + i < pos.getWidth()) && (origin.y() - i >= 0))
     {
-        possibleSquares.append(QPoint(point.x() + i, point.y() - i));
+        possibleSquares.append(QPoint(origin.x() + i, origin.y() - i));
         ++i;
     }
 
     // south
     i = 1;
-    while (point.y() - i >= 0)
+    while (origin.y() - i >= 0)
     {
-        possibleSquares.append(QPoint(point.x(), point.y() - i));
+        possibleSquares.append(QPoint(origin.x(), origin.y() - i));
         ++i;
     }
 
     // south-west
     i = 1;
-    while ((point.x() - i >= 0) && (point.y() - i >= 0))
+    while ((origin.x() - i >= 0) && (origin.y() - i >= 0))
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y() - i));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y() - i));
         ++i;
     }
 
     // west
     i = 1;
-    while (point.x() - i >= 0)
+    while (origin.x() - i >= 0)
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y()));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y()));
         ++i;
     }
 
     // north-west
     i = 1;
-    while ((point.x() - i >= 0) && (point.y() + i < yDim))
+    while ((origin.x() - i >= 0) && (origin.y() + i < pos.getHeight()))
     {
-        possibleSquares.append(QPoint(point.x() - i, point.y() + i));
+        possibleSquares.append(QPoint(origin.x() - i, origin.y() + i));
         ++i;
     }
 

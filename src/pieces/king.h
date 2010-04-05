@@ -34,10 +34,10 @@ class MKing
 : public MPiece
 {
 public:
-    MKing(MColour colour, int width = 8, int height = 8);
-    ~MKing();
+    explicit MKing(MColour colour);
+    virtual ~MKing();
 
-    virtual QList<QPoint> getPossibleSquares(QPoint) const;
+    virtual QList<QPoint> getPossibleSquares(const MPosition &pos, const QPoint &origin) const;
     virtual QChar getLetter() const;
 
     void hasMoved();

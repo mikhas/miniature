@@ -20,6 +20,7 @@
  */
 
 #include "piece.h"
+#include <position.h>
 
 #include <QGraphicsScene>
 #include <QBrush>
@@ -34,12 +35,10 @@ namespace Miniature
 {
 
 MPiece::
-MPiece(MColour colour, MType pieceType, int xDimension, int yDimension, int width, int height)
+MPiece(MColour colour, MType pieceType, int width, int height)
 : QGraphicsObject(),
   colour(colour),
   type(pieceType),
-  xDim(xDimension),
-  yDim(yDimension),
   selection(new QGraphicsRectItem(QRect(0, 0, width, height), this)), // TODO: get rid of magic numbers
   image(width, height, QImage::Format_ARGB32_Premultiplied),
   ghost(new QGraphicsPixmapItem(this)),
