@@ -74,6 +74,7 @@ public Q_SLOTS:
     void onPieceClicked(MPiece *piece);
     void onTargetClicked(const QPoint &cell);
     void onMoveConfirmed();
+    void onPositionPasted();
 
 Q_SIGNALS:
     void sendDebugInfo(QString msg);
@@ -88,6 +89,9 @@ private:
     /* Creates a MPosition with the default chess start position and stores it
      * in m_game. */
     void setupStartPosition();
+
+    //! \brief Allow pasting of positions via Qt's clipboard.
+    void setupPositionPasting();
 
     /* Connects signals of the piece to controller's slots, adds piece to a
      * position (which wraps it in a shared pointer and therefore, takes (shared)

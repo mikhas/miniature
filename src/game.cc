@@ -21,6 +21,7 @@
 #include <game.h>
 #include <position.h>
 #include <pieces.h>
+#include <main.h>
 
 #include <QList>
 
@@ -47,6 +48,7 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
     connectDashboardItems(bottom, top);
 
     newGame();
+    setupPositionPasting();
 }
 
 MGame::~MGame()
@@ -130,7 +132,7 @@ void MGame::abortGame()
 void MGame::setupStartPosition()
 {
     m_game.clear();
-    m_game = MPositionList();
+    m_game = MPositionList(); // leaky?
     Q_ASSERT(m_game.empty());
 
     Q_CHECK_PTR(m_view);
@@ -183,6 +185,18 @@ void MGame::setupStartPosition()
     m_trans_half_move = mHalfMove(pos);
 
     Q_ASSERT(!m_game.empty());
+}
+
+void MGame::setupPositionPasting()
+{
+    // TODO: Get rid of this parent() hack, as it assumes more about parent() than what's healthy. Unless we restrict
+    // the MGame ctor to MMainWindows, that is ...
+    QShortcut *pasteFen = new QShortcut(static_cast<MMainWindow *>(parent()));
+    pasteFen->setKey(QKeySequence(QKeySequence::Paste));
+    pasteFen->setContext(Qt::ApplicationShortcut);
+
+    connect(pasteFen, SIGNAL(activated()),
+            this,     SLOT(onPositionPasted()));
 }
 
 bool MGame::isValidPosition(int half_move) const
@@ -298,9 +312,9 @@ void MGame::updatePlayerStatus(const MPosition &position)
     else
         m_view->getTopDashboardItem()->setStatusText(status);
 
-    m_log->append(QString("%1 %2 - FEN %3").arg(tr("half move #"))
-                                           .arg(m_half_move_index)
-                                           .arg(position.asFen()), MGameLog::GAME);
+    m_log->append(QString("%1 - %2").arg(m_half_move_index).arg(status), MGameLog::GAME);
+    m_log->append(position.asFen(), MGameLog::FEN);
+
 }
 
 void MGame::onPieceClicked(MPiece *piece)
@@ -413,5 +427,29 @@ void MGame::onMoveConfirmed()
         top->disableRequestsButton();
         bottom->enableRequestsButton();
         Q_EMIT turnOfBottomPlayer();
+    }
+}
+
+void MGame::onPositionPasted()
+{
+    if(QApplication::clipboard()->mimeData()->hasText())
+    {
+        newGame();
+        MPosition pos = MPosition::fromFen(QApplication::clipboard()->text());
+        if (pos.isValid())
+        {
+            m_game[0] = pos;
+            m_is_bottom_player_white = (MPiece::WHITE == pos.getColourToMove() ? true : false);
+
+            for (MPosition::MPieces::iterator iter = pos.begin();
+                 iter != pos.end();
+                 ++iter)
+            {
+                if(*iter)
+                    m_board_item->addPiece(*iter);
+            }
+
+            setPositionTo(0);
+        }
     }
 }
