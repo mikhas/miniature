@@ -57,9 +57,42 @@ class MPosition
 public:
     typedef QVector<MPiece*> MPieces;
 
+    //! \brief ASCII values for FEN characters.
+    enum Fen
+    {
+        FEN_NONE = 0,
+        FEN_ROW = 47,
+
+        FEN_1_CELL  = 49,
+        FEN_2_CELLS = 50,
+        FEN_3_CELLS = 51,
+        FEN_4_CELLS = 52,
+        FEN_5_CELLS = 53,
+        FEN_6_CELLS = 54,
+        FEN_7_CELLS = 55,
+        FEN_8_CELLS = 56,
+
+        FEN_BLACK_BISHOP = 98,
+        FEN_BLACK_KING   = 107,
+        FEN_BLACK_KNIGHT = 110,
+        FEN_BLACK_PAWN   = 112,
+        FEN_BLACK_QUEEN  = 113,
+        FEN_BLACK_ROOK   = 114,
+
+        FEN_WHITE_BISHOP = 66,
+        FEN_WHITE_KING   = 75,
+        FEN_WHITE_KNIGHT = 78,
+        FEN_WHITE_PAWN   = 80,
+        FEN_WHITE_QUEEN  = 81,
+        FEN_WHITE_ROOK   = 82
+    };
+
     // construct empty position
     explicit MPosition(int width = 8, int height = 8, int cell_size = 60);
-    ~MPosition();
+    virtual ~MPosition();
+
+    //! Returns a FEN-constructed position, or an empty position in case of errors.
+    static MPosition fromFen(const QString &fen, int width = 8, int height = 8);
 
     QString mapToString(const QPoint &cell) const;
 
@@ -85,8 +118,8 @@ public:
     MPiece * movePiece(const QPoint &origin, const QPoint &target);
     MPiece * pieceAt(const QPoint &cell) const;
 
-    MPieces::const_iterator begin() const;
-    MPieces::const_iterator end() const;
+    MPieces::iterator begin();
+    MPieces::iterator end();
 
     int indexFromPoint(const QPoint &cell) const;
     // This conversion is also used by MBoardView to figure out the correct
@@ -101,6 +134,12 @@ public:
     // (m_invalid_target)
     QPoint getPawnDoubleMove() const;
     void setPawnDoubleMove(const QPoint& target);
+
+    //! \brief Returns the logical board width for this position, as amount of cells.
+    int getWidth() const;
+
+    //! \brief Returns the logical board height for this position, as amount of cells.
+    int getHeight() const;
 
     QPoint getKing(MPiece::MColour colour) const;
     MPiece::MColour getColourToMove() const;
