@@ -21,25 +21,24 @@
 #ifndef GAME_H__
 #define GAME_H__
 
-#include "position.h"
-#include "half_move.h"
-#include "board_view.h"
-#include "graphics_board_item.h"
-#include "game_log.h"
+#include <position.h>
+#include <board_view.h>
+#include <graphics_board_item.h>
+#include <game_log.h>
+#include <game_store.h>
 
-#include <QList>
-#include <QGraphicsView>
-#include <QString>
-#include <QObject>
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
 
-/* This class represents the data structure for a single game. It communicates
- * with the various backends (fics, freechess, chess engines, ...) and is also
- * responsible for sending the current chess position to the board. Therefore,
- * this class needs to be able to convert an internal chess position into a FEN
- * string.
+/*!
+ *  This class represents the data structure for a single game. It communicates
+ *  with the various backends (fics, freechess, chess engines, ...) and is also
+ *  responsible for sending the current chess position to the board. Therefore,
+ *  this class needs to be able to convert an internal chess position into a
+ *  FEN string.
  */
 class MGame
 : public QObject
@@ -47,33 +46,17 @@ class MGame
     Q_OBJECT
 
 public:
-    typedef QList<MPosition> MPositionList;
 
     explicit MGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
     virtual ~MGame();
 
 public Q_SLOTS:
-    /* Reset the game's state and start a new game.*/
     void newGame();
-    /* Game navigation slots. */
     void jumpToStart();
     void prevMove();
     void nextMove();
     void jumpToEnd();
     void abortGame();
-
-    /* If a game was started, sets position to the turn specified by half_move
-     * (one full move: white and black moved, hence half moves). If half_move
-     * specifies an invalid position then the current position is unchanged.
-     * Notice how half_move = 0 would yield the start position in a normal
-     * game.
-     */
-    void setPositionTo(int half_move);
-
-    /* Process user requests coming from the MGraphicsBoardItem or MActionAreas. */
-    void onPieceClicked(MPiece *piece);
-    void onTargetClicked(const QPoint &cell);
-    void onMoveConfirmed();
     void onPositionPasted();
 
 Q_SIGNALS:
@@ -83,28 +66,29 @@ Q_SIGNALS:
     void turnOfBottomPlayer();
     void togglePieceRotations();
 
+private Q_SLOTS:
+    void onWhiteToMove(const MPosition &position);
+    void onBlackToMove(const MPosition &position);
+    void onCandidatePieceSelected();
+    void onMoveDiscarded();
+    void onMoveConfirmationRequested();
+    void onInvalidTargetSelected();
+
 private:
+    void startTurn(const MPosition &position, MDashboardItem *const dashboard);
+
+    bool isWhiteAtBottom() const;
+    bool isBlackAtBottom() const;
+
+    void setupPositionPasting();
     void setupBoardItem();
 
-    /* Creates a MPosition with the default chess start position and stores it
-     * in m_game. */
-    void setupStartPosition();
-
-    //! \brief Allow pasting of positions via Qt's clipboard.
-    void setupPositionPasting();
-
-    /* Connects signals of the piece to controller's slots, adds piece to a
-     * position (which wraps it in a shared pointer and therefore, takes (shared)
-     * ownership. One piece is shared among all positions of a game.
+    /*!
+     *  Helper method to activate dashboard/game interaction.
+     *  @param[in] dashboard the dashboard item that interacts with this MGame
+     *  instance.
      */
-    void addPieceToPositionAt(MPiece *const piece, MPosition *const position, const QPoint &target);
-
-    /* Returns whether the position identified by half_move exists in m_game.
-     */
-    bool isValidPosition(int half_move) const;
-
-    bool isTurnOfTopPlayer() const;
-    bool isTurnOfBottomPlayer() const;
+    void connectDashboardToGame(MDashboardItem *const dashboard);
 
     /*!
      *  Helper method to activate the interaction between the two dashboard items.
@@ -112,34 +96,18 @@ private:
      *  @param[in] first the first dashboard item
      *  @param[in] second the second dashboard item
      */
-    void connectDashboardItems(MDashboardItem *first, MDashboardItem *second);
-
+    void connectDashboards(MDashboardItem *const first, MDashboardItem *const second);
     void updatePlayerStatus(const MPosition &position);
 
-    /* A reference to the board view, we do not take ownership. */
-    MBoardView *m_view;
-
-    MGameLog *m_log;
-
-    /* A container for all pieces in the scene graph, useful for coord mapping. */
-    MGraphicsBoardItem *m_board_item;
-
-    /* An index to the positions stored in m_game, conceptually each half move
-     * is indexed. */
-    int m_half_move_index;
-
-    /* Stores the game history as a list of positions. */
-    MPositionList m_game;
-
-    /* Encapsulates all transitional data for a *potential* half move. Remember
-     * that our UI requires a player to confirm moves so the UI needs to be
-     * able to show candidate moves that will never be part of the game
-     * history. MGame takes ownership. */
-    // TODO: I *think* this one got auto_ptr semantics, all this delete/assign 0 stuff.
-    mHalfMove m_trans_half_move;
-
-    bool m_is_bottom_player_white;
+    MBoardView *m_view; /*< A reference to the board view. >*/
+    MGameLog *m_log; /*< A reference to the game log. >*/
+    MGraphicsBoardItem *m_board_item; /* A container for all pieces in the
+        scene graph, useful for coord mapping. >*/
+    MGameStore *m_game_store; /*< A reference to the game store, owned by
+        this class. >*/
+    MDashboardItem *m_current_dashboard; /*< A reference to the dashboard of
+        the currently moving player. >*/
 };
 
-}; // namespace Miniature
+} // namespace Miniature
 #endif
