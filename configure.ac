@@ -1,4 +1,4 @@
-AC_INIT([miniature], [0.1.7], [http://wiki.maemo.org/Miniature], [miniature])
+AC_INIT([miniature], [0.1.8], [http://wiki.maemo.org/Miniature], [miniature])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([src/main.cc])
