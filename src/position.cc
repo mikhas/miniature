@@ -166,6 +166,7 @@ Miniature::MPosition MPosition::fromFen(const QString &fen, int width, int heigh
         }
     }
 
+    p.resetCastling();
     return p;
 }
 

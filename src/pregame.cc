@@ -96,8 +96,6 @@ onNewGameRequested()
     connect(window, SIGNAL(destroyed()), map, SLOT(map()));
     map->setMapping(window, source);
     connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
-
-    m_log->append("New game started.", MGameLog::GAME);
 }
 
 void MPreGame::

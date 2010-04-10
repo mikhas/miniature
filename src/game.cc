@@ -68,7 +68,6 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
     connectDashboards(top, bottom);
     connectDashboards(bottom, top);
 
-    newGame();
     setupPositionPasting();
 }
 
@@ -108,6 +107,7 @@ void MGame::setupBoardItem()
 
 void MGame::newGame()
 {
+    m_log->append("New game started.", MGameLog::GAME);
     setupBoardItem();
     m_game_store->setupStartPosition();
 }
@@ -158,14 +158,16 @@ void MGame::onWhiteToMove(const MPosition &position)
 
 void MGame::onBlackToMove(const MPosition &position)
 {
-    MDashboardItem *dashboard = (isWhiteAtBottom() ? m_view->getBottomDashboardItem()
-                                                   : m_view->getTopDashboardItem());
+    MDashboardItem *dashboard = (isWhiteAtBottom() ? m_view->getTopDashboardItem()
+                                                   : m_view->getBottomDashboardItem());
     startTurn(position, dashboard);
 }
 
 void MGame::onCandidatePieceSelected()
 {
-    // nothing to do!
+    Q_CHECK_PTR(m_current_dashboard);
+
+    m_current_dashboard->disableConfirmButton();
 }
 
 void MGame::onMoveDiscarded()
@@ -195,6 +197,7 @@ void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard
     {
         m_current_dashboard->disableConfirmButton();
         m_current_dashboard->disableRequestsButton();
+        m_current_dashboard->hideStatus();
     }
 
     // uhm, this could be done nicer
@@ -206,6 +209,8 @@ void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard
 
     m_current_dashboard = dashboard;
     m_current_dashboard->enableRequestsButton();
+
+    updatePlayerStatus(position);
 }
 
 bool MGame::isWhiteAtBottom() const
@@ -231,8 +236,6 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
 
 void MGame::connectDashboards(MDashboardItem *const first, MDashboardItem *const second)
 {
-
-
     // Connect draw requests
     connect(first,  SIGNAL(drawButtonPressed()),
             second, SLOT(drawOffered()));
@@ -280,18 +283,15 @@ void MGame::updatePlayerStatus(const MPosition &position)
 {
     Q_CHECK_PTR(m_current_dashboard);
 
-    m_current_dashboard->hideStatus();
-    m_current_dashboard->hideStatus();
     m_current_dashboard->appendToLastMovesList(QString("42. Rc1"));
-
     QString status;
+
     if (position.inCheck())
         status = tr("Check!");
     else
         status = tr("Turn started");
 
     m_current_dashboard->setStatusText(status);
-
     m_log->append(QString("%1 - %2").arg(m_game_store->getIndex()).arg(status), MGameLog::GAME);
     m_log->append(position.asFen(), MGameLog::FEN);
 
@@ -301,12 +301,12 @@ void MGame::onPositionPasted()
 {
     if(QApplication::clipboard()->mimeData()->hasText())
     {
-        newGame();
         MPosition pos = MPosition::fromFen(QApplication::clipboard()->text());
         if (pos.isValid())
         {
-            m_board_item->updateFromPosition(&pos);
+            setupBoardItem();
             m_game_store->reset(pos);
+            m_log->append("New position pasted.", MGameLog::GAME);
         }
     }
 }

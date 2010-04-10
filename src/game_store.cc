@@ -59,19 +59,6 @@ setupStartPosition()
     m_game = MPositionList(); // leaky?
     Q_ASSERT(m_game.empty());
 
-    //Q_CHECK_PTR(m_view);
-    //MDashboardItem *top = m_view->getTopDashboardItem();
-    //MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-    //top->resetUi();
-    //bottom->resetUi();
-
-    //top->disableConfirmButton();
-    //bottom->disableConfirmButton();
-
-    //top->disableRequestsButton();
-    //bottom->enableRequestsButton();
-
     MPosition pos;
 
     pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
@@ -132,50 +119,18 @@ onPositionRequested(int index)
     m_index = index;
     MPosition pos = m_game[m_index];
 
-    //m_board_item->hidePieces();
+    // Updating the pieces is enough, since in Miniature, pieces never get
+    // lost during a game! They are merely hidden. New pieces get added during
     pos.updatePieces();
     m_candidate_move.deSelect();
     m_candidate_move = mHalfMove(pos);
     Q_EMIT (hasWhiteToMove() ? whiteToMove(pos)
                              : blackToMove(pos));
-    //updatePlayerStatus(pos);
-
-    //MDashboardItem *top = m_view->getTopDashboardItem();
-    //MDashboardItem *bottom = m_view->getBottomDashboardItem();
-    //top->resetUi();
-    //bottom->resetUi();
-
-    //top->disableConfirmButton();
-    //bottom->disableConfirmButton();
-
-/*
-    if (isTurnOfTopPlayer())
-    {
-        top->enableRequestsButton();
-        bottom->disableRequestsButton();
-    }
-    else
-    {
-        top->disableRequestsButton();
-        bottom->enableRequestsButton();
-    }
-*/
 }
 
 void MGameStore::
 onCandidateMoveConfirmed()
 {
-/*
-    MDashboardItem *top = m_view->getTopDashboardItem();
-    MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-    top->resetUi();
-    bottom->resetUi();
-
-    top->disableConfirmButton();
-    bottom->disableConfirmButton();
-*/
-
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
     MPosition pos = MPosition(m_candidate_move.getPosition());
@@ -185,29 +140,12 @@ onCandidateMoveConfirmed()
 
     Q_EMIT (hasWhiteToMove() ? whiteToMove(pos)
                              : blackToMove(pos));
-
-/*
-    updatePlayerStatus(position);
-
-    if (isTurnOfTopPlayer())
-    {
-        top->enableRequestsButton();
-        bottom->disableRequestsButton();
-        Q_EMIT turnOfTopPlayer();
-    }
-    else
-    {
-        top->disableRequestsButton();
-        bottom->enableRequestsButton();
-        Q_EMIT turnOfBottomPlayer();
-    }
-*/
 }
 
 void MGameStore::
 onPieceSelected(MPiece *piece)
 {
-    // If invalid piece was selected => reset selection, purple flashing.
+    // If invalid piece was selected => reset selection, flashing.
     // Currently, most piece selections are "valid" (because the logic analyzer
     // doesnt know how to handle that yet)
     Q_ASSERT(isValidPosition(m_index));
@@ -219,17 +157,6 @@ onPieceSelected(MPiece *piece)
         const bool was_already_selected = m_candidate_move.isSelected(piece);
         m_candidate_move.undo();
         m_candidate_move.deSelect();
-
-/*
-        MDashboardItem *top = m_view->getTopDashboardItem();
-        MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-        top->resetUi();
-        bottom->resetUi();
-
-        top->disableConfirmButton();
-        bottom->disableConfirmButton();
-*/
 
         // Don't re-select the same piece - see b.m.o bug #7868.
         if (!was_already_selected)
@@ -256,42 +183,15 @@ onPieceSelected(MPiece *piece)
 void MGameStore::
 onTargetSelected(const QPoint &target)
 {
-    // Ignores invalid mouse clicks, updates/reset dashboard items when move was
-    // valid/invalid.
-
-    //MDashboardItem *top = m_view->getTopDashboardItem();
-    //MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-    //top->resetUi();
-    //bottom->resetUi();
-
     if (m_candidate_move.isUndoRequest(target))
     {
         m_candidate_move.undo(); // but do not deselect!
         Q_EMIT moveDiscarded();
-        //top->disableConfirmButton();
-        //bottom->disableConfirmButton();
     }
     else if (m_candidate_move.applyToTarget(target))
-    {
         Q_EMIT moveConfirmationRequested();
-        /*
-        if (isTurnOfBottomPlayer())
-            bottom->enableConfirmButton();
-        else
-            top->enableConfirmButton();
-        */
-    }
     else
-    {
         Q_EMIT invalidTargetSelected();
-        /*
-        if (isTurnOfBottomPlayer())
-            bottom->flash();
-        else
-            top->flash();
-        */
-    }
 }
 
 bool MGameStore::
