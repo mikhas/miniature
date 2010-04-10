@@ -5,7 +5,7 @@ miniature (0.1.8-1) unstable; urgency=low
   * Position pasting (FEN strings only).
   * Moving to QGraphicsLayout for dashboard.
 
- -- Michael Hasselmann <michael@taschenorakel.de>  Sat, 10 Apr 2010 17:04 +0300
+ -- Michael Hasselmann <michael@taschenorakel.de>  Sat, 10 Apr 2010 17:04:00 +0300
 
 miniature (0.1.7-1) unstable; urgency=low
 
