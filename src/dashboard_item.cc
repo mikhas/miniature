@@ -142,6 +142,7 @@ setupUi()
                                      QPixmap(":/icons/96x96/play-pressed.png"),
                                      QPixmap(":/icons/96x96/play-flash.png"),
                                      this);
+    m_confirm->setActive(false);
 
     // right-aligned
     m_requests = new MDashboardButton(QPoint(width - icon_size - col_right_width, centered_height),
@@ -150,6 +151,7 @@ setupUi()
                                       QPixmap(":/icons/64x64/stop-pressed.png"),
                                       QPixmap(":/icons/64x64/stop-flash.png"),
                                       this);
+    m_requests->setActive(false);
 
     // left-aligned
     m_takeback = new MDashboardButton(QPoint(col_left_width, centered_height),
