@@ -59,8 +59,18 @@ public:
 
     void hidePieces();
 
-    // Takes ownership and connects propagated signals.
+    /*!
+     *  Adds a piece (which is also a graphics object) to the board item,
+     *  connects propagated signals and also takes ownership.
+     *  @param[in] piece The graphics object that is added.
+     */
     void addPiece(MPiece *const piece);
+
+    /*!
+     *  Adds all pieces found in the position and updates their position.
+     *  @param[in] position The position to update from.
+     */
+    void updateFromPosition(MPosition *const position);
 
 Q_SIGNALS:
     void pieceClicked(MPiece *piece);

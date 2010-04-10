@@ -102,3 +102,18 @@ void MGraphicsBoardItem::addPiece(MPiece *const piece)
     piece->setParentItem(this);
     piece->show();
 }
+
+void MGraphicsBoardItem::updateFromPosition(MPosition *const position)
+{
+    for (MPosition::MPieces::iterator iter = position->begin();
+         iter != position->end();
+         ++iter)
+    {
+        if (*iter)
+            addPiece(*iter);
+    }
+
+    // We could handle this ourselves in the above loop, but this is really not performance-
+    // critical, nor does iterating twice add much overhead.
+    position->updatePieces();
+}
