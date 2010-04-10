@@ -140,8 +140,14 @@ print(const mLogDomainFlags &flags) const
     {
         if (iter->getLogDomainFlags() & flags)
         {
-            m_log_widget->textCursor().insertText(QString("%1 - %2\n").arg(iter->getTime())
-                                                                    .arg(iter->getMessage()));
+            QString msg;
+            if (iter->getLogDomainFlags() & FEN)
+                msg = iter->getMessage() + "\n";
+            else
+                msg = QString("%1 - %2\n").arg(iter->getTime())
+                                          .arg(iter->getMessage());
+
+            m_log_widget->textCursor().insertText(msg);
         }
     }
 }
