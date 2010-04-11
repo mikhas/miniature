@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2010 Michael Hasselmann <michael@taschenorakel.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -51,50 +51,43 @@ public:
     virtual ~MGame();
 
 public Q_SLOTS:
-    void newGame();
-    void jumpToStart();
-    void prevMove();
-    void nextMove();
-    void jumpToEnd();
-    void abortGame();
-    void onPositionPasted();
+    virtual void newGame();
+    virtual void jumpToStart();
+    virtual void prevMove();
+    virtual void nextMove();
+    virtual void jumpToEnd();
+    virtual void abortGame();
+    virtual void onPositionPasted();
 
 Q_SIGNALS:
-    void togglePieceRotations();
+    virtual void togglePieceRotations();
 
 private Q_SLOTS:
-    void onWhiteToMove(const MPosition &position);
-    void onBlackToMove(const MPosition &position);
-    void onCandidatePieceSelected();
-    void onMoveDiscarded();
-    void onMoveConfirmationRequested();
-    void onInvalidTargetSelected();
+    virtual void onWhiteToMove(const MPosition &position);
+    virtual void onBlackToMove(const MPosition &position);
+    virtual void onCandidatePieceSelected();
+    virtual void onMoveDiscarded();
+    virtual void onMoveConfirmationRequested();
+    virtual void onInvalidTargetSelected();
 
-private:
-    void startTurn(const MPosition &position, MDashboardItem *const dashboard);
+protected:
+    virtual void startTurn(const MPosition &position, MDashboardItem *const dashboard);
 
-    bool isWhiteAtBottom() const;
-    bool isBlackAtBottom() const;
+    virtual bool isWhiteAtBottom() const;
+    virtual bool isBlackAtBottom() const;
 
-    void setupPositionPasting();
-    void setupBoardItem();
-    void setupDashboard();
+    virtual void setupBoardItem();
+    virtual void setupDashboard();
 
     /*!
      *  Helper method to activate dashboard/game interaction.
      *  @param[in] dashboard the dashboard item that interacts with this MGame
      *  instance.
      */
-    void connectDashboardToGame(MDashboardItem *const dashboard);
+    virtual void connectDashboardToGame(MDashboardItem *const dashboard);
 
-    /*!
-     *  Helper method to activate the interaction between the two dashboard items.
-     *  To connect the items in both ways, call the method with swapped parameters.
-     *  @param[in] first the first dashboard item
-     *  @param[in] second the second dashboard item
-     */
-    void connectDashboards(MDashboardItem *const first, MDashboardItem *const second);
-    void updatePlayerStatus(const MPosition &position);
+    //!  Updates the player status in the UI from the given \a position.
+    virtual void updatePlayerStatus(const MPosition &position);
 
     MBoardView *m_view; /*< A reference to the board view. >*/
     MGameLog *m_log; /*< A reference to the game log. >*/
@@ -104,6 +97,9 @@ private:
         this class. >*/
     MDashboardItem *m_current_dashboard; /*< A reference to the dashboard of
         the currently moving player. >*/
+
+private:
+    void setupPositionPasting();
 };
 
 } // namespace Miniature

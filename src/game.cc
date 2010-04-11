@@ -1,7 +1,7 @@
 /* Miniature - A chess board that goes always with you, ready to let
  * you play and learn wherever you go.
  *
- * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2010 Michael Hasselmann <michael@taschenorakel.de>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
@@ -19,16 +19,10 @@
  */
 
 #include <game.h>
-#include <position.h>
 #include <pieces.h>
 #include <main.h>
 
-#include <QList>
-
-#include <QFontDatabase>
-
 using namespace Miniature;
-
 
 MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
 : QObject(parent),
@@ -46,7 +40,7 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
 
     connect(m_game_store, SIGNAL(blackToMove(MPosition)),
             this,         SLOT(onBlackToMove(MPosition)));
-    ;
+
     connect(m_game_store, SIGNAL(candidatePieceSelected()),
             this,         SLOT(onCandidatePieceSelected()));
 
@@ -59,7 +53,6 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
     connect(m_game_store, SIGNAL(invalidTargetSelected()),
             this,         SLOT(onInvalidTargetSelected()));
 
-    setupDashboard();
     setupPositionPasting();
 }
 
@@ -91,16 +84,7 @@ void MGame::setupBoardItem()
 
 void MGame::setupDashboard()
 {
-    Q_ASSERT(m_view);
-
-    MDashboardItem *top = m_view->getTopDashboardItem();
-    MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-    connectDashboardToGame(top);
-    connectDashboardToGame(bottom);
-
-    connectDashboards(top, bottom);
-    connectDashboards(bottom, top);
+    // reimpl me!
 }
 
 void MGame::newGame()
@@ -132,7 +116,7 @@ void MGame::jumpToEnd()
 
 void MGame::abortGame()
 {
-    deleteLater();
+    parent()->deleteLater();
 }
 
 void MGame::setupPositionPasting()
@@ -191,13 +175,6 @@ void MGame::onInvalidTargetSelected()
 
 void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard)
 {
-    if (m_current_dashboard)
-    {
-        m_current_dashboard->disableConfirmButton();
-        m_current_dashboard->disableRequestsButton();
-        m_current_dashboard->hideStatus();
-    }
-
     // uhm, this could be done nicer
     if (0 == m_game_store->getIndex())
     {
@@ -207,11 +184,6 @@ void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard
 
     m_current_dashboard = dashboard;
     m_current_dashboard->enableRequestsButton();
-
-    if (isWhiteAtBottom())
-        m_board_item->rotate(0);
-    else
-        m_board_item->rotate(180);
 
     updatePlayerStatus(position);
 }
@@ -235,51 +207,6 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
     // Connect aborted game
     connect(dashboard, SIGNAL(abortGameConfirmed()),
             this,      SLOT(abortGame()));
-}
-
-void MGame::connectDashboards(MDashboardItem *const first, MDashboardItem *const second)
-{
-    // Connect draw requests
-    connect(first,  SIGNAL(drawButtonPressed()),
-            second, SLOT(drawOffered()));
-
-    // Connect adjourn requests
-    connect(first,  SIGNAL(adjournButtonPressed()),
-            second, SLOT(adjournOffered()));
-
-    // Connect resign requests
-    connect(first,  SIGNAL(resignButtonPressed()),
-            first,  SLOT(showResignConfirmation()));
-
-    // Connect abort game requests
-    connect(first,  SIGNAL(abortGameButtonPressed()),
-            first,  SLOT(showAbortGameConfirmation()));
-
-    // Connect game log requests
-    QSignalMapper *mapper = new QSignalMapper(this);
-    mapper->setMapping(first, QApplication::activeWindow());
-    connect(first,  SIGNAL(showGameLogButtonPressed()),
-            mapper, SLOT(map()));
-    connect(mapper, SIGNAL(mapped(QWidget *)),
-            m_log,  SLOT(showLog(QWidget *)));
-
-    // Connect the draw acceptance
-    connect(first,  SIGNAL(drawAccepted()),
-            second, SLOT(onDrawAccepted()));
-    connect(first, SIGNAL(drawAccepted()),
-            first, SLOT(onDrawAccepted()));
-
-    // Connect the adjourn game acceptance
-    connect(first,  SIGNAL(adjournAccepted()),
-            second, SLOT(onAdjournAccepted()));
-    connect(first, SIGNAL(adjournAccepted()),
-            first, SLOT(onAdjournAccepted()));
-
-    // Connect resigned game
-    connect(first,  SIGNAL(resignConfirmed()),
-            second, SLOT(onGameWon()));
-    connect(first,  SIGNAL(resignConfirmed()),
-            first,  SLOT(onGameLost()));
 }
 
 void MGame::updatePlayerStatus(const MPosition &position)
