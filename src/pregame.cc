@@ -20,6 +20,7 @@
 
 #include <pregame.h>
 #include <game.h>
+#include <local_game.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -83,7 +84,7 @@ onNewGameRequested()
     QMainWindow *window = new QMainWindow(m_main_window);
 
     MBoardView *view = new MBoardView(window);
-    MGame *game = new Miniature::MGame(view, m_log, window);
+    MLocalGame *game = new Miniature::MLocalGame(view, m_log, window);
     game->newGame();
 
     MMainWindow::setupGameUi(window, view);
