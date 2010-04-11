@@ -90,10 +90,10 @@ void MGraphicsBoardItem::addPiece(MPiece *const piece)
             this, SIGNAL(pieceClicked(MPiece *)));
 
     // Enable rotation for this piece.
-    connect(this, SIGNAL(rotatePieces180()),
+    connect(this, SIGNAL(pieceRotationRequested180()),
             piece, SLOT(rotate180()));
 
-    connect(this, SIGNAL(rotatePieces0()),
+    connect(this, SIGNAL(pieceRotationRequested0()),
             piece, SLOT(rotate0()));
 
     connect(this, SIGNAL(togglePieceRotations()),
@@ -101,6 +101,16 @@ void MGraphicsBoardItem::addPiece(MPiece *const piece)
 
     piece->setParentItem(this);
     piece->show();
+}
+
+void MGraphicsBoardItem::rotatePieces0()
+{
+    Q_EMIT pieceRotationRequested0();
+}
+
+void MGraphicsBoardItem::rotatePieces180()
+{
+    Q_EMIT pieceRotationRequested180();
 }
 
 void MGraphicsBoardItem::updateFromPosition(MPosition *const position)

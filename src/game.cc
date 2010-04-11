@@ -46,7 +46,7 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
 
     connect(m_game_store, SIGNAL(blackToMove(MPosition)),
             this,         SLOT(onBlackToMove(MPosition)));
-
+    ;
     connect(m_game_store, SIGNAL(candidatePieceSelected()),
             this,         SLOT(onCandidatePieceSelected()));
 
@@ -59,15 +59,7 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
     connect(m_game_store, SIGNAL(invalidTargetSelected()),
             this,         SLOT(onInvalidTargetSelected()));
 
-    MDashboardItem *top = m_view->getTopDashboardItem();
-    MDashboardItem *bottom = m_view->getBottomDashboardItem();
-
-    connectDashboardToGame(top);
-    connectDashboardToGame(bottom);
-
-    connectDashboards(top, bottom);
-    connectDashboards(bottom, top);
-
+    setupDashboard();
     setupPositionPasting();
 }
 
@@ -93,16 +85,22 @@ void MGame::setupBoardItem()
     connect(m_board_item, SIGNAL(targetClicked(QPoint)),
             m_game_store, SLOT(onTargetSelected(QPoint)));
 
-    // connecting signals to signals (which act as if a slot would re-emit
-    // them) is a nice feature
-    connect(this, SIGNAL(turnOfTopPlayer()),
-            m_board_item, SIGNAL(rotatePieces180()));
-
-    connect(this, SIGNAL(turnOfBottomPlayer()),
-            m_board_item, SIGNAL(rotatePieces0()));
-
     connect(this, SIGNAL(togglePieceRotations()),
             m_board_item, SIGNAL(togglePieceRotations()));
+}
+
+void MGame::setupDashboard()
+{
+    Q_ASSERT(m_view);
+
+    MDashboardItem *top = m_view->getTopDashboardItem();
+    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+
+    connectDashboardToGame(top);
+    connectDashboardToGame(bottom);
+
+    connectDashboards(top, bottom);
+    connectDashboards(bottom, top);
 }
 
 void MGame::newGame()
@@ -209,6 +207,11 @@ void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard
 
     m_current_dashboard = dashboard;
     m_current_dashboard->enableRequestsButton();
+
+    if (isWhiteAtBottom())
+        m_board_item->rotate(0);
+    else
+        m_board_item->rotate(180);
 
     updatePlayerStatus(position);
 }

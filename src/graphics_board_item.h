@@ -75,12 +75,14 @@ public:
 Q_SIGNALS:
     void pieceClicked(MPiece *piece);
     void targetClicked(const QPoint &cell);
-    void rotatePieces180();
-    void rotatePieces0();
     void togglePieceRotations();
+    void pieceRotationRequested0();
+    void pieceRotationRequested180();
 
 public Q_SLOT:
     void onMouseButtonPressed(QGraphicsSceneMouseEvent *event);
+    void rotatePieces0();
+    void rotatePieces180();
 
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);

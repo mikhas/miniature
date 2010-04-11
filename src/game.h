@@ -60,10 +60,6 @@ public Q_SLOTS:
     void onPositionPasted();
 
 Q_SIGNALS:
-    void sendDebugInfo(QString msg);
-    void flipBoard();
-    void turnOfTopPlayer();
-    void turnOfBottomPlayer();
     void togglePieceRotations();
 
 private Q_SLOTS:
@@ -82,6 +78,7 @@ private:
 
     void setupPositionPasting();
     void setupBoardItem();
+    void setupDashboard();
 
     /*!
      *  Helper method to activate dashboard/game interaction.
