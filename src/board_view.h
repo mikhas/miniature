@@ -50,6 +50,13 @@ class MBoardView
     Q_OBJECT
 
 public:
+    //! This type is used to decide where to place a dashboard or chat item in a board view.
+    enum Alignment
+    {
+        ALIGN_BOTTOM = 0,
+        ALIGN_TOP    = 1
+    };
+
     explicit MBoardView(QWidget *parent = 0);
     virtual ~MBoardView();
 
@@ -68,17 +75,35 @@ public:
      *
      *  @param[in] item The board item instance.
      */
-    void addBoardItem(MGraphicsBoardItem *item);
+    void addBoard(MGraphicsBoardItem *item);
 
     /*!
-     *  Top dashboard item accessor.
+     *  Creates a new dashboard item (internally) and inserts it into the
+     *  view's layout according to \a align. Deletes previously added
+     *  dashboard.
+     *  \sa MBoardView::getDashboard
      */
-    MDashboardItem * getTopDashboardItem() const;
+    void addDashboard(Alignment align);
 
     /*!
-     *  Bottom dashboard item accessor.
+     *  Returns the dashboard item according to its layout position.
+     *  Can return 0, in which case there is no item for the queried
+     *  alignment!
+     *  @param[in] align The alignment.
      */
-    MDashboardItem * getBottomDashboardItem() const;
+    MDashboardItem * getDashboard(Alignment align) const;
+
+    /*!
+     *  Creates a new chatbox (proxy) widget (internally) and inserts it into
+     *  the view's layout. Deletes previously added chatbox.
+     */
+    void addChatbox();
+
+    /*!
+     *  Returns the chatbox widget according to its layout position.
+     *  Can return 0, in which case there is no widget!
+     */
+    QTextEdit * getChatbox() const;
 
 protected:
     /*!
@@ -102,8 +127,9 @@ private:
 
     const int m_board_item_offset;
 
-    MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/
     MDashboardItem *m_bottom_dashboard; /*!< The bottom player's dashboard item. >*/
+    MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/
+    QTextEdit *m_chatbox; /*!< The player's chatbox (not useful for local games). >*/
 };
 
 }; // namespace Miniature

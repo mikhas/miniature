@@ -37,6 +37,7 @@ namespace
 {
 
     const QSize extent = QSize(480, 800);
+    const QSize chatbox_extent = QSize(480, 160);
 
 }
 
@@ -45,7 +46,10 @@ MBoardView::MBoardView(QWidget *parent)
   m_central(0),
   m_background_page(new QWebPage),
   m_background_image(0),
-  m_board_item_offset(160)
+  m_board_item_offset(160),
+  m_bottom_dashboard(0),
+  m_top_dashboard(0),
+  m_chatbox(0)
 {
     QGraphicsView::setScene(new MScene(this));
     // Ignore the growing property of the scene graph and always only show a
@@ -122,35 +126,98 @@ void MBoardView::setup()
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
-
-    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
-    m_top_dashboard = new MDashboardItem(layout, m_central);
-    layout->addAnchor(m_top_dashboard, Qt::AnchorTop, layout, Qt::AnchorTop);
-    m_top_dashboard->disableConfirmButton();
-    m_top_dashboard->setRotation(180);
-    m_top_dashboard->setZValue(1);
-
-    m_bottom_dashboard = new MDashboardItem(layout, m_central);
-    layout->addAnchor(m_bottom_dashboard, Qt::AnchorBottom, layout, Qt::AnchorBottom);
-    m_bottom_dashboard->disableConfirmButton();
-    m_bottom_dashboard->setZValue(1);
 }
 
-void MBoardView::addBoardItem(MGraphicsBoardItem *item)
+void MBoardView::addDashboard(Alignment align)
 {
     QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
-    layout->addAnchor(m_top_dashboard, Qt::AnchorBottom, item, Qt::AnchorTop);
-    //layout->addAnchor(m_bottom_dashboard, Qt::AnchorTop, item, Qt::AnchorBottom);
+    MDashboardItem *dashboard = new MDashboardItem(layout, m_central);
+
+    switch (align)
+    {
+        case ALIGN_BOTTOM:
+        {
+            delete m_bottom_dashboard;
+            m_bottom_dashboard = dashboard;
+            layout->addAnchor(m_bottom_dashboard, Qt::AnchorBottom, layout, Qt::AnchorBottom);
+        } break;
+
+        case ALIGN_TOP:
+        {
+            delete m_top_dashboard;
+            m_top_dashboard = dashboard;
+            m_top_dashboard->setRotation(180);
+            layout->addAnchor(m_top_dashboard, Qt::AnchorTop, layout, Qt::AnchorTop);
+        } break;
+    }
 }
 
-MDashboardItem * MBoardView::getTopDashboardItem() const
+MDashboardItem * MBoardView::getDashboard(Alignment align) const
 {
-    return m_top_dashboard;
+    MDashboardItem *dashboard = 0;
+
+    switch (align)
+    {
+        case ALIGN_BOTTOM:
+        {
+            dashboard = m_bottom_dashboard;
+        } break;
+
+        case ALIGN_TOP:
+        {
+            dashboard = m_top_dashboard;
+        } break;
+    }
+
+    return dashboard;
 }
 
-MDashboardItem * MBoardView::getBottomDashboardItem() const
+void MBoardView::addChatbox()
 {
-    return m_bottom_dashboard;
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget;
+    layout->addAnchor(proxy, Qt::AnchorTop, layout, Qt::AnchorTop);
+
+    delete m_chatbox;
+    m_chatbox = new QTextEdit;
+    /* does not work ...
+    QPalette palette;
+    m_chatbox->setBackgroundRole(QPalette::Window);
+    m_chatbox->setForegroundRole(QPalette::WindowText);
+    palette.setColor(m_chatbox->backgroundRole(), Qt::black);
+    palette.setColor(m_chatbox->foregroundRole(), Qt::white);
+    m_chatbox->setPalette(palette);
+    */
+    /* does not work, either ...
+    m_chatbox->setTextBackgroundColor(Qt::black);
+    m_chatbox->setTextColor(Qt::white);
+    */
+
+    // It's not my fault if this is the only thing that works, right?
+    m_chatbox->setStyleSheet("color: white; background: black; border:none; padding: 10px;");
+
+    proxy->setWidget(m_chatbox);
+    proxy->setPreferredSize(chatbox_extent);
+}
+
+QTextEdit * MBoardView::getChatbox() const
+{
+    return m_chatbox;
+}
+
+void MBoardView::addBoard(MGraphicsBoardItem *item)
+{
+    Q_ASSERT_X((0 != m_top_dashboard || 0 != m_bottom_dashboard),
+               "addBoard",
+               "No player's dashboard found, cannot attach board.");
+
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+
+    if (m_top_dashboard)
+        layout->addAnchor(m_top_dashboard, Qt::AnchorBottom, item, Qt::AnchorTop);
+    else if (m_bottom_dashboard)
+        layout->addAnchor(m_bottom_dashboard, Qt::AnchorTop, item, Qt::AnchorBottom);
+
 }
 
 void MBoardView::onLoadFinished(bool /*ok*/)
