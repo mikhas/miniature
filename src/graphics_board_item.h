@@ -59,6 +59,12 @@ public:
 
     void hidePieces();
 
+    //! A disabled board emits no signals.
+    void disable();
+
+    //! A board only emits signals when enabled.
+    void enable();
+
     /*!
      *  Adds a piece (which is also a graphics object) to the board item,
      *  connects propagated signals and also takes ownership.
@@ -79,8 +85,8 @@ Q_SIGNALS:
     void pieceRotationRequested0();
     void pieceRotationRequested180();
 
-public Q_SLOT:
-    void onMouseButtonPressed(QGraphicsSceneMouseEvent *event);
+public Q_SLOTS:
+    void onPieceClicked(MPiece *piece);
     void rotatePieces0();
     void rotatePieces180();
 
@@ -88,6 +94,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    bool m_active;
     const int m_board_size;
 };
 
