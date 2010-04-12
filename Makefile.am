@@ -53,6 +53,9 @@ src_miniature_SOURCES = \
 			src/graphics_board_item.cc \
 			src/graphics_board_item.h \
 			src/graphics_board_item.moc.cc \
+			src/network_game.cc \
+			src/network_game.h \
+			src/network_game.moc.cc \
 			src/pieces.h \
 			src/pieces/piece.h \
 			src/pieces/piece.cc \
@@ -104,6 +107,7 @@ BUILT_SOURCES = \
 		src/iconic_button.moc.cc \
 		src/local_game.moc.cc \
 		src/main.moc.cc \
+		src/network_game.moc.cc \
 		src/pieces/piece.moc.cc \
 		src/pregame.moc.cc \
 		$(null)
