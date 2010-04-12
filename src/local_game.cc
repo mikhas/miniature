@@ -35,8 +35,11 @@ void MLocalGame::setupDashboard()
 {
     Q_ASSERT(m_view);
 
-    MDashboardItem *top = m_view->getTopDashboardItem();
-    MDashboardItem *bottom = m_view->getBottomDashboardItem();
+    m_view->addDashboard(MBoardView::ALIGN_BOTTOM);
+    m_view->addDashboard(MBoardView::ALIGN_TOP);
+
+    MDashboardItem *bottom = m_view->getDashboard(MBoardView::ALIGN_BOTTOM);
+    MDashboardItem *top = m_view->getDashboard(MBoardView::ALIGN_TOP);
 
     connectDashboardToGame(top);
     connectDashboardToGame(bottom);
@@ -55,27 +58,9 @@ void MLocalGame::connectDashboards(MDashboardItem *const first, MDashboardItem *
     connect(first,  SIGNAL(adjournButtonPressed()),
             second, SLOT(adjournOffered()));
 
-    // Connect resign requests
-    connect(first,  SIGNAL(resignButtonPressed()),
-            first,  SLOT(showResignConfirmation()));
-
-    // Connect abort game requests
-    connect(first,  SIGNAL(abortGameButtonPressed()),
-            first,  SLOT(showAbortGameConfirmation()));
-
-    // Connect game log requests
-    QSignalMapper *mapper = new QSignalMapper(this);
-    mapper->setMapping(first, QApplication::activeWindow());
-    connect(first,  SIGNAL(showGameLogButtonPressed()),
-            mapper, SLOT(map()));
-    connect(mapper, SIGNAL(mapped(QWidget *)),
-            m_log,  SLOT(showLog(QWidget *)));
-
     // Connect the draw acceptance
     connect(first,  SIGNAL(drawAccepted()),
             second, SLOT(onDrawAccepted()));
-    connect(first, SIGNAL(drawAccepted()),
-            first, SLOT(onDrawAccepted()));
 
     // Connect the adjourn game acceptance
     connect(first,  SIGNAL(adjournAccepted()),
@@ -84,28 +69,15 @@ void MLocalGame::connectDashboards(MDashboardItem *const first, MDashboardItem *
     // Connect resigned game
     connect(first,  SIGNAL(resignConfirmed()),
             second, SLOT(onGameWon()));
-    connect(first,  SIGNAL(resignConfirmed()),
-            first,  SLOT(onGameLost()));
-
-    // Connect abort game
-    connect(first, SIGNAL(abortGameConfirmed()),
-            this,  SLOT(abortGame()));
 }
 
-void MLocalGame::startTurn(const MPosition &position, MDashboardItem *const dashboard)
+void MLocalGame::startTurn(const MPosition &position)
 {
-    if (m_current_dashboard)
-    {
-        m_current_dashboard->disableConfirmButton();
-        m_current_dashboard->disableRequestsButton();
-        m_current_dashboard->hideStatus();
-    }
-
     // TODO: will this really work for swapped colours?
     if (isWhiteAtBottom() && MPiece::WHITE == position.getColourToMove())
-        m_board_item->rotatePieces0();
+        m_board->rotatePieces0();
     else
-        m_board_item->rotatePieces180();
+        m_board->rotatePieces180();
 
-    MGame::startTurn(position, dashboard);
+    MGame::startTurn(position);
 }

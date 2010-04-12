@@ -28,29 +28,29 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
 : QObject(parent),
   m_view(view),
   m_log(log),
-  m_board_item(0),
-  m_game_store(new MGameStore(this)),
-  m_current_dashboard(0)
+  m_board(0),
+  m_store(new MGameStore(this)),
+  m_dashboard(0)
 {
     Q_CHECK_PTR(m_view);
     Q_CHECK_PTR(m_log);
 
-    connect(m_game_store, SIGNAL(whiteToMove(MPosition)),
+    connect(m_store, SIGNAL(whiteToMove(MPosition)),
             this,         SLOT(onWhiteToMove(MPosition)));
 
-    connect(m_game_store, SIGNAL(blackToMove(MPosition)),
+    connect(m_store, SIGNAL(blackToMove(MPosition)),
             this,         SLOT(onBlackToMove(MPosition)));
 
-    connect(m_game_store, SIGNAL(candidatePieceSelected()),
+    connect(m_store, SIGNAL(candidatePieceSelected()),
             this,         SLOT(onCandidatePieceSelected()));
 
-    connect(m_game_store, SIGNAL(moveDiscarded()),
+    connect(m_store, SIGNAL(moveDiscarded()),
             this,         SLOT(onMoveDiscarded()));
 
-    connect(m_game_store, SIGNAL(moveConfirmationRequested()),
+    connect(m_store, SIGNAL(moveConfirmationRequested()),
             this,         SLOT(onMoveConfirmationRequested()));
 
-    connect(m_game_store, SIGNAL(invalidTargetSelected()),
+    connect(m_store, SIGNAL(invalidTargetSelected()),
             this,         SLOT(onInvalidTargetSelected()));
 
     setupPositionPasting();
@@ -63,23 +63,23 @@ void MGame::setupBoardItem()
 {
     Q_ASSERT(m_view);
 
-    if (m_board_item)
+    if (m_board)
     {
-        delete m_board_item;
-        m_board_item = 0;
+        delete m_board;
+        m_board = 0;
     }
 
-    m_board_item = new MGraphicsBoardItem;
-    m_view->addBoardItem(m_board_item);
+    m_board = new MGraphicsBoardItem;
+    m_view->addBoard(m_board);
 
     // process state transition requests
-    connect(m_board_item, SIGNAL(pieceClicked(MPiece *)),
-            m_game_store, SLOT(onPieceSelected(MPiece *)));
-    connect(m_board_item, SIGNAL(targetClicked(QPoint)),
-            m_game_store, SLOT(onTargetSelected(QPoint)));
+    connect(m_board, SIGNAL(pieceClicked(MPiece *)),
+            m_store, SLOT(onPieceSelected(MPiece *)));
+    connect(m_board, SIGNAL(targetClicked(QPoint)),
+            m_store, SLOT(onTargetSelected(QPoint)));
 
     connect(this, SIGNAL(togglePieceRotations()),
-            m_board_item, SIGNAL(togglePieceRotations()));
+            m_board, SIGNAL(togglePieceRotations()));
 }
 
 void MGame::setupDashboard()
@@ -91,22 +91,22 @@ void MGame::newGame()
 {
     m_log->append("New game started.", MGameLog::GAME);
     setupBoardItem();
-    m_game_store->setupStartPosition();
+    m_store->setupStartPosition();
 }
 
 void MGame::jumpToStart()
 {
-    m_game_store->onPositionRequested(0);
+    m_store->onPositionRequested(0);
 }
 
 void MGame::prevMove()
 {
-    m_game_store->onPositionRequested(m_game_store->getIndex() - 1);
+    m_store->onPositionRequested(m_store->getIndex() - 1);
 }
 
 void MGame::nextMove()
 {
-    m_game_store->onPositionRequested(m_game_store->getIndex() + 1);
+    m_store->onPositionRequested(m_store->getIndex() + 1);
 }
 
 void MGame::jumpToEnd()
@@ -116,7 +116,7 @@ void MGame::jumpToEnd()
 
 void MGame::abortGame()
 {
-    parent()->deleteLater();
+    delete this;
 }
 
 void MGame::setupPositionPasting()
@@ -133,58 +133,71 @@ void MGame::setupPositionPasting()
 
 void MGame::onWhiteToMove(const MPosition &position)
 {
-    MDashboardItem *dashboard = (isWhiteAtBottom() ? m_view->getBottomDashboardItem()
-                                                   : m_view->getTopDashboardItem());
-    startTurn(position, dashboard);
+    m_dashboard = (isWhiteAtBottom() ? m_view->getDashboard(MBoardView::ALIGN_BOTTOM)
+                                     : m_view->getDashboard(MBoardView::ALIGN_TOP));
+    startTurn(position);
 }
 
 void MGame::onBlackToMove(const MPosition &position)
 {
-    MDashboardItem *dashboard = (isWhiteAtBottom() ? m_view->getTopDashboardItem()
-                                                   : m_view->getBottomDashboardItem());
-    startTurn(position, dashboard);
+    m_dashboard = (isWhiteAtBottom() ? m_view->getDashboard(MBoardView::ALIGN_TOP)
+                                     : m_view->getDashboard(MBoardView::ALIGN_BOTTOM));
+    startTurn(position);
 }
 
 void MGame::onCandidatePieceSelected()
 {
-    Q_CHECK_PTR(m_current_dashboard);
+    Q_CHECK_PTR(m_dashboard);
 
-    m_current_dashboard->disableConfirmButton();
+    m_dashboard->disableConfirmButton();
 }
 
 void MGame::onMoveDiscarded()
 {
-    Q_CHECK_PTR(m_current_dashboard);
+    Q_CHECK_PTR(m_dashboard);
 
-    m_current_dashboard->disableConfirmButton();
+    m_dashboard->disableConfirmButton();
 }
 
 void MGame::onMoveConfirmationRequested()
 {
-    Q_CHECK_PTR(m_current_dashboard);
+    Q_CHECK_PTR(m_dashboard);
 
-    m_current_dashboard->enableConfirmButton();
+    m_dashboard->enableConfirmButton();
+}
+
+void MGame::onConfirmButtonPressed()
+{
+    endTurn();
+    m_store->onCandidateMoveConfirmed();
 }
 
 void MGame::onInvalidTargetSelected()
 {
-    Q_CHECK_PTR(m_current_dashboard);
+    Q_CHECK_PTR(m_dashboard);
 
-    m_current_dashboard->flash();
+    m_dashboard->flash();
 }
 
-void MGame::startTurn(const MPosition &position, MDashboardItem *const dashboard)
+void MGame::endTurn()
+{
+    Q_CHECK_PTR(m_dashboard);
+
+    m_dashboard->disableConfirmButton();
+    m_dashboard->disableRequestsButton();
+    m_dashboard->hideStatus();
+}
+
+void MGame::startTurn(const MPosition &position)
 {
     // uhm, this could be done nicer
-    if (0 == m_game_store->getIndex())
+    if (0 == m_store->getIndex())
     {
         MPosition pos_copy = MPosition(position);
-        m_board_item->updateFromPosition(&pos_copy);
+        m_board->updateFromPosition(&pos_copy);
     }
 
-    m_current_dashboard = dashboard;
-    m_current_dashboard->enableRequestsButton();
-
+    m_dashboard->enableRequestsButton();
     updatePlayerStatus(position);
 }
 
@@ -201,19 +214,45 @@ bool MGame::isBlackAtBottom() const
 void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
 {
     // Connect move confirmation
-    connect(dashboard,    SIGNAL(confirmButtonPressed()),
-            m_game_store, SLOT(onCandidateMoveConfirmed()));
+    connect(dashboard, SIGNAL(confirmButtonPressed()),
+            this,      SLOT(onConfirmButtonPressed()));
 
     // Connect aborted game
     connect(dashboard, SIGNAL(abortGameConfirmed()),
             this,      SLOT(abortGame()));
+
+    // Connect resign requests
+    connect(dashboard,  SIGNAL(resignButtonPressed()),
+            dashboard,  SLOT(showResignConfirmation()));
+
+    connect(dashboard,  SIGNAL(resignConfirmed()),
+            dashboard,  SLOT(onGameLost()));
+
+    // Connect the draw acceptance
+    connect(dashboard, SIGNAL(drawAccepted()),
+            dashboard, SLOT(onDrawAccepted()));
+
+    connect(dashboard, SIGNAL(abortGameConfirmed()),
+            this,      SLOT(abortGame()));
+
+    // Connect abort game requests
+    connect(dashboard,  SIGNAL(abortGameButtonPressed()),
+            dashboard,  SLOT(showAbortGameConfirmation()));
+
+    // Connect game log requests
+    QSignalMapper *mapper = new QSignalMapper(this);
+    mapper->setMapping(dashboard, QApplication::activeWindow());
+    connect(dashboard,  SIGNAL(showGameLogButtonPressed()),
+            mapper,     SLOT(map()));
+    connect(mapper, SIGNAL(mapped(QWidget *)),
+            m_log,  SLOT(showLog(QWidget *)));
 }
 
 void MGame::updatePlayerStatus(const MPosition &position)
 {
-    Q_CHECK_PTR(m_current_dashboard);
+    Q_CHECK_PTR(m_dashboard);
 
-    m_current_dashboard->appendToLastMovesList(QString("42. Rc1"));
+    m_dashboard->appendToLastMovesList(QString("42. Rc1"));
     QString status;
 
     if (position.inCheck())
@@ -221,8 +260,8 @@ void MGame::updatePlayerStatus(const MPosition &position)
     else
         status = tr("Turn started");
 
-    m_current_dashboard->setStatusText(status);
-    m_log->append(QString("%1 - %2").arg(m_game_store->getIndex()).arg(status), MGameLog::GAME);
+    m_dashboard->setStatusText(status);
+    m_log->append(QString("%1 - %2").arg(m_store->getIndex()).arg(status), MGameLog::GAME);
     m_log->append(position.asFen(), MGameLog::FEN);
 
 }
@@ -235,7 +274,7 @@ void MGame::onPositionPasted()
         if (pos.isValid())
         {
             setupBoardItem();
-            m_game_store->reset(pos);
+            m_store->reset(pos);
             m_log->append("New position pasted.", MGameLog::GAME);
         }
     }

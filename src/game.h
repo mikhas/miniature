@@ -62,16 +62,18 @@ public Q_SLOTS:
 Q_SIGNALS:
     virtual void togglePieceRotations();
 
-private Q_SLOTS:
+private Q_SLOTS: // can be overriden even with public inheritance:
     virtual void onWhiteToMove(const MPosition &position);
     virtual void onBlackToMove(const MPosition &position);
     virtual void onCandidatePieceSelected();
     virtual void onMoveDiscarded();
     virtual void onMoveConfirmationRequested();
+    virtual void onConfirmButtonPressed();
     virtual void onInvalidTargetSelected();
 
 protected:
-    virtual void startTurn(const MPosition &position, MDashboardItem *const dashboard);
+    virtual void endTurn();
+    virtual void startTurn(const MPosition &position);
 
     virtual bool isWhiteAtBottom() const;
     virtual bool isBlackAtBottom() const;
@@ -91,11 +93,11 @@ protected:
 
     MBoardView *m_view; /*< A reference to the board view. >*/
     MGameLog *m_log; /*< A reference to the game log. >*/
-    MGraphicsBoardItem *m_board_item; /* A container for all pieces in the
+    MGraphicsBoardItem *m_board; /* A container for all pieces in the
         scene graph, useful for coord mapping. >*/
-    MGameStore *m_game_store; /*< A reference to the game store, owned by
+    MGameStore *m_store; /*< A reference to the game store, owned by
         this class. >*/
-    MDashboardItem *m_current_dashboard; /*< A reference to the dashboard of
+    MDashboardItem *m_dashboard; /*< A reference to the dashboard of
         the currently moving player. >*/
 
 private:

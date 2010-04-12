@@ -49,7 +49,7 @@ public:
 
 protected:
     virtual void setupDashboard();
-    virtual void startTurn(const MPosition &position, MDashboardItem *const dashboard);
+    virtual void startTurn(const MPosition &position);
 
 private:
     void connectDashboards(MDashboardItem *const first, MDashboardItem *const second);
