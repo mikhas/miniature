@@ -19,11 +19,6 @@
  */
 
 #include <pregame.h>
-#include <game.h>
-#include <local_game.h>
-
-#include <QtCore>
-#include <QtGui>
 
 using namespace Miniature;
 
@@ -75,58 +70,42 @@ onStartScreenRequested()
 }
 
 void MPreGame::
-onNewGameRequested()
+setupGame(QWidget *const source, QMainWindow *const window, MBoardView *const view, MGame *const game)
 {
-    // Prevent further signal emission.
-    QWidget *source = static_cast<QWidget *>(sender());
+    // Prevent further signal emission - we only want one game to be started!
     source->setEnabled(false);
 
-    QMainWindow *window = new QMainWindow(m_main_window);
-
-    MBoardView *view = new MBoardView(window);
-    MLocalGame *game = new Miniature::MLocalGame(view, m_log, window);
     game->newGame();
 
     MMainWindow::setupGameUi(window, view);
     window->show();
 
-    connect(window, SIGNAL(destroyed()), m_main_window, SLOT(show()));
+    connect(game, SIGNAL(destroyed()), window, SLOT(close()));
+    connect(game, SIGNAL(destroyed()), m_main_window, SLOT(show()));
 
     // Allow signal emission only after this window is gone.
     QSignalMapper *map = new QSignalMapper(window);
-    connect(window, SIGNAL(destroyed()), map, SLOT(map()));
-    map->setMapping(window, source);
+    connect(game, SIGNAL(destroyed()), map, SLOT(map()));
+    map->setMapping(game, source);
     connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
+}
+
+void MPreGame::
+onNewGameRequested()
+{
+    QMainWindow *window = new QMainWindow(m_main_window);
+    MBoardView *view = new MBoardView(window);
+    setupGame(static_cast<QWidget *>(sender()), window, view,
+              new MLocalGame(view, m_log, window));
 }
 
 void MPreGame::
 onNewP2PGameRequested()
 {
-    // Prevent further signal emission.
-    QWidget *source = static_cast<QWidget *>(sender());
-    source->setEnabled(false);
-
     QMainWindow *window = new QMainWindow(m_main_window);
-
-    //MBoardView *view = new MBoardView(window);
-
-    QMessageBox::critical(window, tr("Not implemented yet!"), tr("Sorry, but this feature is currently missing ..."));
-
-    //TODO: Activate me!
-    //MGame *game = new Miniature::MGame(view, window);
-    //game->newP2PGame();
-
-    //MMainWindow::setupGameUi(window, view);
-    //window->show();
-    //m_main_window->hide();
-
-    //connect(window, SIGNAL(destroyed()), m_main_window, SLOT(show()));
-
-    // Allow signal emission only after this window is gone.
-    //QSignalMapper *map = new QSignalMapper(window);
-    //connect(window, SIGNAL(destroyed()), map, SLOT(map()));
-    //map->setMapping(window, source);
-    //connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
+    MBoardView *view = new MBoardView(window);
+    setupGame(static_cast<QWidget *>(sender()), window, view,
+              new MNetworkGame(view, m_log, window));
 }
 
 void MPreGame::

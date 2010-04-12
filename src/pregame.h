@@ -18,9 +18,16 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <game.h>
 #include <game_log.h>
+#include <local_game.h>
+#include <network_game.h>
+
 #include <main.h>
 #include <iconic_button.h>
+
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
@@ -62,6 +69,8 @@ public Q_SLOTS:
     void onNewP2PGameRequested();
 
 private:
+    void setupGame(QWidget *const source, QMainWindow *const window, MBoardView *const view, MGame *const game);
+
     MGameLog *m_log;
     MMainWindow *m_main_window;
 

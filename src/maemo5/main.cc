@@ -94,6 +94,7 @@ void MMainWindow::setupPreGameUi(QMainWindow *window, QWidget *subview)
     window->setWindowTitle(tr("Miniature"));
     window->resize(800, 480);
 
+    window->setAttribute(Qt::WA_DeleteOnClose);
     window->setAttribute(Qt::WA_Maemo5StackedWindow);
     window->setAttribute(Qt::WA_Maemo5LandscapeOrientation, true);
 
