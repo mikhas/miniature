@@ -34,9 +34,6 @@ public:
     explicit MNetworkGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
     virtual ~MNetworkGame();
 
-public Q_SLOTS:
-    virtual void appendChatMessage(const QString &msg);
-
 protected:
     virtual void onWhiteToMove(const MPosition &position);
     virtual void onBlackToMove(const MPosition &position);

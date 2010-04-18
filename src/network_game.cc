@@ -40,13 +40,6 @@ MNetworkGame::
 {}
 
 void MNetworkGame::
-appendChatMessage(const QString &msg)
-{
-    m_view->getChatbox()->append(QString("%1\n").arg(msg));
-    m_log->append(QString("%1\n").arg(msg), MGameLog::CHAT);
-}
-
-void MNetworkGame::
 onWhiteToMove(const MPosition &position)
 {
     if (isWhiteAtBottom())

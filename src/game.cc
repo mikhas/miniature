@@ -188,6 +188,8 @@ void MGame::onSendMessageRequest(const QString &message)
 
     m_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
     m_view->getChatbox()->ensureCursorVisible();
+
+    m_log->append(QString("%1\n").arg(message), MGameLog::CHAT);
 }
 
 void MGame::endTurn()
