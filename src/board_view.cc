@@ -102,7 +102,9 @@ void MBoardView::enableAutoOrientationSupport()
     connect(QApplication::desktop(), SIGNAL(resized(int)),
             this,                    SLOT(onOrientationChanged()),
             Qt::UniqueConnection);
+
     static_cast<QMainWindow *>(parent())->setAttribute(Qt::WA_Maemo5AutoOrientation, true);
+    onOrientationChanged();
 }
 
 void MBoardView::applyPortraitLayout()

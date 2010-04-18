@@ -114,9 +114,6 @@ onNewP2PGameRequested()
     setupGame(static_cast<QWidget *>(sender()), window, view,
               new MNetworkGame(view, m_log, window));
 
-    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
-    view->applyPortraitLayout();
-
     view->enableAutoOrientationSupport();
 }
 
