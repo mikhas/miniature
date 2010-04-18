@@ -26,16 +26,8 @@
 #include <dashboard_item.h>
 #include <scene.h>
 
-#include <QGraphicsSvgItem>
-#include <QString>
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QHash>
-
-#include <QPainter>
-#include <QWebPage>
-#include <QWebFrame>
-#include <QImage>
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
@@ -121,7 +113,6 @@ protected:
     virtual void drawBackground(QPainter *painter, const QRectF &region);
 
 private Q_SLOTS:
-    void onLoadFinished(bool ok);
     void startNewMessage();
     void onNewMessage();
     void onNewlineInMessage();
@@ -132,11 +123,7 @@ private:
     void setup();
     void setupShortcuts();
 
-    QWebPage* m_background_page;
-    QImage* m_background_image;
-
     const int m_board_item_offset;
-
     MGraphicsBoardItem *m_board_item; /*!< The board itself. >*/
     MDashboardItem *m_bottom_dashboard; /*!< The bottom player's dashboard item. >*/
     MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/

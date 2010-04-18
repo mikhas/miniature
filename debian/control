@@ -5,8 +5,7 @@ Maintainer: Michael Hasselmann <michael@taschenorakel.de>
 Uploaders: Mathias Hasselmann <mathias.hasselmann@maemo.org>
 Build-Depends: debhelper (>= 5.0.0), cdbs,
  libqt4-dev, libqt4-dbus,
- libqt4-network, libqt4-phonon, libqt4-svg,
- libqt4-webkit, libqt4-xmlpatterns, libqt4-opengl,
+ libqt4-network, libqt4-svg, libqt4-opengl,
  osso-af-settings (>= 0.9.2), libgconf2-dev, libsqlite3-dev,
  desktop-file-utils
 Standards-Version: 3.7.2

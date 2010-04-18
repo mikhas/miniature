@@ -18,7 +18,7 @@ AC_LANG([C++])
 # and we want the configure check to complain when they are missing.
 # TODO: how to remove the opengl dependency when configured without opengl?
 # TODO: how to remove the maemo5 dependency when not on Maemo 5?
-AT_WITH_QT([core dbus gui network svg webkit phonon xmlpatterns opengl maemo5],[debug no_keywords])
+AT_WITH_QT([core dbus gui network svg opengl maemo5],[debug no_keywords])
 AT_REQUIRE_QT_VERSION([4.6])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])

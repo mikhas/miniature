@@ -20,8 +20,7 @@
 
 #include "board_view.h"
 
-#include <QtCore>
-#include <QtGui>
+#include <QtSvg/QSvgRenderer>
 
 #ifdef HAVE_MINIATURE_OPENGL
   #include <QGLWidget>
@@ -41,8 +40,6 @@ namespace
 
 MBoardView::MBoardView(QMainWindow *parent)
 : QGraphicsView(parent),
-  m_background_page(new QWebPage),
-  m_background_image(0),
   m_board_item_offset(160),
   m_board_item(0),
   m_bottom_dashboard(0),
@@ -61,9 +58,6 @@ MBoardView::MBoardView(QMainWindow *parent)
     connect(cancel, SIGNAL(activated()),
             s,      SLOT(resetModalItem()));
 
-    connect(m_background_page, SIGNAL(loadFinished(bool)),
-            this, SLOT(onLoadFinished(bool)));
-
     setup();
     setupShortcuts();
 
@@ -76,48 +70,31 @@ MBoardView::MBoardView(QMainWindow *parent)
 }
 
 MBoardView::~MBoardView()
-{
-    delete m_background_image;
-}
+{}
 
 void  MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 {
-    if (m_background_page && m_background_image)
-    {
-        QPainter bg_painter(m_background_image);
-        m_background_page->mainFrame()->render(&bg_painter);
+    static QSvgRenderer bg(QString(":/boards/glossy.svg"), 0);
+    static QImage img = QImage(QSize(480, 480), QImage::Format_ARGB32_Premultiplied);
 
-        // Get rid of the QWebkit stuff, it seems to slow down mouse event
-        // handling for us even when invisible!
-        delete m_background_page;
-        m_background_page = 0;
-    }
+    QPainter bg_painter(&img);
+    bg.render(&bg_painter);
 
-    if (m_background_image)
-    {
-        painter->drawImage(region,
-                           *m_background_image,
-                           QRectF(region.x(),
-                                  region.y() - m_board_item_offset,
-                                  region.width(),
-                                  region.height()));
-    }
+    painter->drawImage(region, img, QRectF(region.x(),
+                                           region.y() - (width() <= height() ? m_board_item_offset : 0),
+                                           region.width(),
+                                           region.height()));
 }
 
 void MBoardView::setup()
 {
-    QPalette palette = m_background_page->palette();
-    palette.setColor(QPalette::Base, Qt::transparent);
-    m_background_page->setPalette(palette);
-
-    m_background_page->mainFrame()->load(QUrl("qrc:/boards/glossy.svg"));
-
 #ifdef HAVE_MINIATURE_OPENGL
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
+    update();
 }
 
 void MBoardView::enableAutoOrientationSupport()
@@ -198,8 +175,6 @@ void MBoardView::applyLandscapeLayout()
 
 void MBoardView::startNewMessage()
 {
-    qDebug() << "bottom dashboard pos = " << m_bottom_dashboard->pos();
-    qDebug() << "width = " << width() << ", height = " << height();
     if (width() <= height())
         applyLandscapeLayout();
 
@@ -325,20 +300,10 @@ void MBoardView::addBoard(MGraphicsBoardItem *item)
     scene()->addItem(m_board_item);
 }
 
-void MBoardView::onLoadFinished(bool /*ok*/)
-{
-    m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
-    m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32_Premultiplied);
-    update(); // schedule a redraw
-}
-
 void MBoardView::onNewMessage()
 {
     if (!m_message)
         return;
-
-    qDebug() << "onNewMessage ...";
-    qDebug() << "chatbox pos " << m_chatbox->pos();
 
     QTextEdit *edit = static_cast<QTextEdit *>(m_message->widget());
     QString msg = edit->toPlainText().trimmed();
