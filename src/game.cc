@@ -35,6 +35,9 @@ MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
     Q_CHECK_PTR(m_view);
     Q_CHECK_PTR(m_log);
 
+    connect(m_view, SIGNAL(sendMessageRequest(QString)),
+            this,   SLOT(onSendMessageRequest(QString)));
+
     connect(m_store, SIGNAL(whiteToMove(MPosition)),
             this,         SLOT(onWhiteToMove(MPosition)));
 
@@ -177,6 +180,14 @@ void MGame::onInvalidTargetSelected()
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->flash();
+}
+
+void MGame::onSendMessageRequest(const QString &message)
+{
+    Q_CHECK_PTR(m_view);
+
+    m_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
+    m_view->getChatbox()->ensureCursorVisible();
 }
 
 void MGame::endTurn()

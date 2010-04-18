@@ -70,6 +70,7 @@ private Q_SLOTS: // can be overriden even with public inheritance:
     virtual void onMoveConfirmationRequested();
     virtual void onConfirmButtonPressed();
     virtual void onInvalidTargetSelected();
+    virtual void onSendMessageRequest(const QString &message);
 
 protected:
     virtual void endTurn();
