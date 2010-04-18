@@ -65,10 +65,6 @@ MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
   m_actions(new mActions(this)),
   m_session(QDBusConnection::sessionBus())
 {
-    // TODO: query orientation before
-    //setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
-    //setAttribute(Qt::WA_Maemo5LandscapeOrientation, false);
-
     if (!m_session.registerService(dbus_service_name))
     {
         qWarning("Cannot register D-Bus service. Trying to activate other instance.");
@@ -101,33 +97,20 @@ void MMainWindow::setupPreGameUi(QMainWindow *window, QWidget *subview)
     window->setCentralWidget(subview);
 }
 
-void MMainWindow::setupGameUi(QMainWindow *window, QGraphicsView *subview)
+void MMainWindow::setupGameUi(QMainWindow *main, QGraphicsView *view)
 {
-    window->setWindowTitle(tr("Miniature"));
-    window->resize(480, 800);
+    main->setWindowTitle(tr("Miniature"));
+    main->setAttribute(Qt::WA_DeleteOnClose);
+    main->setAttribute(Qt::WA_Maemo5StackedWindow);
+    main->setWindowState(view->windowState() | Qt::WindowFullScreen);
+    main->setCentralWidget(view);
 
-    window->setAttribute(Qt::WA_DeleteOnClose);
-    window->setAttribute(Qt::WA_Maemo5StackedWindow);
-    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
-    window->setWindowState(window->windowState() | Qt::WindowFullScreen);
-
-    QWidget *central = new QWidget(window);
-    window->setCentralWidget(central);
-
-    QVBoxLayout *vbox = new QVBoxLayout(central);
-    vbox->setContentsMargins(0, 0, 0, 0);
-
-    QSizePolicy v_expand(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    subview->setSizePolicy(v_expand);
-    subview->setMinimumSize(QSize(480, 800));
-    subview->setFrameShape(QFrame::NoFrame);
-    subview->setLineWidth(0);
-    subview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    subview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    vbox->addWidget(subview);
-
-    QSpacerItem *v_spacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    vbox->addItem(v_spacer);
+    QSizePolicy no_expand(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    view->setSizePolicy(no_expand);
+    view->setFrameShape(QFrame::NoFrame);
+    view->setLineWidth(0);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 void MMainWindow::registerActions()

@@ -94,6 +94,8 @@ void MPreGame::
 onNewGameRequested()
 {
     QMainWindow *window = new QMainWindow(m_main_window);
+    window->show();
+    m_main_window->hide();
     MBoardView *view = new MBoardView(window);
     setupGame(static_cast<QWidget *>(sender()), window, view,
               new MLocalGame(view, m_log, window));
@@ -103,7 +105,10 @@ void MPreGame::
 onNewP2PGameRequested()
 {
     QMainWindow *window = new QMainWindow(m_main_window);
+    window->show();
+    m_main_window->hide();
     MBoardView *view = new MBoardView(window);
+    view->enableAutoOrientationSupport();
     setupGame(static_cast<QWidget *>(sender()), window, view,
               new MNetworkGame(view, m_log, window));
 }
