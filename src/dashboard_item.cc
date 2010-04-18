@@ -60,6 +60,7 @@ MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent, Qt::WindowF
 {
     setEnabled(false);
     setupUi();
+    applyPortraitLayout();
     setTransformOriginPoint(width * 0.5, height * 0.5);
     show();
 }
@@ -72,6 +73,7 @@ void MDashboardItem::
 setupUi()
 {
     setPreferredSize(extent);
+    m_layout->setSpacing(0);
 
     // Maemo5-specific icons, handle press states by replacing pixmap, or have two pixmap per item?
     const int centered_width  = (width  - icon_size) * 0.5;
@@ -82,23 +84,16 @@ setupUi()
     m_requests_dialog->setPalette(palette);
     m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
     m_requests_dialog->setEnabled(false);
-    m_layout->addAnchor(this,              Qt::AnchorBottom,
-                        m_requests_dialog, Qt::AnchorBottom);
-
     m_requests_dialog->hide();
 
     m_game_dialog->setPalette(palette);
     m_game_dialog->setZValue(1);
     m_game_dialog->setEnabled(false);
-    m_layout->addAnchor(this,          Qt::AnchorBottom,
-                        m_game_dialog, Qt::AnchorBottom);
     m_game_dialog->hide();
 
     m_offers_dialog->setPalette(palette);
     m_offers_dialog->setZValue(1);
     m_offers_dialog->setEnabled(false);
-    m_layout->addAnchor(this,            Qt::AnchorBottom,
-                        m_offers_dialog, Qt::AnchorBottom);
     m_offers_dialog->hide();
 
     QFont font;
@@ -192,6 +187,32 @@ resetUi()
     m_confirm->restore();
     m_requests->restore();
     m_takeback->restore();
+}
+
+void MDashboardItem::
+applyPortraitLayout()
+{
+    m_layout->addAnchor(this,              Qt::AnchorBottom,
+                        m_requests_dialog, Qt::AnchorBottom);
+
+    m_layout->addAnchor(this,          Qt::AnchorBottom,
+                        m_game_dialog, Qt::AnchorBottom);
+
+    m_layout->addAnchor(this,            Qt::AnchorBottom,
+                        m_offers_dialog, Qt::AnchorBottom);
+}
+
+void MDashboardItem::
+applyLandscapeLayout()
+{
+    m_layout->addAnchor(this,              Qt::AnchorRight,
+                        m_requests_dialog, Qt::AnchorRight);
+
+    m_layout->addAnchor(this,          Qt::AnchorRight,
+                        m_game_dialog, Qt::AnchorRight);
+
+    m_layout->addAnchor(this,            Qt::AnchorRight,
+                        m_offers_dialog, Qt::AnchorRight);
 }
 
 

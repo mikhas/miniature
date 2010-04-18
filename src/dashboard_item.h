@@ -73,6 +73,9 @@ Q_SIGNALS:
     void showGameLogButtonPressed(); /*!< the player wants to see the game log >*/
 
 public Q_SLOTS:
+    void applyPortraitLayout();
+    void applyLandscapeLayout();
+
     void enableConfirmButton();
     void disableConfirmButton();
 
