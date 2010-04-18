@@ -99,6 +99,9 @@ onNewGameRequested()
     MBoardView *view = new MBoardView(window);
     setupGame(static_cast<QWidget *>(sender()), window, view,
               new MLocalGame(view, m_log, window));
+
+    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    view->applyPortraitLayout();
 }
 
 void MPreGame::
@@ -108,9 +111,13 @@ onNewP2PGameRequested()
     window->show();
     m_main_window->hide();
     MBoardView *view = new MBoardView(window);
-    view->enableAutoOrientationSupport();
     setupGame(static_cast<QWidget *>(sender()), window, view,
               new MNetworkGame(view, m_log, window));
+
+    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    view->applyPortraitLayout();
+
+    view->enableAutoOrientationSupport();
 }
 
 void MPreGame::

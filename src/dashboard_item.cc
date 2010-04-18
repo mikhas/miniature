@@ -30,9 +30,13 @@ using namespace Miniature;
 namespace
 {
 
-const int width = 480;
-const int height = 160;
-const QSize extent = QSize(width, height);
+const int portrait_width = 480;
+const int portrait_height = 160;
+
+const int landscape_width = 320;
+const int landscape_height = 240;
+
+const QSize extent = QSize(portrait_width, portrait_height);
 
 const int col_left_width = 120;
 const int col_right_width = 120;
@@ -44,9 +48,8 @@ const QColor flash_color = QColor(Qt::red);
 }
 
 MDashboardItem::
-MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent, Qt::WindowFlags flags)
-: QGraphicsWidget(parent, flags),
-  m_layout(layout),
+MDashboardItem(QGraphicsItem *parent)
+: QGraphicsObject(parent),
   m_confirm(0),
   m_requests(0),
   m_takeback(0),
@@ -61,7 +64,7 @@ MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent, Qt::WindowF
     setEnabled(false);
     setupUi();
     applyPortraitLayout();
-    setTransformOriginPoint(width * 0.5, height * 0.5);
+    setTransformOriginPoint(portrait_width * 0.5, portrait_height * 0.5);
     show();
 }
 
@@ -72,12 +75,12 @@ MDashboardItem::
 void MDashboardItem::
 setupUi()
 {
-    setPreferredSize(extent);
-    m_layout->setSpacing(0);
-
     // Maemo5-specific icons, handle press states by replacing pixmap, or have two pixmap per item?
-    const int centered_width  = (width  - icon_size) * 0.5;
-    const int centered_height = 40 + ((height - icon_size - 40) * 0.5); // there is a 1st row w/ 40 pixels.
+    const int centered_portrait_width  = (portrait_width  - icon_size) * 0.5;
+    const int centered_portrait_height = 40 + ((portrait_height - icon_size - 40) * 0.5); // there is a 1st row w/ 40 pixels.
+
+    const int centered_landscape_width = (landscape_width - icon_size) * 0.5;
+    //const int centered_landscape_height = 40 + ((landscape_height - icon_size -40) * 0.5);
 
     QPalette palette;
     palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
@@ -108,12 +111,16 @@ setupUi()
     m_status->setFont(font);
     m_status->setDefaultTextColor(QColor(Qt::black));
     m_status->setTextInteractionFlags(Qt::NoTextInteraction);
-    m_status->setTextWidth(width - col_left_width - col_right_width);
+    m_status->setTextWidth(portrait_width - col_left_width - col_right_width);
     m_status->setPos(QPoint(col_left_width, 0)); // below the board, centered
+
+    m_portrait[m_status]  = MLayout(m_status);
+    m_landscape[m_status] = MLayout(QPointF((landscape_width - m_status->textWidth()) * 0.5,
+                                            landscape_height - m_status->boundingRect().height()));
 
     QGraphicsRectItem *rect_status = new QGraphicsRectItem(m_status);
     rect_status->setFlags(QGraphicsItem::ItemStacksBehindParent);
-    rect_status->setRect(QRect(0, 0, width - col_left_width - col_right_width, 40));
+    rect_status->setRect(QRect(0, 0, portrait_width - col_left_width - col_right_width, 40));
     rect_status->setBrush(QBrush(Qt::yellow)); // TODO: how to get the notification bg color?
     rect_status->show();
 
@@ -129,42 +136,57 @@ setupUi()
     m_last_moves->setDefaultTextColor(QColor(Qt::white));
     m_last_moves->setTextInteractionFlags(Qt::NoTextInteraction);
     m_last_moves->setTextWidth(col_right_width);
-    m_last_moves->setPos(QPoint(width - col_right_width, 0)); // below the board, right-aligned
+    m_last_moves->setPos(QPoint(portrait_width - col_right_width, 0)); // below the board, right-aligned
 
-    m_confirm = new MDashboardButton(QPoint(centered_width - 16, centered_height - 16),
+    m_confirm = new MDashboardButton(QPoint(centered_portrait_width - 16, centered_portrait_height - 16),
                                      QPixmap(":/icons/96x96/play.png"),
                                      QPixmap(":/icons/96x96/play-inactive.png"),
                                      QPixmap(":/icons/96x96/play-pressed.png"),
                                      QPixmap(":/icons/96x96/play-flash.png"),
                                      this);
+
+    m_portrait[m_confirm]  = MLayout(m_confirm);
+    m_landscape[m_confirm] = MLayout(QPointF(centered_landscape_width - 16, landscape_height - 96 - 40 - 16));
+
     m_confirm->setActive(false);
 
     // right-aligned
-    m_requests = new MDashboardButton(QPoint(width - icon_size - col_right_width, centered_height),
+    m_requests = new MDashboardButton(QPoint(portrait_width - icon_size - col_right_width, centered_portrait_height),
                                       QPixmap(":/icons/64x64/stop.png"),
                                       QPixmap(":/icons/64x64/stop-inactive.png"),
                                       QPixmap(":/icons/64x64/stop-pressed.png"),
                                       QPixmap(":/icons/64x64/stop-flash.png"),
                                       this);
+
+    m_portrait[m_requests]  = MLayout(m_requests);
+    m_landscape[m_requests] = MLayout(QPointF(landscape_width - icon_size - 16, landscape_height - icon_size - 32 - 40));
+
     m_requests->setActive(false);
 
     // left-aligned
-    m_takeback = new MDashboardButton(QPoint(col_left_width, centered_height),
+    m_takeback = new MDashboardButton(QPoint(col_left_width, centered_portrait_height),
                                       QPixmap(":/icons/64x64/rewind.png"),
                                       QPixmap(":/icons/64x64/rewind-inactive.png"),
                                       QPixmap(":/icons/64x64/rewind-pressed.png"),
                                       QPixmap(":/icons/64x64/rewind-flash.png"),
                                       this);
+
+    m_portrait[m_takeback]  = MLayout(m_takeback);
+    m_landscape[m_takeback] = MLayout(QPointF(16, landscape_height - icon_size - 32 - 40));
+
     m_takeback->setActive(false); // TODO: not implemented yet
 
     QPixmap *avatar = getContactsAvatar(QString("qgil"));
     QPixmap empty;
     if (avatar)
-        m_avatar = new MDashboardButton(QPoint(10, centered_height),
+        m_avatar = new MDashboardButton(QPoint(10, centered_portrait_height),
                                         *avatar, *avatar, *avatar, *avatar, this, 0);
     else
-       m_avatar = new MDashboardButton(QPoint(10, centered_height),
+       m_avatar = new MDashboardButton(QPoint(10, centered_portrait_height),
                                        empty, empty, empty, empty, this, 0);
+
+    m_portrait[m_avatar]  = MLayout(m_avatar);
+    m_landscape[m_avatar] = MLayout(QPointF(16, landscape_height - (96 + icon_size + 32 + 40)));
 
     // now that the buttons exist we can connect their signals (or rather, forward them)
     connect(m_confirm, SIGNAL(pressed()), this, SIGNAL(confirmButtonPressed()));
@@ -192,27 +214,21 @@ resetUi()
 void MDashboardItem::
 applyPortraitLayout()
 {
-    m_layout->addAnchor(this,              Qt::AnchorBottom,
-                        m_requests_dialog, Qt::AnchorBottom);
-
-    m_layout->addAnchor(this,          Qt::AnchorBottom,
-                        m_game_dialog, Qt::AnchorBottom);
-
-    m_layout->addAnchor(this,            Qt::AnchorBottom,
-                        m_offers_dialog, Qt::AnchorBottom);
+    MLayout::applyToItem(m_status, m_portrait);
+    MLayout::applyToItem(m_confirm, m_portrait);
+    MLayout::applyToItem(m_requests, m_portrait);
+    MLayout::applyToItem(m_takeback, m_portrait);
+    MLayout::applyToItem(m_avatar, m_portrait);
 }
 
 void MDashboardItem::
 applyLandscapeLayout()
 {
-    m_layout->addAnchor(this,              Qt::AnchorRight,
-                        m_requests_dialog, Qt::AnchorRight);
-
-    m_layout->addAnchor(this,          Qt::AnchorRight,
-                        m_game_dialog, Qt::AnchorRight);
-
-    m_layout->addAnchor(this,            Qt::AnchorRight,
-                        m_offers_dialog, Qt::AnchorRight);
+    MLayout::applyToItem(m_status, m_landscape);
+    MLayout::applyToItem(m_confirm, m_landscape);
+    MLayout::applyToItem(m_requests, m_landscape);
+    MLayout::applyToItem(m_takeback, m_landscape);
+    MLayout::applyToItem(m_avatar, m_landscape);
 }
 
 
@@ -236,6 +252,16 @@ getContactsAvatar(const QString &nick)
     return pixmap;
 }
 
+bool MDashboardItem::
+isPortraitModeEnabled() const
+{
+    if (!scene())
+        return true; // wild guess
+
+    return (scene()->width() < scene()->height());
+}
+
+
 void MDashboardItem::
 showConfirmationDialog(const QString &title, QPushButton *button)
 {
@@ -244,7 +270,7 @@ showConfirmationDialog(const QString &title, QPushButton *button)
     if (!m_offers_dialog->widget())
     {
         QWidget *dialog = new QWidget;
-        dialog->resize(width, height);
+        dialog->resize(portrait_width, portrait_height);
 
         QVBoxLayout *vbox = new QVBoxLayout;
         dialog->setLayout(vbox);
@@ -284,7 +310,7 @@ showEndGameUi()
     // Show a single button to end the game
     QGraphicsProxyWidget *dialog_proxy = new QGraphicsProxyWidget(this);
     QWidget *dialog = new QWidget;
-    dialog->resize(width, height - 60);
+    dialog->resize(portrait_width, portrait_height - 60);
     dialog_proxy->setWidget(dialog);
 
     // Need to manually transform proxy widgets, since the parent is a QGraphicsWidget
@@ -307,7 +333,7 @@ showEndGameUi()
 QRectF MDashboardItem::
 boundingRect() const
 {
-    return QRectF(QPoint(0,0), QPoint(width, height));
+    return QRectF(QPoint(0,0), QPoint(portrait_width, portrait_height));
 }
 
 // MDashboardItem public Q_SLOTS:
@@ -352,7 +378,7 @@ showRequestsMenu()
     if(!m_requests_dialog->widget())
     {
         QWidget *dialog = new QWidget;
-        dialog->resize(width, height + 60);
+        dialog->resize(portrait_width, portrait_height + 60);
 
         QVBoxLayout *vbox = new QVBoxLayout;
         dialog->setLayout(vbox);
@@ -365,8 +391,8 @@ showRequestsMenu()
         vbox->addWidget(grid_widget);
 
         QGridLayout *grid = new QGridLayout;
-        grid->setColumnMinimumWidth(0, width * 0.5 - 12);
-        grid->setColumnMinimumWidth(1, width * 0.5 - 12);
+        grid->setColumnMinimumWidth(0, portrait_width * 0.5 - 12);
+        grid->setColumnMinimumWidth(1, portrait_width * 0.5 - 12);
         grid_widget->setLayout(grid);
 
         QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
@@ -407,7 +433,7 @@ showGameMenu()
     if(!m_game_dialog->widget())
     {
         QWidget *dialog = new QWidget;
-        dialog->resize(width, height);
+        dialog->resize(portrait_width, portrait_height);
 
         QVBoxLayout *vbox = new QVBoxLayout;
         dialog->setLayout(vbox);

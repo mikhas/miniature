@@ -24,14 +24,8 @@
 
 #include "position.h"
 
-#include <QGraphicsItem>
-#include <QGraphicsWidget>
-#include <QGraphicsSvgItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsSceneMouseEvent>
-#include <QUrl>
-#include <QVector>
-#include <QPainter>
+#include <QtCore>
+#include <QtGui>
 
 namespace Miniature
 {
@@ -42,12 +36,12 @@ namespace Miniature
  * We use the QGraphicsObject so that we can use signals and slots.
  */
 class MGraphicsBoardItem
-: public QGraphicsWidget
+: public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    MGraphicsBoardItem(int size = 480, QGraphicsItem *parent = 0, Qt::WindowFlags flags = Qt::Widget);
+    MGraphicsBoardItem(int size = 480, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
 
     // TODO: rename to cellSize(), more qt-ish

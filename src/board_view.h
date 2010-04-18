@@ -57,7 +57,7 @@ public:
         ALIGN_TOP    = 1
     };
 
-    explicit MBoardView(QWidget *parent = 0);
+    explicit MBoardView(QMainWindow *parent = 0);
     virtual ~MBoardView();
 
     /*!
@@ -126,11 +126,12 @@ private Q_SLOTS:
     void onNewMessage();
     void onNewlineInMessage();
     void onOrientationChanged();
+    void destroyMessage();
 
 private:
     void setup();
+    void setupShortcuts();
 
-    QGraphicsWidget *m_central;
     QWebPage* m_background_page;
     QImage* m_background_image;
 
@@ -141,6 +142,8 @@ private:
     MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/
     QGraphicsProxyWidget *m_chatbox; /*!< The player's chatbox (not useful for local games). >*/
     QGraphicsProxyWidget *m_message; /*!< The player's text edit for writing a new chat message. >*/
+    QShortcut *m_new_message_shortcut; /*!< Shortcut to send a new message.  >*/
+    QShortcut *m_newline_shortcut; /*! Shortcut to enter a newline in a message. >*/
 };
 
 }; // namespace Miniature

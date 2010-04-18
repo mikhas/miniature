@@ -69,7 +69,7 @@ setModalItem(QGraphicsItem *item)
     }
 
     m_modal_item = item;
-    setFocusItem(m_modal_item, Qt::MouseFocusReason);
+    setFocusItem(m_modal_item);
 
     QGraphicsView *view = views()[0];
     if (m_modal_item && view)
@@ -90,21 +90,12 @@ resetModalItem()
 void MScene::
 keyPressEvent(QKeyEvent *event)
 {
-    switch(event->key())
+    // Assume that only those 3 keys are useful for a focus-in:
+    if (!focusItem() && (event->key() & (Qt::Key_Return | Qt::Key_Enter | Qt::Key_Space)))
     {
-        // Assume that only those 3 keys are useful for a focus-in:
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
-        case Qt::Key_Space:
-            // Allow other components to intercept a key press event if there is no focused item:
-            if (!focusItem())
-            {
-                Q_EMIT focusInOnKeyPressed();
-                return;
-            }
-
-        default:
-            break;
+        // Allow other components to intercept a key press event if there is no focused item:
+        Q_EMIT focusInOnKeyPressed();
+        return;
     }
 
     QGraphicsScene::keyPressEvent(event);

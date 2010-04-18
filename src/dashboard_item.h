@@ -33,12 +33,12 @@ class MDashboardButton;
  *  controls. It replaces the former mActionAreas.
  */
 class MDashboardItem
-: public QGraphicsWidget
+: public QGraphicsObject
 {
     Q_OBJECT
 
 public:
-    explicit MDashboardItem(QGraphicsAnchorLayout *layout, QGraphicsItem *parent = 0, Qt::WindowFlags flags = Qt::Widget);
+    explicit MDashboardItem(QGraphicsItem *parent = 0);
     virtual ~MDashboardItem();
 
     /*!
@@ -112,6 +112,42 @@ protected:
     virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
 
 private:
+    class MLayout;
+    typedef QMap<QGraphicsItem *, MLayout> MLayoutCache;
+
+    // TODO: move impl out of header, if this class proves to be useful.
+    class MLayout
+    {
+    public:
+        explicit MLayout(const QPointF &origin = QPointF(), const QPointF &extent = QPointF())
+            : m_origin(origin),
+              m_extent(extent)
+        {}
+
+        explicit MLayout(QGraphicsItem *const item)
+            : m_origin(item->pos()),
+              m_extent(item->boundingRect().bottomRight()) {}
+
+        virtual ~MLayout() {}
+
+        static void applyToItem(QGraphicsItem *const item, const MLayoutCache &cache)
+        {
+            const MLayout layout = cache.value(item, MLayout());
+            item->setPos(layout.m_origin);
+        }
+
+        static void applyToWidget(QGraphicsProxyWidget *const widget, const MLayoutCache &cache)
+        {
+            const MLayout layout = cache.value(widget, MLayout());
+            widget->setPos(layout.m_origin);
+            widget->resize(layout.m_extent.x(), layout.m_extent.y());
+        }
+
+        QPointF m_origin;
+        QPointF m_extent;
+    };
+
+
     /*!
      *  Helper method to create the acceptance dialogs when sth. was offered.
      *  @param[in] title the title of the dialog
@@ -132,6 +168,9 @@ private:
      */
     QPixmap * getContactsAvatar(const QString &nick);
 
+    //! Checks for orientation depending on scene:
+    bool isPortraitModeEnabled() const;
+
     QGraphicsAnchorLayout* m_layout; /*!< The graphics layout for all UI elements. */
     MDashboardButton *m_confirm; /*!< The 'play' button that needs to be pressed to confirm a move. */
     MDashboardButton *m_requests; /*!< The 'stop' button to request some sort of game resolution, by negotiation. */
@@ -143,6 +182,8 @@ private:
     QGraphicsTextItem *m_status; /*!< The status label below (ontop) the board. */
     QPropertyAnimation *m_status_anim; /*!< The fade out animation for the status label. */
     QGraphicsTextItem *m_last_moves; /*!< The text item that shows the last n moves of a player. */
+    MLayoutCache m_portrait;  /*!< Stores all item positions for portrait mode. */
+    MLayoutCache m_landscape; /*!< Stores all item positions for landscape mode. */
 };
 
 } // namespace Miniature

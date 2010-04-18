@@ -186,6 +186,7 @@ void MGame::onSendMessageRequest(const QString &message)
 {
     Q_CHECK_PTR(m_view);
 
+    qDebug() << "onSendMessageReq: " << message;
     m_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
     m_view->getChatbox()->ensureCursorVisible();
 }
