@@ -20,12 +20,8 @@
 
 #include "board_view.h"
 
-#include <QPixmap>
-#include <QUrl>
-#include <QPoint>
-#include <QPainter>
-#include <QImage>
-#include <QGraphicsProxyWidget>
+#include <QtCore>
+#include <QtGui>
 
 #ifdef HAVE_MINIATURE_OPENGL
   #include <QGLWidget>
@@ -36,9 +32,11 @@ using namespace Miniature;
 namespace
 {
 
-    const QSize extent = QSize(480, 800);
-    const QSize chatbox_extent = QSize(480, 160);
-
+    const QSize extent_portrait  = QSize(480, 800);
+    const QSize extent_landscape = QSize(800, 480);
+    const QSize extent_scene     = QSize(extent_landscape.width(), extent_portrait.height());
+    const QSize extent_chatbox   = QSize(480, 160);
+    const int text_edit_line_height = 64; // TODO: find out how to query this.
 }
 
 MBoardView::MBoardView(QWidget *parent)
@@ -47,22 +45,26 @@ MBoardView::MBoardView(QWidget *parent)
   m_background_page(new QWebPage),
   m_background_image(0),
   m_board_item_offset(160),
+  m_board_item(0),
   m_bottom_dashboard(0),
   m_top_dashboard(0),
-  m_chatbox(0)
+  m_chatbox(0),
+  m_message(0)
 {
-    QGraphicsView::setScene(new MScene(this));
-    // Ignore the growing property of the scene graph and always only show a
-    // fixed area. Also, assume we run in fullscreen (therefore, only works for
-    // pub mode.).
-    // TODO: make this view reusable for other game modes, too.
-    setSceneRect(QRect(QPoint(0, 0), extent));
+    setStyleSheet("* {border: 6px solid green;}");
+    MScene *s = 0;
+    QGraphicsView::setScene(s = new MScene(this));
     scene()->addItem(m_central = new QGraphicsWidget(0, Qt::Widget));
-    m_central->setPreferredSize(extent);
 
-    QGraphicsAnchorLayout *layout = 0;
-    m_central->setLayout(layout = new QGraphicsAnchorLayout);
-    layout->setSpacing(0);
+    QShortcut *cancel = new QShortcut(this);
+    cancel->setKey(Qt::Key_Escape);
+
+    connect(cancel, SIGNAL(activated()),
+            s,      SLOT(resetModalItem()));
+
+    QGraphicsAnchorLayout *l = 0;
+    m_central->setLayout(l = new QGraphicsAnchorLayout);
+    l->setSpacing(0);
 
     connect(m_background_page, SIGNAL(loadFinished(bool)),
             this, SLOT(onLoadFinished(bool)));
@@ -82,13 +84,7 @@ MBoardView::~MBoardView()
     delete m_background_image;
 }
 
-void MBoardView::setScene(QGraphicsScene *scene)
-{
-    QGraphicsView::setScene(scene);
-    setup();
-}
-
-void MBoardView::drawBackground(QPainter *painter, const QRectF &region)
+void  MBoardView::drawBackground(QPainter *painter, const QRectF &region)
 {
     if (m_background_page && m_background_image)
     {
@@ -126,6 +122,134 @@ void MBoardView::setup()
 
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 #endif
+}
+
+void MBoardView::enableAutoOrientationSupport()
+{
+    setAttribute(Qt::WA_Maemo5AutoOrientation, true);
+    connect(QApplication::desktop(), SIGNAL(resized(int)),
+            this,                    SLOT(onOrientationChanged()),
+            Qt::UniqueConnection);
+}
+
+void MBoardView::applyPortraitLayout()
+{
+    Q_CHECK_PTR(m_central);
+    Q_CHECK_PTR(m_board_item);
+
+    Q_ASSERT_X((0 != m_bottom_dashboard || 0 != m_top_dashboard),
+               "applyPortraitLayout",
+               "No dashboards found - cannot apply layout!");
+
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    for (int idx = 0; idx < layout->count(); ++idx)
+        layout->removeAt(idx);
+
+    static_cast<QMainWindow *>(parent())->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    setMinimumSize(extent_portrait);
+    resize(extent_portrait);
+
+    scene()->setSceneRect(QRect(QPoint(0, 0), extent_portrait));
+    m_central->setPreferredSize(extent_portrait);
+
+    if (m_bottom_dashboard)
+    {
+        layout->addAnchor(m_bottom_dashboard, Qt::AnchorTop,
+                          m_board_item,       Qt::AnchorBottom);
+        m_bottom_dashboard->applyPortraitLayout();
+    }
+
+    if (m_top_dashboard)
+    {
+        layout->addAnchor(m_top_dashboard, Qt::AnchorBottom,
+                          m_board_item,    Qt::AnchorTop);
+        m_top_dashboard->applyPortraitLayout();
+    }
+
+    update();
+}
+
+void MBoardView::applyLandscapeLayout()
+{
+    Q_CHECK_PTR(m_central);
+    Q_CHECK_PTR(m_board_item);
+
+    Q_ASSERT_X((0 != m_bottom_dashboard || 0 != m_top_dashboard),
+               "applyLandscapeLayout",
+               "No dashboards found - cannot apply layout!");
+
+    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    for (int idx = 0; idx < layout->count(); ++idx)
+        layout->removeAt(idx);
+
+    static_cast<QMainWindow *>(parent())->setAttribute(Qt::WA_Maemo5LandscapeOrientation, true);
+    setMinimumSize(extent_landscape);
+    resize(extent_landscape);
+
+    scene()->setSceneRect(QRect(QPoint(0, 0), extent_landscape));
+    m_central->setPreferredSize(extent_landscape);
+
+    layout->addAnchor(m_board_item, Qt::AnchorLeft,
+                      layout,       Qt::AnchorLeft);
+    layout->addAnchor(m_board_item, Qt::AnchorTop,
+                      layout,       Qt::AnchorTop);
+    layout->addAnchor(m_board_item, Qt::AnchorBottom,
+                      layout,       Qt::AnchorBottom);
+
+    if (m_bottom_dashboard)
+    {
+        qDebug() << "bottom db found";
+        layout->addAnchor(m_bottom_dashboard, Qt::AnchorBottom,
+                          layout,             Qt::AnchorBottom);
+        layout->addAnchor(m_bottom_dashboard, Qt::AnchorRight,
+                          layout,             Qt::AnchorRight);
+        m_bottom_dashboard->applyLandscapeLayout();
+    }
+
+    if (m_top_dashboard)
+    {
+        qDebug() << "top db found";
+        layout->addAnchor(m_top_dashboard, Qt::AnchorTop,
+                          layout,          Qt::AnchorTop);
+        layout->addAnchor(m_top_dashboard, Qt::AnchorRight,
+                          layout,          Qt::AnchorRight);
+        m_top_dashboard->applyLandscapeLayout();
+    }
+
+    update();
+}
+
+void MBoardView::startNewMessage()
+{
+    setAttribute(Qt::WA_Maemo5LandscapeOrientation, true);
+    applyLandscapeLayout();
+
+    QTextEdit *edit = new QTextEdit;
+    edit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    edit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    QShortcut *new_message = new QShortcut(edit);
+    new_message->setKey(QKeySequence(QKeySequence::InsertParagraphSeparator));
+
+    QShortcut *newline = new QShortcut(edit);
+    newline->setKey(QKeySequence(QKeySequence::InsertLineSeparator));
+
+    connect(new_message, SIGNAL(activated()),
+            this,        SLOT(onNewMessage()));
+
+    connect(newline, SIGNAL(activated()),
+            this,    SLOT(onNewlineInMessage()));
+
+    if (m_message)
+        delete m_message;
+
+    m_message = new QGraphicsProxyWidget;
+    m_message->setWidget(edit);
+    m_message->resize(width(), text_edit_line_height);
+    scene()->addItem(m_message);
+    m_message->setPos(0, height() - text_edit_line_height);
+
+    static_cast<MScene *>(scene())->setModalItem(m_message);
 }
 
 void MBoardView::addDashboard(Alignment align)
@@ -175,49 +299,45 @@ MDashboardItem * MBoardView::getDashboard(Alignment align) const
 void MBoardView::addChatbox()
 {
     QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
-    QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget;
-    layout->addAnchor(proxy, Qt::AnchorTop, layout, Qt::AnchorTop);
 
-    delete m_chatbox;
-    m_chatbox = new QTextEdit;
-    /* does not work ...
-    QPalette palette;
-    m_chatbox->setBackgroundRole(QPalette::Window);
-    m_chatbox->setForegroundRole(QPalette::WindowText);
-    palette.setColor(m_chatbox->backgroundRole(), Qt::black);
-    palette.setColor(m_chatbox->foregroundRole(), Qt::white);
-    m_chatbox->setPalette(palette);
-    */
-    /* does not work, either ...
-    m_chatbox->setTextBackgroundColor(Qt::black);
-    m_chatbox->setTextColor(Qt::white);
-    */
+    if (m_chatbox)
+        delete m_chatbox;
 
+    m_chatbox = new QGraphicsProxyWidget;
+    m_chatbox->setPreferredSize(extent_chatbox);
+    layout->addAnchor(m_chatbox, Qt::AnchorTop, layout, Qt::AnchorTop);
+
+    QTextEdit *edit = new QTextEdit;
+    m_chatbox->setWidget(edit);
+    edit->setTextInteractionFlags(Qt::TextBrowserInteraction);
     // It's not my fault if this is the only thing that works, right?
-    m_chatbox->setStyleSheet("color: white; background: black; border:none; padding: 10px;");
+    edit->setStyleSheet("color: white; background: black; border:none; padding: 10px;");
 
-    proxy->setWidget(m_chatbox);
-    proxy->setPreferredSize(chatbox_extent);
+    // Enable typing of chat messages:
+    connect(static_cast<MScene *>(scene()), SIGNAL(focusInOnKeyPressed()),
+            this,                           SLOT(startNewMessage()),
+            Qt::UniqueConnection);
 }
 
 QTextEdit * MBoardView::getChatbox() const
 {
-    return m_chatbox;
+    return static_cast<QTextEdit *>(m_chatbox->widget());
 }
 
 void MBoardView::addBoard(MGraphicsBoardItem *item)
 {
+    Q_ASSERT_X((0 != item),
+               "addBoard",
+               "No board item specified, invalid view.");
+
     Q_ASSERT_X((0 != m_top_dashboard || 0 != m_bottom_dashboard),
                "addBoard",
                "No player's dashboard found, cannot attach board.");
 
-    QGraphicsAnchorLayout *layout = static_cast<QGraphicsAnchorLayout *>(m_central->layout());
+    delete m_board_item;
+    m_board_item = item;
 
-    if (m_top_dashboard)
-        layout->addAnchor(m_top_dashboard, Qt::AnchorBottom, item, Qt::AnchorTop);
-    else if (m_bottom_dashboard)
-        layout->addAnchor(m_bottom_dashboard, Qt::AnchorTop, item, Qt::AnchorBottom);
-
+    applyPortraitLayout();
 }
 
 void MBoardView::onLoadFinished(bool /*ok*/)
@@ -225,4 +345,38 @@ void MBoardView::onLoadFinished(bool /*ok*/)
     m_background_page->setViewportSize(m_background_page->mainFrame()->contentsSize());
     m_background_image = new QImage(m_background_page->mainFrame()->contentsSize(), QImage::Format_ARGB32_Premultiplied);
     update(); // schedule a redraw
+}
+
+void MBoardView::onNewMessage()
+{
+    enableAutoOrientationSupport();
+
+    QTextEdit *edit = static_cast<QTextEdit *>(m_message->widget());
+    QString msg = edit->toPlainText().trimmed();
+    if (!msg.isEmpty())
+        Q_EMIT sendMessageRequest(msg);
+
+    static_cast<MScene *>(scene())->resetModalItem();
+    m_message->close();
+}
+
+void MBoardView::onNewlineInMessage()
+{
+    if (m_message->boundingRect().height() + (2 * text_edit_line_height) < height())
+    {
+        m_message->resize(width(), m_message->boundingRect().height() + text_edit_line_height);
+        m_message->setPos(0, m_message->pos().y() - text_edit_line_height);
+    }
+
+    QTextEdit *edit = static_cast<QTextEdit *>(m_message->widget());
+    edit->insertPlainText("\n");
+    edit->ensureCursorVisible();
+}
+
+void MBoardView::onOrientationChanged()
+{
+    if (QApplication::desktop()->height() > QApplication::desktop()->width())
+        applyPortraitLayout();
+    else
+        applyLandscapeLayout();
 }

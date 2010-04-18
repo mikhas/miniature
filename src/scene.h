@@ -40,6 +40,7 @@ public:
     explicit MScene(const QRectF &region, QObject *parent = 0);
     virtual ~MScene();
 
+public Q_SLOTS:
     /*!
      *  In order to emulate the cancel behaviour of Maemo 5 we need to decide
      *  when to hide an "modal" item again. Here, it will be hidden once a
@@ -47,15 +48,17 @@ public:
      */
     void setModalItem(QGraphicsItem *item);
 
-    /*!
-     *  Convenience method for setModalItem(0).
-     */
+    //! Convenience method for setModalItem(0).
     void resetModalItem();
 
+Q_SIGNALS:
+    void focusInOnKeyPressed();
+
 protected:
-    /*!
-     *  Overriden to check against modal regions.
-     */
+    //! Overriden, emits a keyPressed signal.
+    virtual void keyPressEvent(QKeyEvent *event);
+
+    //! Overriden to check against modal regions.
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:

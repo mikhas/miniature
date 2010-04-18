@@ -61,14 +61,6 @@ public:
     virtual ~MBoardView();
 
     /*!
-     *  Overriden from QGraphicsView, performs the extra steps necessary
-     *  (setup of board background mainly).
-     *
-     *  @param[in] scene The scene graph instance to be shown in the view.
-     */
-    virtual void setScene(QGraphicsScene* scene);
-
-    /*!
      *  The board item is a special scene item, as it contains all MPieces and
      *  is also reponsible for related event propagation. This method also
      *  positions the the board item.
@@ -105,6 +97,19 @@ public:
      */
     QTextEdit * getChatbox() const;
 
+    /*!
+     *  Allows Miniature to switch between landscape and portrait mode,
+     *  depending on the device's rotation sensor and hardware keyboard status.
+     */
+    void enableAutoOrientationSupport();
+
+Q_SIGNALS:
+    void sendMessageRequest(const QString &message);
+
+public Q_SLOTS:
+    void applyPortraitLayout();
+    void applyLandscapeLayout();
+
 protected:
     /*!
      *  Overriden from QGraphicsView, enables background caching.
@@ -117,6 +122,10 @@ protected:
 
 private Q_SLOTS:
     void onLoadFinished(bool ok);
+    void startNewMessage();
+    void onNewMessage();
+    void onNewlineInMessage();
+    void onOrientationChanged();
 
 private:
     void setup();
@@ -127,9 +136,11 @@ private:
 
     const int m_board_item_offset;
 
+    MGraphicsBoardItem *m_board_item; /*!< The board itself. >*/
     MDashboardItem *m_bottom_dashboard; /*!< The bottom player's dashboard item. >*/
     MDashboardItem *m_top_dashboard; /*!< The top player's dashboard item. >*/
-    QTextEdit *m_chatbox; /*!< The player's chatbox (not useful for local games). >*/
+    QGraphicsProxyWidget *m_chatbox; /*!< The player's chatbox (not useful for local games). >*/
+    QGraphicsProxyWidget *m_message; /*!< The player's text edit for writing a new chat message. >*/
 };
 
 }; // namespace Miniature
