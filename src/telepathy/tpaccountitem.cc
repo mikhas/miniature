@@ -47,13 +47,21 @@ TpAccountItem::TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObj
 TpAccountItem::~TpAccountItem()
 {
     qDebug() << "TpAccountItem::~TpAccountItem()";
+
+    if(mAcc->haveConnection())
+        mAcc->disconnect();
 }
 
 void TpAccountItem::initialize()
 {
     qDebug() << "TpAccountItem::initialize()";
 
-    QObject::connect(mAcc->becomeReady(), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
+    Tp::Features features;
+    features << Tp::Account::FeatureCore
+            << Tp::Account::FeatureAvatar
+            << Tp::Account::FeatureProtocolInfo;
+
+    QObject::connect(mAcc->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
 }
 
 void TpAccountItem::onReady(Tp::PendingOperation *o)
@@ -66,12 +74,15 @@ void TpAccountItem::onReady(Tp::PendingOperation *o)
         return;
     }
 
+    QObject::connect(mAcc.data(), SIGNAL(connectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)),
+                     this, SLOT(onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)));
+
     Q_EMIT initialized();
 }
 
 QString TpAccountItem::getDisplayName()
 {
-    if(mAcc->isReady())
+    if(mAcc->isReady() && mAcc->isValid())
     {
         return mAcc->normalizedName();
     }
@@ -89,25 +100,40 @@ void TpAccountItem::ensureContactsList()
     }
     else
     {
-//        Tp::SimplePresence simplePresence = mAcc->currentPresence();
-//        simplePresence.type = Tp::ConnectionPresenceTypeAvailable;
-//        QObject::connect(mAcc->setRequestedPresence(simplePresence), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onAccountConnected(Tp::PendingOperation *)));
-
-        QObject::connect(mAcc->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onSetEnabledFinished(Tp::PendingOperation *)));
+        QObject::connect(mAcc->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onAccountSetEnabled(Tp::PendingOperation *)));
     }
 }
 
-void TpAccountItem::onSetEnabledFinished(Tp::PendingOperation *o)
+void TpAccountItem::onAccountSetEnabled(Tp::PendingOperation *o)
 {
-    qDebug() << "TpAccountItem::onSetEnabledFinished()";
+    qDebug() << "TpAccountItem::onAccountSetEnabled()";
 
     if(o->isError())
     {
-        qDebug() << "Account set enabled error";
+        qDebug() << "Account set enabled failed.";
         return;
     }
 
-    connectionReady();
+    QObject::connect(mAcc->setConnectsAutomatically(true), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onConnectsAutomatically(Tp::PendingOperation *)));
+}
+
+void TpAccountItem::onConnectsAutomatically(Tp::PendingOperation *o)
+{
+    qDebug() << "TpAccountItem::onConnectsAutomatically()";
+
+    if(o->isError())
+    {
+        qDebug() << "Account connection automatically failed.";
+        return;
+    }
+}
+
+void TpAccountItem::onConnectionStatusChanged(Tp::ConnectionStatus cs, Tp::ConnectionStatusReason)
+{
+    qDebug() << "TpAccountItem::onConnectionStatusChanged()";
+
+    if(Tp::ConnectionStatusConnected == cs && mAcc->haveConnection())
+        connectionReady();
 }
 
 void TpAccountItem::connectionReady()
@@ -153,6 +179,8 @@ void TpAccountItem::onConnectionReady(Tp::PendingOperation *o)
     {
         qDebug() << contact->id();
     }
+
+    Q_EMIT contactsForAccount(contactsList);
 }
 
 };

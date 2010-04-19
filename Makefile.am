@@ -87,6 +87,12 @@ src_miniature_SOURCES = \
 			src/telepathy/tpaccountlistmodel.h \
 			src/telepathy/tpaccountlistmodel.cc \
 			src/telepathy/tpaccountlistmodel.moc.cc \
+			src/telepathy/tpcontactslistmodel.h \
+			src/telepathy/tpcontactslistmodel.cc \
+			src/telepathy/tpcontactslistmodel.moc.cc \
+			src/pregame.cc \
+			src/pregame.h \
+			src/pregame.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5

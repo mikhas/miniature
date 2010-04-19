@@ -29,7 +29,8 @@
 namespace Miniature
 {
 
-AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f), m_accountListModel(NULL)
+AccountSelectionDlg::AccountSelectionDlg(QWidget *parent, Qt::WindowFlags f)
+    : QDialog(parent, f), m_accountListModel(NULL), m_contactsListModel(NULL)
 {
     qDebug() << "AccountSelectionDlg::AccountSelectionDlg()";
 
@@ -99,6 +100,12 @@ void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
 
     ui.listView->clearSelection();
 
+    if(m_contactsListModel == NULL)
+    {
+        m_contactsListModel = new TpContactsListModel();
+    }
+    ui.listView->setModel(m_contactsListModel);
+
     QString normalizedName = lastItemIndex.data().toString();
     qDebug() << "chooseAccountClicked normalizedName:" << normalizedName;
 
@@ -108,8 +115,14 @@ void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
             continue;
 
         acc->ensureContactsList();
-        // connect with backing contacts list
+
+        QObject::connect(acc.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SLOT(onContactsForAccount(const Tp::Contacts)));
     }
+}
+
+void AccountSelectionDlg::onContactsForAccount(const Tp::Contacts c)
+{
+    m_contactsListModel->setContacts(c);
 }
 
 void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)

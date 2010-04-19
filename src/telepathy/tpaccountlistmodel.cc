@@ -38,7 +38,6 @@ int TpAccountListModel::rowCount(const QModelIndex & /*parent*/) const
 
 QVariant TpAccountListModel::data(const QModelIndex & index, int role) const
 {
-
     if(index.isValid() && role == Qt::DisplayRole)
     {
         return QVariant(mAccounts[index.row()]->getDisplayName());

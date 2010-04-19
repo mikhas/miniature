@@ -26,6 +26,7 @@
 #include <QSharedPointer>
 
 #include <TelepathyQt4/Types>
+#include <TelepathyQt4/Connection>
 
 namespace Tp {
     class PendingOperation;
@@ -47,11 +48,14 @@ public:
 
 Q_SIGNALS:
     void initialized();
+    void contactsForAccount(const Tp::Contacts);
 
 private Q_SLOTS:
     void onReady(Tp::PendingOperation *);
-    void onSetEnabledFinished(Tp::PendingOperation *);
     void onConnectionReady(Tp::PendingOperation *);
+    void onAccountSetEnabled(Tp::PendingOperation *);
+    void onConnectsAutomatically(Tp::PendingOperation *);
+    void onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
 
 private:
     void connectionReady();

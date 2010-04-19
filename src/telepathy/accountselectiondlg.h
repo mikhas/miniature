@@ -28,7 +28,10 @@
 
 #include "tpaccountitem.h"
 #include "tpaccountlistmodel.h"
+#include "tpcontactslistmodel.h"
 #include "select_account.ui.h"
+
+#include <TelepathyQt4/Contact>
 
 namespace Miniature
 {
@@ -50,11 +53,13 @@ private Q_SLOTS:
     void listItemClicked(const QModelIndex &);
     void chooseAccountClicked(bool checked = false);
     void chooseContactClicked(bool checked = false);
+    void onContactsForAccount(const Tp::Contacts);
 
 private:
     QList<TpAccountItemPtr> mAccounts;
     Ui::SelectAccountDialog ui;
     TpAccountListModel *m_accountListModel;
+    TpContactsListModel *m_contactsListModel;
     QPersistentModelIndex lastItemIndex;
 };
 
