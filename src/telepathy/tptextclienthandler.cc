@@ -21,8 +21,6 @@
 
 #include "tptextclienthandler.h"
 #include "tphelpers.h"
-#include "tpoutgoingtube.h"
-#include "tpincomingtube.h"
 #include "tpchatsession.h"
 
 #include <TelepathyQt4/Constants>
@@ -33,7 +31,7 @@
 
 #include <QDBusVariant>
 
-namespace Miniature
+namespace TpGame
 {
 
 static inline Tp::ChannelClassList channelClassList()
@@ -47,7 +45,7 @@ static inline Tp::ChannelClassList channelClassList()
     return Tp::ChannelClassList() << Tp::ChannelClass(filter0);
 }
 
-TpTextClientHandler::TpTextClientHandler(QObject *parent)
+TextClientHandler::TextClientHandler(QObject *parent)
     : QObject(parent),
     Tp::AbstractClientHandler(channelClassList(), false)
 {
@@ -59,33 +57,33 @@ TpTextClientHandler::TpTextClientHandler(QObject *parent)
     Tp::registerTypes();
 }
 
-TpTextClientHandler::~TpTextClientHandler()
+TextClientHandler::~TextClientHandler()
 {
     qDebug() << "TpTextClientHandler::~TpTextClientHandler()";
 }
 
-bool TpTextClientHandler::bypassApproval() const
+bool TextClientHandler::bypassApproval() const
 {
     qDebug() << "TpTextClientHandler::bypassApproval()";
 
     return true;
 }
 
-void TpTextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> &context,
+void TextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> &context,
                                           const Tp::AccountPtr &account,
                                           const Tp::ConnectionPtr &connection,
-                                          const QList<Tp::ChannelPtr> &channels,
-                                          const QList<Tp::ChannelRequestPtr> &requestedSatisfied,
-                                          const QDateTime &userActionTime,
-                                          const QVariantMap &handlerInfo)
+                                          const ChannelList &channels,
+                                          const ChannelRequestList &requested_satisfied,
+                                          const QDateTime &user_action_time,
+                                          const QVariantMap &handler_info)
 {
     qDebug() << "TpTextClientHandler::handleChannels()";
-    
+
     Q_UNUSED(account);
     Q_UNUSED(connection);
-    Q_UNUSED(requestedSatisfied);
-    Q_UNUSED(userActionTime);
-    Q_UNUSED(handlerInfo);
+    Q_UNUSED(requested_satisfied);
+    Q_UNUSED(user_action_time);
+    Q_UNUSED(handler_info);
 
     if (channels.size() != 1) {
         // Not expected more than one channel here
@@ -95,14 +93,14 @@ void TpTextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> 
         return;
     }
 
-    Tp::ChannelPtr channel = channels[0];    
-    
+    Tp::ChannelPtr channel = channels[0];
+
     qDebug() << "!!! Channel: " << channel;
-    
+
     QVariantMap properties = channel->immutableProperties();
 
     qDebug() << "properties of the channel " << properties;
-    
+
     if(properties[TELEPATHY_INTERFACE_CHANNEL ".ChannelType"] ==
         TELEPATHY_INTERFACE_CHANNEL_TYPE_TEXT)
     {
@@ -116,15 +114,15 @@ void TpTextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> 
 
         qDebug() << "Handling step1:" << contactId;
 
-        QObject * parent = qobject_cast<QObject*>(account.data());        
-        TpChatSession * chatSession = new TpChatSession(parent, account);
+        QObject * parent = qobject_cast<QObject*>(account.data());
+        ChatSession * chatSession = new ChatSession(parent, account);
 
         Tp::TextChannelPtr textChannel =
-            Tp::TextChannelPtr(qobject_cast<Tp::TextChannel*>(channel.data()));        
+            Tp::TextChannelPtr(qobject_cast<Tp::TextChannel*>(channel.data()));
         chatSession->setTextChannel(textChannel);
-        
+
         context->setFinished();
-        
+
     } else {
         qDebug() << "Not expected channel type";
         context->setFinishedWithError(TELEPATHY_ERROR_NOT_IMPLEMENTED,
@@ -135,4 +133,4 @@ void TpTextClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<> 
     qDebug() << "!!! handleChannels DONE !!!";
 }
 
-};
+} // namespace TpGame

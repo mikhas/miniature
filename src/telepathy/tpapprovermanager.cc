@@ -31,7 +31,7 @@
 #include <TelepathyQt4/Debug>
 #include <TelepathyQt4/Constants>
 
-namespace Miniature
+namespace TpGame
 {
 
 static inline Tp::ChannelClassList channelClassList()
@@ -78,4 +78,4 @@ void TpApproverManager::onFinished()
     approver->deleteLater();
 }
 
-};
+} // namespace TpGame

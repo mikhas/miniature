@@ -25,7 +25,7 @@
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/PendingReady>
 
-namespace Miniature
+namespace TpGame
 {
 
 TpIncomingTube::TpIncomingTube(const Tp::ChannelPtr &channel, QObject *parent)
@@ -87,7 +87,7 @@ void TpIncomingTube::onChannelReady(Tp::PendingOperation *op)
              << mStreamTubeAddress.port;
 
     mTcpSocket = new QTcpSocket;
-    mClient  = new TpTubeClient(this);
+    mClient  = new TubeClient(this);
 /*
     connect(mTcpSocket,
             SIGNAL(connected()),
@@ -154,5 +154,5 @@ void TpIncomingTube::onTcpSocketDisconnected()
     Q_EMIT readyToBeDeleted();
 }
 
-}
+} // namespace TpGame
 

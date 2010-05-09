@@ -26,73 +26,75 @@
 
 #include <QTcpSocket>
 
-namespace Miniature
+namespace TpGame
 {
 
-TpGame::TpGame(QObject *parent) : QObject(parent)
+Game::Game(QObject *parent)
+    : QObject(parent),
+      m_account_manager(new AccountManager(this)),
+      m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
+      m_client_registrar(Tp::ClientRegistrar::create())
 {
-    mTpAccountManager = new TpAccountManager(this);
-    mAccountsDialog = new AccountSelectionDlg(mTpAccountManager);
-
     qDebug() << "Registering client handler.";
-    mClientRegistrar = Tp::ClientRegistrar::create();
-    
+
     Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
 
-    QObject::connect(client.data(),
-                     SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
-                     this,
-                     SLOT(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)));
-    QObject::connect(client.data(),
-                     SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
-                     this,
-                     SLOT(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)));
+    connect(client.data(), SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
+            this,          SLOT(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
+            Qt::UniqueConnection);
 
-    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
+    connect(client.data(), SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
+            this,          SLOT(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
+            Qt::UniqueConnection);
 
-    Tp::SharedPtr<TpTextClientHandler> textClient = Tp::SharedPtr<TpTextClientHandler>(new TpTextClientHandler(0));
-    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
+    // TODO: client name should be a ctor arg
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
+
+    Tp::SharedPtr<TextClientHandler> textClient = Tp::SharedPtr<TextClientHandler>(new TextClientHandler(0));
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
 
 //    Tp::SharedPtr<TpApproverManager> approverManager;
 //    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
 //    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "miniature_approver");
 }
 
-void TpGame::hostGame()
+void Game::hostGame()
 {
     qDebug() << "TpGame::hostGame()";
-    mTpAccountManager->disconnect();
-    QObject::connect(mTpAccountManager, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
+    m_account_manager->disconnect();
+    connect(m_account_manager, SIGNAL(accountNamesChanged(QStringList)),
+            this,              SLOT(onAccountNamesChanged(QStringList)),
+            Qt::UniqueConnection);
 }
 
-void TpGame::onAccountNameListChanged(const QList<QString> accounts)
+void Game::onAccountNamesChanged(const QStringList &account_names)
 {
     qDebug() << "TpGame::onAccountNameListChanged()";
-    
-    Q_FOREACH(QString accountName, accounts)
-    {
-        mTpAccountManager->ensureContactListForAccount(accountName);
-    }
+
+    Q_FOREACH(QString name, account_names)
+        m_account_manager->ensureContactListForAccount(name);
 
     Q_EMIT initialized();
 }
 
-void TpGame::joinGame()
+void Game::joinGame()
 {
     qDebug() << "TpGame::joingGame()";
-    mAccountsDialog->show();
+    m_accounts_dialog->show();
 
     Q_EMIT initialized();
 }
 
-void TpGame::newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)
+void Game::newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)
 {
+    // TODO: impl
     qDebug() << "TpGame::newIncomingTube()";
 }
 
-void TpGame::newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)
+void Game::newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)
 {
+    // TODO: impl
     qDebug() << "TpGame::newOutgoingTube()";
 }
 
-};
+} // namespace TpGame

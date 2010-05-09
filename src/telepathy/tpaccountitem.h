@@ -22,8 +22,8 @@
 #ifndef TPACCOUNTITEM_H_
 #define TPACCOUNTITEM_H_
 
-#include <QObject>
-#include <QSharedPointer>
+#include <QtCore>
+#include <QtGui>
 
 #include <TelepathyQt4/Types>
 #include <TelepathyQt4/Connection>
@@ -33,15 +33,20 @@ namespace Tp {
     class PendingOperation;
 }
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpAccountItem : public QObject
+class AccountItem;
+typedef QSharedPointer<AccountItem> SharedAccountItem;
+
+class AccountItem
+    : public QObject
 {
     Q_OBJECT
+
 public:
-    TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent = 0);
-    ~TpAccountItem();
+    explicit AccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent = 0);
+    virtual ~AccountItem();
 
     QString getDisplayName();
     void ensureContactsList();
@@ -51,33 +56,31 @@ public:
 
 Q_SIGNALS:
     void initialized();
-    void contactsForAccount(const Tp::Contacts);
+    void contactsForAccountChanged(const Tp::Contacts &contacts);
 
 private Q_SLOTS:
-    void onReady(Tp::PendingOperation *);
-    void onConnectionReady(Tp::PendingOperation *);
+    void onFinished(Tp::PendingOperation *pending);
+    void onConnectionReady(Tp::PendingOperation *pending);
     void onAccountSetEnabled(Tp::PendingOperation *);
-    void onConnectsAutomatically(Tp::PendingOperation *);
-    void onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason);
-    void onEnsureChannelFinished(Tp::PendingOperation *);
+    void onConnectsAutomatically(Tp::PendingOperation *pending);
+    void onConnectionStatusChanged(const Tp::ConnectionStatus &status, const Tp::ConnectionStatusReason &reason);
+    void onEnsureChannelFinished(Tp::PendingOperation *pending);
 
 protected:
+    // TODO: just make the parts that are needed by the AM public. Dont use friends.
+    friend class AccountManager;
 
-    friend class TpAccountManager;
-    
     Tp::AccountPtr getInternal();
-    
+
 private:
     void connectionReady();
 
-    Tp::AccountPtr mAcc;
-    Tp::ConnectionPtr mConnection;
-    Tp::PendingChannelRequest *mPendingChannelRequest;
-    Tp::ChannelRequestPtr mChannelRequest;
+    Tp::AccountPtr m_account;
+    Tp::ConnectionPtr m_connection;
+    Tp::PendingChannelRequest *m_pending_request;
+    Tp::ChannelRequestPtr m_channel_request;
 };
 
-typedef QSharedPointer<TpAccountItem> TpAccountItemPtr;
-
-};
+} // namespace TpGame
 
 #endif // TPACCOUNTITEM_H_

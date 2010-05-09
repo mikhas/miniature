@@ -22,36 +22,41 @@
 #ifndef TPTEXTCLIENTHANDLER_H
 #define TPTEXTCLIENTHANDLER_H
 
+#include "tpoutgoingtube.h"
+#include "tpincomingtube.h"
+
 #include <TelepathyQt4/AbstractClientHandler>
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/Channel>
 
 #include <QTcpSocket>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpOutgoingTube;
-class TpIncomingTube;
-
-class TpTextClientHandler : public QObject, public Tp::AbstractClientHandler
+class TextClientHandler
+    : public QObject,
+      public Tp::AbstractClientHandler
 {
     Q_OBJECT
+
 public:
-    TpTextClientHandler(QObject *parent = 0);
-    virtual ~TpTextClientHandler();
+    typedef QList<Tp::ChannelPtr> ChannelList;
+    typedef QList<Tp::ChannelRequestPtr> ChannelRequestList;
+
+    TextClientHandler(QObject *parent = 0);
+    virtual ~TextClientHandler();
 
     virtual bool bypassApproval() const;
     virtual void handleChannels(const Tp::MethodInvocationContextPtr<> &context,
                                 const Tp::AccountPtr &account,
                                 const Tp::ConnectionPtr &connection,
-                                const QList<Tp::ChannelPtr> &channels,
-                                const QList<Tp::ChannelRequestPtr> &requestedSatisfied,
-                                const QDateTime &userActionTime,
-                                const QVariantMap &handlerInfo);
-    
+                                const ChannelList &channels,
+                                const ChannelRequestList &requested_satisfied,
+                                const QDateTime &user_action_time,
+                                const QVariantMap &handler_info);
 };
 
-};
+} // namespace TpGame
 
 #endif // TPTEXTCLIENTHANDLER_H

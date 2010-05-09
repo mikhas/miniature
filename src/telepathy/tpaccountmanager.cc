@@ -44,127 +44,133 @@
 #include <QtMaemo5/QtMaemo5>
 #endif
 
-namespace Miniature
+namespace TpGame
 {
 
-TpAccountManager::TpAccountManager(QObject *parent)
+AccountManager::AccountManager(QObject *parent)
     : QObject(parent)
 {
     qDebug() << "TpAccountManager::TpAccountManager()";
-    
+
     Tp::enableDebug(false);
     Tp::enableWarnings(true);
 
     Tp::registerTypes();
 
-    mAM = Tp::AccountManager::create();
+    m_am = Tp::AccountManager::create();
 
-    QObject::connect(mAM->becomeReady(),
-           SIGNAL(finished(Tp::PendingOperation *)),
-           SLOT(onAMReady(Tp::PendingOperation *)));
+    connect(m_am->becomeReady(), SIGNAL(finished(Tp::PendingOperation *)),
+            this,                SLOT(onAccountManagerReady(Tp::PendingOperation *)));
 }
 
-TpAccountManager::~TpAccountManager()
+AccountManager::~AccountManager()
 {
     qDebug() << "TpAccountManager::~TpAccountManager()";
 }
 
-void TpAccountManager::onAMReady(Tp::PendingOperation *o)
+void AccountManager::onAccountManagerReady(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountManager::onAMReady()";
-    
-    if(o->isError())
+
+    if(pending->isError())
     {
+        // TODO: Shouldn't this be a warning?
         qDebug() << "Account Manager error";
         return;
     }
 
-    mAccounts.clear();
+    m_accounts.clear();
 
-    Q_FOREACH(const QString &path, mAM->allAccountPaths())
+    Q_FOREACH(const QString &path, m_am->allAccountPaths())
     {
-        TpAccountItemPtr account = TpAccountItemPtr(new TpAccountItem(mAM, path, this));
-        QObject::connect(account.data(), SIGNAL(initialized()), this, SLOT(onAccountInitialized()));
+        SharedAccountItem account = SharedAccountItem(new AccountItem(m_am, path, this));
+        connect(account.data(), SIGNAL(initialized()),
+                this,           SLOT(onAccountInitialized()));
         account->initialize();
-        mAccounts.push_back(account);
+        m_accounts.push_back(account);
     }
 }
 
-void TpAccountManager::onAccountInitialized()
+void AccountManager::onAccountInitialized()
 {
     qDebug() << "TpAccountManager::onAccountInitialized ()";
-    
-    QList<QString> accountNamesList;
 
-    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    QStringList account_names;
+
+    Q_FOREACH(SharedAccountItem accItem, m_accounts)
     {
         if(accItem->isInitialized())
         {
-            accountNamesList.push_back(accItem->getDisplayName());
+            account_names.push_back(accItem->getDisplayName());
         }
     }
 
-    Q_EMIT onAccountNameListChanged(accountNamesList);
+    Q_EMIT accountNamesChanged(account_names);
 }
 
-void TpAccountManager::ensureAccountNameList()
+void AccountManager::ensureAccountNameList()
 {
     qDebug() << "TpAccountManager::ensureAccountNameList ()";
     onAccountInitialized();
 }
 
-void TpAccountManager::ensureContactListForAccount(QString accountName)
+void AccountManager::ensureContactListForAccount(const QString &account_name)
 {
-    qDebug() << "TpAccountManager::ensureContactListForAccount ()" << accountName;
-    
-    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    qDebug() << "TpAccountManager::ensureContactListForAccount ()" << account_name;
+
+    Q_FOREACH(SharedAccountItem iter, m_accounts)
     {
-        if(accountName == accItem->getDisplayName())
+        if (account_name == iter->getDisplayName())
         {
-            accItem.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
-            QObject::connect(accItem.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SIGNAL(onContactsForAccount(const Tp::Contacts)));
-            accItem->ensureContactsList();
+            connect(iter.data(), SIGNAL(contactsForAccountChanged(Tp::Contacts)),
+                    this,        SIGNAL(contactsForAccountChanged(Tp::Contacts)),
+                    Qt::UniqueConnection);
+
+            iter->ensureContactsList();
             break;
         }
     }
 }
 
-void TpAccountManager::onEnsureChannel(QString accountName, QString contactName)
+void AccountManager::onEnsureChannel(const QString &account_name, const QString &contact_name)
 {
-    qDebug() << "TpAccountManager::onEnsureChannel ()" << accountName << contactName;
-    
-    mContactName = contactName;
+    qDebug() << "TpAccountManager::onEnsureChannel ()" << account_name << contact_name;
 
-    Q_FOREACH(TpAccountItemPtr accItem, mAccounts)
+    m_contact_name = contact_name;
+
+    Q_FOREACH(SharedAccountItem iter, m_accounts)
     {
-        if(accountName == accItem->getDisplayName())
+        if (account_name == iter->getDisplayName())
         {
-            accItem.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
-            QObject::connect(accItem.data(), SIGNAL(contactsForAccount(const Tp::Contacts)), this, SLOT(ensureContactsForAccount(const Tp::Contacts)));
-            accItem->ensureContactsList();
-            mAccount = accItem;
+            iter.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
+            connect(iter.data(), SIGNAL(contactsForAccountChanged(Tp::Contacts)),
+                    this,        SLOT(ensureContactsForAccount(Tp::Contacts)),
+                    Qt::UniqueConnection);
+
+            iter->ensureContactsList();
+            m_account = iter;
             break;
         }
     }
 }
 
-void TpAccountManager::ensureContactsForAccount(const Tp::Contacts contacts)
+void AccountManager::ensureContactsForAccount(const Tp::Contacts &contacts)
 {
     qDebug() << "TpAccountManager::ensureContactsForAccount()" << contacts;
 
     Q_FOREACH(Tp::ContactPtr contact, contacts)
     {
-        if(contact->id() == mContactName)
+        if(contact->id() == m_contact_name)
         {
             createChannel(contact);
-            // TODO hook up properly 
+            // TODO hook up properly
             createChatSession(contact);
             break;
         }
     }
 }
 
-void TpAccountManager::createChannel(const Tp::ContactPtr contact)
+void AccountManager::createChannel(const Tp::ContactPtr &contact)
 {
     qDebug() << "TpAccountManager::createChannel()";
     qDebug() << "!!!! CREATING CHANNEL for" << contact->id() << " !!!";
@@ -180,10 +186,10 @@ void TpAccountManager::createChannel(const Tp::ContactPtr contact)
     req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"),
                "Miniature");
 
-    mAccount->ensureChannel(req);
+    m_account->ensureChannel(req);
 }
 
-void TpAccountManager::createChatSession(const Tp::ContactPtr contact)
+void AccountManager::createChatSession(const Tp::ContactPtr &contact)
 {
     qDebug() << "TpAccountManager::createChatSession()";
     qDebug() << "!!!! CREATING TEXT SESSION for" << contact->id() << " !!!";
@@ -197,7 +203,7 @@ void TpAccountManager::createChatSession(const Tp::ContactPtr contact)
     req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandle"),
                contact->handle().at(0));
 
-    mAccount->ensureChannel(req);
+    m_account->ensureChannel(req);
 }
 
-};
+} // namespace TpGame

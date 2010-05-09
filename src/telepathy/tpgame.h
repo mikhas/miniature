@@ -26,19 +26,19 @@
 #include "accountselectiondlg.h"
 
 #include <TelepathyQt4/ClientRegistrar>
+#include <QtCore>
+#include <QTcpSocket>
 
-#include <QObject>
-
-namespace Miniature
+namespace TpGame
 {
 
-class QTcpSocket;
-
-class TpGame : public QObject
+class Game
+    : public QObject
 {
     Q_OBJECT
+
 public:
-    TpGame(QObject *parent = 0);
+    Game(QObject *parent = 0);
 
 public Q_SLOTS:
     void hostGame();
@@ -48,16 +48,16 @@ Q_SIGNALS:
     void initialized();
 
 private Q_SLOTS:
-    void onAccountNameListChanged(const QList<QString>);
-    void newIncomingTube(QTcpSocket *, const Tp::ContactPtr &);
-    void newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &);
+    void onAccountNamesChanged(const QStringList &account_names);
+    void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &contact);
+    void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &contact);
 
 private:
-    TpAccountManager *mTpAccountManager;
-    AccountSelectionDlg *mAccountsDialog;
-    Tp::ClientRegistrarPtr mClientRegistrar;
+    AccountManager *m_account_manager;
+    AccountSelectionDlg *m_accounts_dialog;
+    Tp::ClientRegistrarPtr m_client_registrar;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPGAME_H

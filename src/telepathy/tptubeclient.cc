@@ -25,10 +25,10 @@
 #include <QHostAddress>
 #include <QDataStream>
 
-namespace Miniature
+namespace TpGame
 {
 
-TpTubeClient::TpTubeClient(QObject *parent)
+TubeClient::TubeClient(QObject *parent)
     : QTcpSocket(parent)
 {
     qDebug() << "TpTubeClient::TpTubeClient()";
@@ -37,7 +37,7 @@ TpTubeClient::TpTubeClient(QObject *parent)
     connect(this, SIGNAL(connected()), this, SLOT(readyToTransfer()));
 }
 
-void TpTubeClient::readyToTransfer()
+void TubeClient::readyToTransfer()
 {
     qDebug() << "TpTubeClient::readyToTransfer()";
 
@@ -81,7 +81,7 @@ void TpTubeClient::readyToTransfer()
 */
 }
 
-void TpTubeClient::startNewGame()
+void TubeClient::startNewGame()
 {
     qDebug() << "TpTubeClient::startNewGame()";
 
@@ -91,7 +91,7 @@ void TpTubeClient::startNewGame()
     stream << QString("Start new game");
 }
 
-void TpTubeClient::newGameStarted()
+void TubeClient::newGameStarted()
 {
     qDebug() << "TpTubeClient::newGameStarted()";
 
@@ -101,4 +101,4 @@ void TpTubeClient::newGameStarted()
     stream << QString("New game started");
 }
 
-}
+} // namespace TpGame

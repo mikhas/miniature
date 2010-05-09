@@ -28,10 +28,10 @@
 
 #include <QTcpSocket>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpOutgoingTube;
+class OutgoingTube;
 class TpIncomingTube;
 
 class TpTubesClientHandler : public QObject, public Tp::AbstractClientHandler
@@ -52,17 +52,17 @@ public:
 
 Q_SIGNALS:
     void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &);
-    void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &);    
+    void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &);
 
 private Q_SLOTS:
     void deleteOutgoingTube();
     void deleteIncomingTube();
 
 private:
-    QList<TpOutgoingTube*> mOutgoingTubes;
+    QList<OutgoingTube*> mOutgoingTubes;
     QList<TpIncomingTube*> mIncomingTubes;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPTUBESCLIENTHANDLER_H

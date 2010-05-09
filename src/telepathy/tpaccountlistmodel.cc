@@ -23,7 +23,7 @@
 
 #include <QtGlobal>
 
-namespace Miniature
+namespace TpGame
 {
 
 
@@ -54,4 +54,4 @@ void TpAccountListModel::setAccounts(const QList<QString> &accounts)
     reset();
 }
 
-};
+} // namespace TpGame

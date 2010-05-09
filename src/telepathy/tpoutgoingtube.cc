@@ -27,10 +27,10 @@
 #include <QHostAddress>
 #include <QNetworkInterface>
 
-namespace Miniature
+namespace TpGame
 {
 
-TpOutgoingTube::TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
+OutgoingTube::OutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
     : QObject(parent),
     mChannel(channel)
 {
@@ -44,12 +44,12 @@ TpOutgoingTube::TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
             SLOT(onChannelReady(Tp::PendingOperation *)));
 }
 
-TpOutgoingTube::~TpOutgoingTube()
+OutgoingTube::~OutgoingTube()
 {
     qDebug() << "TpOutgoingTube::~TpOutgoingTube()";
 }
 
-void TpOutgoingTube::onChannelReady(Tp::PendingOperation *op)
+void OutgoingTube::onChannelReady(Tp::PendingOperation *op)
 {
     qDebug() << "TpOutgoingTube::onChannelReady()";
 
@@ -136,7 +136,7 @@ void TpOutgoingTube::onChannelReady(Tp::PendingOperation *op)
     }
 }
 
-void TpOutgoingTube::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName, const QString &errorMessage)
+void OutgoingTube::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &errorName, const QString &errorMessage)
 {
     Q_UNUSED(proxy);
 
@@ -145,14 +145,14 @@ void TpOutgoingTube::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &e
     Q_EMIT readyToBeDeleted();
 }
 
-void TpOutgoingTube::onTubeStateChanged(uint state)
+void OutgoingTube::onTubeStateChanged(uint state)
 {
     qDebug() << "Tube state changed:" << state;
 
     Q_EMIT statusChanged(state);
 }
 
-void TpOutgoingTube::onOfferTubeFinished(QDBusPendingCallWatcher *watcher)
+void OutgoingTube::onOfferTubeFinished(QDBusPendingCallWatcher *watcher)
 {
     QDBusPendingReply<void> reply = *watcher;
 
@@ -166,7 +166,7 @@ void TpOutgoingTube::onOfferTubeFinished(QDBusPendingCallWatcher *watcher)
     qDebug() << "Offer tube succeeded !!!!";
 }
 
-void TpOutgoingTube::onNewRemoteConnection(uint handle, QDBusVariant connectionParam, uint connectionId)
+void OutgoingTube::onNewRemoteConnection(uint handle, QDBusVariant connectionParam, uint connectionId)
 {
     QVariant v = connectionParam.variant();
     qDebug() << "variant =" << v << "handle:" << handle << "connectionId:" << connectionId;
@@ -179,5 +179,4 @@ void TpOutgoingTube::onNewRemoteConnection(uint handle, QDBusVariant connectionP
     // Start server listening!
 }
 
-
-};
+} // namespace TpGame

@@ -33,42 +33,43 @@
 
 #include <TelepathyQt4/Contact>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpAccountManager;
+class AccountManager;
 
-class AccountSelectionDlg : public QDialog
+class AccountSelectionDlg
+    : public QDialog
 {
     Q_OBJECT
 public:
-    AccountSelectionDlg(TpAccountManager *, QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit AccountSelectionDlg(AccountManager *account_manager, QWidget *parent = 0, Qt::WindowFlags f = 0);
     virtual ~AccountSelectionDlg();
 
 Q_SIGNALS:
-    void ensureChannel(QString, QString);
+    void ensureChannel(const QString &, const QString &);
 
 protected:
     virtual void showEvent(QShowEvent *event);
 
 private Q_SLOTS:
-    void onAccountNameListChanged(const QList<QString>);
-    void listItemClicked(const QModelIndex &);
+    void onAccountNamesChanged(const QStringList &account_names);
+    void listItemClicked(const QModelIndex &index);
     void chooseAccountClicked(bool checked = false);
     void chooseContactClicked(bool checked = false);
-    void onContactsForAccount(const Tp::Contacts);
+    void onContactsForAccountChanged(const Tp::Contacts &contacts);
 
 private:
-    QList<TpAccountItemPtr> mAccounts;
+    QList<SharedAccountItem> m_accounts;
     Ui::SelectAccountDialog ui;
-    TpAccountManager *mAccMgr;
-    TpAccountListModel *mAccountListModel;
-    TpContactsListModel *mContactsListModel;
-    QPersistentModelIndex lastItemIndex;
-    QString mAccountName;
+    AccountManager *m_account_manager;
+    TpAccountListModel *m_account;
+    TpContactsListModel *m_contacts;
+    QPersistentModelIndex m_last_index;
+    QString m_account_name;
 };
 
-};
+} // namespace TpGame
 
 #endif //ACCOUNTSELECTIONDLG_H_
 

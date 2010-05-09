@@ -26,7 +26,7 @@
 
 #include <QAbstractListModel>
 
-namespace Miniature
+namespace TpGame
 {
 
 class TpAccountListModel : public QAbstractListModel
@@ -44,6 +44,6 @@ private:
     QList<QString> mAccounts;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPACCOUNTLISTMODEL_H

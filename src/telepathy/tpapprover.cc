@@ -27,7 +27,7 @@
 #include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/ChannelDispatchOperation>
 
-namespace Miniature
+namespace TpGame
 {
 
 TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
@@ -40,7 +40,7 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
     mDispatchOp(dispatchOperation)
 {
     qDebug() << "TpApprover::TpApprover()";
-    
+
     connect(mDispatchOp->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
@@ -60,4 +60,4 @@ void TpApprover::onDispatchOperationReady(Tp::PendingOperation *)
     Q_EMIT finished();
 }
 
-};
+} // namespace TpGame

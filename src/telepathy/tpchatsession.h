@@ -28,29 +28,29 @@
 #include <TelepathyQt4/PendingChannelRequest>
 #include <TelepathyQt4/TextChannel>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpChatSession : public QObject
+class ChatSession : public QObject
 {
     Q_OBJECT
-    
+
 public:
-    TpChatSession(QObject *parent, Tp::AccountPtr account);
-    virtual ~TpChatSession();
+    ChatSession(QObject *parent, Tp::AccountPtr account);
+    virtual ~ChatSession();
 
     void setTextChannel(/*Tp::ContactPtr contact,*/const Tp::TextChannelPtr &textChannel);
-    
+
 private Q_SLOTS:
     void onTextChannelReady(Tp::PendingOperation *op);
-
     void sendMessage(const QString &message);
-    void messageSent(const Tp::Message &message,
-                     Tp::MessageSendingFlags flags,
-                     const QString &sentMessageToken);
-    void messageReceived(const Tp::ReceivedMessage &message);
 
-	void onContactPresenceChanged(const QString &, uint, const QString &);
+    void onMessageSent(const Tp::Message &message,
+                       Tp::MessageSendingFlags flags,
+                       const QString &sentMessageToken);
+
+    void onMessageReceived(const Tp::ReceivedMessage &message);
+    void onContactPresenceChanged(const QString &, uint, const QString &);
 
 private:
     Tp::AccountPtr m_account;
@@ -58,6 +58,6 @@ private:
     Tp::TextChannelPtr m_textChannel;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPCHATSESSION_H

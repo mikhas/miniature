@@ -26,7 +26,7 @@
 
 #include <TelepathyQt4/Channel>
 
-namespace Miniature
+namespace TpGame
 {
 
 class TpApprover : public QObject
@@ -57,6 +57,6 @@ private:
     friend class TpApproverManager;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPAPPROVER_H

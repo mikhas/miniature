@@ -3,9 +3,9 @@
 namespace Miniature
 {
 
-TCommandsMap createCommandsMap()
+CommandsMap createCommandsMap()
 {
-    TCommandsMap commandsMap;
+    CommandsMap commandsMap;
 
     commandsMap[Miniature::NewGame] = QString("new_game");
     commandsMap[Miniature::NewGameStarted] = QString("new_game_started");
@@ -19,7 +19,7 @@ TCommandsMap createCommandsMap()
     return commandsMap;
 }
 
-};
+} // namespace Miniature
 
 QDBusArgument &operator<<(QDBusArgument &argument,
         const StreamTubeAddress &streamTubeAddress)
@@ -42,12 +42,14 @@ const QDBusArgument &operator>>(const QDBusArgument &argument,
 
 QString commandToString(Miniature::Command command)
 {
-    Miniature::TCommandsMap commandsMap = Miniature::createCommandsMap();
-    for(Miniature::TCommandsMap::const_iterator c = commandsMap.begin(); c != commandsMap.end(); c++)
+    Miniature::CommandsMap commandsMap = Miniature::createCommandsMap();
+    for (Miniature::CommandsMap::const_iterator iter = commandsMap.begin();
+         iter != commandsMap.end();
+         ++iter)
     {
-        if(command == c->first)
+        if (command == iter->first)
         {
-            return c->second;
+            return iter->second;
             break;
         }
     }
@@ -65,16 +67,17 @@ ResignGame,
 
 Miniature::Command commandFromString(QString command)
 {
-    Miniature::TCommandsMap commandsMap = Miniature::createCommandsMap();
-    for(Miniature::TCommandsMap::const_iterator c = commandsMap.begin(); c != commandsMap.end(); c++)
+    Miniature::CommandsMap commandsMap = Miniature::createCommandsMap();
+    for (Miniature::CommandsMap::const_iterator iter = commandsMap.begin();
+         iter != commandsMap.end();
+         ++iter)
     {
-        if(command.compare(c->second) == 0)
+        if (!command.compare(iter->second))
         {
-            return c->first;
+            return iter->first;
             break;
         }
     }
 
     return Miniature::Nop;
 }
-

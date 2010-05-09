@@ -28,7 +28,7 @@
 #include <TelepathyQt4/Types>
 #include <TelepathyQt4/Contact>
 
-namespace Miniature
+namespace TpGame
 {
 
 class TpContactsListModel : public QAbstractListModel
@@ -46,6 +46,6 @@ private:
     QList<Tp::ContactPtr> mContacts;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPCONTACTSLISTMODEL_H

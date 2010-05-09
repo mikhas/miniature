@@ -32,32 +32,30 @@
 #include <TelepathyQt4/ChannelRequest>
 #include <TelepathyQt4/ContactManager>
 
-#include <QString>
-#include <QtGlobal>
-
-namespace Miniature
+namespace TpGame
 {
 
-TpAccountItem::TpAccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent) : QObject(parent), 
-            mAcc(Tp::Account::create(am->dbusConnection(), am->busName(), path))
+AccountItem::AccountItem(Tp::AccountManagerPtr am, const QString &path, QObject *parent)
+    : QObject(parent),
+      m_account(Tp::Account::create(am->dbusConnection(), am->busName(), path))
 {
     qDebug() << "TpAccountItem::TpAccountItem()";
 }
 
-TpAccountItem::~TpAccountItem()
+AccountItem::~AccountItem()
 {
     qDebug() << "TpAccountItem::~TpAccountItem()";
 
-    if(mAcc->haveConnection())
-        mAcc->disconnect();
+    if (m_account->haveConnection())
+        m_account->disconnect();
 }
 
-bool TpAccountItem::isInitialized()
+bool AccountItem::isInitialized()
 {
-    return mAcc->isReady() && mAcc->isValid();
+    return m_account->isReady() && m_account->isValid();
 }
 
-void TpAccountItem::initialize()
+void AccountItem::initialize()
 {
     qDebug() << "TpAccountItem::initialize()";
 
@@ -66,146 +64,161 @@ void TpAccountItem::initialize()
             << Tp::Account::FeatureAvatar
             << Tp::Account::FeatureProtocolInfo;
 
-    QObject::connect(mAcc->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)), SLOT(onReady(Tp::PendingOperation *)));
+    connect(m_account->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)),
+            this,                             SLOT(onFinished(Tp::PendingOperation *)),
+            Qt::UniqueConnection);
 }
 
-void TpAccountItem::onReady(Tp::PendingOperation *o)
+void AccountItem::onFinished(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountItem::onReady()";
 
-    if(o->isError())
+    if (pending->isError())
     {
+        // TODO: should be a warning?
         qDebug() << "Account ready error.";
         return;
     }
 
-    QObject::connect(mAcc.data(), SIGNAL(connectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)),
-                     this, SLOT(onConnectionStatusChanged(Tp::ConnectionStatus, Tp::ConnectionStatusReason)));
+    connect(m_account.data(), SIGNAL(connectionStatusChanged(Tp::ConnectionStatus,
+                                                             Tp::ConnectionStatusReason)),
+            this,             SLOT(onConnectionStatusChanged(Tp::ConnectionStatus,
+                                                             Tp::ConnectionStatusReason)),
+            Qt::UniqueConnection);
 
     Q_EMIT initialized();
 }
 
-QString TpAccountItem::getDisplayName()
+QString AccountItem::getDisplayName()
 {
-    if(mAcc->isReady() && mAcc->isValid())
-    {
-        return mAcc->normalizedName();
-    }
+    if (m_account->isReady() && m_account->isValid())
+        return m_account->normalizedName();
 
+    // TODO: really only return empty string?!
     return QString();
 }
 
-void TpAccountItem::ensureContactsList()
+void AccountItem::ensureContactsList()
 {
     qDebug() << "TpAccountItem::ensureContactsList()";
 
-    if(mAcc->haveConnection())
-    {
+    if (m_account->haveConnection())
         connectionReady();
-    }
     else
-    {
-        QObject::connect(mAcc->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onAccountSetEnabled(Tp::PendingOperation *)));
-    }
+        // TODO: A setter should not return an instance?
+        connect(m_account->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)),
+                this,                        SLOT(onAccountSetEnabled(Tp::PendingOperation *)),
+                Qt::UniqueConnection);
 }
 
-void TpAccountItem::onAccountSetEnabled(Tp::PendingOperation *o)
+void AccountItem::onAccountSetEnabled(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountItem::onAccountSetEnabled()";
 
-    if(o->isError())
+    if (pending->isError())
     {
+        // TODO: should be a warning?
         qDebug() << "Account set enabled failed.";
         return;
     }
 
-    QObject::connect(mAcc->setConnectsAutomatically(true), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onConnectsAutomatically(Tp::PendingOperation *)));
+    // TODO: A setter should not return an instance?
+    connect(m_account->setConnectsAutomatically(true), SIGNAL(finished(Tp::PendingOperation *)),
+            this,                                      SLOT(onConnectsAutomatically(Tp::PendingOperation *)),
+            Qt::UniqueConnection);
 }
 
-void TpAccountItem::onConnectsAutomatically(Tp::PendingOperation *o)
+void AccountItem::onConnectsAutomatically(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountItem::onConnectsAutomatically()";
 
-    if(o->isError())
+    if (pending->isError())
     {
+        // TODO: should be a warning?
         qDebug() << "Account connection automatically failed.";
         return;
     }
 }
 
-void TpAccountItem::onConnectionStatusChanged(Tp::ConnectionStatus cs, Tp::ConnectionStatusReason)
+void AccountItem::onConnectionStatusChanged(const Tp::ConnectionStatus &cs, const Tp::ConnectionStatusReason &)
 {
     qDebug() << "TpAccountItem::onConnectionStatusChanged()";
 
-    if(Tp::ConnectionStatusConnected == cs && mAcc->haveConnection())
+    if (Tp::ConnectionStatusConnected == cs && m_account->haveConnection())
         connectionReady();
 }
 
-void TpAccountItem::connectionReady()
+void AccountItem::connectionReady()
 {
     qDebug() << "TpAccountItem::connectionReady()";
 
-    if(!mAcc->haveConnection())
+    if (!m_account->haveConnection())
     {
+        // TODO: should be a warning?
         qDebug() << "Error: Could not find active connection or account";
         return;
     }
 
-    mConnection = mAcc->connection();
+    m_connection = m_account->connection();
 
     Tp::Features features;
     features << Tp::Connection::FeatureCore
              << Tp::Connection::FeatureRoster
              << Tp::Connection::FeatureRosterGroups;
 
-    QObject::connect(mConnection->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onConnectionReady(Tp::PendingOperation *)));
+    // TODO: should not return an instance?
+    connect(m_connection->becomeReady(features), SIGNAL(finished(Tp::PendingOperation *)),
+            this,                                SLOT(onConnectionReady(Tp::PendingOperation *)),
+            Qt::UniqueConnection);
 }
 
-void TpAccountItem::onConnectionReady(Tp::PendingOperation *o)
+void AccountItem::onConnectionReady(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountItem::onConnectionReady()";
 
-    if(o->isError())
+    if (pending->isError())
     {
+        // TODO: should be a warning?
         qDebug() << "Connection ready failed";
         return;
     }
 
-    if(mConnection->status() != Tp::Connection::StatusConnected)
+    if (m_connection->status() != Tp::Connection::StatusConnected)
     {
+        // TODO: should be a warning?
         qDebug() << "connection.status() is not Connected!";
         return;
     }
 
-    Tp::ContactManager *contactManager = mConnection->contactManager();
-    Tp::Contacts contactsList = contactManager->allKnownContacts();
-
-    Q_EMIT contactsForAccount(contactsList);
+    Q_EMIT contactsForAccountChanged(m_connection->contactManager()->allKnownContacts());
 }
 
-void TpAccountItem::ensureChannel(const QVariantMap &req)
+void AccountItem::ensureChannel(const QVariantMap &req)
 {
-    qDebug() << "TpAccountItem::ensureChannel()";
+    qDebug() << "TpAccountItem::ensureChannel() - "
+             << req;
 
-    qDebug() << req;
-
-    QObject::connect(mAcc->ensureChannel(req), SIGNAL(finished(Tp::PendingOperation *)), this, SLOT(onEnsureChannelFinished(Tp::PendingOperation *)));
+    // TODO: should not return an instance?
+    connect(m_account->ensureChannel(req), SIGNAL(finished(Tp::PendingOperation *)),
+            this,                          SLOT(onEnsureChannelFinished(Tp::PendingOperation *)),
+            Qt::UniqueConnection);
 }
 
-void TpAccountItem::onEnsureChannelFinished(Tp::PendingOperation *o)
+void AccountItem::onEnsureChannelFinished(Tp::PendingOperation *pending)
 {
     qDebug() << "TpAccountItem::onEnsureChannelFinished()";
 
-    if(o->isError())
+    if(pending->isError())
     {
-        qDebug() << "Ensure channel failed: " << o->errorName() << o->errorMessage();
+        // TODO: should be a warning?
+        qDebug() << "Ensure channel failed: " << pending->errorName() << pending->errorMessage();
         return;
     }
 }
 
-Tp::AccountPtr TpAccountItem::getInternal()
+Tp::AccountPtr AccountItem::getInternal()
 {
-    return mAcc;
+    return m_account;
 }
 
-}
+} // namespace TpGame

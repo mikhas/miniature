@@ -25,7 +25,7 @@
 #include <QObject>
 #include <TelepathyQt4/AbstractClientApprover>
 
-namespace Miniature
+namespace TpGame
 {
 
 class TpApprover;
@@ -49,6 +49,6 @@ private:
     QList<TpApprover *> mApprovers;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPAPPROVERMANAGER_H

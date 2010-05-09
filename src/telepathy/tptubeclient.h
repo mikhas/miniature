@@ -24,14 +24,16 @@
 
 #include <QTcpSocket>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpTubeClient : public QTcpSocket
+class TubeClient
+    : public QTcpSocket
 {
     Q_OBJECT
+
 public:
-    TpTubeClient(QObject *parent = 0);
+    TubeClient(QObject *parent = 0);
 
 Q_SIGNALS:
 
@@ -43,6 +45,6 @@ private Q_SLOTS:
     void readyToTransfer();
 };
 
-};
+} // namespace TpGame
 
 #endif // TPTUBECLIENT_H

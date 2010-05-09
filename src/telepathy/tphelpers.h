@@ -32,10 +32,11 @@ enum Command
     Nop
 };
 
-typedef std::map<Miniature::Command, QString> TCommandsMap;
+typedef std::map<Miniature::Command, QString> CommandsMap;
 
-TCommandsMap createCommandsMap();
-};
+CommandsMap createCommandsMap();
+
+} // namespace Miniature
 
 QString commandToString(Miniature::Command c);
 Miniature::Command commandFromString(QString c);

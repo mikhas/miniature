@@ -31,7 +31,7 @@
 
 #include <QDBusVariant>
 
-namespace Miniature
+namespace TpGame
 {
 
 static inline Tp::ChannelClassList channelClassList()
@@ -100,7 +100,7 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
             {
                 qDebug() << "Outgoing channel !";
 
-                TpOutgoingTube *tube = new TpOutgoingTube(channel);
+                OutgoingTube *tube = new OutgoingTube(channel);
                 connect(tube,
                         SIGNAL(tubeReady(QTcpSocket *, const Tp::ContactPtr &)),
                         SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)));
@@ -136,7 +136,7 @@ void TpTubesClientHandler::deleteOutgoingTube()
 {
     qDebug() << "TpTubesClientHandler::deleteOutgoingTube()";
 
-    TpOutgoingTube *tube = qobject_cast<TpOutgoingTube*>(sender());
+    OutgoingTube *tube = qobject_cast<OutgoingTube*>(sender());
 
     if(!tube)
     {
@@ -164,4 +164,4 @@ void TpTubesClientHandler::deleteIncomingTube()
     tube->deleteLater();
 }
 
-};
+} // namespace TpGame

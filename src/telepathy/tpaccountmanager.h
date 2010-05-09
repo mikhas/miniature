@@ -22,8 +22,8 @@
 #ifndef TPACCOUNTMANAGER_H_
 #define TPACCOUNTMANAGER_H_
 
-#include <QObject>
-#include <QList>
+#include <QtCore>
+#include <QtGui>
 
 #include "tpaccountitem.h"
 
@@ -33,39 +33,44 @@ namespace Tp {
     class PendingOperation;
 }
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpAccountManager : public QObject
+class AccountManager
+    : public QObject
 {
     Q_OBJECT
-public:
-    TpAccountManager(QObject *parent = 0);
-    ~TpAccountManager();
-
-    void ensureAccountNameList();
-    void ensureContactListForAccount(QString);
-
-Q_SIGNALS:
-    void onAccountNameListChanged(const QList<QString>);
-    void onContactsForAccount(const Tp::Contacts);
-
-private Q_SLOTS:
-    void onAMReady(Tp::PendingOperation *);
-    void onAccountInitialized();
-    void onEnsureChannel(QString, QString);
-    void ensureContactsForAccount(const Tp::Contacts);
-    void createChannel(const Tp::ContactPtr);
-    void createChatSession(const Tp::ContactPtr contact);
 
 private:
-    Tp::AccountManagerPtr mAM;
-    QList<TpAccountItemPtr> mAccounts;
-    TpAccountItemPtr mAccount;
-    QString mContactName;
+    typedef QList<SharedAccountItem> AccountList;
+
+public:
+    explicit AccountManager(QObject *parent = 0);
+    virtual ~AccountManager();
+
+    void ensureAccountNameList();
+    void ensureContactListForAccount(const QString &account_name);
+
+Q_SIGNALS:
+    void accountNamesChanged(const QStringList &account_names);
+    void contactsForAccountChanged(const Tp::Contacts &contacts);
+
+private Q_SLOTS:
+    void onAccountManagerReady(Tp::PendingOperation *pending);
+    void onAccountInitialized();
+    void onEnsureChannel(const QString &account, const QString &name);
+    void ensureContactsForAccount(const Tp::Contacts &contacts);
+    void createChannel(const Tp::ContactPtr &contact);
+    void createChatSession(const Tp::ContactPtr &contact);
+
+private:
+    Tp::AccountManagerPtr m_am;
+    AccountList m_accounts;
+    SharedAccountItem m_account;
+    QString m_contact_name;
 };
 
-};
+} // namespace TpGame
 
 #endif //TPACCOUNTMANAGER_H_
 

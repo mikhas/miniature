@@ -27,18 +27,24 @@
 
 #include <QtDebug>
 
-namespace Miniature
+namespace TpGame
 {
 
-AccountSelectionDlg::AccountSelectionDlg(TpAccountManager *accountManager, QWidget *parent, Qt::WindowFlags f)
-    : QDialog(parent, f), mAccMgr(accountManager), mAccountListModel(NULL), mContactsListModel(NULL)
+AccountSelectionDlg::
+AccountSelectionDlg(AccountManager *account_manager, QWidget *parent, Qt::WindowFlags f)
+    : QDialog(parent, f),
+      m_account_manager(account_manager),
+      m_account(0),
+      m_contacts(0)
 {
     qDebug() << "AccountSelectionDlg::AccountSelectionDlg()";
 
     ui.setupUi(this);
 
-    QObject::connect(mAccMgr, SIGNAL(onAccountNameListChanged(const QList<QString>)), this, SLOT(onAccountNameListChanged(const QList<QString>)));
-    QObject::connect(this, SIGNAL(ensureChannel(QString,QString)), mAccMgr, SLOT(onEnsureChannel(QString,QString)));
+    connect(m_account_manager, SIGNAL(accountNamesChanged(QStringList)),
+            this,              SLOT(onAccountNamesChanged(QStringList)));
+    connect(this,              SIGNAL(ensureChannel(QString, QString)),
+            m_account_manager, SLOT(onEnsureChannel(QString, QString)));
 }
 
 AccountSelectionDlg::~AccountSelectionDlg()
@@ -46,17 +52,17 @@ AccountSelectionDlg::~AccountSelectionDlg()
     qDebug() << "AccountSelectionDlg::~AccountSelectionDlg()";
 }
 
-void AccountSelectionDlg::onAccountNameListChanged(const QList<QString> accountNameList)
+void AccountSelectionDlg::onAccountNamesChanged(const QStringList &account_names)
 {
     qDebug() << "AccountSelectionDlg::onAccountListChanged()";
 
-    if(mAccountListModel == NULL)
+    if(m_account == NULL)
     {
-        mAccountListModel = new TpAccountListModel();
+        m_account = new TpAccountListModel();
     }
 
-    mAccountListModel->setAccounts(accountNameList);
-    ui.listView->setModel(mAccountListModel);
+    m_account->setAccounts(account_names);
+    ui.listView->setModel(m_account);
 }
 
 void AccountSelectionDlg::showEvent(QShowEvent *event)
@@ -64,11 +70,16 @@ void AccountSelectionDlg::showEvent(QShowEvent *event)
     qDebug() << "AccountSelectionDlg::showEvent()";
 
     ui.chooseButton->setEnabled(false);
-    ui.chooseButton->setText(QObject::tr("Choose account"));
-    QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseAccountClicked(bool)));
-    QObject::connect(ui.listView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(listItemClicked(const QModelIndex &)));
+    ui.chooseButton->setText(tr("Choose account"));
+    connect(ui.chooseButton, SIGNAL(clicked(bool)),
+            this,            SLOT(chooseAccountClicked(bool)),
+            Qt::UniqueConnection);
 
-    mAccMgr->ensureAccountNameList();
+    connect(ui.listView, SIGNAL(clicked(const QModelIndex &)),
+            this,        SLOT(listItemClicked(const QModelIndex &)),
+            Qt::UniqueConnection);
+
+    m_account_manager->ensureAccountNameList();
 
     QDialog::showEvent(event);
 }
@@ -78,7 +89,7 @@ void AccountSelectionDlg::listItemClicked(const QModelIndex &index)
     qDebug() << "AccountSelectionDlg::listItemClicked()";
 
     ui.chooseButton->setEnabled(true);
-    lastItemIndex = index;
+    m_last_index = index;
 }
 
 void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
@@ -86,36 +97,42 @@ void AccountSelectionDlg::chooseAccountClicked(bool /*checked*/)
     qDebug() << "AccountSelectionDlg::chooseAccountClicked()";
 
     ui.chooseButton->disconnect();
-    ui.chooseButton->setText(QObject::tr("Choose contact"));
+    ui.chooseButton->setText(tr("Choose contact"));
     ui.chooseButton->setEnabled(false);
-    QObject::connect(ui.chooseButton, SIGNAL(clicked(bool)), this, SLOT(chooseContactClicked(bool)));
+
+    connect(ui.chooseButton, SIGNAL(clicked(bool)),
+            this,            SLOT(chooseContactClicked(bool)),
+            Qt::UniqueConnection);
 
     ui.listView->clearSelection();
     ui.listView->setDisabled(true);
 
-    QObject::connect(mAccMgr, SIGNAL(onContactsForAccount(const Tp::Contacts)), this, SLOT(onContactsForAccount(const Tp::Contacts)));
-    mAccountName = lastItemIndex.data().toString();
-    mAccMgr->ensureContactListForAccount(mAccountName);
+    connect(m_account_manager, SIGNAL(contactsForAccountChanged(Tp::Contacts)),
+            this,              SLOT(onContactsForAccountChanged(Tp::Contacts)),
+            Qt::UniqueConnection);
+
+    m_account_name = m_last_index.data().toString();
+    m_account_manager->ensureContactListForAccount(m_account_name);
 }
 
-void AccountSelectionDlg::onContactsForAccount(const Tp::Contacts c)
+void AccountSelectionDlg::onContactsForAccountChanged(const Tp::Contacts &c)
 {
-    if(mContactsListModel == NULL)
+    if(!m_contacts)
     {
-        mContactsListModel = new TpContactsListModel();
+        m_contacts = new TpContactsListModel();
     }
 
-    mContactsListModel->setContacts(c);
-    ui.listView->setModel(mContactsListModel);
+    m_contacts->setContacts(c);
+    ui.listView->setModel(m_contacts);
     ui.listView->setEnabled(true);
-    ui.label->setText(QObject::tr("Select contact:"));
+    ui.label->setText(tr("Select contact:"));
 }
 
 void AccountSelectionDlg::chooseContactClicked(bool /*checked*/)
 {
     qDebug() << "AccountSelectionDlg::chooseContactClicked()";
 
-    Q_EMIT ensureChannel(mAccountName, lastItemIndex.data().toString());
+    Q_EMIT ensureChannel(m_account_name, m_last_index.data().toString());
 }
 
-};
+} // namespace TpGame

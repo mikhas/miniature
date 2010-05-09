@@ -30,10 +30,10 @@
 
 #include "tphelpers.h"
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpTubeClient;
+class TubeClient;
 
 class TpIncomingTube : public QObject
 {
@@ -60,9 +60,9 @@ private:
     Tp::ContactPtr mContact;
     QTcpSocket *mTcpSocket;
     StreamTubeAddress mStreamTubeAddress;
-    TpTubeClient *mClient;
+    TubeClient *mClient;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPINCOMINGTUBE_H

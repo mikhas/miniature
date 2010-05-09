@@ -27,20 +27,20 @@
 #include <TelepathyQt4/ContactManager>
 #include <TelepathyQt4/Account>
 
-namespace Miniature
+namespace TpGame
 {
-    
-TpChatSession::TpChatSession(QObject *parent, Tp::AccountPtr account) :
+
+ChatSession::ChatSession(QObject *parent, Tp::AccountPtr account) :
     QObject(parent),
     m_account(account)
 {
     qDebug() << "TpChatSession::TpChatSession()";
 }
 
-TpChatSession::~TpChatSession()
+ChatSession::~ChatSession()
 {
     qDebug() << "TpChatSession::~TpChatSession()";
-    
+
     // When the ChatSession is closed, we should close the channel so that a new one is launched if
     // the same contact tries to contact us again.
     if (!m_textChannel.isNull()) {
@@ -50,7 +50,7 @@ TpChatSession::~TpChatSession()
     }
 }
 
-void TpChatSession::sendMessage(const QString &message)
+void ChatSession::sendMessage(const QString &message)
 {
     qDebug() << "TpChatSession::sendMessage()" << message;
 
@@ -58,14 +58,14 @@ void TpChatSession::sendMessage(const QString &message)
         qWarning() << "Message not sent because channel does not yet exist.";
 
         // TODO Indicate that the message sending failed.
-        
+
         return;
     }
 
     m_textChannel->send(message);
 }
 
-void TpChatSession::messageSent(const Tp::Message &message,
+void ChatSession::onMessageSent(const Tp::Message &message,
                                        Tp::MessageSendingFlags flags,
                                        const QString &sentMessageToken)
 {
@@ -78,7 +78,7 @@ void TpChatSession::messageSent(const Tp::Message &message,
     // TODO process outgoing messages with status ...
 }
 
-void TpChatSession::messageReceived(const Tp::ReceivedMessage &message)
+void ChatSession::onMessageReceived(const Tp::ReceivedMessage &message)
 {
     qDebug() << "TpChatSession::messageReceived" << message.text();
 
@@ -86,18 +86,18 @@ void TpChatSession::messageReceived(const Tp::ReceivedMessage &message)
 
     // TODO process received message
 
-    // Acknowledge the receipt of this message, 
+    // Acknowledge the receipt of this message,
     // so it won't be redespatched to us when we close the channel.
     m_textChannel->acknowledge(QList<Tp::ReceivedMessage>() << message);
 }
 
-void TpChatSession::setTextChannel(/*Tp::ContactPtr contact, */const Tp::TextChannelPtr &textChannel)
+void ChatSession::setTextChannel(/*Tp::ContactPtr contact, */const Tp::TextChannelPtr &textChannel)
 {
     qDebug() << "TpChatSession::setTextChannel";
 
 #if 0
     // TOOD watch for contact presence
-    
+
     if (contact.isNull()) {
         qWarning() << "Null contact. Fail.";
         return;
@@ -105,9 +105,9 @@ void TpChatSession::setTextChannel(/*Tp::ContactPtr contact, */const Tp::TextCha
     m_contact = contact;
 
     connect(m_contact.data(), SIGNAL(simplePresenceChanged(const QString &, uint, const QString &)),
-            this, SLOT(onContactPresenceChanged(const QString &, uint, const QString &)));        
+            this, SLOT(onContactPresenceChanged(const QString &, uint, const QString &)));
 #endif
-    
+
     m_textChannel = textChannel;
 
     // We must get the text channel ready with the required features.
@@ -128,12 +128,12 @@ void TpChatSession::setTextChannel(/*Tp::ContactPtr contact, */const Tp::TextCha
             SLOT(onTextChannelReady(Tp::PendingOperation*)));
 }
 
-void TpChatSession::onTextChannelReady(Tp::PendingOperation *op)
+void ChatSession::onTextChannelReady(Tp::PendingOperation *op)
 {
     qDebug() << "TpChatSession::onTextChannelReady";
 
     Q_UNUSED(op);
-    
+
     if (op->isError()) {
         qWarning() << "Text channel failed to become ready:"
                                        << op->errorName()
@@ -141,19 +141,17 @@ void TpChatSession::onTextChannelReady(Tp::PendingOperation *op)
         return;
     }
 
-    QObject::connect(m_textChannel.data(),
-                     SIGNAL(messageSent(const Tp::Message &, Tp::MessageSendingFlags, const QString &)),
-                     this,
-                     SLOT(messageSent(const Tp::Message &, Tp::MessageSendingFlags, const QString &)));
-    
-    QObject::connect(m_textChannel.data(),
-                     SIGNAL(messageReceived(const Tp::ReceivedMessage &)),
-                     this,
-                     SLOT(messageReceived(const Tp::ReceivedMessage &)));
+    connect(m_textChannel.data(), SIGNAL(messageSent(Tp::Message, Tp::MessageSendingFlags, QString)),
+            this,                 SLOT(onMessageSent(Tp::Message, Tp::MessageSendingFlags, QString)),
+            Qt::UniqueConnection);
+
+    connect(m_textChannel.data(), SIGNAL(messageReceived(Tp::ReceivedMessage)),
+            this,                 SLOT(onMessageReceived(Tp::ReceivedMessage)),
+            Qt::UniqueConnection);
 
     // Check for messages already there in the message queue.
     Q_FOREACH (const Tp::ReceivedMessage &message, m_textChannel->messageQueue()) {
-        messageReceived(message);
+        onMessageReceived(message);
     }
 
 #if 1
@@ -169,16 +167,16 @@ void TpChatSession::onTextChannelReady(Tp::PendingOperation *op)
 #endif
 }
 
-void TpChatSession::onContactPresenceChanged(const QString &, uint type, const QString &)
+void ChatSession::onContactPresenceChanged(const QString &, uint type, const QString &)
 {
     qDebug() << "TpChatSession::onContactPresenceChanged";
 
     Q_UNUSED(type);
 #if 0
     if(!account()->isConnected() || type == Tp::ConnectionPresenceTypeOffline) {
-        // TODO tell player about the other player leaved chat session 
+        // TODO tell player about the other player leaved chat session
     }
-#endif    
+#endif
 }
 
-};
+} // namespace TpGame

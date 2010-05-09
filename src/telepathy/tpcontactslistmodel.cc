@@ -21,7 +21,7 @@
 
 #include "tpcontactslistmodel.h"
 
-namespace Miniature
+namespace TpGame
 {
 
 TpContactsListModel::TpContactsListModel(QObject *parent)
@@ -52,5 +52,5 @@ void TpContactsListModel::setContacts(const Tp::Contacts c)
     reset();
 }
 
-};
+} // namespace TpGame
 

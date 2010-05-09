@@ -20,27 +20,27 @@
  */
 
 #include "tptubeserver.h"
-#include "tptubeclient.h"
 
-namespace Miniature
+namespace TpGame
 {
 
-TpTubeServer::TpTubeServer(QObject *parent)
+TubeServer::TubeServer(QObject *parent)
     : QTcpServer(parent)
 {
     qDebug() << "TpTubeServer::TpTubeServer()";
 }
 
-void TpTubeServer::incomingConnection(int socketDescriptor)
+void TubeServer::incomingConnection(int socketDescriptor)
 {
     qDebug() << "TpTubeServer::incomingConnection()";
 
-    TpTubeClient *client = new TpTubeClient(this);
+    TubeClient *client = new TubeClient(this);
     if(client->setSocketDescriptor(socketDescriptor))
     {
-        QObject::connect(client,
-            SIGNAL(error(QAbstractSocket::SocketError)),
-            SLOT(removeClient()));
+        connect(client, SIGNAL(error(QAbstractSocket::SocketError)),
+                this,   SLOT(removeClient()),
+                Qt::UniqueConnection);
+
         clients << client;
         return;
     }
@@ -49,13 +49,13 @@ void TpTubeServer::incomingConnection(int socketDescriptor)
     delete client;
 }
 
-void TpTubeServer::removeClient()
+void TubeServer::removeClient()
 {
     qDebug() << "TpTubeServer::removeClient()";
 
-    TpTubeClient *client = qobject_cast<TpTubeClient*>(sender());
+    TubeClient *client = static_cast<TubeClient*>(sender());
     client->deleteLater();
     clients.removeAll(client);
 }
 
-};
+} // namespace TpGame

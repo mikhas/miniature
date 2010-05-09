@@ -22,6 +22,8 @@
 #ifndef TPOUTGOINGTUBE_H
 #define TPOUTGOINGTUBE_H
 
+#include "tptubeserver.h"
+
 #include <QObject>
 #include <QTcpSocket>
 
@@ -30,17 +32,18 @@
 #include <TelepathyQt4/PendingOperation>
 #include <TelepathyQt4/Constants>
 
-#include "tptubeserver.h"
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpOutgoingTube : public QObject
+class OutgoingTube
+    : public QObject
 {
     Q_OBJECT
+
 public:
-    TpOutgoingTube(const Tp::ChannelPtr &channel, QObject *parent = 0);
-    ~TpOutgoingTube();
+    explicit OutgoingTube(const Tp::ChannelPtr &channel, QObject *parent = 0);
+    virtual ~OutgoingTube();
 
 Q_SIGNALS:
     void tubeReady(QTcpSocket *socket, const Tp::ContactPtr &);
@@ -58,9 +61,9 @@ private:
     Tp::ChannelPtr mChannel;
     Tp::Client::ChannelInterfaceTubeInterface *mTubeInterface;
     Tp::Client::ChannelTypeStreamTubeInterface *mStreamTubeInterface;
-    TpTubeServer server;
+    TubeServer server;
 };
 
-};
+} // namespace TpGame
 
 #endif // TPOUTGOINGTUBE_H

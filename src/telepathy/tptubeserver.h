@@ -22,18 +22,19 @@
 #ifndef TPTUBESERVER_H
 #define TPTUBESERVER_H
 
+#include "tptubeclient.h"
 #include <QTcpServer>
 
-namespace Miniature
+namespace TpGame
 {
 
-class TpTubeClient;
-
-class TpTubeServer : public QTcpServer
+class TubeServer
+    : public QTcpServer
 {
     Q_OBJECT
+
 public:
-    TpTubeServer(QObject *parent = 0);
+    TubeServer(QObject *parent = 0);
 
 protected:
     void incomingConnection(int socketDescriptor);
@@ -42,10 +43,10 @@ private Q_SLOTS:
     void removeClient();
 
 private:
-    QList<TpTubeClient*> clients;
+    QList<TubeClient*> clients;
 
 };
 
-};
+} // namespace TpGame
 
 #endif // TPTUBESERVER_H
