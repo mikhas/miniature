@@ -22,18 +22,36 @@
 
 using namespace Miniature;
 
+namespace
+{
+    const QLatin1String path_prefix("/usr/share/themes/alpha/backgrounds/");
+    const QString local_game_filename(path_prefix + "app_install_games.png");
+    const QString host_game_filename(path_prefix + "app_install_network.png");
+    const QString join_game_filename(path_prefix + "app_install_network.png");
+    const QString fics_game_filename(path_prefix + "app_install_network.png");
+}
+
 MPreGame::
 MPreGame(QObject *parent)
-: QObject(parent),
-  m_log(new MGameLog(this)),
-  m_main_window(new MMainWindow(m_log))
+    : QObject(parent),
+      m_main(&m_log),
+      m_local_game(tr("Local Game"),
+                   QPixmap(local_game_filename),
+                   &m_main),
+      m_host_game(tr("Host P2P Game"),
+                  QPixmap(host_game_filename),
+                  &m_main),
+      m_join_game(tr("Join P2P Game"),
+                  QPixmap(join_game_filename),
+                  &m_main),
+      m_fics_game(tr("Join FICS Game"),
+                  QPixmap(fics_game_filename),
+                  &m_main)
 {}
 
 MPreGame::
 ~MPreGame()
-{
-    delete m_main_window;
-}
+{}
 
 void MPreGame::
 onStartScreenRequested()
@@ -49,76 +67,138 @@ onStartScreenRequested()
     QHBoxLayout *hbox = new QHBoxLayout;
     buttons->setLayout(hbox);
 
-    MIconicButton *new_game = new MIconicButton(QPixmap("/usr/share/themes/alpha/backgrounds/app_install_games.png"),
-                                                tr("Local Game"), m_main_window);
-    hbox->addWidget(new_game);
+    hbox->addWidget(m_local_game.getButton());
+    hbox->addWidget(m_host_game.getButton());
+    hbox->addWidget(m_join_game.getButton());
+    hbox->addWidget(m_fics_game.getButton());
 
-    MIconicButton *new_p2p_game = new MIconicButton(QPixmap("/usr/share/themes/alpha/backgrounds/app_install_network.png"),
-                                                    QString("P2P Game"), m_main_window);
-    hbox->addWidget(new_p2p_game);
+    MMainWindow::setupPreGameUi(&m_main, buttons);
+    m_main.show();
 
-    MMainWindow::setupPreGameUi(m_main_window, buttons);
-    m_main_window->show();
+    connect(m_local_game.getButton(), SIGNAL(pressed()),
+            this,                     SLOT(onStartLocalGame()),
+            Qt::UniqueConnection);
 
-    connect(new_game, SIGNAL(pressed()),
-            this, SLOT(onNewGameRequested()));
+    connect(m_host_game.getButton(), SIGNAL(pressed()),
+            this,                    SLOT(onHostGame()),
+            Qt::UniqueConnection);
 
-    connect(new_p2p_game, SIGNAL(pressed()),
-            this, SLOT(onNewP2PGameRequested()));
+    connect(m_join_game.getButton(), SIGNAL(pressed()),
+            this,                    SLOT(onJoinGame()),
+            Qt::UniqueConnection);
 
-    m_log->append("Miniature started.", MGameLog::PREGAME);
+    m_log.append("Miniature started.", MGameLog::PREGAME);
 }
 
 void MPreGame::
-setupGame(QWidget *const source, QMainWindow *const window, MBoardView *const view, MGame *const game)
+setupGame(MGameConfig *config)
 {
     // Prevent further signal emission - we only want one game to be started!
-    source->setEnabled(false);
+    config->getButton()->disable();
 
-    game->newGame();
+    MMainWindow::setupGameUi(config->getWindow(), config->getBoardView());
+    config->getWindow()->show();
+    config->getGame()->newGame();
+    m_main.hide();
 
-    MMainWindow::setupGameUi(window, view);
-    window->show();
+    connect(config->getGame(),   SIGNAL(destroyed()),
+            config->getWindow(), SLOT(close()),
+            Qt::UniqueConnection);
 
-    connect(game, SIGNAL(destroyed()), window, SLOT(close()));
-    connect(game, SIGNAL(destroyed()), m_main_window, SLOT(show()));
+    connect(config->getGame(), SIGNAL(destroyed()),
+            &m_main,           SLOT(show()),
+            Qt::UniqueConnection);
 
-    // Allow signal emission only after this window is gone.
-    QSignalMapper *map = new QSignalMapper(window);
-    connect(game, SIGNAL(destroyed()), map, SLOT(map()));
-    map->setMapping(game, source);
-    connect(map, SIGNAL(mapped(QWidget *)), this, SLOT(enableWidget(QWidget *)));
+    // Allow signal emission from button only after the game is gone.
+    connect(config->getGame(),   SIGNAL(destroyed()),
+            config->getButton(), SLOT(enable()),
+            Qt::UniqueConnection);
 }
 
 void MPreGame::
-onNewGameRequested()
+onStartLocalGame()
 {
-    QMainWindow *window = new QMainWindow(m_main_window);
-    window->show();
-    m_main_window->hide();
-    MBoardView *view = new MBoardView(window);
-    setupGame(static_cast<QWidget *>(sender()), window, view,
-              new MLocalGame(view, m_log, window));
+    m_local_game.setGame(new MLocalGame(&m_log));
+    setupGame(&m_local_game);
 
-    window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
-    view->applyPortraitLayout();
+    m_local_game.getWindow()->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    m_local_game.getBoardView()->applyPortraitLayout();
 }
 
 void MPreGame::
-onNewP2PGameRequested()
+onHostGame()
 {
-    QMainWindow *window = new QMainWindow(m_main_window);
-    window->show();
-    m_main_window->hide();
-    MBoardView *view = new MBoardView(window);
-    setupGame(static_cast<QWidget *>(sender()), window, view,
-              new MNetworkGame(view, m_log, window));
+    m_host_game.setGame(new MNetworkGame(&m_log));
+    setupGame(&m_host_game);
 
-    view->enableAutoOrientationSupport();
+    static_cast<MNetworkGame*>(m_host_game.getGame())->hostGame();
+    m_host_game.getBoardView()->enableAutoOrientationSupport();
 }
 
 void MPreGame::
-enableWidget(QWidget *widget)
+onJoinGame()
 {
-    widget->setEnabled(true);
+    m_join_game.setGame(new MNetworkGame(&m_log));
+    setupGame(&m_join_game);
+
+    static_cast<MNetworkGame*>(m_join_game.getGame())->joinGame();
+    m_join_game.getBoardView()->enableAutoOrientationSupport();
+}
+
+void MPreGame::
+onJoinFicsGame()
+{
+    // TODO: implement!
+}
+
+MPreGame::MGameConfig::
+MGameConfig(const QString &button_label,const QPixmap &button_icon, MMainWindow *main)
+    : m_main(main),
+      m_window(0),
+      m_game(0),
+      m_button(new MIconicButton(button_icon, button_label, main))
+{
+    Q_ASSERT(0 != m_main);
+    Q_ASSERT(0 != m_button);
+}
+
+MPreGame::MGameConfig::
+~MGameConfig()
+{}
+
+void MPreGame::MGameConfig::
+setGame(MGame *game)
+{
+    delete m_game;
+    m_game = game;
+
+    delete m_window;
+    m_window = new QMainWindow(m_main);
+
+    m_game->setParent(m_window);
+    m_game->setBoardView(new MBoardView(m_window));
+}
+
+QMainWindow * MPreGame::MGameConfig::
+getWindow() const
+{
+    return m_window;
+}
+
+MBoardView * MPreGame::MGameConfig::
+getBoardView() const
+{
+    return m_game->getBoardView();
+}
+
+MGame * MPreGame::MGameConfig::
+getGame() const
+{
+    return m_game;
+}
+
+MIconicButton * MPreGame::MGameConfig::
+getButton() const
+{
+    return m_button;
 }

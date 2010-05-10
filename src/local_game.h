@@ -44,15 +44,16 @@ class MLocalGame
     Q_OBJECT
 
 public:
-    explicit MLocalGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
+    explicit MLocalGame(MGameLog *log,
+                        QObject *parent = 0);
+
     virtual ~MLocalGame();
 
-protected:
-    virtual void setupDashboard();
-    virtual void startTurn(const MPosition &position);
-
 private:
-    void connectDashboards(MDashboardItem *const first, MDashboardItem *const second);
+    virtual void setupDashboard();
+    void startTurn(const MPosition &position);
+    void connectDashboards(MDashboardItem *const first,
+                           MDashboardItem *const second);
 };
 
 } // namespace Miniature

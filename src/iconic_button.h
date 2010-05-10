@@ -37,6 +37,10 @@ public:
     virtual ~MIconicButton();
     virtual QSize sizeHint() const;
 
+public Q_SLOTS:
+    void enable();
+    void disable();
+
 Q_SIGNALS:
     void pressed();
 

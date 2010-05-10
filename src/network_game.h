@@ -22,8 +22,10 @@
 #define NETWORK_GAME_H__
 
 #include <game.h>
+#include <telepathy/tpgame.h>
 
-namespace Miniature {
+namespace Miniature
+{
 
 class MNetworkGame
     : public Miniature::MGame
@@ -31,14 +33,23 @@ class MNetworkGame
     Q_OBJECT
 
 public:
-    explicit MNetworkGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
+    explicit MNetworkGame(MGameLog *log,
+                          QObject *parent = 0);
+
     virtual ~MNetworkGame();
 
-protected:
-    virtual void onWhiteToMove(const MPosition &position);
-    virtual void onBlackToMove(const MPosition &position);
-    virtual void endTurn();
-    virtual void setupDashboard();
+public Q_SLOTS:
+    void hostGame();
+    void joinGame();
+
+private:
+    void setupDashboard();
+    void onWhiteToMove(const MPosition &position);
+    void onBlackToMove(const MPosition &position);
+    void endTurn();
+
+    // TODO: turn this int some interface later, once we have inet + tp.
+    TpGame::Game *m_tp_game;
 };
 
 } // namespace Miniature

@@ -341,7 +341,7 @@ boundingRect() const
 void MDashboardItem::
 enableConfirmButton()
 {
-    Q_CHECK_PTR(m_confirm);
+    Q_ASSERT(0 != m_confirm);
 
     m_confirm->setActive(true);
 }
@@ -349,7 +349,7 @@ enableConfirmButton()
 void MDashboardItem::
 disableConfirmButton()
 {
-    Q_CHECK_PTR(m_confirm);
+    Q_ASSERT(0 != m_confirm);
 
     m_confirm->setActive(false);
 }
@@ -357,7 +357,7 @@ disableConfirmButton()
 void MDashboardItem::
 enableRequestsButton()
 {
-    Q_CHECK_PTR(m_requests);
+    Q_ASSERT(0 != m_requests);
 
     m_requests->setActive(true);
 }
@@ -365,7 +365,7 @@ enableRequestsButton()
 void MDashboardItem::
 disableRequestsButton()
 {
-    Q_CHECK_PTR(m_requests);
+    Q_ASSERT(0 != m_requests);
 
     m_requests->setActive(false);
 }

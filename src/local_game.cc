@@ -22,24 +22,24 @@
 
 using namespace Miniature;
 
-MLocalGame::MLocalGame(MBoardView *view, MGameLog *log, QObject *parent)
-: MGame(view, log, parent)
-{
-    setupDashboard(); // cannot be reimpl in derived class if called in ctor, I wish there was "final" ...
-}
+MLocalGame::MLocalGame(MGameLog *log, QObject *parent)
+    : MGame(log, parent)
+{}
 
 MLocalGame::~MLocalGame()
 {}
 
 void MLocalGame::setupDashboard()
 {
-    Q_ASSERT(m_view);
+    Q_ASSERT_X((0 != m_board_view),
+               "setupDashboard",
+               "Invalid board view - cannot add dashboard.");
 
-    m_view->addDashboard(MBoardView::ALIGN_BOTTOM);
-    m_view->addDashboard(MBoardView::ALIGN_TOP);
+    m_board_view->addDashboard(MBoardView::ALIGN_BOTTOM);
+    m_board_view->addDashboard(MBoardView::ALIGN_TOP);
 
-    MDashboardItem *bottom = m_view->getDashboard(MBoardView::ALIGN_BOTTOM);
-    MDashboardItem *top = m_view->getDashboard(MBoardView::ALIGN_TOP);
+    MDashboardItem *bottom = m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM);
+    MDashboardItem *top = m_board_view->getDashboard(MBoardView::ALIGN_TOP);
 
     connectDashboardToGame(top);
     connectDashboardToGame(bottom);

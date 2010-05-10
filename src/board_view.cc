@@ -109,7 +109,9 @@ void MBoardView::enableAutoOrientationSupport()
 
 void MBoardView::applyPortraitLayout()
 {
-    Q_CHECK_PTR(m_board_item);
+    Q_ASSERT_X((0 != m_board_item),
+               "applyPortraitLayout",
+               "No board item found - cannot apply layout!");
 
     Q_ASSERT_X((0 != m_bottom_dashboard || 0 != m_top_dashboard),
                "applyPortraitLayout",
@@ -143,7 +145,9 @@ void MBoardView::applyPortraitLayout()
 
 void MBoardView::applyLandscapeLayout()
 {
-    Q_CHECK_PTR(m_board_item);
+    Q_ASSERT_X((0 != m_board_item),
+               "applyLandscapeLayout",
+               "No board item found - cannot apply layout!");
 
     Q_ASSERT_X((0 != m_bottom_dashboard || 0 != m_top_dashboard),
                "applyLandscapeLayout",
@@ -292,10 +296,6 @@ void MBoardView::addBoard(MGraphicsBoardItem *item)
     Q_ASSERT_X((0 != item),
                "addBoard",
                "No board item specified, invalid view.");
-
-    Q_ASSERT_X((0 != m_top_dashboard || 0 != m_bottom_dashboard),
-               "addBoard",
-               "No player's dashboard found, cannot attach board.");
 
     delete m_board_item;
     m_board_item = item;

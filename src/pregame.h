@@ -44,9 +44,6 @@ public:
     explicit MPreGame(QObject *parent = 0);
     virtual ~MPreGame();
 
-    /*!
-     *  Returns the MGameLog used internally.
-     */
     MGameLog * getLog() const;
 
 public Q_SLOTS:
@@ -58,28 +55,58 @@ public Q_SLOTS:
      */
     void onStartScreenRequested();
 
-    /*!
-     *  Starts a game in "pub mode"
-     */
-    void onNewGameRequested();
+    //! Starts a game in "pub mode"
+    void onStartLocalGame();
 
-    /*!
-     *  Starts a new P2P game.
-     */
-    void onNewP2PGameRequested();
+    //! Hosts a new P2P game.
+    void onHostGame();
+
+    //! Join an existing P2P game.
+    void onJoinGame();
+
+    //! Join a game on FICS.
+    void onJoinFicsGame();
 
 private:
-    void setupGame(QWidget *const source, QMainWindow *const window, MBoardView *const view, MGame *const game);
-
-    MGameLog *m_log;
-    MMainWindow *m_main_window;
-
-private Q_SLOTS:
     /*!
-     *  Helper slots since QSignalMapper cannot map booleans.
+     *  This class helps to configure a game, it does some basic setup and
+     *  takes care of the ownership relationships between the interacting components:
+     *  The MMainWindow -> a MIconicButton,
+     *                  -> a QMainWindow   -> a MGame,
+     *                                     -> a MBoardView.
      */
-    void enableWidget(QWidget *widget);
+    class MGameConfig
+    {
 
+    public:
+        explicit MGameConfig(const QString &button_label,
+                             const QPixmap &button_icon,
+                             MMainWindow *main);
+
+        virtual ~MGameConfig();
+
+        void setGame(MGame *game);
+
+        QMainWindow * getWindow() const;
+        MBoardView * getBoardView() const;
+        MGame * getGame() const;
+        MIconicButton * getButton() const;
+
+    private:
+        QPointer<MMainWindow> m_main;
+        QPointer<QMainWindow> m_window;
+        QPointer<MGame> m_game;
+        QPointer<MIconicButton> m_button;
+    };
+
+    void setupGame(MGameConfig *config);
+
+    MGameLog m_log;
+    MMainWindow m_main;
+    MGameConfig m_local_game;
+    MGameConfig m_host_game;
+    MGameConfig m_join_game;
+    MGameConfig m_fics_game;
 };
 
 } // namespace Miniature

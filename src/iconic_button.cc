@@ -52,6 +52,18 @@ sizeHint() const
 }
 
 void MIconicButton::
+enable()
+{
+    setEnabled(true);
+}
+
+void MIconicButton::
+disable()
+{
+    setEnabled(false);
+}
+
+void MIconicButton::
 paintEvent (QPaintEvent *event)
 {
     event->accept();

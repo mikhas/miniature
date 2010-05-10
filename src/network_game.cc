@@ -23,21 +23,45 @@
 using namespace Miniature;
 
 MNetworkGame::
-MNetworkGame(MBoardView *view, MGameLog *log, QObject *parent)
-    : MGame(view, log, parent)
-{
-    m_view->addChatbox();
-    setupDashboard(); // cannot be reimpl in derived class if called in ctor, I wish there was "final" ...
-
-    if (isWhiteAtBottom())
-        m_dashboard = m_view->getDashboard(MBoardView::ALIGN_BOTTOM);
-    else
-        m_dashboard = m_view->getDashboard(MBoardView::ALIGN_TOP);
-}
+MNetworkGame(MGameLog *log, QObject *parent)
+    : MGame(log, parent),
+      m_tp_game(0)
+{}
 
 MNetworkGame::
 ~MNetworkGame()
 {}
+
+void MNetworkGame::
+hostGame()
+{
+    delete m_tp_game;
+    m_tp_game = new TpGame::Game(this);
+    m_tp_game->hostGame();
+}
+
+void MNetworkGame::
+joinGame()
+{
+    delete m_tp_game;
+    m_tp_game = new TpGame::Game(this);
+    m_tp_game->joinGame();
+}
+
+void MNetworkGame::
+setupDashboard()
+{
+    Q_ASSERT(0 != m_board_view);
+
+    m_board_view->addChatbox();
+    m_board_view->addDashboard(MBoardView::ALIGN_BOTTOM);
+    connectDashboardToGame(m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM));
+
+    if (isWhiteAtBottom())
+        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM);
+    else
+        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_TOP);
+}
 
 void MNetworkGame::
 onWhiteToMove(const MPosition &position)
@@ -64,13 +88,4 @@ endTurn()
 {
     m_board->disable();
     MGame::endTurn();
-}
-
-void MNetworkGame::
-setupDashboard()
-{
-    Q_ASSERT(m_view);
-
-    m_view->addDashboard(MBoardView::ALIGN_BOTTOM);
-    connectDashboardToGame(m_view->getDashboard(MBoardView::ALIGN_BOTTOM));
 }

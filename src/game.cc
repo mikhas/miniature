@@ -24,56 +24,67 @@
 
 using namespace Miniature;
 
-MGame::MGame(MBoardView *view, MGameLog *log, QObject *parent)
+MGame::MGame(MGameLog *log, QObject *parent)
 : QObject(parent),
-  m_view(view),
+  m_board_view(0),
   m_log(log),
   m_board(0),
   m_store(new MGameStore(this)),
   m_dashboard(0)
 {
-    Q_CHECK_PTR(m_view);
-    Q_CHECK_PTR(m_log);
-
-    connect(m_view, SIGNAL(sendMessageRequest(QString)),
-            this,   SLOT(onSendMessageRequest(QString)));
+    Q_ASSERT(0 != m_log);
 
     connect(m_store, SIGNAL(whiteToMove(MPosition)),
-            this,         SLOT(onWhiteToMove(MPosition)));
+            this,    SLOT(onWhiteToMove(MPosition)));
 
     connect(m_store, SIGNAL(blackToMove(MPosition)),
-            this,         SLOT(onBlackToMove(MPosition)));
+            this,    SLOT(onBlackToMove(MPosition)));
 
     connect(m_store, SIGNAL(candidatePieceSelected()),
-            this,         SLOT(onCandidatePieceSelected()));
+            this,    SLOT(onCandidatePieceSelected()));
 
     connect(m_store, SIGNAL(moveDiscarded()),
-            this,         SLOT(onMoveDiscarded()));
+            this,    SLOT(onMoveDiscarded()));
 
     connect(m_store, SIGNAL(moveConfirmationRequested()),
-            this,         SLOT(onMoveConfirmationRequested()));
+            this,    SLOT(onMoveConfirmationRequested()));
 
     connect(m_store, SIGNAL(invalidTargetSelected()),
-            this,         SLOT(onInvalidTargetSelected()));
-
-    setupPositionPasting();
+            this,    SLOT(onInvalidTargetSelected()));
 }
 
 MGame::~MGame()
 {}
 
+void MGame::setBoardView(MBoardView *view)
+{
+    Q_ASSERT_X((0 != view),
+               "setBoardView",
+               "Invalid board view!");
+
+    delete m_board_view;
+    m_board_view = view;
+
+    connect(m_board_view, SIGNAL(sendMessageRequest(QString)),
+            this,         SLOT(onSendMessageRequest(QString)));
+
+    setupDashboard();
+    setupBoardItem();
+}
+
+MBoardView * MGame::getBoardView() const
+{
+    return m_board_view;
+}
+
 void MGame::setupBoardItem()
 {
-    Q_ASSERT(m_view);
+    Q_ASSERT(0 != m_board_view);
 
-    if (m_board)
-    {
-        delete m_board;
-        m_board = 0;
-    }
-
+    delete m_board;
     m_board = new MGraphicsBoardItem;
-    m_view->addBoard(m_board);
+
+    m_board_view->addBoard(m_board);
 
     // process state transition requests
     connect(m_board, SIGNAL(pieceClicked(MPiece *)),
@@ -81,19 +92,22 @@ void MGame::setupBoardItem()
     connect(m_board, SIGNAL(targetClicked(QPoint)),
             m_store, SLOT(onTargetSelected(QPoint)));
 
-    connect(this, SIGNAL(togglePieceRotations()),
+    connect(this,    SIGNAL(togglePieceRotations()),
             m_board, SIGNAL(togglePieceRotations()));
 }
 
 void MGame::setupDashboard()
 {
     // reimpl me!
+
+    Q_ASSERT_X((false),
+               "setupDashboard",
+               "This code should not be reached!");
 }
 
 void MGame::newGame()
 {
     m_log->append("New game started.", MGameLog::GAME);
-    setupBoardItem();
     m_store->setupStartPosition();
 }
 
@@ -122,11 +136,11 @@ void MGame::abortGame()
     delete this;
 }
 
-void MGame::setupPositionPasting()
+void MGame::activatePositionPasting(MMainWindow *active_window)
 {
     // TODO: Get rid of this parent() hack, as it assumes more about parent() than what's healthy. Unless we restrict
     // the MGame ctor to MMainWindows, that is ...
-    QShortcut *pasteFen = new QShortcut(static_cast<MMainWindow *>(parent()));
+    QShortcut *pasteFen = new QShortcut(active_window);
     pasteFen->setKey(QKeySequence(QKeySequence::Paste));
     pasteFen->setContext(Qt::ApplicationShortcut);
 
@@ -136,15 +150,15 @@ void MGame::setupPositionPasting()
 
 void MGame::onWhiteToMove(const MPosition &position)
 {
-    m_dashboard = (isWhiteAtBottom() ? m_view->getDashboard(MBoardView::ALIGN_BOTTOM)
-                                     : m_view->getDashboard(MBoardView::ALIGN_TOP));
+    m_dashboard = (isWhiteAtBottom() ? m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM)
+                                     : m_board_view->getDashboard(MBoardView::ALIGN_TOP));
     startTurn(position);
 }
 
 void MGame::onBlackToMove(const MPosition &position)
 {
-    m_dashboard = (isWhiteAtBottom() ? m_view->getDashboard(MBoardView::ALIGN_TOP)
-                                     : m_view->getDashboard(MBoardView::ALIGN_BOTTOM));
+    m_dashboard = (isWhiteAtBottom() ? m_board_view->getDashboard(MBoardView::ALIGN_TOP)
+                                     : m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM));
     startTurn(position);
 }
 
@@ -184,10 +198,10 @@ void MGame::onInvalidTargetSelected()
 
 void MGame::onSendMessageRequest(const QString &message)
 {
-    Q_CHECK_PTR(m_view);
+    Q_CHECK_PTR(m_board_view);
 
-    m_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
-    m_view->getChatbox()->ensureCursorVisible();
+    m_board_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
+    m_board_view->getChatbox()->ensureCursorVisible();
 
     m_log->append(QString("%1\n").arg(message), MGameLog::CHAT);
 }
@@ -235,11 +249,11 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
             this,      SLOT(abortGame()));
 
     // Connect resign requests
-    connect(dashboard,  SIGNAL(resignButtonPressed()),
-            dashboard,  SLOT(showResignConfirmation()));
+    connect(dashboard, SIGNAL(resignButtonPressed()),
+            dashboard, SLOT(showResignConfirmation()));
 
-    connect(dashboard,  SIGNAL(resignConfirmed()),
-            dashboard,  SLOT(onGameLost()));
+    connect(dashboard, SIGNAL(resignConfirmed()),
+            dashboard, SLOT(onGameLost()));
 
     // Connect the draw acceptance
     connect(dashboard, SIGNAL(drawAccepted()),
@@ -249,14 +263,14 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
             this,      SLOT(abortGame()));
 
     // Connect abort game requests
-    connect(dashboard,  SIGNAL(abortGameButtonPressed()),
-            dashboard,  SLOT(showAbortGameConfirmation()));
+    connect(dashboard, SIGNAL(abortGameButtonPressed()),
+            dashboard, SLOT(showAbortGameConfirmation()));
 
     // Connect game log requests
     QSignalMapper *mapper = new QSignalMapper(this);
     mapper->setMapping(dashboard, QApplication::activeWindow());
-    connect(dashboard,  SIGNAL(showGameLogButtonPressed()),
-            mapper,     SLOT(map()));
+    connect(dashboard, SIGNAL(showGameLogButtonPressed()),
+            mapper,    SLOT(map()));
     connect(mapper, SIGNAL(mapped(QWidget *)),
             m_log,  SLOT(showLog(QWidget *)));
 }

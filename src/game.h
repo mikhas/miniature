@@ -26,6 +26,7 @@
 #include <graphics_board_item.h>
 #include <game_log.h>
 #include <game_store.h>
+#include <main.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -41,14 +42,19 @@ namespace Miniature
  *  FEN string.
  */
 class MGame
-: public QObject
+    : public QObject
 {
     Q_OBJECT
 
 public:
 
-    explicit MGame(MBoardView *view, MGameLog *log, QObject *parent = 0);
+    explicit MGame(MGameLog *log, QObject *parent = 0);
     virtual ~MGame();
+
+    virtual void setBoardView(MBoardView *view);
+    MBoardView * getBoardView() const;
+
+    virtual void activatePositionPasting(MMainWindow *active_window);
 
 public Q_SLOTS:
     virtual void newGame();
@@ -60,7 +66,7 @@ public Q_SLOTS:
     virtual void onPositionPasted();
 
 Q_SIGNALS:
-    virtual void togglePieceRotations();
+    void togglePieceRotations();
 
 private Q_SLOTS: // can be overriden even with public inheritance:
     virtual void onWhiteToMove(const MPosition &position);
@@ -92,7 +98,7 @@ protected:
     //!  Updates the player status in the UI from the given \a position.
     virtual void updatePlayerStatus(const MPosition &position);
 
-    MBoardView *m_view; /*< A reference to the board view. >*/
+    MBoardView *m_board_view; /*< A reference to the board view. >*/
     MGameLog *m_log; /*< A reference to the game log. >*/
     MGraphicsBoardItem *m_board; /* A container for all pieces in the
         scene graph, useful for coord mapping. >*/
@@ -102,7 +108,7 @@ protected:
         the currently moving player. >*/
 
 private:
-    void setupPositionPasting();
+    void activatePositionPasting();
 };
 
 } // namespace Miniature
