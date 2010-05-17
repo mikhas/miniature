@@ -154,7 +154,7 @@ void ChatSession::onTextChannelReady(Tp::PendingOperation *op)
         onMessageReceived(message);
     }
 
-#if 1
+#if 0
     // JUST FOR TESTING
     if (!m_textChannel.isNull()) {
         qDebug() << "saying hello";

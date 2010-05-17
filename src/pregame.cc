@@ -131,7 +131,14 @@ onHostGame()
     m_host_game.setGame(new MNetworkGame(&m_log));
     setupGame(&m_host_game);
 
-    static_cast<MNetworkGame*>(m_host_game.getGame())->hostGame();
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_host_game.getGame());
+    if(!game)
+    {
+        qWarning() << "This should never happen!";
+        onStartScreenRequested();
+    }
+
+    game->hostGame();
     m_host_game.getBoardView()->enableAutoOrientationSupport();
 }
 
@@ -141,7 +148,14 @@ onJoinGame()
     m_join_game.setGame(new MNetworkGame(&m_log));
     setupGame(&m_join_game);
 
-    static_cast<MNetworkGame*>(m_join_game.getGame())->joinGame();
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_join_game.getGame());
+    if(!game)
+    {
+        qWarning() << "This should never happen!";
+        onStartScreenRequested();
+    }
+
+    game->joinGame();
     m_join_game.getBoardView()->enableAutoOrientationSupport();
 }
 

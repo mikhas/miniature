@@ -42,6 +42,9 @@ public Q_SLOTS:
     void hostGame();
     void joinGame();
 
+Q_SIGNALS:
+    void disconnected();
+
 private:
     void setupDashboard();
     void onWhiteToMove(const MPosition &position);

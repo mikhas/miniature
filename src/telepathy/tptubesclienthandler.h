@@ -53,6 +53,7 @@ public:
 Q_SIGNALS:
     void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &);
     void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &);
+    void disconnected();
 
 private Q_SLOTS:
     void deleteOutgoingTube();

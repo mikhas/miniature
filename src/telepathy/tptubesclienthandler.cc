@@ -144,6 +144,8 @@ void TpTubesClientHandler::deleteOutgoingTube()
         return;
     }
 
+    Q_EMIT disconnected();
+
     mOutgoingTubes.removeOne(tube);
     tube->deleteLater();
 }
@@ -159,6 +161,8 @@ void TpTubesClientHandler::deleteIncomingTube()
         qDebug() << "Wrong incoming tube?";
         return;
     }
+
+    Q_EMIT disconnected();
 
     mIncomingTubes.removeOne(tube);
     tube->deleteLater();

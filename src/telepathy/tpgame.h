@@ -46,6 +46,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void initialized();
+    void disconnected();
 
 private Q_SLOTS:
     void onAccountNamesChanged(const QStringList &account_names);

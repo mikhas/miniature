@@ -47,6 +47,8 @@ Game::Game(QObject *parent)
             this,          SLOT(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
             Qt::UniqueConnection);
 
+    connect(client.data(), SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
+
     // TODO: client name should be a ctor arg
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
 
