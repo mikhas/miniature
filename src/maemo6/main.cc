@@ -19,7 +19,8 @@
  */
 
 #include <config.h>
-#include <main.h>
+#include <mmainwindow.h>
+#include <dbusappactivator.h>
 #include <about.ui.h>
 
 /*! \brief Container for Miniature main actions.
