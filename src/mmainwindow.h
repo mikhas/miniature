@@ -97,31 +97,5 @@ private:
     QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */
 };
 
-/*! \brief D-Bus activation for Miniature
- *
- *  On Maemo, applications get started via D-Bus. Also, D-Bus will take care
- *  that there is always only one application instance running. This class
- *  provides the required D-Bus interface for Miniature.
- *
- *  For non-Maemo platforms the class' implementation will simply do nothing.
- */
-class QDBusAppActivator
-: public QDBusAbstractAdaptor
-{
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.maemo.miniature")
 
-public:
-    explicit QDBusAppActivator(MMainWindow *window);
-
-public Q_SLOTS:
-    /*!
-     *  This slot gets called via D-Bus.
-     */
-    void top_application();
-
-private:
-    MMainWindow *m_window; /*!< A back pointer to the main view. */
-};
-
-#endif // MINIATURE_H__
+#endif // MMAINWINDOW_H
