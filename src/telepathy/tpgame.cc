@@ -91,12 +91,16 @@ void Game::newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)
 {
     // TODO: impl
     qDebug() << "TpGame::newIncomingTube()";
+
+    Q_EMIT connected();
 }
 
 void Game::newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)
 {
     // TODO: impl
     qDebug() << "TpGame::newOutgoingTube()";
+
+    Q_EMIT connected();
 }
 
 } // namespace TpGame

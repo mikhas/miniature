@@ -44,6 +44,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void disconnected();
+    void connected();
 
 private:
     void setupDashboard();

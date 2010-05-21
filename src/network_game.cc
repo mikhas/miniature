@@ -38,6 +38,7 @@ hostGame()
     delete m_tp_game;
     m_tp_game = new TpGame::Game(this);
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     m_tp_game->hostGame();
 }
 
@@ -47,6 +48,7 @@ joinGame()
     delete m_tp_game;
     m_tp_game = new TpGame::Game(this);
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     m_tp_game->joinGame();
 }
 

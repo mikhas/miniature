@@ -68,7 +68,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void togglePieceRotations();
     void disconnected();
-    void setupBoard();
+    void connected();
 
 private Q_SLOTS: // can be overriden even with public inheritance:
     virtual void onWhiteToMove(const MPosition &position);

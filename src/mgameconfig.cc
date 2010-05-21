@@ -81,7 +81,7 @@ setupGame()
             Qt::UniqueConnection);
 
     connect(getGame(), SIGNAL(disconnected()), SIGNAL(restart()), Qt::UniqueConnection);
-    connect(getGame(), SIGNAL(setupBoard()), SLOT(runGame()), Qt::UniqueConnection);
+    connect(getGame(), SIGNAL(connected()), SLOT(runGame()), Qt::UniqueConnection);
 
     getGame()->newGame();
 }
