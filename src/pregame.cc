@@ -121,7 +121,10 @@ onStartLocalGame()
     m_local_game.setGame(new MLocalGame(&m_log));
     setupGame(&m_local_game);
 
+#ifdef Q_WS_MAEMO_5
     m_local_game.getWindow()->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+#endif
+
     m_local_game.getBoardView()->applyPortraitLayout();
 }
 
@@ -137,6 +140,9 @@ onHostGame()
         qWarning() << "This should never happen!";
         onStartScreenRequested();
     }
+
+    connect(game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
+    connect(game, SIGNAL(setupBoard()), SLOT(setupGameBoard()), Qt::UniqueConnection);
 
     game->hostGame();
     m_host_game.getBoardView()->enableAutoOrientationSupport();
@@ -155,6 +161,9 @@ onJoinGame()
         onStartScreenRequested();
     }
 
+    connect(game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
+    connect(game, SIGNAL(setupBoard()), SLOT(setupGameBoard()), Qt::UniqueConnection);
+
     game->joinGame();
     m_join_game.getBoardView()->enableAutoOrientationSupport();
 }
@@ -163,6 +172,12 @@ void MPreGame::
 onJoinFicsGame()
 {
     // TODO: implement!
+}
+
+void MPreGame::
+setupGameBoard()
+{
+
 }
 
 MPreGame::MGameConfig::

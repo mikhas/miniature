@@ -103,7 +103,10 @@ void MBoardView::enableAutoOrientationSupport()
             this,                    SLOT(onOrientationChanged()),
             Qt::UniqueConnection);
 
+#ifdef Q_WS_MAEMO_5
     static_cast<QMainWindow *>(parent())->setAttribute(Qt::WA_Maemo5AutoOrientation, true);
+#endif
+
     onOrientationChanged();
 }
 
