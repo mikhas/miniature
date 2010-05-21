@@ -26,7 +26,7 @@
 #include <graphics_board_item.h>
 #include <game_log.h>
 #include <game_store.h>
-#include <main.h>
+#include <mmainwindow.h>
 
 #include <QtCore>
 #include <QtGui>

@@ -23,7 +23,7 @@
 #include <local_game.h>
 #include <network_game.h>
 
-#include <main.h>
+#include <mmainwindow.h>
 #include <iconic_button.h>
 
 #include <QtCore>

@@ -18,33 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <config.h>
-#include <main.h>
 #include <pregame.h>
-
-MMainWindow::~MMainWindow()
-{}
-
-void MMainWindow::appendDebugOutput(const QString &msg)
-{
-    Q_UNUSED(msg);
-    // no impl
-}
-
-void MMainWindow::toggleDebugOutput()
-{
-    // no impl
-}
-
-QDBusAppActivator::QDBusAppActivator(MMainWindow *window)
-: QDBusAbstractAdaptor(window),
-  m_window(window)
-{}
-
-void QDBusAppActivator::top_application()
-{
-    m_window->activateWindow();
-}
 
 int main(int argc, char ** argv)
 {

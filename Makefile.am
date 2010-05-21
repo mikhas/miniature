@@ -13,8 +13,12 @@ src_miniature_LDADD = $(MINIATURE_LIBS) $(QT_LIBS)
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \
 			src/main.cc \
-			src/main.h \
-			src/main.moc.cc \
+                        src/mmainwindow.cc \
+                        src/mmainwindow.h \
+                        src/mmainwindow.moc.cc \
+                        src/dbusappactivator.cc \
+                        src/dbusappactivator.h \
+                        src/dbusappactivator.moc.cc \
 			data/data.qrc \
 			data/data.qrc.cc \
 			src/board_view.cc \
@@ -153,13 +157,14 @@ BUILT_SOURCES = \
 		src/graphics_board_item.moc.cc \
 		src/iconic_button.moc.cc \
 		src/local_game.moc.cc \
-		src/main.moc.cc \
 		src/network_game.moc.cc \
 		src/pieces/piece.moc.cc \
 		src/pregame.moc.cc \
 		src/telepathy/tpaccountmanager.moc.cc \
 		src/telepathy/tpaccountitem.moc.cc \
 		src/select_account.ui.h \
+                src/mmainwindow.moc.cc \
+                src/dbusappactivator.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
