@@ -24,6 +24,7 @@
 #include <network_game.h>
 
 #include <mmainwindow.h>
+#include <mgameconfig.h>
 #include <iconic_button.h>
 
 #include <QtCore>
@@ -68,45 +69,14 @@ public Q_SLOTS:
     void onJoinFicsGame();
 
 private:
-    /*!
-     *  This class helps to configure a game, it does some basic setup and
-     *  takes care of the ownership relationships between the interacting components:
-     *  The MMainWindow -> a MIconicButton,
-     *                  -> a QMainWindow   -> a MGame,
-     *                                     -> a MBoardView.
-     */
-    class MGameConfig
-    {
-
-    public:
-        explicit MGameConfig(const QString &button_label,
-                             const QPixmap &button_icon,
-                             MMainWindow *main);
-
-        virtual ~MGameConfig();
-
-        void setGame(MGame *game);
-
-        QMainWindow * getWindow() const;
-        MBoardView * getBoardView() const;
-        MGame * getGame() const;
-        MIconicButton * getButton() const;
-
-    private:
-        QPointer<MMainWindow> m_main;
-        QPointer<QMainWindow> m_window;
-        QPointer<MGame> m_game;
-        QPointer<MIconicButton> m_button;
-    };
-
-    void setupGame(MGameConfig *config);
-
     MGameLog m_log;
     MMainWindow m_main;
-    MGameConfig m_local_game;
-    MGameConfig m_host_game;
-    MGameConfig m_join_game;
-    MGameConfig m_fics_game;
+    MGameConfig m_game_config;
+
+    QPointer<MIconicButton> m_local_game;
+    QPointer<MIconicButton> m_host_game;
+    QPointer<MIconicButton> m_join_game;
+    QPointer<MIconicButton> m_fics_game;
 };
 
 } // namespace Miniature

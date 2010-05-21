@@ -21,6 +21,9 @@ src_miniature_SOURCES = \
                         src/dbusappactivator.moc.cc \
 			data/data.qrc \
 			data/data.qrc.cc \
+                        src/mgameconfig.h \
+                        src/mgameconfig.cc \
+                        src/mgameconfig.moc.cc \
 			src/board_view.cc \
 			src/board_view.h \
 			src/board_view.moc.cc \
@@ -165,6 +168,7 @@ BUILT_SOURCES = \
 		src/select_account.ui.h \
                 src/mmainwindow.moc.cc \
                 src/dbusappactivator.moc.cc \
+                src/mgameconfig.moc.cc \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
