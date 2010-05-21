@@ -16,7 +16,7 @@ QDBusArgument &operator<<(QDBusArgument &argument,
 const QDBusArgument &operator>>(const QDBusArgument &argument,
         StreamTubeAddress &streamTubeAddress);
 
-namespace Miniature
+namespace TpGame
 {
 
 enum Command
@@ -32,14 +32,14 @@ enum Command
     Nop
 };
 
-typedef std::map<Miniature::Command, QString> CommandsMap;
+typedef std::map<TpGame::Command, QString> CommandsMap;
 
 CommandsMap createCommandsMap();
 
 } // namespace Miniature
 
-QString commandToString(Miniature::Command c);
-Miniature::Command commandFromString(QString c);
+QString commandToString(TpGame::Command c);
+TpGame::Command commandFromString(QString c);
 
 
 

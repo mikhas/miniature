@@ -1,20 +1,20 @@
 #include "tphelpers.h"
 
-namespace Miniature
+namespace TpGame
 {
 
 CommandsMap createCommandsMap()
 {
     CommandsMap commandsMap;
 
-    commandsMap[Miniature::NewGame] = QString("new_game");
-    commandsMap[Miniature::NewGameStarted] = QString("new_game_started");
-    commandsMap[Miniature::NextMove] = QString("next_move");
-    commandsMap[Miniature::BackMove] = QString("back_move");
-    commandsMap[Miniature::PauseGame] = QString("pause_game");
-    commandsMap[Miniature::ProposeDraw] = QString("propose_draw");
-    commandsMap[Miniature::AdjournGame] = QString("adjourn_game");
-    commandsMap[Miniature::ResignGame] = QString("resign_game");
+    commandsMap[TpGame::NewGame] = QString("new_game");
+    commandsMap[TpGame::NewGameStarted] = QString("new_game_started");
+    commandsMap[TpGame::NextMove] = QString("next_move");
+    commandsMap[TpGame::BackMove] = QString("back_move");
+    commandsMap[TpGame::PauseGame] = QString("pause_game");
+    commandsMap[TpGame::ProposeDraw] = QString("propose_draw");
+    commandsMap[TpGame::AdjournGame] = QString("adjourn_game");
+    commandsMap[TpGame::ResignGame] = QString("resign_game");
 
     return commandsMap;
 }
@@ -40,10 +40,10 @@ const QDBusArgument &operator>>(const QDBusArgument &argument,
     return argument;
 }
 
-QString commandToString(Miniature::Command command)
+QString commandToString(TpGame::Command command)
 {
-    Miniature::CommandsMap commandsMap = Miniature::createCommandsMap();
-    for (Miniature::CommandsMap::const_iterator iter = commandsMap.begin();
+    TpGame::CommandsMap commandsMap = TpGame::createCommandsMap();
+    for (TpGame::CommandsMap::const_iterator iter = commandsMap.begin();
          iter != commandsMap.end();
          ++iter)
     {
@@ -54,7 +54,7 @@ QString commandToString(Miniature::Command command)
         }
     }
 
-    return commandsMap[Miniature::Nop];
+    return commandsMap[TpGame::Nop];
 }
 /*
 NextMove,
@@ -65,10 +65,10 @@ AdjournGame,
 ResignGame,
 */
 
-Miniature::Command commandFromString(QString command)
+TpGame::Command commandFromString(QString command)
 {
-    Miniature::CommandsMap commandsMap = Miniature::createCommandsMap();
-    for (Miniature::CommandsMap::const_iterator iter = commandsMap.begin();
+    TpGame::CommandsMap commandsMap = TpGame::createCommandsMap();
+    for (TpGame::CommandsMap::const_iterator iter = commandsMap.begin();
          iter != commandsMap.end();
          ++iter)
     {
@@ -79,5 +79,5 @@ Miniature::Command commandFromString(QString command)
         }
     }
 
-    return Miniature::Nop;
+    return TpGame::Nop;
 }

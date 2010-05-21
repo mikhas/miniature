@@ -45,12 +45,12 @@ void TubeClient::readyToTransfer()
 
     QString command;
     stream >> command;
-/*
-    Command c = commandFromString(command);
+
+    TpGame::Command c = commandFromString(command);
 
     switch(c)
     {
-        case Miniature::NewGame:
+        case TpGame::NewGame:
         {
             qDebug() << "switch NewGame";
 
@@ -62,7 +62,7 @@ void TubeClient::readyToTransfer()
             newGameStarted();
             break;
         }
-        case Miniature::NewGameStarted:
+        case TpGame::NewGameStarted:
         {
             qDebug() << "switch NewGameStarted";
 
@@ -72,13 +72,19 @@ void TubeClient::readyToTransfer()
             qDebug() << testString;
             break;
         }
-        case Miniature::Nop:
+
+        case TpGame::NextMove:
+        case TpGame::BackMove:
+        case TpGame::PauseGame:
+        case TpGame::ProposeDraw:
+        case TpGame::AdjournGame:
+        case TpGame::ResignGame:
+        case TpGame::Nop:
         {
             // nothing;
             break;
         }
     }
-*/
 }
 
 void TubeClient::startNewGame()
@@ -87,7 +93,7 @@ void TubeClient::startNewGame()
 
     QDataStream stream(this);
 
-    stream << commandToString(Miniature::NewGame);
+    stream << commandToString(TpGame::NewGame);
     stream << QString("Start new game");
 }
 
@@ -97,7 +103,7 @@ void TubeClient::newGameStarted()
 
     QDataStream stream(this);
 
-    stream << commandToString(Miniature::NewGameStarted);
+    stream << commandToString(TpGame::NewGameStarted);
     stream << QString("New game started");
 }
 
