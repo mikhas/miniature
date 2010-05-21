@@ -54,7 +54,8 @@ MGame::MGame(MGameLog *log, QObject *parent)
 }
 
 MGame::~MGame()
-{}
+{
+}
 
 void MGame::setBoardView(MBoardView *view)
 {

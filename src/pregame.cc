@@ -174,12 +174,6 @@ onJoinFicsGame()
     // TODO: implement!
 }
 
-void MPreGame::
-setupGameBoard()
-{
-
-}
-
 MPreGame::MGameConfig::
 MGameConfig(const QString &button_label,const QPixmap &button_icon, MMainWindow *main)
     : m_main(main),
@@ -202,7 +196,7 @@ setGame(MGame *game)
     m_game = game;
 
     delete m_window;
-    m_window = new QMainWindow(m_main);
+    m_window = new QMainWindow;
 
     m_game->setParent(m_window);
     m_game->setBoardView(new MBoardView(m_window));
