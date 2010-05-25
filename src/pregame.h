@@ -26,6 +26,7 @@
 #include <mmainwindow.h>
 #include <mgameconfig.h>
 #include <iconic_button.h>
+#include "incoming_connection.ui.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -68,6 +69,9 @@ public Q_SLOTS:
     //! Join a game on FICS.
     void onJoinFicsGame();
 
+private Q_SLOTS:
+    void onWaitingForConnection();
+
 private:
     MGameLog m_log;
     MMainWindow m_main;
@@ -77,6 +81,7 @@ private:
     QPointer<MIconicButton> m_host_game;
     QPointer<MIconicButton> m_join_game;
     QPointer<MIconicButton> m_fics_game;
+    Ui_IncomingConnectionWidget *m_waiting_ui;
 };
 
 } // namespace Miniature

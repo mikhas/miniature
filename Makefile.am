@@ -169,6 +169,7 @@ BUILT_SOURCES = \
                 src/mmainwindow.moc.cc \
                 src/dbusappactivator.moc.cc \
                 src/mgameconfig.moc.cc \
+                src/incoming_connection.ui.h \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop

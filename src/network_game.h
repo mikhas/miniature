@@ -41,6 +41,7 @@ public:
 public Q_SLOTS:
     void hostGame();
     void joinGame();
+    void disconnect();
 
 Q_SIGNALS:
     void disconnected();

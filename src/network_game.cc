@@ -53,6 +53,15 @@ joinGame()
 }
 
 void MNetworkGame::
+disconnect()
+{
+    if(m_tp_game)
+        delete m_tp_game;
+
+    Q_EMIT disconnected();
+}
+
+void MNetworkGame::
 setupDashboard()
 {
     Q_ASSERT(0 != m_board_view);

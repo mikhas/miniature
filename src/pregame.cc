@@ -35,16 +35,9 @@ MPreGame::
 MPreGame(QObject *parent)
     : QObject(parent),
       m_main(&m_log),
-      m_game_config(&m_main)
+      m_game_config(&m_main),
+      m_waiting_ui(new Ui_IncomingConnectionWidget)
 {
-    m_local_game = new MIconicButton(QPixmap(local_game_filename),
-        tr("Local Game"), &m_main);
-    m_host_game = new MIconicButton(QPixmap(host_game_filename),
-        tr("Host P2P Game"), &m_main);
-    m_join_game = new MIconicButton(QPixmap(join_game_filename),
-        tr("Join P2P Game"), &m_main);
-    m_fics_game = new MIconicButton(QPixmap(fics_game_filename),
-        tr("Join FICS Game"), &m_main);
 }
 
 MPreGame::
@@ -52,8 +45,26 @@ MPreGame::
 {}
 
 void MPreGame::
+onWaitingForConnection()
+{
+    QWidget *central = new QWidget;
+    m_waiting_ui->setupUi(central);
+    MMainWindow::setupPreGameUi(&m_main, central);
+    m_main.show();
+}
+
+void MPreGame::
 onStartScreenRequested()
 {
+    m_local_game = new MIconicButton(QPixmap(local_game_filename),
+        tr("Local Game"));
+    m_host_game = new MIconicButton(QPixmap(host_game_filename),
+        tr("Host P2P Game"));
+    m_join_game = new MIconicButton(QPixmap(join_game_filename),
+        tr("Join P2P Game"));
+    m_fics_game = new MIconicButton(QPixmap(fics_game_filename),
+        tr("Join FICS Game"));
+
     QWidget *central = new QWidget;
     QVBoxLayout *vbox = new QVBoxLayout;
     central->setLayout(vbox);
@@ -70,7 +81,7 @@ onStartScreenRequested()
     hbox->addWidget(m_join_game);
     hbox->addWidget(m_fics_game);
 
-    MMainWindow::setupPreGameUi(&m_main, buttons);
+    MMainWindow::setupPreGameUi(&m_main, central);
     m_main.show();
 
     connect(m_local_game, SIGNAL(pressed()),
@@ -118,6 +129,15 @@ onHostGame()
         qWarning() << "This should never happen!";
         onStartScreenRequested();
     }
+
+    onWaitingForConnection();
+
+    connect(m_waiting_ui->cancelButton, SIGNAL(released()),
+            game, SLOT(disconnect()),
+            Qt::UniqueConnection);
+    connect(game, SIGNAL(disconnected()),
+            this, SLOT(onStartScreenRequested()),
+            Qt::UniqueConnection);
 
     game->hostGame();
     m_game_config.getBoardView()->enableAutoOrientationSupport();
