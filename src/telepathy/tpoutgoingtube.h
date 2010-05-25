@@ -55,10 +55,11 @@ private Q_SLOTS:
     void onChannelInvalidated(Tp::DBusProxy *, const QString &, const QString &);
     void onOfferTubeFinished(QDBusPendingCallWatcher *);
     void onNewRemoteConnection(uint, QDBusVariant, uint);
-    void onTubeStateChanged(uint);
+    void onTubeChannelStateChanged(uint);
 
 private:
     Tp::ChannelPtr mChannel;
+    Tp::ContactPtr mContact;
     Tp::Client::ChannelInterfaceTubeInterface *mTubeInterface;
     Tp::Client::ChannelTypeStreamTubeInterface *mStreamTubeInterface;
     TubeServer server;

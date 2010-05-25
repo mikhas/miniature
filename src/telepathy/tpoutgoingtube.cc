@@ -80,7 +80,7 @@ void OutgoingTube::onChannelReady(Tp::PendingOperation *op)
 
         connect(mTubeInterface,
                 SIGNAL(TubeChannelStateChanged(uint)),
-                SLOT(onTubeStateChanged(uint)));
+                SLOT(onTubeChannelStateChanged(uint)));
 
         if(!server.listen())
         {
@@ -145,9 +145,15 @@ void OutgoingTube::onChannelInvalidated(Tp::DBusProxy *proxy, const QString &err
     Q_EMIT readyToBeDeleted();
 }
 
-void OutgoingTube::onTubeStateChanged(uint state)
+void OutgoingTube::onTubeChannelStateChanged(uint state)
 {
+    qDebug() << "OutgoingTube::onTubeChannelStateChanged()";
     qDebug() << "Tube state changed:" << state;
+
+    if(state != Tp::TubeStateOpen)
+        return;
+
+    Q_EMIT tubeReady(server.nextPendingConnection(), mContact);
 
     Q_EMIT statusChanged(state);
 }

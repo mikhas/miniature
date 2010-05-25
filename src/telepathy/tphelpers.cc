@@ -8,13 +8,15 @@ CommandsMap createCommandsMap()
     CommandsMap commandsMap;
 
     commandsMap[TpGame::NewGame] = QString("new_game");
-    commandsMap[TpGame::NewGameStarted] = QString("new_game_started");
-    commandsMap[TpGame::NextMove] = QString("next_move");
-    commandsMap[TpGame::BackMove] = QString("back_move");
-    commandsMap[TpGame::PauseGame] = QString("pause_game");
-    commandsMap[TpGame::ProposeDraw] = QString("propose_draw");
-    commandsMap[TpGame::AdjournGame] = QString("adjourn_game");
-    commandsMap[TpGame::ResignGame] = QString("resign_game");
+    commandsMap[TpGame::NewGameAccept] = QString("new_game_accept");
+    commandsMap[TpGame::Move] = QString("move");
+    commandsMap[TpGame::TakeBack] = QString("take_back");
+    commandsMap[TpGame::TakeBackAccept] = QString("take_back_accept");
+    commandsMap[TpGame::Draw] = QString("draw");
+    commandsMap[TpGame::DrawAccept] = QString("draw_accept");
+    commandsMap[TpGame::Resign] = QString("resign");
+    commandsMap[TpGame::Adjourn] = QString("adjourn");
+    commandsMap[TpGame::AdjournAccept] = QString("adjourn_accept");
 
     return commandsMap;
 }
@@ -56,14 +58,6 @@ QString commandToString(TpGame::Command command)
 
     return commandsMap[TpGame::Nop];
 }
-/*
-NextMove,
-BackMove,
-PauseGame,
-ProposeDraw,
-AdjournGame,
-ResignGame,
-*/
 
 TpGame::Command commandFromString(QString command)
 {

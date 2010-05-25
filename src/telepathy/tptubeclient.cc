@@ -52,19 +52,22 @@ void TubeClient::readyToTransfer()
     {
         case TpGame::NewGame:
         {
-            qDebug() << "switch NewGame";
+            qDebug() << "Receiving NewGame";
 
             QString testString;
             stream >> testString;
 
             qDebug() << testString;
 
-            newGameStarted();
+            Q_EMIT receivedNewGame();
+
+            sendNewGameAccept();
             break;
         }
-        case TpGame::NewGameStarted:
+
+        case TpGame::NewGameAccept:
         {
-            qDebug() << "switch NewGameStarted";
+            qDebug() << "Receiving NewGameAccept";
 
             QString testString;
             stream >> testString;
@@ -73,12 +76,78 @@ void TubeClient::readyToTransfer()
             break;
         }
 
-        case TpGame::NextMove:
-        case TpGame::BackMove:
-        case TpGame::PauseGame:
-        case TpGame::ProposeDraw:
-        case TpGame::AdjournGame:
-        case TpGame::ResignGame:
+        case TpGame::Move:
+        {
+            qDebug() << "Receiving Move";
+
+            Q_EMIT receivedMove();
+
+            break;
+        }
+
+        case TpGame::TakeBack:
+        {
+            qDebug() << "Receiving TakeBack";
+
+            Q_EMIT receivedTakeBack();
+
+            break;
+        }
+
+        case TpGame::TakeBackAccept:
+        {
+            qDebug() << "Receiving TakeBackAccept";
+
+            Q_EMIT receivedTakeBackAccept();
+
+            break;
+        }
+
+        case TpGame::Draw:
+        {
+            qDebug() << "Receiving Draw";
+
+            Q_EMIT receivedDraw();
+
+            break;
+        }
+
+        case TpGame::DrawAccept:
+        {
+            qDebug() << "Receiving DrawAccept";
+
+            Q_EMIT receivedDrawAccept();
+
+            break;
+        }
+
+        case TpGame::Resign:
+        {
+            qDebug() << "Receiving Resign";
+
+            Q_EMIT receivedResign();
+
+            break;
+        }
+
+        case TpGame::Adjourn:
+        {
+            qDebug() << "Receiving Adjourn";
+
+            Q_EMIT receivedAdjourn();
+
+            break;
+        }
+
+        case TpGame::AdjournAccept:
+        {
+            qDebug() << "Receiving AdjournAccept";
+
+            Q_EMIT receivedAdjournAccept();
+
+            break;
+        }
+
         case TpGame::Nop:
         {
             // nothing;
@@ -87,9 +156,9 @@ void TubeClient::readyToTransfer()
     }
 }
 
-void TubeClient::startNewGame()
+void TubeClient::sendNewGame()
 {
-    qDebug() << "TpTubeClient::startNewGame()";
+    qDebug() << "TpTubeClient::sendNewGame()";
 
     QDataStream stream(this);
 
@@ -97,14 +166,71 @@ void TubeClient::startNewGame()
     stream << QString("Start new game");
 }
 
-void TubeClient::newGameStarted()
+void TubeClient::sendNewGameAccept()
 {
-    qDebug() << "TpTubeClient::newGameStarted()";
+    qDebug() << "TpTubeClient::sendNewGameAccept()";
 
     QDataStream stream(this);
 
-    stream << commandToString(TpGame::NewGameStarted);
-    stream << QString("New game started");
+    stream << commandToString(TpGame::NewGameAccept);
+    stream << QString("New game accept");
 }
+
+void TubeClient::sendMove()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::Move);
+}
+
+void TubeClient::sendTakeBack()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::TakeBack);
+}
+
+void TubeClient::sendTakeBackAccept()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::TakeBackAccept);
+}
+
+void TubeClient::sendDraw()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::Draw);
+}
+
+void TubeClient::sendDrawAccept()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::DrawAccept);
+}
+
+void TubeClient::sendResign()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::Resign);
+}
+
+void TubeClient::sendAdjourn()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::Adjourn);
+}
+
+void TubeClient::sendAdjournAccept()
+{
+    QDataStream stream(this);
+
+    stream << commandToString(TpGame::AdjournAccept);
+}
+
 
 } // namespace TpGame

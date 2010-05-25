@@ -22,19 +22,33 @@ namespace TpGame
 enum Command
 {
     NewGame,
-    NewGameStarted,
-    NextMove,
-    BackMove,
-    PauseGame,
-    ProposeDraw,
-    AdjournGame,
-    ResignGame,
+    NewGameAccept,
+    Move,
+    TakeBack,
+    TakeBackAccept,
+    Draw,
+    DrawAccept,
+    Resign,
+    Adjourn,
+    AdjournAccept,
     Nop
 };
 
 typedef std::map<TpGame::Command, QString> CommandsMap;
 
 CommandsMap createCommandsMap();
+
+struct MoveStruct
+{
+    QString mMove;
+    QString mFen;
+};
+
+struct TakeBackStruct
+{
+    int mBackMoves;
+    QString mFen;
+};
 
 } // namespace Miniature
 

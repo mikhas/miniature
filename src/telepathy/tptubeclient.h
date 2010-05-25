@@ -36,13 +36,32 @@ public:
     TubeClient(QObject *parent = 0);
 
 Q_SIGNALS:
+    void receivedNewGame();
+    void receivedNewGameAccept();
+    void receivedMove();
+    void receivedTakeBack();
+    void receivedTakeBackAccept();
+    void receivedDraw();
+    void receivedDrawAccept();
+    void receivedResign();
+    void receivedAdjourn();
+    void receivedAdjournAccept();
 
 public Q_SLOTS:
-    void startNewGame();
-    void newGameStarted();
+    void sendNewGame();
+    void sendNewGameAccept();
+    void sendMove();
+    void sendTakeBack();
+    void sendTakeBackAccept();
+    void sendDraw();
+    void sendDrawAccept();
+    void sendResign();
+    void sendAdjourn();
+    void sendAdjournAccept();
 
 private Q_SLOTS:
     void readyToTransfer();
+
 };
 
 } // namespace TpGame
