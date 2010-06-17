@@ -73,10 +73,10 @@ setupDashboard()
     m_board_view->addDashboard(MBoardView::ALIGN_BOTTOM);
     connectDashboardToGame(m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM));
 
-    if (isWhiteAtBottom())
+//    if (isWhiteAtBottom())
         m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM);
-    else
-        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_TOP);
+//    else
+//        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_TOP);
 }
 
 void MNetworkGame::

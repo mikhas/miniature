@@ -121,7 +121,7 @@ void MGame::newGame()
     setupBoardItem();
 
     m_log->append("New game started.", MGameLog::GAME);
-    m_store->setupStartPosition();
+    m_store->setupStartPosition(isWhiteAtBottom());
 }
 
 void MGame::jumpToStart()

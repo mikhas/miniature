@@ -53,7 +53,7 @@ public:
      *  Creates a MPosition with the default chess start position and stores it
      *  in m_game.
      */
-    void setupStartPosition();
+    void setupStartPosition(bool isWhiteAtBottom = true);
 
     //! Returns whose turn it is.
     bool hasWhiteToMove() const;
