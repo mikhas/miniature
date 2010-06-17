@@ -32,6 +32,7 @@ MGame::MGame(MGameLog *log, QObject *parent)
   m_store(new MGameStore(this)),
   m_dashboard(0)
 {
+    qDebug() << "MGame::MGame()";
     Q_ASSERT(0 != m_log);
 
     connect(m_store, SIGNAL(whiteToMove(MPosition)),
@@ -55,10 +56,13 @@ MGame::MGame(MGameLog *log, QObject *parent)
 
 MGame::~MGame()
 {
+    qDebug() << "MGame::~MGame()";
 }
 
 void MGame::setBoardView(MBoardView *view)
 {
+    qDebug() << "MGame::setBoardView()";
+
     Q_ASSERT_X((0 != view),
                "setBoardView",
                "Invalid board view!");
@@ -75,11 +79,15 @@ void MGame::setBoardView(MBoardView *view)
 
 MBoardView * MGame::getBoardView() const
 {
+    qDebug() << "MGame::getBoardView()";
+
     return m_board_view;
 }
 
 void MGame::setupBoardItem()
 {
+    qDebug() << "MGame::setupBoardItem()";
+
     Q_ASSERT(0 != m_board_view);
 
     delete m_board;
@@ -99,6 +107,8 @@ void MGame::setupBoardItem()
 
 void MGame::setupDashboard()
 {
+    qDebug() << "MGame::setupDashboard()";
+
     // reimpl me!
 
     Q_ASSERT_X((false),
@@ -108,37 +118,51 @@ void MGame::setupDashboard()
 
 void MGame::newGame()
 {
+    qDebug() << "MGame::newGame()";
+
     m_log->append("New game started.", MGameLog::GAME);
     m_store->setupStartPosition();
 }
 
 void MGame::jumpToStart()
 {
+    qDebug() << "MGame::jumpToStart()";
+
     m_store->onPositionRequested(0);
 }
 
 void MGame::prevMove()
 {
+    qDebug() << "MGame::prevMove()";
+
     m_store->onPositionRequested(m_store->getIndex() - 1);
 }
 
 void MGame::nextMove()
 {
+    qDebug() << "MGame::nextMove()";
+
     m_store->onPositionRequested(m_store->getIndex() + 1);
 }
 
 void MGame::jumpToEnd()
 {
+    qDebug() << "MGame::jumpToEnd()";
+
 // no impl
 }
 
 void MGame::abortGame()
 {
+    qDebug() << "MGame::abortGame()";
+
     delete this;
 }
 
 void MGame::activatePositionPasting(MMainWindow *active_window)
 {
+    qDebug() << "MGame::activatePositionPasting()";
+
     // TODO: Get rid of this parent() hack, as it assumes more about parent() than what's healthy. Unless we restrict
     // the MGame ctor to MMainWindows, that is ...
     QShortcut *pasteFen = new QShortcut(active_window);
@@ -151,6 +175,8 @@ void MGame::activatePositionPasting(MMainWindow *active_window)
 
 void MGame::onWhiteToMove(const MPosition &position)
 {
+    qDebug() << "MGame::onWhiteToMove()";
+
     m_dashboard = (isWhiteAtBottom() ? m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM)
                                      : m_board_view->getDashboard(MBoardView::ALIGN_TOP));
     startTurn(position);
@@ -158,6 +184,8 @@ void MGame::onWhiteToMove(const MPosition &position)
 
 void MGame::onBlackToMove(const MPosition &position)
 {
+    qDebug() << "MGame::onBlackToMove()";
+
     m_dashboard = (isWhiteAtBottom() ? m_board_view->getDashboard(MBoardView::ALIGN_TOP)
                                      : m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM));
     startTurn(position);
@@ -165,6 +193,8 @@ void MGame::onBlackToMove(const MPosition &position)
 
 void MGame::onCandidatePieceSelected()
 {
+    qDebug() << "MGame::onCandidatePieceSelected()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->disableConfirmButton();
@@ -172,6 +202,8 @@ void MGame::onCandidatePieceSelected()
 
 void MGame::onMoveDiscarded()
 {
+    qDebug() << "MGame::onMoveDiscard()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->disableConfirmButton();
@@ -179,6 +211,8 @@ void MGame::onMoveDiscarded()
 
 void MGame::onMoveConfirmationRequested()
 {
+    qDebug() << "MGame::onMoveConfirmationRequested()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->enableConfirmButton();
@@ -186,12 +220,16 @@ void MGame::onMoveConfirmationRequested()
 
 void MGame::onConfirmButtonPressed()
 {
+    qDebug() << "MGame::onConfirmButtonPressed()";
+
     endTurn();
     m_store->onCandidateMoveConfirmed();
 }
 
 void MGame::onInvalidTargetSelected()
 {
+    qDebug() << "MGame::onInvalidTargetSelected()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->flash();
@@ -199,6 +237,8 @@ void MGame::onInvalidTargetSelected()
 
 void MGame::onSendMessageRequest(const QString &message)
 {
+    qDebug() << "MGame::onSendMessageRequest()";
+
     Q_CHECK_PTR(m_board_view);
 
     m_board_view->getChatbox()->insertPlainText(QString("%1\n").arg(message));
@@ -209,6 +249,8 @@ void MGame::onSendMessageRequest(const QString &message)
 
 void MGame::endTurn()
 {
+    qDebug() << "MGame::endTurn()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->disableConfirmButton();
@@ -218,6 +260,8 @@ void MGame::endTurn()
 
 void MGame::startTurn(const MPosition &position)
 {
+    qDebug() << "MGame::startTurn()";
+
     // uhm, this could be done nicer
     if (0 == m_store->getIndex())
     {
@@ -231,16 +275,22 @@ void MGame::startTurn(const MPosition &position)
 
 bool MGame::isWhiteAtBottom() const
 {
+    qDebug() << "MGame::isWhiteAtBottom()";
+
     return true;
 }
 
 bool MGame::isBlackAtBottom() const
 {
+    qDebug() << "MGame::isBlackAtBottom()";
+
     return !isWhiteAtBottom();
 }
 
 void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
 {
+    qDebug() << "MGame::connectDashboardToGame()";
+
     // Connect move confirmation
     connect(dashboard, SIGNAL(confirmButtonPressed()),
             this,      SLOT(onConfirmButtonPressed()));
@@ -278,6 +328,8 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
 
 void MGame::updatePlayerStatus(const MPosition &position)
 {
+    qDebug() << "MGame::updatePlayerStatus()";
+
     Q_CHECK_PTR(m_dashboard);
 
     m_dashboard->appendToLastMovesList(QString("42. Rc1"));
@@ -296,6 +348,8 @@ void MGame::updatePlayerStatus(const MPosition &position)
 
 void MGame::onPositionPasted()
 {
+    qDebug() << "MGame::onPositionPasted()";
+
     if(QApplication::clipboard()->mimeData()->hasText())
     {
         MPosition pos = MPosition::fromFen(QApplication::clipboard()->text());

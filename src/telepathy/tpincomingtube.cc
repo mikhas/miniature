@@ -123,7 +123,7 @@ void TpIncomingTube::onTubeChannelStateChanged(uint state)
     if(state != Tp::TubeStateOpen)
         return;
 
-    Q_EMIT tubeReady(mTcpSocket, mContact);
+    Q_EMIT tubeReady(mClient, mContact);
 
     mClient->sendNewGame();
 }

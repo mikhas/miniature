@@ -23,6 +23,7 @@
 #include "tpapprovermanager.h"
 #include "tptubesclienthandler.h"
 #include "tptextclienthandler.h"
+#include "tptubeclient.h"
 
 #include <QTcpSocket>
 
@@ -33,18 +34,19 @@ Game::Game(QObject *parent)
     : QObject(parent),
       m_account_manager(new AccountManager(this)),
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
-      m_client_registrar(Tp::ClientRegistrar::create())
+      m_client_registrar(Tp::ClientRegistrar::create()),
+      mClient(0)
 {
     qDebug() << "Registering client handler.";
 
     Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
 
-    connect(client.data(), SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
-            this,          SLOT(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)),
+    connect(client.data(), SIGNAL(newIncomingTube(TubeClient *, const Tp::ContactPtr &)),
+            this,          SLOT(newIncomingTube(TubeClient *, const Tp::ContactPtr &)),
             Qt::UniqueConnection);
 
-    connect(client.data(), SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
-            this,          SLOT(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)),
+    connect(client.data(), SIGNAL(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)),
+            this,          SLOT(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)),
             Qt::UniqueConnection);
 
     connect(client.data(), SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
@@ -87,20 +89,102 @@ void Game::joinGame()
     Q_EMIT initialized();
 }
 
-void Game::newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)
+void Game::newIncomingTube(TubeClient *client, const Tp::ContactPtr &)
 {
     // TODO: impl
     qDebug() << "TpGame::newIncomingTube()";
 
+    initConnections(client);
+
     Q_EMIT connected();
 }
 
-void Game::newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)
+void Game::newOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
 {
     // TODO: impl
     qDebug() << "TpGame::newOutgoingTube()";
 
+    initConnections(client);
+
     Q_EMIT connected();
+}
+
+void Game::initConnections(TubeClient *client)
+{
+    if(!client)
+        return;
+
+    mClient = client;
+
+    connect(mClient, SIGNAL(receivedNewGame()), SIGNAL(receivedNewGame()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedNewGameAccept()), SIGNAL(receivedNewGameAccept()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedMove()), SIGNAL(receivedMove()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedTakeBack()), SIGNAL(receivedTakeBack()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedTakeBackAccept()), SIGNAL(receivedTakeBackAccept()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedDraw()), SIGNAL(receivedDraw()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedDrawAccept()), SIGNAL(receivedDrawAccept()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedResign()), SIGNAL(receivedResign()), Qt::UniqueConnection);
+    connect(mClient, SIGNAL(receivedAdjourn()), SIGNAL(receivedAdjournAccept()), Qt::UniqueConnection);
+}
+
+void Game::sendNewGame()
+{
+    if(mClient)
+        mClient->sendNewGame();
+}
+
+void Game::sendNewGameAccept()
+{
+    if(mClient)
+        mClient->sendNewGameAccept();
+}
+
+void Game::sendMove()
+{
+    if(mClient)
+        mClient->sendMove();
+}
+
+void Game::sendTakeBack()
+{
+    if(mClient)
+        mClient->sendTakeBack();
+}
+
+void Game::sendTakeBackAccept()
+{
+    if(mClient)
+        mClient->sendTakeBackAccept();
+}
+
+void Game::sendDraw()
+{
+    if(mClient)
+        mClient->sendDraw();
+}
+
+void Game::sendDrawAccept()
+{
+    if(mClient)
+        mClient->sendDrawAccept();
+}
+
+void Game::sendResign()
+{
+    if(mClient)
+        mClient->sendResign();
+}
+
+void Game::sendAdjourn()
+{
+    if(mClient)
+        mClient->sendAdjourn();
+}
+
+void Game::sendAdjournAccept()
+{
+    if(mClient)
+        mClient->sendAdjournAccept();
 }
 
 } // namespace TpGame

@@ -58,4 +58,12 @@ void TubeServer::removeClient()
     clients.removeAll(client);
 }
 
+TubeClient* TubeServer::getClient()
+{
+    if(clients.isEmpty())
+        return 0;
+
+    return clients.first();
+}
+
 } // namespace TpGame

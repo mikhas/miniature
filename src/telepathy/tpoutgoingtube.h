@@ -46,7 +46,7 @@ public:
     virtual ~OutgoingTube();
 
 Q_SIGNALS:
-    void tubeReady(QTcpSocket *socket, const Tp::ContactPtr &);
+    void tubeReady(TubeClient*, const Tp::ContactPtr &);
     void statusChanged(uint);
     void readyToBeDeleted();
 

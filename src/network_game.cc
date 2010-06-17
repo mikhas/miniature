@@ -25,7 +25,8 @@ using namespace Miniature;
 MNetworkGame::
 MNetworkGame(MGameLog *log, QObject *parent)
     : MGame(log, parent),
-      m_tp_game(0)
+      m_tp_game(0),
+      mIsHostGame(true)
 {}
 
 MNetworkGame::
@@ -39,6 +40,7 @@ hostGame()
     m_tp_game = new TpGame::Game(this);
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
     m_tp_game->hostGame();
 }
 
@@ -49,6 +51,7 @@ joinGame()
     m_tp_game = new TpGame::Game(this);
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(connected()), SLOT(joinGameConnected()), Qt::UniqueConnection);
     m_tp_game->joinGame();
 }
 
@@ -101,4 +104,28 @@ endTurn()
 {
     m_board->disable();
     MGame::endTurn();
+}
+
+void MNetworkGame::
+hostGameConnected()
+{
+    mIsHostGame = true;
+}
+
+void MNetworkGame::
+joinGameConnected()
+{
+    mIsHostGame = false;
+}
+
+bool MNetworkGame::
+isWhiteAtBottom() const
+{
+    return mIsHostGame;
+}
+
+bool MNetworkGame::
+isBlackAtBottom() const
+{
+    return !isWhiteAtBottom();
 }

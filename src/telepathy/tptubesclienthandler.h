@@ -33,6 +33,7 @@ namespace TpGame
 
 class OutgoingTube;
 class TpIncomingTube;
+class TubeClient;
 
 class TpTubesClientHandler : public QObject, public Tp::AbstractClientHandler
 {
@@ -51,8 +52,8 @@ public:
                                 const QVariantMap &handlerInfo);
 
 Q_SIGNALS:
-    void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &);
-    void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &);
+    void newOutgoingTube(TubeClient *, const Tp::ContactPtr &);
+    void newIncomingTube(TubeClient *, const Tp::ContactPtr &);
     void disconnected();
 
 private Q_SLOTS:

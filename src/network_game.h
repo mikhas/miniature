@@ -47,6 +47,14 @@ Q_SIGNALS:
     void disconnected();
     void connected();
 
+private Q_SLOTS:
+    void hostGameConnected();
+    void joinGameConnected();
+
+protected:
+    virtual bool isWhiteAtBottom() const;
+    virtual bool isBlackAtBottom() const;
+
 private:
     void setupDashboard();
     void onWhiteToMove(const MPosition &position);
@@ -55,6 +63,8 @@ private:
 
     // TODO: turn this int some interface later, once we have inet + tp.
     TpGame::Game *m_tp_game;
+
+    bool mIsHostGame;
 };
 
 } // namespace Miniature

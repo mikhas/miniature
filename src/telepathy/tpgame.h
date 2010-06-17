@@ -32,6 +32,8 @@
 namespace TpGame
 {
 
+class TubeClient;
+
 class Game
     : public QObject
 {
@@ -44,20 +46,44 @@ public Q_SLOTS:
     void hostGame();
     void joinGame();
 
+    void sendNewGame();
+    void sendNewGameAccept();
+    void sendMove();
+    void sendTakeBack();
+    void sendTakeBackAccept();
+    void sendDraw();
+    void sendDrawAccept();
+    void sendResign();
+    void sendAdjourn();
+    void sendAdjournAccept();
+
 Q_SIGNALS:
     void initialized();
     void disconnected();
     void connected();
 
+    void receivedNewGame();
+    void receivedNewGameAccept();
+    void receivedMove();
+    void receivedTakeBack();
+    void receivedTakeBackAccept();
+    void receivedDraw();
+    void receivedDrawAccept();
+    void receivedResign();
+    void receivedAdjourn();
+    void receivedAdjournAccept();
+
 private Q_SLOTS:
     void onAccountNamesChanged(const QStringList &account_names);
-    void newIncomingTube(QTcpSocket *socket, const Tp::ContactPtr &contact);
-    void newOutgoingTube(QTcpSocket *socket, const Tp::ContactPtr &contact);
+    void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
+    void newOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
 
 private:
+    void initConnections(TubeClient*);
     AccountManager *m_account_manager;
     AccountSelectionDlg *m_accounts_dialog;
     Tp::ClientRegistrarPtr m_client_registrar;
+    TubeClient *mClient;
 };
 
 } // namespace TpGame

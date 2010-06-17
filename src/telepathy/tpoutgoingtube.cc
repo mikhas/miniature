@@ -153,7 +153,7 @@ void OutgoingTube::onTubeChannelStateChanged(uint state)
     if(state != Tp::TubeStateOpen)
         return;
 
-    Q_EMIT tubeReady(server.nextPendingConnection(), mContact);
+    Q_EMIT tubeReady(server.getClient(), mContact);
 
     Q_EMIT statusChanged(state);
 }

@@ -102,8 +102,8 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
 
                 OutgoingTube *tube = new OutgoingTube(channel);
                 connect(tube,
-                        SIGNAL(tubeReady(QTcpSocket *, const Tp::ContactPtr &)),
-                        SIGNAL(newOutgoingTube(QTcpSocket *, const Tp::ContactPtr &)));
+                        SIGNAL(tubeReady(TubeClient *, const Tp::ContactPtr &)),
+                        SIGNAL(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)));
                 connect(tube,
                         SIGNAL(readyToBeDeleted()),
                         SLOT(deleteOutgoingTube()));
@@ -116,8 +116,8 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
 
                 TpIncomingTube *tube = new TpIncomingTube(channel);
                 connect(tube,
-                        SIGNAL(tubeReady(QTcpSocket*, const Tp::ContactPtr &)),
-                        SIGNAL(newIncomingTube(QTcpSocket *, const Tp::ContactPtr &)));
+                        SIGNAL(tubeReady(TubeClient*, const Tp::ContactPtr &)),
+                        SIGNAL(newIncomingTube(TubeClient *, const Tp::ContactPtr &)));
                 connect(tube,
                         SIGNAL(readyToBeDeleted()),
                         SLOT(deleteIncomingTube()));

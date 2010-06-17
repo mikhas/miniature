@@ -28,6 +28,8 @@
 namespace TpGame
 {
 
+class TubeClient;
+
 class TubeServer
     : public QTcpServer
 {
@@ -35,6 +37,7 @@ class TubeServer
 
 public:
     TubeServer(QObject *parent = 0);
+    TubeClient* getClient();
 
 protected:
     void incomingConnection(int socketDescriptor);
