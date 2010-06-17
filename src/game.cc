@@ -72,9 +72,6 @@ void MGame::setBoardView(MBoardView *view)
 
     connect(m_board_view, SIGNAL(sendMessageRequest(QString)),
             this,         SLOT(onSendMessageRequest(QString)));
-
-    setupDashboard();
-    setupBoardItem();
 }
 
 MBoardView * MGame::getBoardView() const
@@ -119,6 +116,9 @@ void MGame::setupDashboard()
 void MGame::newGame()
 {
     qDebug() << "MGame::newGame()";
+
+    setupDashboard();
+    setupBoardItem();
 
     m_log->append("New game started.", MGameLog::GAME);
     m_store->setupStartPosition();

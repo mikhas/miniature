@@ -82,8 +82,6 @@ setupGame()
 
     connect(getGame(), SIGNAL(disconnected()), SIGNAL(restart()), Qt::UniqueConnection);
     connect(getGame(), SIGNAL(connected()), SLOT(runGame()), Qt::UniqueConnection);
-
-    getGame()->newGame();
 }
 
 void MGameConfig::

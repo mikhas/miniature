@@ -109,6 +109,7 @@ onStartLocalGame()
     m_game_config.setGame(new MLocalGame(&m_log));
     m_game_config.setupGame();
     m_game_config.runGame();
+    m_game_config.getGame()->newGame();
 
 #ifdef Q_WS_MAEMO_5
     m_game_config.getWindow()->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
@@ -140,7 +141,6 @@ onHostGame()
             Qt::UniqueConnection);
 
     game->hostGame();
-    m_game_config.getBoardView()->enableAutoOrientationSupport();
 }
 
 void MPreGame::
@@ -157,7 +157,6 @@ onJoinGame()
     }
 
     game->joinGame();
-    m_game_config.getBoardView()->enableAutoOrientationSupport();
 }
 
 void MPreGame::

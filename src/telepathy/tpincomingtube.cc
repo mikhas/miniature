@@ -124,8 +124,6 @@ void TpIncomingTube::onTubeChannelStateChanged(uint state)
         return;
 
     Q_EMIT tubeReady(mClient, mContact);
-
-    mClient->sendNewGame();
 }
 
 void TpIncomingTube::onTcpSocketConnected()

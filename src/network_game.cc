@@ -110,12 +110,14 @@ void MNetworkGame::
 hostGameConnected()
 {
     mIsHostGame = true;
+    newGame();
 }
 
 void MNetworkGame::
 joinGameConnected()
 {
     mIsHostGame = false;
+    newGame();
 }
 
 bool MNetworkGame::
@@ -128,4 +130,12 @@ bool MNetworkGame::
 isBlackAtBottom() const
 {
     return !isWhiteAtBottom();
+}
+
+void MNetworkGame::
+newGame()
+{
+    MGame::newGame();
+
+    m_board_view->enableAutoOrientationSupport();
 }
