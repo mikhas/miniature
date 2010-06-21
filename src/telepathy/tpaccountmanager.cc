@@ -164,7 +164,9 @@ void AccountManager::ensureContactsForAccount(const Tp::Contacts &contacts)
         {
             createChannel(contact);
             // TODO hook up properly
+#ifdef ENABLE_CHAT_SESSION
             createChatSession(contact);
+#endif
             break;
         }
     }

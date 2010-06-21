@@ -51,11 +51,16 @@ Game::Game(QObject *parent)
 
     connect(client.data(), SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
 
+#ifdef ENABLE_CHAT_SESSION
     // TODO: client name should be a ctor arg
+    // Do not handle text channels now: it would get all text channels and the
+    // user's messages would be lost
+
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
 
     Tp::SharedPtr<TextClientHandler> textClient = Tp::SharedPtr<TextClientHandler>(new TextClientHandler(0));
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
+#endif
 
 //    Tp::SharedPtr<TpApproverManager> approverManager;
 //    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
