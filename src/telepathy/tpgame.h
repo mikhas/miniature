@@ -28,6 +28,7 @@
 #include <TelepathyQt4/ClientRegistrar>
 #include <QtCore>
 #include <QTcpSocket>
+#include <QDataStream>
 
 namespace TpGame
 {
@@ -77,13 +78,15 @@ private Q_SLOTS:
     void onAccountNamesChanged(const QStringList &account_names);
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
     void newOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
+    void readPackets();
 
 private:
-    void initConnections(TubeClient*);
+    //void initConnections(TubeClient*);
     AccountManager *m_account_manager;
     AccountSelectionDlg *m_accounts_dialog;
     Tp::ClientRegistrarPtr m_client_registrar;
     TubeClient *mClient;
+    QDataStream mStream;
 };
 
 } // namespace TpGame

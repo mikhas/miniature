@@ -94,7 +94,10 @@ void Game::newIncomingTube(TubeClient *client, const Tp::ContactPtr &)
     // TODO: impl
     qDebug() << "TpGame::newIncomingTube()";
 
-    initConnections(client);
+    mClient = client;
+    mStream.setDevice(mClient);
+
+    connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
 
     Q_EMIT connected();
 }
@@ -104,87 +107,235 @@ void Game::newOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
     // TODO: impl
     qDebug() << "TpGame::newOutgoingTube()";
 
-    initConnections(client);
+    mClient = client;
+    mStream.setDevice(mClient);
+
+    connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
+
+    sendNewGame(); // for testing only
 
     Q_EMIT connected();
 }
 
-void Game::initConnections(TubeClient *client)
+void Game::readPackets()
 {
-    if(!client)
-        return;
+    qDebug() << "Game::readPackets()";
 
-    mClient = client;
+    QString command;
+    mStream >> command;
 
-    connect(mClient, SIGNAL(receivedNewGame()), SIGNAL(receivedNewGame()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedNewGameAccept()), SIGNAL(receivedNewGameAccept()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedMove()), SIGNAL(receivedMove()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedTakeBack()), SIGNAL(receivedTakeBack()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedTakeBackAccept()), SIGNAL(receivedTakeBackAccept()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedDraw()), SIGNAL(receivedDraw()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedDrawAccept()), SIGNAL(receivedDrawAccept()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedResign()), SIGNAL(receivedResign()), Qt::UniqueConnection);
-    connect(mClient, SIGNAL(receivedAdjourn()), SIGNAL(receivedAdjournAccept()), Qt::UniqueConnection);
+    TpGame::Command c = commandFromString(command);
+
+    switch(c)
+    {
+        case TpGame::NewGame:
+        {
+            qDebug() << "Receiving NewGame";
+
+            QString testString;
+            mStream >> testString;
+
+            qDebug() << testString;
+
+            Q_EMIT receivedNewGame();
+
+            sendNewGameAccept();
+            break;
+        }
+
+        case TpGame::NewGameAccept:
+        {
+            qDebug() << "Receiving NewGameAccept";
+
+            QString testString;
+            mStream >> testString;
+
+            qDebug() << testString;
+
+            Q_EMIT receivedNewGameAccept();
+            break;
+        }
+
+        case TpGame::Move:
+        {
+            qDebug() << "Receiving Move";
+
+            Q_EMIT receivedMove();
+
+            break;
+        }
+
+        case TpGame::TakeBack:
+        {
+            qDebug() << "Receiving TakeBack";
+
+            Q_EMIT receivedTakeBack();
+
+            break;
+        }
+
+        case TpGame::TakeBackAccept:
+        {
+            qDebug() << "Receiving TakeBackAccept";
+
+            Q_EMIT receivedTakeBackAccept();
+
+            break;
+        }
+
+        case TpGame::Draw:
+        {
+            qDebug() << "Receiving Draw";
+
+            Q_EMIT receivedDraw();
+
+            break;
+        }
+
+        case TpGame::DrawAccept:
+        {
+            qDebug() << "Receiving DrawAccept";
+
+            Q_EMIT receivedDrawAccept();
+
+            break;
+        }
+
+        case TpGame::Resign:
+        {
+            qDebug() << "Receiving Resign";
+
+            Q_EMIT receivedResign();
+
+            break;
+        }
+
+        case TpGame::Adjourn:
+        {
+            qDebug() << "Receiving Adjourn";
+
+            Q_EMIT receivedAdjourn();
+
+            break;
+        }
+
+        case TpGame::AdjournAccept:
+        {
+            qDebug() << "Receiving AdjournAccept";
+
+            Q_EMIT receivedAdjournAccept();
+
+            break;
+        }
+
+        case TpGame::Nop:
+        {
+            // nothing;
+            break;
+        }
+    }
 }
 
 void Game::sendNewGame()
 {
-    if(mClient)
-        mClient->sendNewGame();
+    qDebug() << "Game::sendNewGame()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::NewGame);
+    mStream << QString("Start new game");
 }
 
 void Game::sendNewGameAccept()
 {
-    if(mClient)
-        mClient->sendNewGameAccept();
+    qDebug() << "Game::sendNewGameAccept()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::NewGameAccept);
+    mStream << QString("New game accept");
 }
 
 void Game::sendMove()
 {
-    if(mClient)
-        mClient->sendMove();
+    qDebug() << "Game::sendMove()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::Move);
 }
 
 void Game::sendTakeBack()
 {
-    if(mClient)
-        mClient->sendTakeBack();
+    qDebug() << "Game::sendTakeBack()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::TakeBack);
 }
 
 void Game::sendTakeBackAccept()
 {
-    if(mClient)
-        mClient->sendTakeBackAccept();
+    qDebug() << "Game::sendTakeBackAccept()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::TakeBackAccept);
 }
 
 void Game::sendDraw()
 {
-    if(mClient)
-        mClient->sendDraw();
+    qDebug() << "Game::sendDraw()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::Draw);
 }
 
 void Game::sendDrawAccept()
 {
-    if(mClient)
-        mClient->sendDrawAccept();
+    qDebug() << "Game::sendDrawAccept()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::DrawAccept);
 }
 
 void Game::sendResign()
 {
-    if(mClient)
-        mClient->sendResign();
+    qDebug() << "Game::sendResign()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::Resign);
 }
 
 void Game::sendAdjourn()
 {
-    if(mClient)
-        mClient->sendAdjourn();
+    qDebug() << "Game::sendAdjourn()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::Adjourn);
 }
 
 void Game::sendAdjournAccept()
 {
-    if(mClient)
-        mClient->sendAdjournAccept();
+    qDebug() << "Game::sendAdjournAccept()";
+
+    if(!mClient)
+        return;
+
+    mStream << commandToString(TpGame::AdjournAccept);
 }
 
 } // namespace TpGame
