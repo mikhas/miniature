@@ -51,7 +51,7 @@ Game::Game(QObject *parent)
 
     connect(client.data(), SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
 
-    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "miniature_handler");
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "Miniature");
 
 #ifdef ENABLE_CHAT_SESSION
     // TODO: client name should be a ctor arg
