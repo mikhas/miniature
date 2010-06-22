@@ -38,6 +38,16 @@ MPreGame(QObject *parent)
       m_game_config(&m_main),
       m_waiting_ui(new Ui_IncomingConnectionWidget)
 {
+    m_game_config.setGame(new MNetworkGame(&m_log));
+    m_game_config.setupGame();
+
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
+    if(!game)
+    {
+        qWarning() << "This should never happen!";
+    }
+
+    game->hostGame();
 }
 
 MPreGame::
@@ -121,26 +131,7 @@ onStartLocalGame()
 void MPreGame::
 onHostGame()
 {
-    m_game_config.setGame(new MNetworkGame(&m_log));
-    m_game_config.setupGame();
-
-    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
-    if(!game)
-    {
-        qWarning() << "This should never happen!";
-        onStartScreenRequested();
-    }
-
     onWaitingForConnection();
-
-    connect(m_waiting_ui->cancelButton, SIGNAL(released()),
-            game, SLOT(disconnect()),
-            Qt::UniqueConnection);
-    connect(game, SIGNAL(disconnected()),
-            this, SLOT(onStartScreenRequested()),
-            Qt::UniqueConnection);
-
-    game->hostGame();
 }
 
 void MPreGame::

@@ -55,6 +55,8 @@ public:
 };
 
 const char* const dbus_service_name = "org.maemo.miniature";
+const char* const dbus_telepathy_service_name =
+        "org.freedesktop.Telepathy.Client.Miniature";
 const char* const dbus_service_path = "/org/maemo/miniature";
 
 MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
@@ -63,7 +65,13 @@ MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
   m_actions(new mActions(this)),
   m_session(QDBusConnection::sessionBus())
 {
-    if(!m_session.registerService(dbus_service_name))
+    if(!m_session.registerObject(dbus_service_path, this))
+    {
+        qFatal("Cannot register D-Bus service. Aborting.");
+        exit(EXIT_FAILURE);
+    }
+
+    if(!m_session.registerService(dbus_telepathy_service_name))
     {
         qWarning("Cannot register D-Bus service. Trying to activate other instance.");
         m_session.call(QDBusMessage::createMethodCall(dbus_service_name, dbus_service_path,
@@ -71,9 +79,11 @@ MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
         exit(EXIT_FAILURE);
     }
 
-    if(!m_session.registerObject(dbus_service_path, this))
+    if(!m_session.registerService(dbus_service_name))
     {
-        qFatal("Cannot register D-Bus service. Aborting.");
+        qWarning("Cannot register D-Bus service. Trying to activate other instance.");
+        m_session.call(QDBusMessage::createMethodCall(dbus_service_name, dbus_service_path,
+            dbus_service_name, "top_application"));
         exit(EXIT_FAILURE);
     }
 

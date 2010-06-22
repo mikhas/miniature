@@ -173,7 +173,12 @@ BUILT_SOURCES = \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
-dist_dbusservice_DATA = data/org.maemo.miniature.service
+dist_dbusservice_DATA = \
+                data/org.maemo.miniature.service \
+                data/org.freedesktop.Telepathy.Client.Miniature.service
+
+clientsdir = /usr/share/telepathy/clients
+clients_DATA = data/Miniature.client
 
 iconthemedir = $(datadir)/icons/hicolor
 appicon48dir = $(iconthemedir)/48x48/apps
