@@ -27,7 +27,8 @@ int main(int argc, char ** argv)
     QApplication app(argc, argv);
 
     Miniature::MPreGame pre_game;
-    pre_game.onStartScreenRequested();
+    if (!(app.argc() > 1 && app.argv()[1] == QString("--no-ui")))
+        pre_game.onStartScreenRequested();
 
     return app.exec();
 }

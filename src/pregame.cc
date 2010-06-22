@@ -48,24 +48,11 @@ MPreGame(QObject *parent)
     }
 
     game->hostGame();
-}
 
-MPreGame::
-~MPreGame()
-{}
+    connect(&m_game_config, SIGNAL(restart()),
+            this,          SLOT(onStartScreenRequested()),
+            Qt::UniqueConnection);
 
-void MPreGame::
-onWaitingForConnection()
-{
-    QWidget *central = new QWidget;
-    m_waiting_ui->setupUi(central);
-    MMainWindow::setupPreGameUi(&m_main, central);
-    m_main.show();
-}
-
-void MPreGame::
-onStartScreenRequested()
-{
     m_local_game = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
     m_host_game = new MIconicButton(QPixmap(host_game_filename),
@@ -92,7 +79,6 @@ onStartScreenRequested()
     hbox->addWidget(m_fics_game);
 
     MMainWindow::setupPreGameUi(&m_main, central);
-    m_main.show();
 
     connect(m_local_game, SIGNAL(pressed()),
             this,         SLOT(onStartLocalGame()),
@@ -105,10 +91,26 @@ onStartScreenRequested()
     connect(m_join_game, SIGNAL(pressed()),
             this,        SLOT(onJoinGame()),
             Qt::UniqueConnection);
+}
 
-    connect(&m_game_config, SIGNAL(restart()),
-            this,          SLOT(onStartScreenRequested()),
-            Qt::UniqueConnection);
+MPreGame::
+~MPreGame()
+{}
+
+void MPreGame::
+onWaitingForConnection()
+{
+    QWidget *central = new QWidget;
+    m_waiting_ui->setupUi(central);
+    MMainWindow::setupPreGameUi(&m_main, central);
+    m_main.show();
+}
+
+void MPreGame::
+onStartScreenRequested()
+{
+
+    m_main.show();
 
     m_log.append("Miniature started.", MGameLog::PREGAME);
 }
