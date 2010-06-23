@@ -27,6 +27,9 @@
 #include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/ChannelDispatchOperation>
 
+#include <gtk/gtk.h>
+#include <hildon/hildon.h>
+
 namespace TpGame
 {
 
@@ -44,7 +47,23 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
     connect(mDispatchOp->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
-    mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+
+    GtkWidget *note = hildon_note_new_confirmation (NULL,
+                    "Do you want to play chess?");
+
+    int i = gtk_dialog_run (GTK_DIALOG (note));
+    gtk_widget_destroy (GTK_WIDGET (note));
+
+    if (i == GTK_RESPONSE_OK)
+    {
+        mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+    }
+    else
+    {
+        connect(mDispatchOp->claim (),
+                SIGNAL(finished(Tp::PendingOperation *)),
+                SLOT(onReadyToBeClosed(Tp::PendingOperation *)));
+    }
 }
 
 TpApprover::~TpApprover()
@@ -59,6 +78,15 @@ void TpApprover::onDispatchOperationReady(Tp::PendingOperation *)
     mContext->setFinished();
 
     Q_EMIT finished();
+}
+
+void TpApprover::onReadyToBeClosed(Tp::PendingOperation *)
+{
+    qDebug() << "TpApprover::onReadyToBeClosed()";
+    for (int i = 0; i < mChannels.size(); ++i)
+    {
+        mChannels.at(i)->requestClose();
+    }
 }
 
 } // namespace TpGame

@@ -39,6 +39,7 @@ public:
 
 private Q_SLOTS:
     void onDispatchOperationReady(Tp::PendingOperation* );
+    void onReadyToBeClosed(Tp::PendingOperation* );
 
 Q_SIGNALS:
     void finished();
