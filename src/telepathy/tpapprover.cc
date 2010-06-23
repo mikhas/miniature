@@ -44,6 +44,7 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
     connect(mDispatchOp->becomeReady(),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
+    mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
 }
 
 TpApprover::~TpApprover()

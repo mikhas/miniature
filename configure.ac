@@ -48,6 +48,7 @@ fi
 AC_CONFIG_FILES([Makefile
                  data/miniature.desktop
                  data/org.maemo.miniature.service
+                 data/org.freedesktop.Telepathy.Client.MiniatureApprover.service
                  data/org.freedesktop.Telepathy.Client.Miniature.service])
 
 AC_OUTPUT

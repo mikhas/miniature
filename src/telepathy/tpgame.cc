@@ -62,9 +62,9 @@ Game::Game(QObject *parent)
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
 #endif
 
-//    Tp::SharedPtr<TpApproverManager> approverManager;
-//    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
-//    mClientRegistrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "miniature_approver");
+    Tp::SharedPtr<TpApproverManager> approverManager;
+    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
 }
 
 void Game::hostGame()

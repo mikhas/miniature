@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.freedesktop.Telepathy.Client.MiniatureApprover
+Exec=@prefix@/games/miniature --no-ui
