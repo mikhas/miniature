@@ -35,8 +35,6 @@ AC_ARG_ENABLE(dbusservice,
     AS_HELP_STRING([--enable-dbusservice], [Enable DBus Service directory]),
     [ac_enable_dbusservice=$enableval], [ac_enable_dbusservice=yes])
 
-PKG_CHECK_MODULES([MINIATURE], [hildon-1 >= 2.2.19])
-
 if test "x$ac_enable_dbusservice" != "xno"; then
 AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
 if test -z "$dbusservicedir"; then
