@@ -142,7 +142,7 @@ void AccountManager::onEnsureChannel(const QString &account_name, const QString 
     {
         if (account_name == iter->getDisplayName())
         {
-            iter.data()->disconnect(SIGNAL(contactsForAccount(Tp::Contacts)));
+            iter.data()->disconnect(SIGNAL(contactsForAccountChanged(Tp::Contacts)));
             connect(iter.data(), SIGNAL(contactsForAccountChanged(Tp::Contacts)),
                     this,        SLOT(ensureContactsForAccount(Tp::Contacts)),
                     Qt::UniqueConnection);
