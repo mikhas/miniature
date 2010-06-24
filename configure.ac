@@ -15,7 +15,7 @@ PKG_PROG_PKG_CONFIG
 AC_LANG([C++])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
-PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0 hildon-1 >= 2.2.19])
+PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0 hildon-1 >= 2.1.34])
 AC_SUBST([MINIATURE_CFLAGS])
 AC_SUBST([MINIATURE_LIBS])
 
@@ -31,18 +31,27 @@ AC_ARG_ENABLE(opengl,
     [AC_DEFINE(HAVE_MINIATURE_OPENGL, [1], [Define to enable Qt's OpenGL graphics system])]
 )
 
-AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
+AC_ARG_ENABLE(dbusservice,
+    AS_HELP_STRING([--enable-dbusservice], [Enable DBus Service directory]),
+    [ac_enable_dbusservice=$enableval], [ac_enable_dbusservice=yes])
+
+PKG_CHECK_MODULES([MINIATURE], [hildon-1 >= 2.2.19])
+
+if test "x$ac_enable_dbusservice" != "xno"; then
 AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
+if test -z "$dbusservicedir"; then
+  AC_MSG_ERROR([Cannot find D-Bus service file folder])
+fi
+
+fi
+
+AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
 AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])
 AC_SUBST([LIBS])
 
 if test -z "x$desktopentrydir"; then
   AC_MSG_ERROR([Cannot find desktop entry file folder])
-fi
-
-if test -z "$dbusservicedir"; then
-  AC_MSG_ERROR([Cannot find D-Bus service file folder])
 fi
 
 AC_CONFIG_FILES([Makefile
