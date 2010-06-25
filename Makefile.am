@@ -129,6 +129,9 @@ src_miniature_SOURCES = \
 			src/telepathy/tptubeclient.h \
 			src/telepathy/tptubeclient.cc \
 			src/telepathy/tptubeclient.moc.cc \
+			src/telepathy/contact-chooser.h \
+			src/telepathy/contact-chooser.cc \
+			src/telepathy/contact-chooser.moc.cc \
 			$(null)
 
 if MINIATURE_PLATFORM_MAEMO5

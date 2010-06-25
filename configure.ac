@@ -15,7 +15,7 @@ PKG_PROG_PKG_CONFIG
 AC_LANG([C++])
 
 PKG_CHECK_EXISTS([osso-af-settings >= 0.9.2])
-PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0 hildon-1 >= 2.1.34])
+PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0 hildon-1 >= 2.1.34 telepathy-glib libosso-abook-1.0])
 AC_SUBST([MINIATURE_CFLAGS])
 AC_SUBST([MINIATURE_LIBS])
 
