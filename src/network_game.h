@@ -51,6 +51,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void hostGameConnected();
     void joinGameConnected();
+    void receivedNewGame(bool);
 
 protected:
     virtual bool isWhiteAtBottom() const;
@@ -65,7 +66,7 @@ private:
     // TODO: turn this int some interface later, once we have inet + tp.
     TpGame::Game *m_tp_game;
 
-    bool mIsHostGame;
+    bool mIsWhiteAtBottom;
 };
 
 } // namespace Miniature

@@ -19,6 +19,7 @@
  */
 
 #include "network_game.h"
+#include <QMessageBox>
 
 using namespace Miniature;
 
@@ -26,7 +27,7 @@ MNetworkGame::
 MNetworkGame(MGameLog *log, QObject *parent)
     : MGame(log, parent),
       m_tp_game(0),
-      mIsHostGame(true)
+      mIsWhiteAtBottom(true)
 {}
 
 MNetworkGame::
@@ -41,6 +42,7 @@ hostGame()
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(receivedNewGame(bool)), SLOT(receivedNewGame(bool)), Qt::UniqueConnection);
     m_tp_game->hostGame();
 }
 
@@ -67,6 +69,8 @@ disconnect()
 void MNetworkGame::
 setupDashboard()
 {
+    qDebug() << "MNetworkGame::setupDashboard()";
+
     Q_ASSERT(0 != m_board_view);
 
     m_board_view->addChatbox();
@@ -109,21 +113,34 @@ endTurn()
 void MNetworkGame::
 hostGameConnected()
 {
-    mIsHostGame = true;
-    newGame();
+    mIsWhiteAtBottom = true;
 }
 
 void MNetworkGame::
 joinGameConnected()
 {
-    mIsHostGame = false;
-    newGame();
+    mIsWhiteAtBottom = false;
+
+    QMessageBox msgBox;
+    msgBox.setText("Select pieces color.");
+    msgBox.setInformativeText("Do you want to play white or black?");
+    QPushButton *whiteButton = msgBox.addButton(tr("White"), QMessageBox::ActionRole);
+    QPushButton *blackButton = msgBox.addButton(tr("Black"), QMessageBox::ActionRole);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == whiteButton)
+    {
+        mIsWhiteAtBottom = true;
+        newGame();
+    }
+    if(msgBox.clickedButton() == blackButton)
+        newGame();
 }
 
 bool MNetworkGame::
 isWhiteAtBottom() const
 {
-    return mIsHostGame;
+    return mIsWhiteAtBottom;
 }
 
 bool MNetworkGame::
@@ -137,5 +154,14 @@ newGame()
 {
     MGame::newGame();
 
+    m_tp_game->sendNewGame(isWhiteAtBottom());
+
     m_board_view->enableAutoOrientationSupport();
+}
+
+void MNetworkGame::
+receivedNewGame(bool whiteChoosed)
+{
+    mIsWhiteAtBottom = !whiteChoosed;
+    newGame();
 }

@@ -117,7 +117,7 @@ void Game::newOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
 
     connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
 
-    sendNewGame(); // for testing only
+    m_accounts_dialog->hide();
 
     Q_EMIT connected();
 }
@@ -139,10 +139,12 @@ void Game::readPackets()
 
             QString testString;
             mStream >> testString;
+            bool whiteChoosed = false;
+            mStream >> whiteChoosed;
 
             qDebug() << testString;
 
-            Q_EMIT receivedNewGame();
+            Q_EMIT receivedNewGame(whiteChoosed);
 
             sendNewGameAccept();
             break;
@@ -241,7 +243,7 @@ void Game::readPackets()
     }
 }
 
-void Game::sendNewGame()
+void Game::sendNewGame(bool whiteChoosed)
 {
     qDebug() << "Game::sendNewGame()";
 
@@ -250,6 +252,7 @@ void Game::sendNewGame()
 
     mStream << commandToString(TpGame::NewGame);
     mStream << QString("Start new game");
+    mStream << whiteChoosed;
 }
 
 void Game::sendNewGameAccept()

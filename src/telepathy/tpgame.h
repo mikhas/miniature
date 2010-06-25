@@ -47,7 +47,7 @@ public Q_SLOTS:
     void hostGame();
     void joinGame();
 
-    void sendNewGame();
+    void sendNewGame(bool whiteChoosed = false);
     void sendNewGameAccept();
     void sendMove();
     void sendTakeBack();
@@ -63,7 +63,7 @@ Q_SIGNALS:
     void disconnected();
     void connected();
 
-    void receivedNewGame();
+    void receivedNewGame(bool whiteChoosed);
     void receivedNewGameAccept();
     void receivedMove();
     void receivedTakeBack();
