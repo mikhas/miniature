@@ -707,12 +707,12 @@ miniature_contact_chooser_can_send_to_roster_contact (MiniatureContactChooser *s
       tp_proxy_get_object_path (account));
 
   if (table == NULL)
-    return FALSE;
+    return TRUE; // FIXME: do not filter yet
 
   lookup = g_hash_table_lookup (table, GUINT_TO_POINTER (handle));
 
   if (lookup != NULL && GPOINTER_TO_INT (lookup))
     return TRUE;
 
-  return FALSE;
+  return TRUE; // FIXME: do not filter yet
 }
