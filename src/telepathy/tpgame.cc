@@ -43,6 +43,7 @@ Game::Game(QObject *parent)
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
       m_client_registrar(Tp::ClientRegistrar::create()),
       mClient(0),
+      contact_window(0),
       contact_view(0),
       selected_master_contact(0),
       selected_contact(0),
@@ -166,13 +167,15 @@ contact_activated_cb (OssoABookContactView *view,
   game->requested_account->ensureChannel(req);
 
   g_list_free (selection);
+
+  gtk_widget_destroy (game->contact_window);
+  game->contact_window = NULL;
 }
 
 void Game::joinGame()
 {
     qDebug() << "TpGame::joingGame()";
 
-    GtkWidget *contact_window;
     GtkWidget *vbox;
 
     contact_window = hildon_stackable_window_new ();

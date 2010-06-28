@@ -98,6 +98,7 @@ private:
 public:
     // This is private really, but mixing GLib and QT does not allow it to
     // be  private
+    GtkWidget *contact_window;
     GtkWidget *contact_view;
     OssoABookContact *selected_master_contact;
     OssoABookContact *selected_contact;
