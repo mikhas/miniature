@@ -25,6 +25,13 @@
 #include "tptextclienthandler.h"
 #include "tptubeclient.h"
 
+#include "contact-chooser.h"
+
+#include <TelepathyQt4/Account>
+
+#include <telepathy-glib/dbus.h>
+#include <telepathy-glib/account.h>
+
 #include <QTcpSocket>
 
 namespace TpGame
@@ -35,7 +42,11 @@ Game::Game(QObject *parent)
       m_account_manager(new AccountManager(this)),
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
       m_client_registrar(Tp::ClientRegistrar::create()),
-      mClient(0)
+      mClient(0),
+      contact_view(0),
+      selected_master_contact(0),
+      selected_contact(0),
+      requested_account(0)
 {
     qDebug() << "Registering client handler.";
 
@@ -86,11 +97,101 @@ void Game::onAccountNamesChanged(const QStringList &account_names)
     Q_EMIT initialized();
 }
 
+static void
+contact_activated_cb (OssoABookContactView *view,
+    GtkTreePath *path G_GNUC_UNUSED,
+    gpointer data)
+{
+  GList *selection;
+  OssoABookContact *contact, *roster_contact = NULL;
+  McAccount *mcaccount;
+  GList *roster, *l;
+  guint count = 0;
+  Game *game = (Game *)data;
+
+  qDebug() << "Contact selected";
+
+  selection = osso_abook_contact_view_get_selection (view);
+
+  /* Only one contact is allowed to be selected at one time. */
+  contact = (OssoABookContact *) selection->data;
+
+  roster = osso_abook_contact_get_roster_contacts (contact);
+
+  for (l = roster; l != NULL; l = l->next)
+    {
+      if (miniature_contact_chooser_can_send_to_roster_contact (
+              MINIATURE_CONTACT_CHOOSER (game->contact_view),
+              OSSO_ABOOK_CONTACT (l->data)))
+        {
+          count++;
+          roster_contact = (OssoABookContact *)l->data;
+          qDebug ("Selected contact: %s", osso_abook_contact_get_bound_name (roster_contact));
+        }
+    }
+
+  qDebug("Contact selected: %d roster items", count);
+
+  if (count == 0)
+    {
+      g_list_free (selection);
+      return;
+    }
+  if (game->selected_contact != NULL)
+    g_object_unref (game->selected_contact);
+
+  if (game->selected_master_contact != NULL)
+    g_object_unref (game->selected_master_contact);
+
+  game->selected_contact = (OssoABookContact *) g_object_ref (roster_contact);
+  game->selected_master_contact = (OssoABookContact *) g_object_ref (contact);
+
+  mcaccount = osso_abook_contact_get_account (game->selected_contact);
+  TpDBusDaemon *dbus = tp_dbus_daemon_dup (NULL);
+  TpAccount *tpaccount = tp_account_new (dbus, tp_proxy_get_object_path (mcaccount), NULL);
+  game->requested_account = Tp::Account::create
+      (tp_proxy_get_bus_name (tpaccount), tp_proxy_get_object_path (mcaccount));
+  g_object_unref (dbus);
+
+  QVariantMap req;
+  req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".ChannelType"),
+             TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE);
+  req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetHandleType"),
+             Tp::HandleTypeContact);
+  req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL ".TargetID"),
+             QLatin1String(osso_abook_contact_get_bound_name (roster_contact)));
+  req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"),
+             "Miniature");
+
+  game->requested_account->ensureChannel(req);
+
+  g_list_free (selection);
+}
+
 void Game::joinGame()
 {
     qDebug() << "TpGame::joingGame()";
-    m_accounts_dialog->show();
 
+    GtkWidget *contact_window;
+    GtkWidget *vbox;
+
+    contact_window = hildon_stackable_window_new ();
+    gtk_window_set_title (GTK_WINDOW (contact_window), "Select a contact");
+    gtk_container_set_border_width (GTK_CONTAINER (contact_window), 5);
+
+    vbox = gtk_vbox_new (FALSE, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (vbox), 0);
+
+    contact_view = miniature_contact_chooser_new ();
+    g_signal_connect (contact_view, "contact-activated",
+        G_CALLBACK (contact_activated_cb), (gpointer) this);
+    gtk_box_pack_start (GTK_BOX (vbox), contact_view, TRUE, TRUE, 0);
+    gtk_widget_show (contact_view);
+
+    gtk_container_add (GTK_CONTAINER (contact_window), vbox);
+    gtk_widget_show (vbox);
+    gtk_widget_show (contact_window);
+    
     Q_EMIT initialized();
 }
 

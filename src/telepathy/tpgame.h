@@ -25,7 +25,14 @@
 #include "tpaccountmanager.h"
 #include "accountselectiondlg.h"
 
+#include <gtk/gtk.h>
+#include <libosso-abook/osso-abook.h>
+
+#include <TelepathyQt4/shared-ptr.h>
 #include <TelepathyQt4/ClientRegistrar>
+#include <TelepathyQt4/Account>
+#include <TelepathyQt4/PendingChannelRequest>
+
 #include <QtCore>
 #include <QTcpSocket>
 #include <QDataStream>
@@ -87,6 +94,14 @@ private:
     Tp::ClientRegistrarPtr m_client_registrar;
     TubeClient *mClient;
     QDataStream mStream;
+
+public:
+    // This is private really, but mixing GLib and QT does not allow it to
+    // be  private
+    GtkWidget *contact_view;
+    OssoABookContact *selected_master_contact;
+    OssoABookContact *selected_contact;
+    Tp::AccountPtr requested_account;
 };
 
 } // namespace TpGame
