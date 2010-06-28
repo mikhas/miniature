@@ -167,7 +167,12 @@ void Game::readPackets()
         {
             qDebug() << "Receiving Move";
 
-            Q_EMIT receivedMove();
+            QString fenPos;
+            mStream >> fenPos;
+
+            qDebug() << "Fen position:" << fenPos;
+
+            Q_EMIT receivedMove(fenPos);
 
             break;
         }
@@ -266,14 +271,15 @@ void Game::sendNewGameAccept()
     mStream << QString("New game accept");
 }
 
-void Game::sendMove()
+void Game::sendMove(QString &fenPos)
 {
-    qDebug() << "Game::sendMove()";
+    qDebug() << "Game::sendMove()" << fenPos;
 
     if(!mClient)
         return;
 
     mStream << commandToString(TpGame::Move);
+    mStream << fenPos;
 }
 
 void Game::sendTakeBack()

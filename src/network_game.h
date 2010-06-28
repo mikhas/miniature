@@ -51,7 +51,9 @@ Q_SIGNALS:
 private Q_SLOTS:
     void hostGameConnected();
     void joinGameConnected();
+    void onConfirmButtonPressed();
     void receivedNewGame(bool);
+    void receivedMove(QString&);
 
 protected:
     virtual bool isWhiteAtBottom() const;
@@ -62,6 +64,7 @@ private:
     void onWhiteToMove(const MPosition &position);
     void onBlackToMove(const MPosition &position);
     void endTurn();
+    QString reverseFenPos(QString &fenPos);
 
     // TODO: turn this int some interface later, once we have inet + tp.
     TpGame::Game *m_tp_game;

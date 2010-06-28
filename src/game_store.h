@@ -78,7 +78,8 @@ public Q_SLOTS:
      *  Adds the selected candidate move to the store and emits {white,
      *  black}ToMove.
      */
-    void onCandidateMoveConfirmed();
+    MPosition onCandidateMoveConfirmed();
+    void onCandidateMoveConfirmed(MPosition &pos);
 
     /*!
      *  Evaluates the selected piece and emits candidatePieceSelected,

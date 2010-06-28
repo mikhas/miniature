@@ -165,17 +165,26 @@ onPositionRequested(int index)
 }
 
 void MGameStore::
-onCandidateMoveConfirmed()
+onCandidateMoveConfirmed(MPosition &pos)
 {
-    // Assumption: The move is already visible on the board, hence we only add
-    // the transitional position to the position list.
-    MPosition pos = MPosition(m_candidate_move.getPosition());
     m_candidate_move.deSelect();
     m_candidate_move = mHalfMove(pos);
     m_game.insert(++m_index, pos);
 
     Q_EMIT (hasWhiteToMove() ? whiteToMove(pos)
                              : blackToMove(pos));
+}
+
+MPosition MGameStore::
+onCandidateMoveConfirmed()
+{
+    // Assumption: The move is already visible on the board, hence we only add
+    // the transitional position to the position list.
+    MPosition pos = MPosition(m_candidate_move.getPosition());
+
+    onCandidateMoveConfirmed(pos);
+
+    return pos;
 }
 
 void MGameStore::

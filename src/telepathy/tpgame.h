@@ -49,7 +49,7 @@ public Q_SLOTS:
 
     void sendNewGame(bool whiteChoosed = false);
     void sendNewGameAccept();
-    void sendMove();
+    void sendMove(QString &fenPos);
     void sendTakeBack();
     void sendTakeBackAccept();
     void sendDraw();
@@ -65,7 +65,7 @@ Q_SIGNALS:
 
     void receivedNewGame(bool whiteChoosed);
     void receivedNewGameAccept();
-    void receivedMove();
+    void receivedMove(QString &fenPos);
     void receivedTakeBack();
     void receivedTakeBackAccept();
     void receivedDraw();

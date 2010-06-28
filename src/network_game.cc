@@ -43,6 +43,7 @@ hostGame()
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(receivedNewGame(bool)), SLOT(receivedNewGame(bool)), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(receivedMove(QString&)), SLOT(receivedMove(QString&)), Qt::UniqueConnection);
     m_tp_game->hostGame();
 }
 
@@ -77,30 +78,27 @@ setupDashboard()
     m_board_view->addDashboard(MBoardView::ALIGN_BOTTOM);
     connectDashboardToGame(m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM));
 
-//    if (isWhiteAtBottom())
-        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM);
-//    else
-//        m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_TOP);
+    m_dashboard = m_board_view->getDashboard(MBoardView::ALIGN_BOTTOM);
 }
 
 void MNetworkGame::
 onWhiteToMove(const MPosition &position)
 {
-    if (isWhiteAtBottom())
-    {
+//    if (isWhiteAtBottom())
+//    {
         m_board->enable();
         startTurn(position);
-    }
+//    }
 }
 
 void MNetworkGame::
 onBlackToMove(const MPosition &position)
 {
-    if (!isWhiteAtBottom())
-    {
+//    if (!isWhiteAtBottom())
+//    {
         m_board->enable();
         startTurn(position);
-    }
+//    }
 }
 
 void MNetworkGame::
@@ -165,3 +163,44 @@ receivedNewGame(bool whiteChoosed)
     mIsWhiteAtBottom = !whiteChoosed;
     newGame();
 }
+
+void MNetworkGame::
+onConfirmButtonPressed()
+{
+    endTurn();
+    MPosition pos = m_store->onCandidateMoveConfirmed();
+
+    QString fenPos = pos.asFen();
+    m_tp_game->sendMove(fenPos);
+}
+
+void MNetworkGame::
+receivedMove(QString &fenPos)
+{
+    MPosition pos;
+    fenPos = reverseFenPos(fenPos);
+    pos.fromFen(fenPos);
+    qDebug() << "fenPos:" << pos.asFen();
+    endTurn();
+    m_store->onCandidateMoveConfirmed(pos);
+}
+
+QString MNetworkGame::
+reverseFenPos(QString &fenPos)
+{
+    QStringList fenPosList = fenPos.simplified().split("/");
+    QString newFenPos;
+
+    for(int i = fenPosList.count(); i>0; --i)
+    {
+        newFenPos += fenPosList.at(i);
+        if(i>1)
+            newFenPos += "/";
+    }
+
+    qDebug() << "fenPos:" << fenPos << "Reversed:" << newFenPos;
+
+    return newFenPos;
+}
+// rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR
+// RNBQKBNR/PPPP1PPP/8/4P3/8/8/pppppppp/rnbqkbnr
