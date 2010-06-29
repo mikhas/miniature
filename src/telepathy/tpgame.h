@@ -22,11 +22,15 @@
 #ifndef TPGAME_H
 #define TPGAME_H
 
+#include <config.h>
+
 #include "tpaccountmanager.h"
 #include "accountselectiondlg.h"
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 #include <gtk/gtk.h>
 #include <libosso-abook/osso-abook.h>
+#endif
 
 #include <TelepathyQt4/shared-ptr.h>
 #include <TelepathyQt4/ClientRegistrar>
@@ -95,6 +99,7 @@ private:
     TubeClient *mClient;
     QDataStream mStream;
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 public:
     // This is private really, but mixing GLib and QT does not allow it to
     // be  private
@@ -103,6 +108,7 @@ public:
     OssoABookContact *selected_master_contact;
     OssoABookContact *selected_contact;
     Tp::AccountPtr requested_account;
+#endif
 };
 
 } // namespace TpGame

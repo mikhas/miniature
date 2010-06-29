@@ -5,10 +5,10 @@ ACLOCAL_AMFLAGS = -I build
 gamesdir = $(prefix)/games
 games_PROGRAMS = src/miniature
 
-src_miniature_CXXFLAGS = $(MINIATURE_CFLAGS) $(QT_CXXFLAGS) -Wall -Werror -I./src $(AM_CXXFLAGS)
+src_miniature_CXXFLAGS = $(MINIATURE_CFLAGS) $(MAEMOCONTACTSELECTOR_CFLAGS) $(QT_CXXFLAGS) -Wall -Werror -I./src $(AM_CXXFLAGS)
 src_miniature_CPPFLAGS = $(QT_CPPFLAGS)
 src_miniature_LDFLAGS  = $(QT_LDFLAGS) $(AM_LDFLAGS)
-src_miniature_LDADD = $(MINIATURE_LIBS) $(QT_LIBS)
+src_miniature_LDADD = $(MINIATURE_LIBS) $(MAEMOCONTACTSELECTOR_LIBS) $(QT_LIBS)
 
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \
@@ -129,10 +129,15 @@ src_miniature_SOURCES = \
 			src/telepathy/tptubeclient.h \
 			src/telepathy/tptubeclient.cc \
 			src/telepathy/tptubeclient.moc.cc \
+			$(null)
+
+if HAVE_MAEMOCONTACTSELECTOR
+src_miniature_SOURCES += \
 			src/telepathy/contact-chooser.h \
 			src/telepathy/contact-chooser.cc \
 			src/telepathy/contact-chooser.moc.cc \
 			$(null)
+endif
 
 if MINIATURE_PLATFORM_MAEMO5
 src_miniature_SOURCES += \

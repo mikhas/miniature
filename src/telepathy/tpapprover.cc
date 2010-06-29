@@ -19,6 +19,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
 #include "tpapprover.h"
 
 #include <TelepathyQt4/Contact>
@@ -27,8 +28,10 @@
 #include <TelepathyQt4/PendingReady>
 #include <TelepathyQt4/ChannelDispatchOperation>
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 #include <gtk/gtk.h>
 #include <hildon/hildon.h>
+#endif
 
 namespace TpGame
 {
@@ -48,6 +51,7 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
     GtkWidget *note = hildon_note_new_confirmation (NULL,
                     "Do you want to play chess?");
 
@@ -64,6 +68,9 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
                 SIGNAL(finished(Tp::PendingOperation *)),
                 SLOT(onReadyToBeClosed(Tp::PendingOperation *)));
     }
+#else
+    mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+#endif
 }
 
 TpApprover::~TpApprover()

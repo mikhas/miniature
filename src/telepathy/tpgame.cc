@@ -19,18 +19,20 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
 #include "tpgame.h"
+
 #include "tpapprovermanager.h"
 #include "tptubesclienthandler.h"
 #include "tptextclienthandler.h"
 #include "tptubeclient.h"
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 #include "contact-chooser.h"
-
-#include <TelepathyQt4/Account>
-
 #include <telepathy-glib/dbus.h>
 #include <telepathy-glib/account.h>
+#include <TelepathyQt4/Account>
+#endif
 
 #include <QTcpSocket>
 
@@ -42,12 +44,15 @@ Game::Game(QObject *parent)
       m_account_manager(new AccountManager(this)),
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
       m_client_registrar(Tp::ClientRegistrar::create()),
-      mClient(0),
+      mClient(0)
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+      ,
       contact_window(0),
       contact_view(0),
       selected_master_contact(0),
       selected_contact(0),
       requested_account(0)
+#endif
 {
     qDebug() << "Registering client handler.";
 
@@ -98,6 +103,7 @@ void Game::onAccountNamesChanged(const QStringList &account_names)
     Q_EMIT initialized();
 }
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 static void
 contact_activated_cb (OssoABookContactView *view,
     GtkTreePath *path G_GNUC_UNUSED,
@@ -171,11 +177,13 @@ contact_activated_cb (OssoABookContactView *view,
   gtk_widget_destroy (game->contact_window);
   game->contact_window = NULL;
 }
+#endif
 
 void Game::joinGame()
 {
     qDebug() << "TpGame::joingGame()";
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
     GtkWidget *vbox;
 
     contact_window = hildon_stackable_window_new ();
@@ -194,6 +202,9 @@ void Game::joinGame()
     gtk_container_add (GTK_CONTAINER (contact_window), vbox);
     gtk_widget_show (vbox);
     gtk_widget_show (contact_window);
+#else
+    m_accounts_dialog->show();
+#endif
     
     Q_EMIT initialized();
 }
