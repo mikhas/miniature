@@ -176,6 +176,8 @@ BUILT_SOURCES = \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
+
+dbusservicedir = $(datadir)/dbus-1/services
 dist_dbusservice_DATA = \
                 data/org.maemo.miniature.service \
                 data/org.freedesktop.Telepathy.Client.Miniature.service \

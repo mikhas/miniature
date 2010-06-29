@@ -31,18 +31,6 @@ AC_ARG_ENABLE(opengl,
     [AC_DEFINE(HAVE_MINIATURE_OPENGL, [1], [Define to enable Qt's OpenGL graphics system])]
 )
 
-AC_ARG_ENABLE(dbusservice,
-    AS_HELP_STRING([--enable-dbusservice], [Enable DBus Service directory]),
-    [ac_enable_dbusservice=$enableval], [ac_enable_dbusservice=yes])
-
-if test "x$ac_enable_dbusservice" != "xno"; then
-AC_SUBST([dbusservicedir], [`"$PKG_CONFIG" --variable=dbusservicedir osso-af-settings`])
-if test -z "$dbusservicedir"; then
-  AC_MSG_ERROR([Cannot find D-Bus service file folder])
-fi
-
-fi
-
 AC_SUBST([desktopentrydir], [`"$PKG_CONFIG" --variable=desktopentrydir osso-af-settings`])
 AC_SUBST([AM_CXXFLAGS])
 AC_SUBST([AM_LDFLAGS])
