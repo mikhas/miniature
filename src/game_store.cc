@@ -107,11 +107,11 @@ setupStartPosition(bool isWhiteAtBottom)
         pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,7));
         pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,7));
 
-        pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,0));
-        pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,7));
+        pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(4,0));
+        pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(4,7));
 
-        pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,0));
-        pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,7));
+        pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(3,0));
+        pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(3,7));
 
         for (int i = 0; i < 8; ++i)
         {
