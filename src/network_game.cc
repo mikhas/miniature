@@ -178,42 +178,9 @@ void MNetworkGame::
 receivedMove(QString &fenPos)
 {
     MPosition pos;
-    fenPos = reverseFenPos(fenPos);
-    pos.fromFen(fenPos);
+    pos = pos.fromFen(fenPos);
     qDebug() << "fenPos:" << pos.asFen();
     endTurn();
     m_store->onCandidateMoveConfirmed(pos);
 }
 
-/*
- * Ex:
- * in: rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b
- * out: RNBQKBNR/PPPP1PPP/8/4P3/8/8/pppppppp/rnbqkbnr/ w
- */
-
-QString MNetworkGame::
-reverseFenPos(QString &fenPos)
-{
-    qDebug() << "MNetworkGame::reverseFenPos()";
-
-    QStringList fenPosList = fenPos.simplified().split("/");
-    QString newFenPos;
-
-    for(int i = fenPosList.count()-2; i>=0; --i)
-    {
-        newFenPos += fenPosList.at(i);
-        newFenPos += "/";
-    }
-
-    QString whiteOrBlack = fenPosList.at(fenPosList.count()-1);
-    if(whiteOrBlack.compare(" b")==0)
-        whiteOrBlack = " w";
-    else
-        whiteOrBlack = " b";
-
-    newFenPos += whiteOrBlack;
-
-    qDebug() << "fenPos  :" << fenPos << "\nReversed:" << newFenPos;
-
-    return newFenPos;
-}
