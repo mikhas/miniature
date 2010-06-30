@@ -241,6 +241,12 @@ void Game::readPackets()
 {
     qDebug() << "Game::readPackets()";
 
+    if (mClient->bytesAvailable() == 0)
+    {
+        qDebug() << "Game::readPackets()";
+        return;
+    }
+
     QString command;
     mStream >> command;
 
@@ -361,6 +367,9 @@ void Game::readPackets()
             break;
         }
     }
+
+    /* read next packet if there is still packets to read */
+    readPackets();
 }
 
 void Game::sendNewGame(bool whiteChoosed)
