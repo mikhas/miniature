@@ -55,6 +55,7 @@ joinGame()
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SLOT(joinGameConnected()), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(receivedMove(QString&)), SLOT(receivedMove(QString&)), Qt::UniqueConnection);
     m_tp_game->joinGame();
 }
 

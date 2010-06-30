@@ -133,6 +133,8 @@ void MGraphicsBoardItem::rotatePieces180()
 
 void MGraphicsBoardItem::updateFromPosition(MPosition *const position)
 {
+    hidePieces(); // FIXME: old pieces should be destroyed, not just hidden
+
     for (MPosition::MPieces::iterator iter = position->begin();
          iter != position->end();
          ++iter)

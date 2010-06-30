@@ -262,12 +262,8 @@ void MGame::startTurn(const MPosition &position)
 {
     qDebug() << "MGame::startTurn()";
 
-    // uhm, this could be done nicer
-    if (0 == m_store->getIndex())
-    {
-        MPosition pos_copy = MPosition(position);
-        m_board->updateFromPosition(&pos_copy);
-    }
+    MPosition pos_copy = MPosition(position);
+    m_board->updateFromPosition(&pos_copy);
 
     m_dashboard->enableRequestsButton();
     updatePlayerStatus(position);
