@@ -104,11 +104,14 @@ void AccountItem::ensureContactsList()
 
     if (m_account->haveConnection())
         connectionReady();
+/* FIXME: Miniature should not enable telepathy accounts and should not start them
+          For now, just disable this and let refactor this later
     else
         // TODO: A setter should not return an instance?
         connect(m_account->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)),
                 this,                        SLOT(onAccountSetEnabled(Tp::PendingOperation *)),
                 Qt::UniqueConnection);
+*/
 }
 
 void AccountItem::onAccountSetEnabled(Tp::PendingOperation *pending)
