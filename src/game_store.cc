@@ -53,7 +53,7 @@ getIndex() const
 }
 
 void MGameStore::
-setupStartPosition(bool isWhiteAtBottom)
+setupStartPosition()
 {
     m_game.clear();
     m_game = MPositionList(); // leaky?
@@ -61,63 +61,31 @@ setupStartPosition(bool isWhiteAtBottom)
 
     MPosition pos;
 
-    if(isWhiteAtBottom)
+    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
+    pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
+    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
+    pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
+
+    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
+    pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
+    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
+    pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
+
+    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
+    pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
+    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
+    pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
+
+    pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
+    pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
+
+    pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
+    pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
+
+    for (int i = 0; i < 8; ++i)
     {
-        pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,0));
-        pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,0));
-        pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,7));
-        pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,7));
-
-        pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,0));
-        pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,0));
-        pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,7));
-        pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,7));
-
-        pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,0));
-        pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,0));
-        pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,7));
-        pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,7));
-
-        pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(3,0));
-        pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(3,7));
-
-        pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(4,0));
-        pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(4,7));
-
-        for (int i = 0; i < 8; ++i)
-        {
-            pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
-            pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
-        }
-    }
-    else
-    {
-        pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(0,0));
-        pos.addPieceAt(new MRook(MPiece::WHITE), QPoint(7,0));
-        pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(0,7));
-        pos.addPieceAt(new MRook(MPiece::BLACK), QPoint(7,7));
-
-        pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(1,0));
-        pos.addPieceAt(new MKnight(MPiece::WHITE), QPoint(6,0));
-        pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(1,7));
-        pos.addPieceAt(new MKnight(MPiece::BLACK), QPoint(6,7));
-
-        pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(2,0));
-        pos.addPieceAt(new MBishop(MPiece::WHITE), QPoint(5,0));
-        pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(2,7));
-        pos.addPieceAt(new MBishop(MPiece::BLACK), QPoint(5,7));
-
-        pos.addPieceAt(new MQueen(MPiece::WHITE), QPoint(4,0));
-        pos.addPieceAt(new MQueen(MPiece::BLACK), QPoint(4,7));
-
-        pos.addPieceAt(new MKing(MPiece::WHITE), QPoint(3,0));
-        pos.addPieceAt(new MKing(MPiece::BLACK), QPoint(3,7));
-
-        for (int i = 0; i < 8; ++i)
-        {
-            pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,1));
-            pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,6));
-        }
+        pos.addPieceAt(new MPawn(MPiece::BLACK), QPoint(i,1));
+        pos.addPieceAt(new MPawn(MPiece::WHITE), QPoint(i,6));
     }
 
     pos.resetCastling();
@@ -128,10 +96,7 @@ setupStartPosition(bool isWhiteAtBottom)
 
     Q_ASSERT(!m_game.empty());
 
-    if(isWhiteAtBottom)
-        Q_EMIT whiteToMove(pos);
-    else
-        Q_EMIT blackToMove(pos);
+    Q_EMIT whiteToMove(pos);
 }
 
 bool MGameStore::
@@ -167,6 +132,7 @@ onPositionRequested(int index)
 void MGameStore::
 onCandidateMoveConfirmed(MPosition &pos)
 {
+    qDebug() << "MGameStore::onCandidateMoveConfirmed";
     m_candidate_move.deSelect();
     m_candidate_move = mHalfMove(pos);
     m_game.insert(++m_index, pos);
