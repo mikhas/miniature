@@ -104,43 +104,6 @@ void AccountItem::ensureContactsList()
 
     if (m_account->haveConnection())
         connectionReady();
-/* FIXME: Miniature should not enable telepathy accounts and should not start them
-          For now, just disable this and let refactor this later
-    else
-        // TODO: A setter should not return an instance?
-        connect(m_account->setEnabled(true), SIGNAL(finished(Tp::PendingOperation *)),
-                this,                        SLOT(onAccountSetEnabled(Tp::PendingOperation *)),
-                Qt::UniqueConnection);
-*/
-}
-
-void AccountItem::onAccountSetEnabled(Tp::PendingOperation *pending)
-{
-    qDebug() << "TpAccountItem::onAccountSetEnabled()";
-
-    if (pending->isError())
-    {
-        // TODO: should be a warning?
-        qDebug() << "Account set enabled failed.";
-        return;
-    }
-
-    // TODO: A setter should not return an instance?
-    connect(m_account->setConnectsAutomatically(true), SIGNAL(finished(Tp::PendingOperation *)),
-            this,                                      SLOT(onConnectsAutomatically(Tp::PendingOperation *)),
-            Qt::UniqueConnection);
-}
-
-void AccountItem::onConnectsAutomatically(Tp::PendingOperation *pending)
-{
-    qDebug() << "TpAccountItem::onConnectsAutomatically()";
-
-    if (pending->isError())
-    {
-        // TODO: should be a warning?
-        qDebug() << "Account connection automatically failed.";
-        return;
-    }
 }
 
 void AccountItem::onConnectionStatusChanged(const Tp::ConnectionStatus &cs, const Tp::ConnectionStatusReason &)
@@ -217,11 +180,6 @@ void AccountItem::onEnsureChannelFinished(Tp::PendingOperation *pending)
         qDebug() << "Ensure channel failed: " << pending->errorName() << pending->errorMessage();
         return;
     }
-}
-
-Tp::AccountPtr AccountItem::getInternal()
-{
-    return m_account;
 }
 
 } // namespace TpGame

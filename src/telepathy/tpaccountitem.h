@@ -61,16 +61,12 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onFinished(Tp::PendingOperation *pending);
     void onConnectionReady(Tp::PendingOperation *pending);
-    void onAccountSetEnabled(Tp::PendingOperation *);
-    void onConnectsAutomatically(Tp::PendingOperation *pending);
     void onConnectionStatusChanged(const Tp::ConnectionStatus &status, const Tp::ConnectionStatusReason &reason);
     void onEnsureChannelFinished(Tp::PendingOperation *pending);
 
 protected:
     // TODO: just make the parts that are needed by the AM public. Dont use friends.
     friend class AccountManager;
-
-    Tp::AccountPtr getInternal();
 
 private:
     void connectionReady();
