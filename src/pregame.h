@@ -26,7 +26,6 @@
 #include <mmainwindow.h>
 #include <mgameconfig.h>
 #include <iconic_button.h>
-#include "incoming_connection.ui.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -60,17 +59,11 @@ public Q_SLOTS:
     //! Starts a game in "pub mode"
     void onStartLocalGame();
 
-    //! Hosts a new P2P game.
-    void onHostGame();
-
     //! Join an existing P2P game.
     void onJoinGame();
 
     //! Join a game on FICS.
     void onJoinFicsGame();
-
-private Q_SLOTS:
-    void onWaitingForConnection();
 
 private:
     MGameLog m_log;
@@ -78,10 +71,8 @@ private:
     MGameConfig m_game_config;
 
     QPointer<MIconicButton> m_local_game;
-    QPointer<MIconicButton> m_host_game;
     QPointer<MIconicButton> m_join_game;
     QPointer<MIconicButton> m_fics_game;
-    Ui_IncomingConnectionWidget *m_waiting_ui;
 };
 
 } // namespace Miniature

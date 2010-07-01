@@ -35,8 +35,7 @@ MPreGame::
 MPreGame(QObject *parent)
     : QObject(parent),
       m_main(&m_log),
-      m_game_config(&m_main),
-      m_waiting_ui(new Ui_IncomingConnectionWidget)
+      m_game_config(&m_main)
 {
     m_game_config.setGame(new MNetworkGame(&m_log));
     m_game_config.setupGame();
@@ -55,8 +54,6 @@ MPreGame(QObject *parent)
 
     m_local_game = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
-    m_host_game = new MIconicButton(QPixmap(host_game_filename),
-        tr("Host P2P Game"));
     m_join_game = new MIconicButton(QPixmap(join_game_filename),
         tr("Join P2P Game"));
     m_fics_game = new MIconicButton(QPixmap(fics_game_filename),
@@ -74,7 +71,6 @@ MPreGame(QObject *parent)
     buttons->setLayout(hbox);
 
     hbox->addWidget(m_local_game);
-    hbox->addWidget(m_host_game);
     hbox->addWidget(m_join_game);
     hbox->addWidget(m_fics_game);
 
@@ -82,10 +78,6 @@ MPreGame(QObject *parent)
 
     connect(m_local_game, SIGNAL(pressed()),
             this,         SLOT(onStartLocalGame()),
-            Qt::UniqueConnection);
-
-    connect(m_host_game, SIGNAL(pressed()),
-            this,        SLOT(onHostGame()),
             Qt::UniqueConnection);
 
     connect(m_join_game, SIGNAL(pressed()),
@@ -96,15 +88,6 @@ MPreGame(QObject *parent)
 MPreGame::
 ~MPreGame()
 {}
-
-void MPreGame::
-onWaitingForConnection()
-{
-    QWidget *central = new QWidget;
-    m_waiting_ui->setupUi(central);
-    MMainWindow::setupPreGameUi(&m_main, central);
-    m_main.show();
-}
 
 void MPreGame::
 onStartScreenRequested()
@@ -128,12 +111,6 @@ onStartLocalGame()
 #endif
 
     m_game_config.getBoardView()->applyPortraitLayout();
-}
-
-void MPreGame::
-onHostGame()
-{
-    onWaitingForConnection();
 }
 
 void MPreGame::
