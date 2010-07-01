@@ -86,15 +86,19 @@ Q_SIGNALS:
     void receivedAdjournAccept();
 
 private Q_SLOTS:
+#ifndef HAVE_MAEMOCONTACTSELECTOR
     void onAccountNamesChanged(const QStringList &account_names);
+#endif
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
     void newOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
     void readPackets();
 
 private:
     //void initConnections(TubeClient*);
+#ifndef HAVE_MAEMOCONTACTSELECTOR
     AccountManager *m_account_manager;
     AccountSelectionDlg *m_accounts_dialog;
+#endif
     Tp::ClientRegistrarPtr m_client_registrar;
     TubeClient *mClient;
     QDataStream mStream;

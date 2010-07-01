@@ -41,8 +41,10 @@ namespace TpGame
 
 Game::Game(QObject *parent)
     : QObject(parent),
+#ifndef HAVE_MAEMOCONTACTSELECTOR
       m_account_manager(new AccountManager(this)),
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
+#endif
       m_client_registrar(Tp::ClientRegistrar::create()),
       mClient(0)
 #ifdef HAVE_MAEMOCONTACTSELECTOR
@@ -87,12 +89,15 @@ Game::Game(QObject *parent)
 void Game::hostGame()
 {
     qDebug() << "TpGame::hostGame()";
+#ifndef HAVE_MAEMOCONTACTSELECTOR
     m_account_manager->disconnect();
     connect(m_account_manager, SIGNAL(accountNamesChanged(QStringList)),
             this,              SLOT(onAccountNamesChanged(QStringList)),
             Qt::UniqueConnection);
+#endif
 }
 
+#ifndef HAVE_MAEMOCONTACTSELECTOR
 void Game::onAccountNamesChanged(const QStringList &account_names)
 {
     qDebug() << "TpGame::onAccountNameListChanged()";
@@ -102,6 +107,7 @@ void Game::onAccountNamesChanged(const QStringList &account_names)
 
     Q_EMIT initialized();
 }
+#endif
 
 #ifdef HAVE_MAEMOCONTACTSELECTOR
 static void
@@ -232,7 +238,9 @@ void Game::newOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
 
     connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
 
+#ifndef HAVE_MAEMOCONTACTSELECTOR
     m_accounts_dialog->hide();
+#endif
 
     Q_EMIT connected();
 }
