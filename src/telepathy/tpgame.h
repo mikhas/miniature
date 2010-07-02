@@ -55,8 +55,9 @@ public:
     Game(QObject *parent = 0);
 
 public Q_SLOTS:
-    void hostGame();
+    void hostGame(TubeClient *, const Tp::ContactPtr &);
     void joinGame();
+    void setupOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
 
     void sendNewGame(bool whiteChoosed = false);
     void sendNewGameAccept();
@@ -88,7 +89,6 @@ Q_SIGNALS:
 private Q_SLOTS:
     void onAccountNamesChanged(const QStringList &account_names);
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
-    void newOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
     void readPackets();
 
 private:
@@ -97,7 +97,6 @@ private:
     AccountManager *m_account_manager;
     AccountSelectionDlg *m_accounts_dialog;
 #endif
-    Tp::ClientRegistrarPtr m_client_registrar;
     TubeClient *mClient;
     QDataStream mStream;
 

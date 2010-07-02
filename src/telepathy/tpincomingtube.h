@@ -43,7 +43,7 @@ public:
     ~TpIncomingTube();
 
 Q_SIGNALS:
-    void tubeReady(TubeClient *, const Tp::ContactPtr &);
+    void tubeReady(TpGame::TubeClient *, const Tp::ContactPtr &);
     void readyToBeDeleted();
 
 private Q_SLOTS:

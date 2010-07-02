@@ -52,8 +52,8 @@ public:
                                 const QVariantMap &handlerInfo);
 
 Q_SIGNALS:
-    void newOutgoingTube(TubeClient *, const Tp::ContactPtr &);
-    void newIncomingTube(TubeClient *, const Tp::ContactPtr &);
+    void newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
+    void newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
     void disconnected();
 
 private Q_SLOTS:

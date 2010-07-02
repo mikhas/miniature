@@ -46,7 +46,7 @@ public:
     virtual ~OutgoingTube();
 
 Q_SIGNALS:
-    void tubeReady(TubeClient*, const Tp::ContactPtr &);
+    void tubeReady(TpGame::TubeClient*, const Tp::ContactPtr &);
     void statusChanged(uint);
     void readyToBeDeleted();
 

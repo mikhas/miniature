@@ -19,6 +19,8 @@
  */
 
 #include <pregame.h>
+#include <telepathy/tptubesclienthandler.h>
+#include <telepathy/tpapprovermanager.h>
 
 using namespace Miniature;
 
@@ -39,16 +41,32 @@ MPreGame(QObject *parent)
     , m_game_config(&m_main)
     , m_game(0)
     , m_window(0)
+    , m_client_registrar(Tp::ClientRegistrar::create())
 {
-    setupGame(new MNetworkGame(m_log));
-    
-    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
-    if(!game)
-    {
-        qWarning() << "This should never happen!";
-    }
-    game->hostGame();
 
+    /* Telepathy handlers for network games */
+    Tp::SharedPtr<TpGame::TpTubesClientHandler> client =
+            Tp::SharedPtr<TpGame::TpTubesClientHandler>(new TpGame::TpTubesClientHandler(0));
+
+    connect(client.data(), SIGNAL(newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &)),
+            this,          SLOT(newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &)),
+            Qt::UniqueConnection);
+
+    connect(client.data(), SIGNAL(newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &)),
+            this,          SLOT(newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &)),
+            Qt::UniqueConnection);
+
+    connect(client.data(), SIGNAL(disconnected()),
+            this, SLOT(onStartScreenRequested()),
+            Qt::UniqueConnection);
+
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "Miniature");
+
+    Tp::SharedPtr<TpGame::TpApproverManager> approverManager;
+    approverManager = Tp::SharedPtr<TpGame::TpApproverManager>(new TpGame::TpApproverManager(0));
+    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
+
+    /* Setup UI */
     m_local_game_button = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
     m_join_game_button = new MIconicButton(QPixmap(join_game_filename),
@@ -156,6 +174,34 @@ onJoinGame()
 
     // TODO: Let's move this in the MGame interface, to avoid the dynamic cast:
     game->joinGame();
+}
+
+void MPreGame::newOutgoingTube(TpGame::TubeClient *client, const Tp::ContactPtr &contact)
+{
+    qDebug() << "MPreGame::newOutgoingTube()";
+    /* m_game is already setup by onJoinGame() */
+    if (!m_game)
+    {
+        qWarning() << "MPreGame::newOutgoingTube: This should never happen!";
+        return;
+    }
+
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
+    game->setupOutgoingTube(client, contact);
+}
+
+void MPreGame::newIncomingTube(TpGame::TubeClient *client, const Tp::ContactPtr &contact)
+{
+    qDebug() << "MPreGame::newIncomingTube()";
+    /* Prepare hosting games */
+    setupGame(new MNetworkGame(&m_log));
+    
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
+    if(!game)
+    {
+        qWarning() << "This should never happen!";
+    }
+    game->hostGame(client, contact);
 }
 
 void MPreGame::

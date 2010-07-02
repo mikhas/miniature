@@ -23,6 +23,7 @@
 
 #include <game.h>
 #include <telepathy/tpgame.h>
+#include <telepathy/tptubeclient.h>
 
 namespace Miniature
 {
@@ -38,10 +39,11 @@ public:
     virtual ~MNetworkGame();
 
 public Q_SLOTS:
-    void hostGame();
+    void hostGame(TpGame::TubeClient *, const Tp::ContactPtr &);
     void joinGame();
     void disconnect();
     void newGame();
+    void setupOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
 
 Q_SIGNALS:
     void disconnected();

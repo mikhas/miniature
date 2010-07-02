@@ -22,6 +22,10 @@
 #include <game_log.h>
 #include <local_game.h>
 #include <network_game.h>
+#include <telepathy/tpgame.h>
+#include <telepathy/tptubeclient.h>
+
+#include <TelepathyQt4/contact.h>
 
 #include <main_window.h>
 #include <iconic_button.h>
@@ -64,6 +68,8 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void runGame();
+    void newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &contact);
+    void newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &contact);
 
 private:
     void setupGame(MGame *game);
@@ -76,6 +82,8 @@ private:
     QPointer<MIconicButton> m_local_game_button;
     QPointer<MIconicButton> m_join_game_button;
     QPointer<MIconicButton> m_fics_game_button;
+
+    Tp::ClientRegistrarPtr m_client_registrar;
 };
 
 } // namespace Miniature

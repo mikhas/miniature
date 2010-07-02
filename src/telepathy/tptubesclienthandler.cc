@@ -104,8 +104,8 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
 
                 OutgoingTube *tube = new OutgoingTube(channel);
                 connect(tube,
-                        SIGNAL(tubeReady(TubeClient *, const Tp::ContactPtr &)),
-                        SIGNAL(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)));
+                        SIGNAL(tubeReady(TpGame::TubeClient *, const Tp::ContactPtr &)),
+                        SIGNAL(newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &)));
                 connect(tube,
                         SIGNAL(readyToBeDeleted()),
                         SLOT(deleteOutgoingTube()));
@@ -118,8 +118,8 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
 
                 TpIncomingTube *tube = new TpIncomingTube(channel);
                 connect(tube,
-                        SIGNAL(tubeReady(TubeClient*, const Tp::ContactPtr &)),
-                        SIGNAL(newIncomingTube(TubeClient *, const Tp::ContactPtr &)));
+                        SIGNAL(tubeReady(TpGame::TubeClient*, const Tp::ContactPtr &)),
+                        SIGNAL(newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &)));
                 connect(tube,
                         SIGNAL(readyToBeDeleted()),
                         SLOT(deleteIncomingTube()));

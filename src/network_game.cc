@@ -35,8 +35,9 @@ MNetworkGame::
 {}
 
 void MNetworkGame::
-hostGame()
+hostGame(TpGame::TubeClient *tube_client, const Tp::ContactPtr &contact)
 {
+    qDebug() << "MNetworkGame::hostGame()";
     delete m_tp_game;
     m_tp_game = new TpGame::Game(this);
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
@@ -44,7 +45,14 @@ hostGame()
     connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(receivedNewGame(bool)), SLOT(receivedNewGame(bool)), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(receivedMove(QString&)), SLOT(receivedMove(QString&)), Qt::UniqueConnection);
-    m_tp_game->hostGame();
+    m_tp_game->hostGame(tube_client, contact);
+}
+
+void MNetworkGame::
+setupOutgoingTube(TpGame::TubeClient *tube_client, const Tp::ContactPtr &contact)
+{
+    qDebug() << "MNetworkGame::setupOutgoingTube()";
+    m_tp_game->setupOutgoingTube(tube_client, contact);
 }
 
 void MNetworkGame::

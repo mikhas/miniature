@@ -45,7 +45,6 @@ Game::Game(QObject *parent)
       m_account_manager(new AccountManager(this)),
       m_accounts_dialog(new AccountSelectionDlg(m_account_manager)),
 #endif
-      m_client_registrar(Tp::ClientRegistrar::create()),
       mClient(0)
 #ifdef HAVE_MAEMOCONTACTSELECTOR
       ,
@@ -56,37 +55,9 @@ Game::Game(QObject *parent)
       requested_account(0)
 #endif
 {
-    qDebug() << "Registering client handler.";
-
-    Tp::SharedPtr<TpTubesClientHandler> client = Tp::SharedPtr<TpTubesClientHandler>(new TpTubesClientHandler(0));
-
-    connect(client.data(), SIGNAL(newIncomingTube(TubeClient *, const Tp::ContactPtr &)),
-            this,          SLOT(newIncomingTube(TubeClient *, const Tp::ContactPtr &)),
-            Qt::UniqueConnection);
-
-    connect(client.data(), SIGNAL(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)),
-            this,          SLOT(newOutgoingTube(TubeClient *, const Tp::ContactPtr &)),
-            Qt::UniqueConnection);
-
-    connect(client.data(), SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
-
-    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "Miniature");
-
-#ifdef ENABLE_CHAT_SESSION
-    // TODO: client name should be a ctor arg
-    // Do not handle text channels now: it would get all text channels and the
-    // user's messages would be lost
-
-    Tp::SharedPtr<TextClientHandler> textClient = Tp::SharedPtr<TextClientHandler>(new TextClientHandler(0));
-    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(textClient), "miniature_text_handler");
-#endif
-
-    Tp::SharedPtr<TpApproverManager> approverManager;
-    approverManager = Tp::SharedPtr<TpApproverManager>(new TpApproverManager(0));
-    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
 }
 
-void Game::hostGame()
+void Game::hostGame(TubeClient *tube_client, const Tp::ContactPtr &contact)
 {
     qDebug() << "TpGame::hostGame()";
 #ifndef HAVE_MAEMOCONTACTSELECTOR
@@ -94,6 +65,8 @@ void Game::hostGame()
     connect(m_account_manager, SIGNAL(accountNamesChanged(QStringList)),
             this,              SLOT(onAccountNamesChanged(QStringList)),
             Qt::UniqueConnection);
+#else
+    newIncomingTube(tube_client, contact);
 #endif
 }
 
@@ -230,7 +203,7 @@ void Game::newIncomingTube(TubeClient *client, const Tp::ContactPtr &)
     Q_EMIT connected();
 }
 
-void Game::newOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
+void Game::setupOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
 {
     // TODO: impl
     qDebug() << "TpGame::newOutgoingTube()";
