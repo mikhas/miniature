@@ -86,9 +86,7 @@ Q_SIGNALS:
     void receivedAdjournAccept();
 
 private Q_SLOTS:
-#ifndef HAVE_MAEMOCONTACTSELECTOR
     void onAccountNamesChanged(const QStringList &account_names);
-#endif
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
     void newOutgoingTube(TubeClient *, const Tp::ContactPtr &contact);
     void readPackets();

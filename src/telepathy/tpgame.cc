@@ -97,17 +97,19 @@ void Game::hostGame()
 #endif
 }
 
-#ifndef HAVE_MAEMOCONTACTSELECTOR
 void Game::onAccountNamesChanged(const QStringList &account_names)
 {
     qDebug() << "TpGame::onAccountNameListChanged()";
 
     Q_FOREACH(QString name, account_names)
+    {
+#ifndef HAVE_MAEMOCONTACTSELECTOR
         m_account_manager->ensureContactListForAccount(name);
+#endif
+    }
 
     Q_EMIT initialized();
 }
-#endif
 
 #ifdef HAVE_MAEMOCONTACTSELECTOR
 static void
