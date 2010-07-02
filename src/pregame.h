@@ -24,7 +24,6 @@
 #include <network_game.h>
 
 #include <main_window.h>
-#include <mgameconfig.h>
 #include <iconic_button.h>
 
 #include <QtCore>
@@ -63,10 +62,16 @@ public Q_SLOTS:
     //! Join a game on FICS.
     void onJoinFicsGame();
 
+private Q_SLOTS:
+    void runGame();
+
 private:
+    void setupGame(MGame *game);
+
     MSharedGameLog m_log;
     MMainWindow m_main;
-    MGameConfig m_game_config;
+    QPointer<MGame> m_game;
+    QPointer<QMainWindow> m_window;
 
     QPointer<MIconicButton> m_local_game_button;
     QPointer<MIconicButton> m_join_game_button;

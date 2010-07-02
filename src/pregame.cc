@@ -37,21 +37,17 @@ MPreGame(QObject *parent)
     , m_log(new MGameLog)
     , m_main(m_log)
     , m_game_config(&m_main)
+    , m_game(0)
+    , m_window(0)
 {
-    m_game_config.setGame(new MNetworkGame(m_log));
-    m_game_config.setupGame();
-
-    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
+    setupGame(new MNetworkGame(m_log));
+    
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
     if(!game)
     {
         qWarning() << "This should never happen!";
     }
-
     game->hostGame();
-
-    connect(&m_game_config, SIGNAL(restart()),
-            this,          SLOT(onStartScreenRequested()),
-            Qt::UniqueConnection);
 
     m_local_game_button = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
@@ -91,6 +87,39 @@ MPreGame::
 {}
 
 void MPreGame::
+setupGame(MGame *game)
+{
+    delete m_game;
+    m_game = game;
+
+    delete m_window;
+    m_window = new QMainWindow;
+
+    m_game->setParent(m_window);
+    m_game->setBoardView(new MBoardView(m_window));
+
+    MMainWindow::setupGameUi(m_window, m_game->getBoardView());
+
+    connect(m_game,   SIGNAL(destroyed()),
+            m_window, SLOT(close()),
+            Qt::UniqueConnection);
+
+    connect(m_game, SIGNAL(destroyed()),
+            &m_main, SLOT(show()),
+            Qt::UniqueConnection);
+
+    connect(m_game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
+    connect(m_game, SIGNAL(connected()), SLOT(runGame()), Qt::UniqueConnection);
+}
+
+void MPreGame::
+runGame()
+{
+    m_window->show();
+    m_main.hide();
+}
+
+void MPreGame::
 onStartScreenRequested()
 {
     m_main.show();
@@ -100,25 +129,25 @@ onStartScreenRequested()
 void MPreGame::
 onStartLocalGame()
 {
-    m_game_config.setGame(new MLocalGame(m_log));
-    m_game_config.setupGame();
-    m_game_config.runGame();
-    m_game_config.getGame()->newGame();
+    setupGame(new MLocalGame(m_log));
+
+    m_window->show();
+    m_main.hide();
+    m_game->newGame();
 
 #ifdef Q_WS_MAEMO_5
-    m_game_config.getWindow()->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
+    m_window->setAttribute(Qt::WA_Maemo5PortraitOrientation, true);
 #endif
 
-    m_game_config.getBoardView()->applyPortraitLayout();
+    m_game->getBoardView()->applyPortraitLayout();
 }
 
 void MPreGame::
 onJoinGame()
 {
-    m_game_config.setGame(new MNetworkGame(m_log));
-    m_game_config.setupGame();
+    setupGame(new MNetworkGame(m_log));
 
-    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
+    MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
     if(!game)
     {
         qWarning() << "This should never happen!";
