@@ -20,7 +20,6 @@
 
 #include <game.h>
 #include <pieces.h>
-#include <mmainwindow.h>
 
 using namespace Miniature;
 

@@ -22,7 +22,7 @@
 #define MGAMECONFIG_H
 
 #include <QObject>
-#include <mmainwindow.h>
+#include <main_window.h>
 #include <game.h>
 
 /*!

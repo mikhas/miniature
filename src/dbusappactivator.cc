@@ -18,12 +18,12 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <mmainwindow.h>
+#include <main_window.h>
 #include <dbusappactivator.h>
 
 QDBusAppActivator::QDBusAppActivator(MMainWindow *window)
-: QDBusAbstractAdaptor(window),
-  m_window(window)
+    : QDBusAbstractAdaptor(window)
+    , m_window(window)
 {}
 
 void QDBusAppActivator::top_application()

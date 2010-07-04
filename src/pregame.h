@@ -23,7 +23,7 @@
 #include <local_game.h>
 #include <network_game.h>
 
-#include <mmainwindow.h>
+#include <main_window.h>
 #include <mgameconfig.h>
 #include <iconic_button.h>
 

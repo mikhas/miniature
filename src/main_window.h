@@ -21,6 +21,7 @@
 #ifndef MINIATURE_H__
 #define MINIATURE_H__
 
+#include <memory>
 #include <game_log.h>
 
 #include <QtGui>
@@ -32,13 +33,13 @@ class mDialogs;
 /*! \brief Miniature main view
  *
  *  This class represents Miniature's main view. It sets up the basic UI, the
- *  menu and delegates further control to MGame.
- *  The ctor implementation is platform-specific and therefore located in
- *  separate .cc files. Automake is used to decide which file to include for
- *  the given platform Miniature is compiled for.
+ *  menu and delegates further control to MGame. Most methods implementations
+ *  are platform-specific and therefore located in separate .cc files.
+ *  Automake is used to decide which file to include for the given platform
+ *  Miniature is compiled for.
  */
 class MMainWindow
-: public QMainWindow
+    : public QMainWindow
 {
     Q_OBJECT
 
@@ -46,56 +47,27 @@ public:
     explicit MMainWindow(MGameLog *log, QWidget *parent = 0);
     virtual ~MMainWindow();
 
-    /*!
-     *  Initializes the pre-game UI.
-     */
+    //! Initializes the pre-game UI.
     static void setupPreGameUi(QMainWindow *window, QWidget *subview);
 
-    /*!
-     *  Initializes the normal game mode UI.
-     */
+    //! Initializes the game UI for normal modes.
     static void setupGameUi(QMainWindow *window, QGraphicsView *subview);
 
-    /*!
-     *  Registers the main view actions in the menu, and connects them.
-     */
+    //! Registers the main view actions in the menu, and connects them.
     void registerActions();
 
-    /*!
-     *  Connects the main view actions to the game controller.
-     */
+    //! Connects the main view actions to the game controller.
     void connectActions();
 
 public Q_SLOTS:
-    /*!
-     *  This slot can be used to send debug output to be shown in the main
-     *  view. Useful when not run from a terminal.
-     * @param[in] The debug message.
-     */
-    void appendDebugOutput(const QString &msg);
-
-    /*!
-     *  This slot can be used to fill the game log. It can also contain debug
-     *  output.
-     */
-    //void appendToGameLog(const QString &msg, const LogLevelFlags &log_level);
-
-    /*!
-     *  This slot toggles whether the debug output is shown to the user at all.
-     */
-    void toggleDebugOutput();
-
-    /*!
-     *  Shows the about dialog.
-     */
+    //! Shows the about dialog.
     void showAboutDialog();
 
 private:
-    MGameLog *m_log; /*<! The game log which is used for the game log window. */
-    mActions *m_actions; /*!< The main actions used in the main view. */
-    mDialogs *m_dialogs; /*!< The dialogs used in the main view. */
+    QPointer<MGameLog> m_log; /*!< The game log which is used for the game log window. */
+    std::auto_ptr<mActions> m_actions; /*!< The main actions used in the main view. */
+    std::auto_ptr<mDialogs> m_dialogs; /*!< The dialogs used in the main view. */
     QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */
 };
-
 
 #endif // MMAINWINDOW_H

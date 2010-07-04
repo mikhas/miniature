@@ -37,7 +37,7 @@
  *  *how* the messages are reported.
  */
 class MGameLog
-: public QObject
+    : public QObject
 {
     Q_OBJECT
 

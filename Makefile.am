@@ -13,9 +13,9 @@ src_miniature_LDADD = $(MINIATURE_LIBS) $(MAEMOCONTACTSELECTOR_LIBS) $(QT_LIBS)
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \
 			src/main.cc \
-                        src/mmainwindow.cc \
-                        src/mmainwindow.h \
-                        src/mmainwindow.moc.cc \
+                        src/main_window.cc \
+                        src/main_window.h \
+                        src/main_window.moc.cc \
                         src/dbusappactivator.cc \
                         src/dbusappactivator.h \
                         src/dbusappactivator.moc.cc \
@@ -141,16 +141,16 @@ endif
 
 if MINIATURE_PLATFORM_MAEMO5
 src_miniature_SOURCES += \
-			src/maemo5/main.cc \
+			src/maemo5/main_window.cc \
 			$(null)
 else
 if MINIATURE_PLATFORM_MAEMO6
 src_miniature_SOURCES += \
-			src/maemo5/main.cc \
+			src/meego/main_window.cc \
 			$(null)
 else
 src_miniature_SOURCES += \
-			src/generic/main.cc \
+			src/generic/main_window.cc \
 			$(null)
 endif
 endif
@@ -174,7 +174,7 @@ BUILT_SOURCES = \
 		src/telepathy/tpaccountmanager.moc.cc \
 		src/telepathy/tpaccountitem.moc.cc \
 		src/select_account.ui.h \
-                src/mmainwindow.moc.cc \
+                src/main_window.moc.cc \
                 src/dbusappactivator.moc.cc \
                 src/mgameconfig.moc.cc \
 		$(null)

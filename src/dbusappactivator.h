@@ -22,6 +22,11 @@
 #ifndef DBUSAPPACTIVATOR_H
 #define DBUSAPPACTIVATOR_H
 
+#include <QDBusAbstractAdaptor>
+#include <QPointer>
+
+class MMainWindow;
+
 /*! \brief D-Bus activation for Miniature
  *
  *  On Maemo, applications get started via D-Bus. Also, D-Bus will take care
@@ -30,10 +35,6 @@
  *
  *  For non-Maemo platforms the class' implementation will simply do nothing.
  */
-
-#include <QDBusAbstractAdaptor>
-
-class MMainWindow;
 
 class QDBusAppActivator
 : public QDBusAbstractAdaptor
@@ -45,13 +46,12 @@ public:
     explicit QDBusAppActivator(MMainWindow *window);
 
 public Q_SLOTS:
-    /*!
-     *  This slot gets called via D-Bus.
-     */
+    //! This slot gets called via D-Bus and brings Miniature into the
+    //! foreground.
     void top_application();
 
 private:
-    MMainWindow *m_window; /*!< A back pointer to the main view. */
+    QPointer<MMainWindow> m_window; /*!< A back pointer to the main view. */
 };
 
 #endif // DBUSAPPACTIVATOR_H

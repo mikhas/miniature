@@ -19,7 +19,7 @@
  */
 
 #include <config.h>
-#include <mmainwindow.h>
+#include <main_window.h>
 #include <dbusappactivator.h>
 
 #include <QtCore>
@@ -34,15 +34,15 @@ public:
      *  @param[in] owner The owner of the contained actions.
      */
     explicit mActions(QObject *owner)
-    :  show_about_dialog(new QAction(owner)),
-       show_game_log(new QAction(owner))
+        : show_about_dialog(new QAction(owner))
+        , show_game_log(new QAction(owner))
     {}
 
     virtual ~mActions()
     {}
 
-    QAction* show_about_dialog;
-    QAction* show_game_log;
+    QAction *show_about_dialog;
+    QAction *show_game_log;
 };
 
 /*! \brief Container for Miniature dialogs.
@@ -135,6 +135,7 @@ void MMainWindow::registerActions()
 
 void MMainWindow::connectActions()
 {
+    // Bind this main window to the game log action:
     QSignalMapper *mapper = new QSignalMapper(this);
     mapper->setMapping(m_actions->show_game_log, this);
 
@@ -151,7 +152,7 @@ void MMainWindow::connectActions()
 void MMainWindow::showAboutDialog()
 {
     QFont font = QFont("helvetica", 14, QFont::Normal);
-    QDialog *dialog = new QDialog(QApplication::activeWindow());
+    QPointer<QDialog> dialog = new QDialog(QApplication::activeWindow());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->setWindowTitle(tr("About Miniature"));
     dialog->resize(-1, 480);
@@ -167,13 +168,12 @@ void MMainWindow::showAboutDialog()
     slogan->setAlignment(Qt::AlignCenter);
     vbox->addWidget(slogan);
 
-    // TODO: Find correct color roles that are used in the QTextBrowser, and remove the HTML style hack.
-    QPalette lightBg;
-    lightBg.setColor(QPalette::Base, QColor(Qt::white));
-    lightBg.setColor(QPalette::WindowText, QColor(Qt::black));
+    QPalette light_bg;
+    light_bg.setColor(QPalette::Base, QColor(Qt::white));
+    light_bg.setColor(QPalette::WindowText, QColor(Qt::black));
 
-    QTextBrowser *description = new QTextBrowser(dialog);
-    description->setPalette(lightBg);
+    QPointer<QTextBrowser> description = new QTextBrowser(dialog);
+    description->setPalette(light_bg);
     description->setSizePolicy(policy);
 
     description->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
@@ -192,7 +192,7 @@ void MMainWindow::showAboutDialog()
 
     vbox->addWidget(description);
 
-    QDialogButtonBox *buttons = new QDialogButtonBox(dialog);
+    QPointer<QDialogButtonBox> buttons = new QDialogButtonBox(dialog);
     buttons->setOrientation(Qt::Horizontal);
     buttons->setStandardButtons(QDialogButtonBox::Close);
     vbox->addWidget(buttons);
