@@ -97,17 +97,21 @@ void MGraphicsBoardItem::addPiece(MPiece *const piece)
 
     // Qt doesn't even get event propagation right =) But I can help out here!
     connect(piece, SIGNAL(pieceClicked(MPiece *)),
-            this,  SLOT(onPieceClicked(MPiece *)));
+            this,  SLOT(onPieceClicked(MPiece *)),
+            Qt::UniqueConnection);
 
     // Enable rotation for this piece.
     connect(this, SIGNAL(pieceRotationRequested180()),
-            piece, SLOT(rotate180()));
+            piece, SLOT(rotate180()),
+            Qt::UniqueConnection);
 
     connect(this, SIGNAL(pieceRotationRequested0()),
-            piece, SLOT(rotate0()));
+            piece, SLOT(rotate0()),
+            Qt::UniqueConnection);
 
     connect(this, SIGNAL(togglePieceRotations()),
-            piece, SLOT(toggleRotations()));
+            piece, SLOT(toggleRotations()),
+            Qt::UniqueConnection);
 
     piece->setParentItem(this);
     piece->show();
