@@ -38,7 +38,6 @@ MPreGame(QObject *parent)
     : QObject(parent)
     , m_log(new MGameLog)
     , m_main(m_log)
-    , m_game_config(&m_main)
     , m_game(0)
     , m_window(0)
     , m_client_registrar(Tp::ClientRegistrar::create())
@@ -194,7 +193,7 @@ void MPreGame::newIncomingTube(TpGame::TubeClient *client, const Tp::ContactPtr 
 {
     qDebug() << "MPreGame::newIncomingTube()";
     /* Prepare hosting games */
-    setupGame(new MNetworkGame(&m_log));
+    setupGame(new MNetworkGame(m_log));
     
     MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
     if(!game)
