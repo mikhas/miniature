@@ -45,7 +45,8 @@ MPiece(MColour colour, MType pieceType, int width, int height)
   dropShadow(new QGraphicsPixmapItem(this)),
   ghostFadeOutTimer(new QTimeLine(250, this)),
   rotated(false),
-  enableRotations(true)
+  enableRotations(true),
+  boardRotated(true)
 {
     // Initialize QImage so that we dont get artifacts from previous images.
     image.fill(Qt::transparent);
@@ -177,13 +178,29 @@ moveTo(const QPoint &target)
 QPoint MPiece::
 mapToCell() const
 {
-    return QPoint(pos().x() / 60, pos().y() / 60); // TODO: remove magic numbers!
+    // TODO: remove magic numbers!
+    QPoint boardSize = QPoint(7, 7);
+    QPoint rotatedPos = QPoint(pos().x() / 60, pos().y() / 60);
+
+    if (boardRotated)
+        return boardSize - rotatedPos;
+    else
+        return rotatedPos;
 }
 
 QPoint MPiece::
 mapFromCell(const QPoint &cell) const
 {
-    return QPoint(cell.x() * 60, cell.y() * 60); // TODO: remove magic numbers!
+    // TODO: remove magic numbers!
+    QPoint boardSize = QPoint(7, 7);
+    QPoint rotatedCell;
+
+    if (boardRotated)
+        rotatedCell = boardSize - cell;
+    else
+        rotatedCell = cell;
+
+    return rotatedCell * 60;
 }
 
 void MPiece::
@@ -242,6 +259,12 @@ rotate(bool flip)
     setTransformOriginPoint(center, center);
 
     setRotation(flip ? 180 : 0);
+}
+
+void MPiece::
+setBoardRotated(bool _boardRotated)
+{
+    boardRotated = _boardRotated;
 }
 
 void MPiece::

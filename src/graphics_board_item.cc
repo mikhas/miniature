@@ -35,7 +35,8 @@ using namespace Miniature;
 MGraphicsBoardItem::MGraphicsBoardItem(int size, QGraphicsItem *parent)
 : QGraphicsObject(parent),
   m_active(true),
-  m_board_size(size)
+  m_board_size(size),
+  boardRotated(true)
 {}
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
@@ -51,8 +52,21 @@ void MGraphicsBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 
     if (m_active)
-        Q_EMIT targetClicked(QPoint(floor(event->pos().x() / getCellSize()),
-                                    floor(event->pos().y() / getCellSize())));
+    {
+        QPoint pos;
+        if (boardRotated)
+        {
+            pos = QPoint(floor(event->pos().x() / getCellSize()),
+                         floor(event->pos().y() / getCellSize()));
+            pos = QPoint(7, 7) - pos;
+        }
+        else
+        {
+            pos = QPoint(floor(event->pos().x() / getCellSize()),
+                         floor(event->pos().y() / getCellSize()));
+        }
+        Q_EMIT targetClicked(pos);
+    }
 }
 
 QRectF MGraphicsBoardItem::boundingRect() const

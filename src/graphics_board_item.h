@@ -90,6 +90,7 @@ protected:
 private:
     bool m_active;
     const int m_board_size;
+    bool boardRotated;
 };
 
 };

@@ -94,6 +94,7 @@ public Q_SLOTS:
     void rotate0();
     void rotate180();
     void rotate(bool flip);
+    void setBoardRotated(bool boardRotated);
 
     void toggleRotations();
 
@@ -127,6 +128,7 @@ protected:
 
     bool rotated;
     bool enableRotations;
+    bool boardRotated;
 };
 
 } // namespace Miniature
