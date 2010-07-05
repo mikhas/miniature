@@ -61,6 +61,8 @@ void Game::hostGame(TubeClient *tube_client, const Tp::ContactPtr &contact)
 {
     qDebug() << "TpGame::hostGame()";
 #ifndef HAVE_MAEMOCONTACTSELECTOR
+    Q_UNUSED(tube_client);
+    Q_UNUSED(contact);
     m_account_manager->disconnect();
     connect(m_account_manager, SIGNAL(accountNamesChanged(QStringList)),
             this,              SLOT(onAccountNamesChanged(QStringList)),
