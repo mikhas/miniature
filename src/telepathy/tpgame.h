@@ -53,6 +53,7 @@ class Game
 
 public:
     Game(QObject *parent = 0);
+    ~Game();
 
 public Q_SLOTS:
     void hostGame(TubeClient *, const Tp::ContactPtr &);
@@ -90,6 +91,7 @@ private Q_SLOTS:
     void onAccountNamesChanged(const QStringList &account_names);
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
     void readPackets();
+    void tubeClientDestroyed();
 
 private:
     //void initConnections(TubeClient*);

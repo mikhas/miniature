@@ -39,6 +39,9 @@ public:
     TubeServer(QObject *parent = 0);
     TubeClient* getClient();
 
+Q_SIGNALS:
+    void disconnected();
+
 protected:
     void incomingConnection(int socketDescriptor);
 

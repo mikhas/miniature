@@ -57,6 +57,16 @@ Game::Game(QObject *parent)
 {
 }
 
+Game::~Game()
+{
+    qDebug() << "Game::~Game()";
+    if (mClient)
+    {
+        mClient->close();
+        mClient = 0;
+    }
+}
+
 void Game::hostGame(TubeClient *tube_client, const Tp::ContactPtr &contact)
 {
     qDebug() << "TpGame::hostGame()";
@@ -192,6 +202,11 @@ void Game::joinGame()
     Q_EMIT initialized();
 }
 
+void Game::tubeClientDestroyed()
+{
+    mClient = 0;
+}
+
 void Game::newIncomingTube(TubeClient *client, const Tp::ContactPtr &)
 {
     // TODO: impl
@@ -201,6 +216,7 @@ void Game::newIncomingTube(TubeClient *client, const Tp::ContactPtr &)
     mStream.setDevice(mClient);
 
     connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
+    connect(mClient, SIGNAL(destroyed()), SLOT(tubeClientDestroyed()));
 
     Q_EMIT connected();
 }
@@ -214,6 +230,7 @@ void Game::setupOutgoingTube(TubeClient *client, const Tp::ContactPtr &)
     mStream.setDevice(mClient);
 
     connect(mClient, SIGNAL(readyToTransfer()), SLOT(readPackets()));
+    connect(mClient, SIGNAL(destroyed()), SLOT(tubeClientDestroyed()));
 
 #ifndef HAVE_MAEMOCONTACTSELECTOR
     m_accounts_dialog->hide();

@@ -56,6 +56,7 @@ void TubeServer::removeClient()
     TubeClient *client = static_cast<TubeClient*>(sender());
     client->deleteLater();
     clients.removeAll(client);
+    Q_EMIT disconnected();
 }
 
 TubeClient* TubeServer::getClient()

@@ -56,6 +56,7 @@ private Q_SLOTS:
     void onOfferTubeFinished(QDBusPendingCallWatcher *);
     void onNewRemoteConnection(uint, QDBusVariant, uint);
     void onTubeChannelStateChanged(uint);
+    void disconnected();
 
 private:
     Tp::ChannelPtr mChannel;

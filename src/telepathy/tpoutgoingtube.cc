@@ -42,11 +42,19 @@ OutgoingTube::OutgoingTube(const Tp::ChannelPtr &channel, QObject *parent)
     connect(mChannel->becomeReady(features),
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onChannelReady(Tp::PendingOperation *)));
+    connect(&server,
+            SIGNAL(disconnected()),
+            SLOT(disconnected()));
 }
 
 OutgoingTube::~OutgoingTube()
 {
     qDebug() << "TpOutgoingTube::~TpOutgoingTube()";
+}
+
+void OutgoingTube::disconnected()
+{
+    Q_EMIT readyToBeDeleted();
 }
 
 void OutgoingTube::onChannelReady(Tp::PendingOperation *op)
