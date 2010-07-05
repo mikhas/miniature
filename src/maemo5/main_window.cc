@@ -60,7 +60,7 @@ public:
 const char* const dbus_service_name = "org.maemo.miniature";
 const char* const dbus_service_path = "/org/maemo/miniature";
 
-MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
+MMainWindow::MMainWindow(const MSharedGameLog &log, QWidget *parent)
 : QMainWindow(parent),
   m_log(log),
   m_actions(new mActions(this)),
@@ -136,14 +136,16 @@ void MMainWindow::registerActions()
 void MMainWindow::connectActions()
 {
     // Bind this main window to the game log action:
+    // TODO: get rid of this signal mapping, the logger class can just as well
+    // query the active window itself.
     QSignalMapper *mapper = new QSignalMapper(this);
     mapper->setMapping(m_actions->show_game_log, this);
 
     connect(m_actions->show_game_log, SIGNAL(triggered()),
             mapper,                   SLOT(map()));
 
-    connect(mapper, SIGNAL(mapped(QWidget *)),
-            m_log,  SLOT(showLog(QWidget *)));
+    connect(mapper,       SIGNAL(mapped(QWidget *)),
+            m_log.data(), SLOT(showLog(QWidget *)));
 
     connect(m_actions->show_about_dialog, SIGNAL(triggered()),
             this,                         SLOT(showAboutDialog()));

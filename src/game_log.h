@@ -30,6 +30,9 @@
 #include <QMainWindow>
 #include <QTime>
 
+class MGameLog;
+typedef QSharedPointer<MGameLog> MSharedGameLog;
+
 /*! \brief Logging facility for Miniature.
  *
  *  This class allows other components to append messages to the game log via

@@ -47,8 +47,8 @@ class MGame
     Q_OBJECT
 
 public:
-
-    explicit MGame(MGameLog *log, QObject *parent = 0);
+    explicit MGame(const MSharedGameLog &log,
+                        QObject *parent = 0);
     virtual ~MGame();
 
     virtual void setBoardView(MBoardView *view);
@@ -100,8 +100,8 @@ protected:
     //!  Updates the player status in the UI from the given \a position.
     virtual void updatePlayerStatus(const MPosition &position);
 
-    MBoardView *m_board_view; /*< A reference to the board view. >*/
-    MGameLog *m_log; /*< A reference to the game log. >*/
+    MBoardView *m_board_view; /*< A reference to the board view. */
+    MSharedGameLog m_log; /*< A reference to the game log. >*/
     MGraphicsBoardItem *m_board; /* A container for all pieces in the
         scene graph, useful for coord mapping. >*/
     MGameStore *m_store; /*< A reference to the game store, owned by

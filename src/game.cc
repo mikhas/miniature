@@ -23,16 +23,17 @@
 
 using namespace Miniature;
 
-MGame::MGame(MGameLog *log, QObject *parent)
-: QObject(parent),
-  m_board_view(0),
-  m_log(log),
-  m_board(0),
-  m_store(new MGameStore(this)),
-  m_dashboard(0)
+MGame::
+MGame(const MSharedGameLog &log, QObject *parent)
+    : QObject(parent)
+    , m_board_view(0)
+    , m_log(log)
+    , m_board(0)
+    , m_store(new MGameStore(this))
+    , m_dashboard(0)
 {
     qDebug() << "MGame::MGame()";
-    Q_ASSERT(0 != m_log);
+    Q_ASSERT(not m_log.isNull());
 
     connect(m_store, SIGNAL(whiteToMove(MPosition)),
             this,    SLOT(onWhiteToMove(MPosition)));
@@ -53,12 +54,14 @@ MGame::MGame(MGameLog *log, QObject *parent)
             this,    SLOT(onInvalidTargetSelected()));
 }
 
-MGame::~MGame()
+MGame::
+~MGame()
 {
     qDebug() << "MGame::~MGame()";
 }
 
-void MGame::setBoardView(MBoardView *view)
+void MGame::
+setBoardView(MBoardView *view)
 {
     qDebug() << "MGame::setBoardView()";
 
@@ -73,14 +76,16 @@ void MGame::setBoardView(MBoardView *view)
             this,         SLOT(onSendMessageRequest(QString)));
 }
 
-MBoardView * MGame::getBoardView() const
+MBoardView * MGame::
+getBoardView() const
 {
     qDebug() << "MGame::getBoardView()";
 
     return m_board_view;
 }
 
-void MGame::setupBoardItem()
+void MGame::
+setupBoardItem()
 {
     qDebug() << "MGame::setupBoardItem()";
 
@@ -101,7 +106,8 @@ void MGame::setupBoardItem()
             m_board, SIGNAL(togglePieceRotations()));
 }
 
-void MGame::setupDashboard()
+void MGame::
+setupDashboard()
 {
     qDebug() << "MGame::setupDashboard()";
 
@@ -112,7 +118,8 @@ void MGame::setupDashboard()
                "This code should not be reached!");
 }
 
-void MGame::newGame()
+void MGame::
+newGame()
 {
     qDebug() << "MGame::newGame()";
 
@@ -123,42 +130,48 @@ void MGame::newGame()
     m_store->setupStartPosition();
 }
 
-void MGame::jumpToStart()
+void MGame::
+jumpToStart()
 {
     qDebug() << "MGame::jumpToStart()";
 
     m_store->onPositionRequested(0);
 }
 
-void MGame::prevMove()
+void MGame::
+prevMove()
 {
     qDebug() << "MGame::prevMove()";
 
     m_store->onPositionRequested(m_store->getIndex() - 1);
 }
 
-void MGame::nextMove()
+void MGame::
+nextMove()
 {
     qDebug() << "MGame::nextMove()";
 
     m_store->onPositionRequested(m_store->getIndex() + 1);
 }
 
-void MGame::jumpToEnd()
+void MGame::
+jumpToEnd()
 {
     qDebug() << "MGame::jumpToEnd()";
 
 // no impl
 }
 
-void MGame::abortGame()
+void MGame::
+abortGame()
 {
     qDebug() << "MGame::abortGame()";
 
     delete this;
 }
 
-void MGame::activatePositionPasting(MMainWindow *active_window)
+void MGame::
+activatePositionPasting(MMainWindow *active_window)
 {
     qDebug() << "MGame::activatePositionPasting()";
 
@@ -172,7 +185,8 @@ void MGame::activatePositionPasting(MMainWindow *active_window)
             this,     SLOT(onPositionPasted()));
 }
 
-void MGame::onWhiteToMove(const MPosition &position)
+void MGame::
+onWhiteToMove(const MPosition &position)
 {
     qDebug() << "MGame::onWhiteToMove()";
 
@@ -181,7 +195,8 @@ void MGame::onWhiteToMove(const MPosition &position)
     startTurn(position);
 }
 
-void MGame::onBlackToMove(const MPosition &position)
+void MGame::
+onBlackToMove(const MPosition &position)
 {
     qDebug() << "MGame::onBlackToMove()";
 
@@ -190,7 +205,8 @@ void MGame::onBlackToMove(const MPosition &position)
     startTurn(position);
 }
 
-void MGame::onCandidatePieceSelected()
+void MGame::
+onCandidatePieceSelected()
 {
     qDebug() << "MGame::onCandidatePieceSelected()";
 
@@ -199,7 +215,8 @@ void MGame::onCandidatePieceSelected()
     m_dashboard->disableConfirmButton();
 }
 
-void MGame::onMoveDiscarded()
+void MGame::
+onMoveDiscarded()
 {
     qDebug() << "MGame::onMoveDiscard()";
 
@@ -208,7 +225,8 @@ void MGame::onMoveDiscarded()
     m_dashboard->disableConfirmButton();
 }
 
-void MGame::onMoveConfirmationRequested()
+void MGame::
+onMoveConfirmationRequested()
 {
     qDebug() << "MGame::onMoveConfirmationRequested()";
 
@@ -217,7 +235,8 @@ void MGame::onMoveConfirmationRequested()
     m_dashboard->enableConfirmButton();
 }
 
-void MGame::onConfirmButtonPressed()
+void MGame::
+onConfirmButtonPressed()
 {
     qDebug() << "MGame::onConfirmButtonPressed()";
 
@@ -225,7 +244,8 @@ void MGame::onConfirmButtonPressed()
     m_store->onCandidateMoveConfirmed();
 }
 
-void MGame::onInvalidTargetSelected()
+void MGame::
+onInvalidTargetSelected()
 {
     qDebug() << "MGame::onInvalidTargetSelected()";
 
@@ -234,7 +254,8 @@ void MGame::onInvalidTargetSelected()
     m_dashboard->flash();
 }
 
-void MGame::onSendMessageRequest(const QString &message)
+void MGame::
+onSendMessageRequest(const QString &message)
 {
     qDebug() << "MGame::onSendMessageRequest()";
 
@@ -246,7 +267,8 @@ void MGame::onSendMessageRequest(const QString &message)
     m_log->append(QString("%1\n").arg(message), MGameLog::CHAT);
 }
 
-void MGame::endTurn()
+void MGame::
+endTurn()
 {
     qDebug() << "MGame::endTurn()";
 
@@ -257,7 +279,8 @@ void MGame::endTurn()
     m_dashboard->hideStatus();
 }
 
-void MGame::startTurn(const MPosition &position)
+void MGame::
+startTurn(const MPosition &position)
 {
     qDebug() << "MGame::startTurn()";
 
@@ -268,21 +291,24 @@ void MGame::startTurn(const MPosition &position)
     updatePlayerStatus(position);
 }
 
-bool MGame::isWhiteAtBottom() const
+bool MGame::
+isWhiteAtBottom() const
 {
     qDebug() << "MGame::isWhiteAtBottom()";
 
     return true;
 }
 
-bool MGame::isBlackAtBottom() const
+bool MGame::
+isBlackAtBottom() const
 {
     qDebug() << "MGame::isBlackAtBottom()";
 
     return !isWhiteAtBottom();
 }
 
-void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
+void MGame::
+connectDashboardToGame(MDashboardItem *const dashboard)
 {
     qDebug() << "MGame::connectDashboardToGame()";
 
@@ -317,11 +343,12 @@ void MGame::connectDashboardToGame(MDashboardItem *const dashboard)
     mapper->setMapping(dashboard, QApplication::activeWindow());
     connect(dashboard, SIGNAL(showGameLogButtonPressed()),
             mapper,    SLOT(map()));
-    connect(mapper, SIGNAL(mapped(QWidget *)),
-            m_log,  SLOT(showLog(QWidget *)));
+    connect(mapper,       SIGNAL(mapped(QWidget *)),
+            m_log.data(), SLOT(showLog(QWidget *)));
 }
 
-void MGame::updatePlayerStatus(const MPosition &position)
+void MGame::
+updatePlayerStatus(const MPosition &position)
 {
     qDebug() << "MGame::updatePlayerStatus()";
 
@@ -341,7 +368,8 @@ void MGame::updatePlayerStatus(const MPosition &position)
 
 }
 
-void MGame::onPositionPasted()
+void MGame::
+onPositionPasted()
 {
     qDebug() << "MGame::onPositionPasted()";
 

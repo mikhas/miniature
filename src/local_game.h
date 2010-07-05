@@ -35,18 +35,15 @@
 namespace Miniature
 {
 
-/*!
- *  This class specializes MGame for 2-player local games on one device.
- */
+//! This class specializes MGame for 2-player local games on one device.
 class MLocalGame
-: public MGame
+    : public MGame
 {
     Q_OBJECT
 
 public:
-    explicit MLocalGame(MGameLog *log,
+    explicit MLocalGame(const MSharedGameLog &log,
                         QObject *parent = 0);
-
     virtual ~MLocalGame();
 
 private:

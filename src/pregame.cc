@@ -33,11 +33,12 @@ namespace
 
 MPreGame::
 MPreGame(QObject *parent)
-    : QObject(parent),
-      m_main(&m_log),
-      m_game_config(&m_main)
+    : QObject(parent)
+    , m_log(new MGameLog)
+    , m_main(m_log)
+    , m_game_config(&m_main)
 {
-    m_game_config.setGame(new MNetworkGame(&m_log));
+    m_game_config.setGame(new MNetworkGame(m_log));
     m_game_config.setupGame();
 
     MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
@@ -52,11 +53,11 @@ MPreGame(QObject *parent)
             this,          SLOT(onStartScreenRequested()),
             Qt::UniqueConnection);
 
-    m_local_game = new MIconicButton(QPixmap(local_game_filename),
+    m_local_game_button = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
-    m_join_game = new MIconicButton(QPixmap(join_game_filename),
+    m_join_game_button = new MIconicButton(QPixmap(join_game_filename),
         tr("Join P2P Game"));
-    m_fics_game = new MIconicButton(QPixmap(fics_game_filename),
+    m_fics_game_button = new MIconicButton(QPixmap(fics_game_filename),
         tr("Join FICS Game"));
 
     QWidget *central = new QWidget;
@@ -70,17 +71,17 @@ MPreGame(QObject *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     buttons->setLayout(hbox);
 
-    hbox->addWidget(m_local_game);
-    hbox->addWidget(m_join_game);
-    hbox->addWidget(m_fics_game);
+    hbox->addWidget(m_local_game_button);
+    hbox->addWidget(m_join_game_button);
+    hbox->addWidget(m_fics_game_button);
 
     MMainWindow::setupPreGameUi(&m_main, central);
 
-    connect(m_local_game, SIGNAL(pressed()),
+    connect(m_local_game_button, SIGNAL(pressed()),
             this,         SLOT(onStartLocalGame()),
             Qt::UniqueConnection);
 
-    connect(m_join_game, SIGNAL(pressed()),
+    connect(m_join_game_button, SIGNAL(pressed()),
             this,        SLOT(onJoinGame()),
             Qt::UniqueConnection);
 }
@@ -92,16 +93,14 @@ MPreGame::
 void MPreGame::
 onStartScreenRequested()
 {
-
     m_main.show();
-
-    m_log.append("Miniature started.", MGameLog::PREGAME);
+    m_log->append("Miniature started.", MGameLog::PREGAME);
 }
 
 void MPreGame::
 onStartLocalGame()
 {
-    m_game_config.setGame(new MLocalGame(&m_log));
+    m_game_config.setGame(new MLocalGame(m_log));
     m_game_config.setupGame();
     m_game_config.runGame();
     m_game_config.getGame()->newGame();
@@ -116,7 +115,7 @@ onStartLocalGame()
 void MPreGame::
 onJoinGame()
 {
-    m_game_config.setGame(new MNetworkGame(&m_log));
+    m_game_config.setGame(new MNetworkGame(m_log));
     m_game_config.setupGame();
 
     MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game_config.getGame());
@@ -126,6 +125,7 @@ onJoinGame()
         onStartScreenRequested();
     }
 
+    // TODO: Let's move this in the MGame interface, to avoid the dynamic cast:
     game->joinGame();
 }
 

@@ -24,10 +24,10 @@
 using namespace Miniature;
 
 MNetworkGame::
-MNetworkGame(MGameLog *log, QObject *parent)
-    : MGame(log, parent),
-      m_tp_game(0),
-      mIsWhiteAtBottom(true)
+MNetworkGame(const MSharedGameLog &log, QObject *parent)
+    : MGame(log, parent)
+    , m_tp_game(0)
+    , m_white_at_bottom(true)
 {}
 
 MNetworkGame::
@@ -112,13 +112,13 @@ endTurn()
 void MNetworkGame::
 hostGameConnected()
 {
-    mIsWhiteAtBottom = true;
+    m_white_at_bottom = true;
 }
 
 void MNetworkGame::
 joinGameConnected()
 {
-    mIsWhiteAtBottom = false;
+    m_white_at_bottom = false;
 
     QMessageBox msgBox;
     msgBox.setText("Select pieces color.");
@@ -129,7 +129,7 @@ joinGameConnected()
 
     if(msgBox.clickedButton() == whiteButton)
     {
-        mIsWhiteAtBottom = true;
+        m_white_at_bottom = true;
         newGame();
     }
     if(msgBox.clickedButton() == blackButton)
@@ -139,7 +139,7 @@ joinGameConnected()
 bool MNetworkGame::
 isWhiteAtBottom() const
 {
-    return mIsWhiteAtBottom;
+    return m_white_at_bottom;
 }
 
 bool MNetworkGame::
@@ -154,14 +154,13 @@ newGame()
     MGame::newGame();
 
     m_tp_game->sendNewGame(isWhiteAtBottom());
-
     m_board_view->enableAutoOrientationSupport();
 }
 
 void MNetworkGame::
-receivedNewGame(bool whiteChoosed)
+receivedNewGame(bool white_chosed)
 {
-    mIsWhiteAtBottom = !whiteChoosed;
+    m_white_at_bottom = !white_chosed;
     newGame();
 }
 
@@ -176,12 +175,10 @@ onConfirmButtonPressed()
 }
 
 void MNetworkGame::
-receivedMove(QString &fenPos)
+receivedMove(const QString &fen)
 {
-    MPosition pos;
-    pos = pos.fromFen(fenPos);
+    MPosition pos(pos.fromFen(fen));
     qDebug() << "fenPos:" << pos.asFen();
     endTurn();
     m_store->onCandidateMoveConfirmed(pos);
 }
-

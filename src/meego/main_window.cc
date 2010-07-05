@@ -28,7 +28,7 @@ class mActions
 class mDialogs
 {};
 
-MMainWindow::MMainWindow(MGameLog *log, QWidget *parent)
+MMainWindow::MMainWindow(const MSharedGameLog &log, QWidget *parent)
 : QMainWindow(parent),
   m_log(log),
   m_actions(new mActions(this)),

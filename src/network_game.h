@@ -33,9 +33,8 @@ class MNetworkGame
     Q_OBJECT
 
 public:
-    explicit MNetworkGame(MGameLog *log,
+    explicit MNetworkGame(const MSharedGameLog &log,
                           QObject *parent = 0);
-
     virtual ~MNetworkGame();
 
 public Q_SLOTS:
@@ -52,8 +51,8 @@ private Q_SLOTS:
     void hostGameConnected();
     void joinGameConnected();
     void onConfirmButtonPressed();
-    void receivedNewGame(bool);
-    void receivedMove(QString&);
+    void receivedNewGame(bool white_chose);
+    void receivedMove(const QString& fen);
 
 protected:
     virtual bool isWhiteAtBottom() const;
@@ -68,7 +67,7 @@ private:
     // TODO: turn this int some interface later, once we have inet + tp.
     TpGame::Game *m_tp_game;
 
-    bool mIsWhiteAtBottom;
+    bool m_white_at_bottom;
 };
 
 } // namespace Miniature

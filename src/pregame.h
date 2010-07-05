@@ -33,11 +33,12 @@
 namespace Miniature
 {
 /*!
- *  This class controls the start screen and forwards control to the correct
- *  MGame controller once the user made a choice
+ *  This class controls the start screen. It also sets up the specific game
+ *  controller and its UI, handing over the control flow once the user made a
+ *  choice.
  */
 class MPreGame
-: public QObject
+    : public QObject
 {
     Q_OBJECT
 
@@ -45,14 +46,11 @@ public:
     explicit MPreGame(QObject *parent = 0);
     virtual ~MPreGame();
 
-    MGameLog * getLog() const;
-
 public Q_SLOTS:
     /*!
      *  Shows the start screen where the user can choose one of the available game modi.
      *  In the near future, this method will also initialize the prerendering
      *  of all the needed QImages in a separate thread.
-     *  @param[in] view the view where we place the start screen into.
      */
     void onStartScreenRequested();
 
@@ -66,13 +64,13 @@ public Q_SLOTS:
     void onJoinFicsGame();
 
 private:
-    MGameLog m_log;
+    MSharedGameLog m_log;
     MMainWindow m_main;
     MGameConfig m_game_config;
 
-    QPointer<MIconicButton> m_local_game;
-    QPointer<MIconicButton> m_join_game;
-    QPointer<MIconicButton> m_fics_game;
+    QPointer<MIconicButton> m_local_game_button;
+    QPointer<MIconicButton> m_join_game_button;
+    QPointer<MIconicButton> m_fics_game_button;
 };
 
 } // namespace Miniature

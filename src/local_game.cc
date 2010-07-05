@@ -22,14 +22,17 @@
 
 using namespace Miniature;
 
-MLocalGame::MLocalGame(MGameLog *log, QObject *parent)
+MLocalGame::
+MLocalGame(const MSharedGameLog &log, QObject *parent)
     : MGame(log, parent)
 {}
 
-MLocalGame::~MLocalGame()
+MLocalGame::
+~MLocalGame()
 {}
 
-void MLocalGame::setupDashboard()
+void MLocalGame::
+setupDashboard()
 {
     Q_ASSERT_X((0 != m_board_view),
                "setupDashboard",
@@ -48,7 +51,8 @@ void MLocalGame::setupDashboard()
     connectDashboards(bottom, top);
 }
 
-void MLocalGame::connectDashboards(MDashboardItem *const first, MDashboardItem *const second)
+void MLocalGame::
+connectDashboards(MDashboardItem *const first, MDashboardItem *const second)
 {
     // Connect draw requests
     connect(first,  SIGNAL(drawButtonPressed()),
@@ -71,7 +75,8 @@ void MLocalGame::connectDashboards(MDashboardItem *const first, MDashboardItem *
             second, SLOT(onGameWon()));
 }
 
-void MLocalGame::startTurn(const MPosition &position)
+void MLocalGame::
+startTurn(const MPosition &position)
 {
     // TODO: will this really work for swapped colours?
     if (isWhiteAtBottom() && MPiece::WHITE == position.getColourToMove())

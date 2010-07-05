@@ -44,7 +44,7 @@ class MMainWindow
     Q_OBJECT
 
 public:
-    explicit MMainWindow(MGameLog *log, QWidget *parent = 0);
+    explicit MMainWindow(const MSharedGameLog &log, QWidget *parent = 0);
     virtual ~MMainWindow();
 
     //! Initializes the pre-game UI.
@@ -64,7 +64,7 @@ public Q_SLOTS:
     void showAboutDialog();
 
 private:
-    QPointer<MGameLog> m_log; /*!< The game log which is used for the game log window. */
+    MSharedGameLog m_log; /*!< The game log which is used for the game log window. */
     std::auto_ptr<mActions> m_actions; /*!< The main actions used in the main view. */
     std::auto_ptr<mDialogs> m_dialogs; /*!< The dialogs used in the main view. */
     QDBusConnection m_session; /*!< The D-Bus connection used for activating Miniature. */
