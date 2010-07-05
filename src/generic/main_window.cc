@@ -28,10 +28,10 @@ class mActions
 class mDialogs
 {};
 
-MMainWindow::MMainWindow(const MGameLog &log, QWidget *parent)
+MMainWindow::MMainWindow(const MSharedGameLog &log, QWidget *parent)
 : QMainWindow(parent),
   m_log(log),
-  m_actions(new mActions(this)),
+  m_actions(new mActions()),
   m_session(QDBusConnection::sessionBus())
 {
     registerActions();
@@ -39,7 +39,16 @@ MMainWindow::MMainWindow(const MGameLog &log, QWidget *parent)
 }
 
 void MMainWindow::setupPreGameUi(QMainWindow *window, QWidget *subview)
-{}
+{
+  Q_UNUSED(window);
+  Q_UNUSED(subview);
+}
+
+void MMainWindow::setupGameUi(QMainWindow *main, QGraphicsView *view)
+{
+  Q_UNUSED(main);
+  Q_UNUSED(view);
+}
 
 void MMainWindow::registerActions()
 {}

@@ -44,7 +44,7 @@ hostGame(TpGame::TubeClient *tube_client, const Tp::ContactPtr &contact)
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(receivedNewGame(bool)), SLOT(receivedNewGame(bool)), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(receivedMove(QString&)), SLOT(receivedMove(QString&)), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(receivedMove(const QString&)), SLOT(receivedMove(const QString&)), Qt::UniqueConnection);
     m_tp_game->hostGame(tube_client, contact);
 }
 
@@ -63,7 +63,7 @@ joinGame()
     connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
     connect(m_tp_game, SIGNAL(connected()), SLOT(joinGameConnected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(receivedMove(QString&)), SLOT(receivedMove(QString&)), Qt::UniqueConnection);
+    connect(m_tp_game, SIGNAL(receivedMove(const QString&)), SLOT(receivedMove(const QString&)), Qt::UniqueConnection);
     m_tp_game->joinGame();
 }
 

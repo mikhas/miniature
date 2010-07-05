@@ -77,7 +77,7 @@ Q_SIGNALS:
 
     void receivedNewGame(bool whiteChoosed);
     void receivedNewGameAccept();
-    void receivedMove(QString &fenPos);
+    void receivedMove(const QString &fenPos);
     void receivedTakeBack();
     void receivedTakeBackAccept();
     void receivedDraw();
