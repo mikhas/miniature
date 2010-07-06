@@ -41,7 +41,7 @@ class MGraphicsBoardItem
     Q_OBJECT
 
 public:
-    MGraphicsBoardItem(int size = 480, QGraphicsItem *parent = 0);
+    MGraphicsBoardItem(bool rotated, int size = 480, QGraphicsItem *parent = 0);
     ~MGraphicsBoardItem();
 
     // TODO: rename to cellSize(), more qt-ish

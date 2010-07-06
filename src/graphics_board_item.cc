@@ -32,11 +32,11 @@
 
 using namespace Miniature;
 
-MGraphicsBoardItem::MGraphicsBoardItem(int size, QGraphicsItem *parent)
+MGraphicsBoardItem::MGraphicsBoardItem(bool rotated, int size, QGraphicsItem *parent)
 : QGraphicsObject(parent),
   m_active(true),
   m_board_size(size),
-  boardRotated(true)
+  boardRotated(rotated)
 {}
 
 MGraphicsBoardItem::~MGraphicsBoardItem()
@@ -127,6 +127,7 @@ void MGraphicsBoardItem::addPiece(MPiece *const piece)
             piece, SLOT(toggleRotations()),
             Qt::UniqueConnection);
 
+    piece->setBoardRotated(boardRotated);
     piece->setParentItem(this);
     piece->show();
 }

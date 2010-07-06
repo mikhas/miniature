@@ -92,7 +92,7 @@ setupBoardItem()
     Q_ASSERT(0 != m_board_view);
 
     delete m_board;
-    m_board = new MGraphicsBoardItem;
+    m_board = new MGraphicsBoardItem(isBlackAtBottom());
 
     m_board_view->addBoard(m_board);
 
