@@ -18,6 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
+
 #include <pregame.h>
 #include <telepathy/tptubesclienthandler.h>
 #include <telepathy/tpapprovermanager.h>
@@ -40,6 +42,7 @@ MPreGame(QObject *parent)
     , m_main(m_log)
     , m_game(0)
     , m_window(0)
+    , m_wait_contact_ui(new Ui_WaitContactWidget)
     , m_client_registrar(Tp::ClientRegistrar::create())
 {
 
@@ -55,8 +58,12 @@ MPreGame(QObject *parent)
             this,          SLOT(newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &)),
             Qt::UniqueConnection);
 
+    connect(client.data(), SIGNAL(newOutgoingChannel(const char *)),
+            this,          SLOT(newOutgoingChannel(const char *)),
+            Qt::UniqueConnection);
+
     connect(client.data(), SIGNAL(disconnected()),
-            this, SLOT(onStartScreenRequested()),
+            this, SLOT(enableCentralMenu()),
             Qt::UniqueConnection);
 
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "Miniature");
@@ -66,6 +73,24 @@ MPreGame(QObject *parent)
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
 
     /* Setup UI */
+    enableCentralMenu();
+}
+
+MPreGame::
+~MPreGame()
+{}
+
+void MPreGame::
+enableCentralMenu()
+{
+    /* Remove previous games if any */
+    if (m_game != 0)
+        delete m_game;
+
+    if (m_window != 0)
+        delete m_window;
+
+    /* setup the menu UI */
     m_local_game_button = new MIconicButton(QPixmap(local_game_filename),
         tr("Local Game"));
     m_join_game_button = new MIconicButton(QPixmap(join_game_filename),
@@ -73,9 +98,9 @@ MPreGame(QObject *parent)
     m_fics_game_button = new MIconicButton(QPixmap(fics_game_filename),
         tr("Join FICS Game"));
 
-    QWidget *central = new QWidget;
+    QWidget *central_menu = new QWidget;
     QVBoxLayout *vbox = new QVBoxLayout;
-    central->setLayout(vbox);
+    central_menu->setLayout(vbox);
     vbox->setAlignment(Qt::AlignCenter);
 
     QWidget *buttons = new QWidget;
@@ -88,7 +113,7 @@ MPreGame(QObject *parent)
     hbox->addWidget(m_join_game_button);
     hbox->addWidget(m_fics_game_button);
 
-    MMainWindow::setupPreGameUi(&m_main, central);
+    MMainWindow::setupPreGameUi(&m_main, central_menu);
 
     connect(m_local_game_button, SIGNAL(pressed()),
             this,         SLOT(onStartLocalGame()),
@@ -99,17 +124,28 @@ MPreGame(QObject *parent)
             Qt::UniqueConnection);
 }
 
-MPreGame::
-~MPreGame()
-{}
+void MPreGame::
+enableCentralWaitContact()
+{
+    QWidget *central_wait_contact = new QWidget;
+    m_wait_contact_ui->setupUi(central_wait_contact);
+
+    MMainWindow::setupPreGameUi(&m_main, central_wait_contact);
+
+    connect(m_wait_contact_ui->cancelButton, SIGNAL(pressed()),
+            this,        SLOT(onCancelButton()),
+            Qt::UniqueConnection);
+}
 
 void MPreGame::
 setupGame(MGame *game)
 {
-    delete m_game;
+    if (m_game != 0)
+        delete m_game;
     m_game = game;
 
-    delete m_window;
+    if (m_window != 0)
+        delete m_window;
     m_window = new QMainWindow;
 
     m_game->setParent(m_window);
@@ -125,7 +161,7 @@ setupGame(MGame *game)
             &m_main, SLOT(show()),
             Qt::UniqueConnection);
 
-    connect(m_game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
+    connect(m_game, SIGNAL(disconnected()), SLOT(enableCentralMenu()), Qt::UniqueConnection);
     connect(m_game, SIGNAL(connected()), SLOT(runGame()), Qt::UniqueConnection);
 }
 
@@ -140,7 +176,6 @@ void MPreGame::
 onStartScreenRequested()
 {
     m_main.show();
-    m_log->append("Miniature started.", MGameLog::PREGAME);
 }
 
 void MPreGame::
@@ -164,17 +199,35 @@ onJoinGame()
 {
     setupGame(new MNetworkGame(m_log));
 
+    // TODO: Let's move this in the MGame interface, to avoid the dynamic cast:
     MNetworkGame *game = qobject_cast<MNetworkGame*>(m_game);
     if(!game)
     {
         qWarning() << "This should never happen!";
-        onStartScreenRequested();
+        enableCentralMenu();
     }
 
-    // TODO: Let's move this in the MGame interface, to avoid the dynamic cast:
     game->joinGame();
+
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+    m_main.hide();
+#endif
 }
 
+void MPreGame::
+onCancelButton()
+{
+    enableCentralMenu();
+    m_main.show();
+}
+
+void MPreGame::newOutgoingChannel(const char *name)
+{
+    qDebug() << "Show waiting window here";
+    qDebug() << "Name: " << name;
+    enableCentralWaitContact();
+    m_main.show();
+}
 void MPreGame::newOutgoingTube(TpGame::TubeClient *client, const Tp::ContactPtr &contact)
 {
     qDebug() << "MPreGame::newOutgoingTube()";

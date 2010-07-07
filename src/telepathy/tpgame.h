@@ -92,6 +92,7 @@ private Q_SLOTS:
     void newIncomingTube(TubeClient *, const Tp::ContactPtr &contact);
     void readPackets();
     void tubeClientDestroyed();
+    void onPendingChannelRequestFinished(Tp::PendingOperation *op);
 
 private:
     //void initConnections(TubeClient*);
@@ -111,6 +112,7 @@ public:
     OssoABookContact *selected_master_contact;
     OssoABookContact *selected_contact;
     Tp::AccountPtr requested_account;
+    Tp::PendingChannelRequest *pcr;
 #endif
 };
 

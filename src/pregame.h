@@ -29,6 +29,7 @@
 
 #include <main_window.h>
 #include <iconic_button.h>
+#include "wait_contact.ui.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -70,6 +71,10 @@ private Q_SLOTS:
     void runGame();
     void newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &contact);
     void newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &contact);
+    void newOutgoingChannel(const char *name);
+    void onCancelButton();
+    void enableCentralMenu();
+    void enableCentralWaitContact();
 
 private:
     void setupGame(MGame *game);
@@ -82,6 +87,7 @@ private:
     QPointer<MIconicButton> m_local_game_button;
     QPointer<MIconicButton> m_join_game_button;
     QPointer<MIconicButton> m_fics_game_button;
+    Ui_WaitContactWidget *m_wait_contact_ui;
 
     Tp::ClientRegistrarPtr m_client_registrar;
 };

@@ -52,6 +52,7 @@ public:
                                 const QVariantMap &handlerInfo);
 
 Q_SIGNALS:
+    void newOutgoingChannel(const char *name);
     void newOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
     void newIncomingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
     void disconnected();

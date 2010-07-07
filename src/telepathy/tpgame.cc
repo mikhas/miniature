@@ -52,7 +52,8 @@ Game::Game(QObject *parent)
       contact_view(0),
       selected_master_contact(0),
       selected_contact(0),
-      requested_account(0)
+      requested_account(0),
+      pcr(0)
 #endif
 {
 }
@@ -94,6 +95,21 @@ void Game::onAccountNamesChanged(const QStringList &account_names)
     }
 
     Q_EMIT initialized();
+}
+
+void Game::onPendingChannelRequestFinished(
+        Tp::PendingOperation *op)
+{
+    if(op->isError())
+    {
+        qDebug() << "Game::onPendingChannelRequestFinished failure: " << op->errorName();
+        return;
+    }
+    qDebug() << "Game::onPendingChannelRequestFinished success";
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+  gtk_widget_destroy (contact_window);
+  contact_window = NULL;
+#endif
 }
 
 #ifdef HAVE_MAEMOCONTACTSELECTOR
@@ -163,12 +179,11 @@ contact_activated_cb (OssoABookContactView *view,
   req.insert(QLatin1String(TELEPATHY_INTERFACE_CHANNEL_TYPE_STREAM_TUBE ".Service"),
              "Miniature");
 
-  game->requested_account->ensureChannel(req);
+  game->pcr = game->requested_account->ensureChannel(req);
+  QObject::connect(game->pcr, SIGNAL(finished(Tp::PendingOperation *)),
+          game, SLOT(onPendingChannelRequestFinished(Tp::PendingOperation *)));
 
   g_list_free (selection);
-
-  gtk_widget_destroy (game->contact_window);
-  game->contact_window = NULL;
 }
 #endif
 

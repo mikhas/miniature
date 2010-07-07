@@ -101,6 +101,7 @@ void TpTubesClientHandler::handleChannels(const Tp::MethodInvocationContextPtr<>
             if(properties[TELEPATHY_INTERFACE_CHANNEL ".Requested"].toBool())
             {
                 qDebug() << "Outgoing channel !";
+                Q_EMIT newOutgoingChannel("");
 
                 OutgoingTube *tube = new OutgoingTube(channel);
                 connect(tube,

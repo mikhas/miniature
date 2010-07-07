@@ -173,6 +173,7 @@ BUILT_SOURCES = \
 		src/select_account.ui.h \
                 src/main_window.moc.cc \
                 src/dbusappactivator.moc.cc \
+                src/wait_contact.ui.h \
 		$(null)
 
 dist_desktopentry_DATA = data/miniature.desktop
