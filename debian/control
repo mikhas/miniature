@@ -2,12 +2,12 @@ Source: miniature
 Section: games
 Priority: optional
 Maintainer: Michael Hasselmann <michael@taschenorakel.de>
-Uploaders: Mathias Hasselmann <mathias.hasselmann@maemo.org>
+Uploaders: Michael Hasselmann <michael@taschenorakel.de>
 Build-Depends: debhelper (>= 5.0.0), cdbs,
  libqt4-dev, libqt4-dbus, libqt4-network, libqt4-svg, libqt4-opengl,
  libtelepathy-qt4-dev, libhildon1-dev (>= 2.2.19),
  osso-af-settings (>= 0.9.2), libgconf2-dev, libsqlite3-dev,
- desktop-file-utils
+ desktop-file-utils, libosso-abook-dev
 Standards-Version: 3.7.2
 
 
@@ -27,6 +27,7 @@ Description: A chess board to play and learn wherever you go.
  .
  Miniature is based on Qt, targets Maemo as primary platform and plans to have
  ports for Symbian, Windows Mobile and desktop OSs (Linux, Windows, Mac).
+XSBC-Bugtracker: https://bugs.maemo.org/buglist.cgi?product=Miniature
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgI
  fAhkiAAAAAlwSFlzAAAVFgAAFRYBDHmQBwAAABl0RVh0U29mdHdhcmUAd3d3
