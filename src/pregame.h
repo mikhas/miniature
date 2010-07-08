@@ -82,7 +82,7 @@ private:
     void setupGame(MGame *game);
 
     MSharedGameLog m_log;
-    MMainWindow m_main;
+    MMainWindow *m_main;
     QPointer<MGame> m_game;
     QPointer<QMainWindow> m_window;
 

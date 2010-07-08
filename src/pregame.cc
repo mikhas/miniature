@@ -39,13 +39,12 @@ MPreGame::
 MPreGame(QObject *parent)
     : QObject(parent)
     , m_log(new MGameLog)
-    , m_main(m_log)
+    , m_main(new MMainWindow(m_log))
     , m_game(0)
     , m_window(0)
     , m_wait_contact_ui(new Ui_WaitContactWidget)
     , m_client_registrar(Tp::ClientRegistrar::create())
 {
-
     /* Telepathy handlers for network games */
     Tp::SharedPtr<TpGame::TpTubesClientHandler> client =
             Tp::SharedPtr<TpGame::TpTubesClientHandler>(new TpGame::TpTubesClientHandler(0));
@@ -115,7 +114,7 @@ enableCentralMenu()
     hbox->addWidget(m_join_game_button);
     hbox->addWidget(m_fics_game_button);
 
-    MMainWindow::setupPreGameUi(&m_main, central_menu);
+    MMainWindow::setupPreGameUi(m_main, central_menu);
 
     connect(m_local_game_button, SIGNAL(pressed()),
             this,         SLOT(onStartLocalGame()),
@@ -132,7 +131,7 @@ enableCentralWaitContact()
     QWidget *central_wait_contact = new QWidget;
     m_wait_contact_ui->setupUi(central_wait_contact);
 
-    MMainWindow::setupPreGameUi(&m_main, central_wait_contact);
+    MMainWindow::setupPreGameUi(m_main, central_wait_contact);
 
     connect(m_wait_contact_ui->cancelButton, SIGNAL(pressed()),
             this,        SLOT(onCancelButton()),
@@ -180,7 +179,7 @@ setupGame(MGame *game)
             Qt::UniqueConnection);
 
     connect(m_game, SIGNAL(destroyed()),
-            &m_main, SLOT(show()),
+            m_main, SLOT(show()),
             Qt::UniqueConnection);
 
     connect(m_game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
@@ -191,14 +190,14 @@ void MPreGame::
 runGame()
 {
     m_window->show();
-    m_main.hide();
+    m_main->hide();
 }
 
 void MPreGame::
 onStartScreenRequested()
 {
     enableCentralMenu();
-    m_main.show();
+    m_main->show();
 }
 
 void MPreGame::
@@ -207,7 +206,7 @@ onStartLocalGame()
     setupGame(new MLocalGame(m_log));
 
     m_window->show();
-    m_main.hide();
+    m_main->hide();
     m_game->newGame();
 
 #ifdef Q_WS_MAEMO_5
@@ -233,7 +232,7 @@ onJoinGame()
     game->joinGame();
 
 #ifdef HAVE_MAEMOCONTACTSELECTOR
-    m_main.hide();
+    m_main->hide();
 #endif
 }
 
@@ -241,7 +240,7 @@ void MPreGame::
 onCancelButton()
 {
     enableCentralMenu();
-    m_main.show();
+    m_main->show();
 }
 
 void MPreGame::newOutgoingChannel(const char *name)
@@ -249,7 +248,7 @@ void MPreGame::newOutgoingChannel(const char *name)
     qDebug() << "Show waiting window here";
     qDebug() << "Name: " << name;
     enableCentralWaitContact();
-    m_main.show();
+    m_main->show();
 }
 
 void MPreGame::newOutgoingTube(TpGame::TubeClient *client, const Tp::ContactPtr &contact)
