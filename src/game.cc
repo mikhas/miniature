@@ -331,9 +331,6 @@ connectDashboardToGame(MDashboardItem *const dashboard)
     connect(dashboard, SIGNAL(drawAccepted()),
             dashboard, SLOT(onDrawAccepted()));
 
-    connect(dashboard, SIGNAL(abortGameConfirmed()),
-            this,      SLOT(abortGame()));
-
     // Connect abort game requests
     connect(dashboard, SIGNAL(abortGameButtonPressed()),
             dashboard, SLOT(showAbortGameConfirmation()));

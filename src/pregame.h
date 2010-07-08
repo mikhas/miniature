@@ -75,6 +75,8 @@ private Q_SLOTS:
     void onCancelButton();
     void enableCentralMenu();
     void enableCentralWaitContact();
+    void windowDestroyed();
+    void gameDestroyed();
 
 private:
     void setupGame(MGame *game);

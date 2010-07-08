@@ -71,9 +71,6 @@ MPreGame(QObject *parent)
     Tp::SharedPtr<TpGame::TpApproverManager> approverManager;
     approverManager = Tp::SharedPtr<TpGame::TpApproverManager>(new TpGame::TpApproverManager(0));
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
-
-    /* Setup UI */
-    enableCentralMenu();
 }
 
 MPreGame::
@@ -85,10 +82,15 @@ enableCentralMenu()
 {
     /* Remove previous games if any */
     if (m_game != 0)
-        delete m_game;
-
+    {
+        m_game->deleteLater();
+        m_game = 0;
+    }
     if (m_window != 0)
-        delete m_window;
+    {
+        m_window->deleteLater();
+        m_window = 0;
+    }
 
     /* setup the menu UI */
     m_local_game_button = new MIconicButton(QPixmap(local_game_filename),
@@ -138,20 +140,40 @@ enableCentralWaitContact()
 }
 
 void MPreGame::
+windowDestroyed()
+{
+    m_window = 0;
+}
+
+void MPreGame::
+gameDestroyed()
+{
+    m_game = 0;
+    enableCentralMenu();
+}
+
+void MPreGame::
 setupGame(MGame *game)
 {
     if (m_game != 0)
-        delete m_game;
+        m_game->deleteLater();
     m_game = game;
 
     if (m_window != 0)
-        delete m_window;
+        m_window->deleteLater();
     m_window = new QMainWindow;
 
-    m_game->setParent(m_window);
     m_game->setBoardView(new MBoardView(m_window));
 
     MMainWindow::setupGameUi(m_window, m_game->getBoardView());
+
+    connect(m_window, SIGNAL(destroyed()),
+            SLOT(windowDestroyed()),
+            Qt::UniqueConnection);
+
+    connect(m_game, SIGNAL(destroyed()),
+            SLOT(gameDestroyed()),
+            Qt::UniqueConnection);
 
     connect(m_game,   SIGNAL(destroyed()),
             m_window, SLOT(close()),
@@ -161,7 +183,7 @@ setupGame(MGame *game)
             &m_main, SLOT(show()),
             Qt::UniqueConnection);
 
-    connect(m_game, SIGNAL(disconnected()), SLOT(enableCentralMenu()), Qt::UniqueConnection);
+    connect(m_game, SIGNAL(disconnected()), SLOT(onStartScreenRequested()), Qt::UniqueConnection);
     connect(m_game, SIGNAL(connected()), SLOT(runGame()), Qt::UniqueConnection);
 }
 
@@ -175,6 +197,7 @@ runGame()
 void MPreGame::
 onStartScreenRequested()
 {
+    enableCentralMenu();
     m_main.show();
 }
 
@@ -228,6 +251,7 @@ void MPreGame::newOutgoingChannel(const char *name)
     enableCentralWaitContact();
     m_main.show();
 }
+
 void MPreGame::newOutgoingTube(TpGame::TubeClient *client, const Tp::ContactPtr &contact)
 {
     qDebug() << "MPreGame::newOutgoingTube()";

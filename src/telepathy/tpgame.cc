@@ -185,6 +185,21 @@ contact_activated_cb (OssoABookContactView *view,
 
   g_list_free (selection);
 }
+
+static gboolean
+delete_event_window_cb (GtkWidget *window G_GNUC_UNUSED,
+                        GdkEvent *event G_GNUC_UNUSED,
+                        gpointer data)
+{
+  Game *game = (Game *)data;
+  game->delete_event_window();
+  return FALSE;
+}
+
+void Game::delete_event_window()
+{
+  Q_EMIT disconnected();
+}
 #endif
 
 void Game::joinGame()
@@ -206,6 +221,9 @@ void Game::joinGame()
         G_CALLBACK (contact_activated_cb), (gpointer) this);
     gtk_box_pack_start (GTK_BOX (vbox), contact_view, TRUE, TRUE, 0);
     gtk_widget_show (contact_view);
+
+    g_signal_connect (G_OBJECT (contact_window), "delete-event",
+        G_CALLBACK (delete_event_window_cb), (gpointer) this);
 
     gtk_container_add (GTK_CONTAINER (contact_window), vbox);
     gtk_widget_show (vbox);
