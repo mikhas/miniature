@@ -1,3 +1,12 @@
+miniature (0.1.9-1) unstable; urgency=low
+
+  * Added P2P support.
+  * Added libosso-abook integration for P2P account selection.
+  * Added Telepathy tubes for P2P.
+  * Fix main screen crashes.
+
+ -- Michael Hasselmann <michael@taschenorakel.de>  Thu, 8 Jul 2010 21:28 +0300
+
 miniature (0.1.8-1) unstable; urgency=low
 
   * New game icons.
