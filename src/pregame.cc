@@ -80,6 +80,7 @@ void MPreGame::
 enableCentralMenu()
 {
     /* Remove previous games if any */
+    // TODO: Fix the object ownership so we dont need to use deleteLater at all.
     if (m_game != 0)
     {
         m_game->deleteLater();
@@ -107,12 +108,15 @@ enableCentralMenu()
     QWidget *buttons = new QWidget;
     vbox->addWidget(buttons);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-    buttons->setLayout(hbox);
+    QLayout *box = 0;
+    box = (m_main->width() >= m_main->height() ? static_cast<QLayout *>(new QHBoxLayout) 
+                                               : static_cast<QLayout *>(new QVBoxLayout));
+    buttons->setLayout(box);
 
-    hbox->addWidget(m_local_game_button);
-    hbox->addWidget(m_join_game_button);
-    hbox->addWidget(m_fics_game_button);
+    box->addWidget(m_local_game_button);
+    box->addWidget(m_join_game_button);
+    // TODO: Get FICS mode to work!
+    // box->addWidget(m_fics_game_button);
 
     MMainWindow::setupPreGameUi(m_main, central_menu);
 

@@ -25,7 +25,8 @@ using namespace Miniature;
 namespace
 {
 int min_button_size = 70;
-int font_extra_space = 30;
+int font_extra_width = 70;
+int font_extra_height = 30;
 int font_size = 20;
 }
 
@@ -47,8 +48,8 @@ MIconicButton::
 QSize MIconicButton::
 sizeHint() const
 {
-    return QSize(qMax(min_button_size, m_pixmap.width()),
-                 qMax(min_button_size, m_pixmap.height()) + font_extra_space);
+    return QSize(qMax(min_button_size, m_pixmap.width()) + font_extra_width,
+                 qMax(min_button_size, m_pixmap.height()) + font_extra_height);
 }
 
 void MIconicButton::
@@ -69,7 +70,7 @@ paintEvent (QPaintEvent *event)
     event->accept();
     QPainter painter(this);
 
-    painter.drawPixmap(QRect(event->rect().x(),
+    painter.drawPixmap(QRect(event->rect().x() + ((width() * 0.5) - (m_pixmap.width() * 0.5)),
                              event->rect().y(),
                              m_pixmap.width(),
                              m_pixmap.height()),
@@ -81,8 +82,8 @@ paintEvent (QPaintEvent *event)
     painter.setPen(QColor(Qt::white));
     painter.drawText(QRect(event->rect().x(),
                            event->rect().y() + m_pixmap.height(),
-                           m_pixmap.width(),
-                           font_extra_space),
+                           width(),
+                           font_extra_height),
                      Qt::AlignCenter, m_label);
 }
 
