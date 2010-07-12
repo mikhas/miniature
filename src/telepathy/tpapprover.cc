@@ -33,6 +33,7 @@
 #ifdef HAVE_MAEMOCONTACTSELECTOR
 #include <gtk/gtk.h>
 #include <hildon/hildon.h>
+#include <libosso-abook/osso-abook.h>
 #endif
 
 namespace TpGame
@@ -41,13 +42,21 @@ namespace TpGame
 TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
                        const QList<Tp::ChannelPtr> &channels,
                        const Tp::ChannelDispatchOperationPtr &dispatchOperation,
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+                       OssoABookAggregator *abook_aggregator,
+#endif
                        QObject *parent)
     : QObject(parent),
     mContext(context),
     mChannels(channels),
     mDispatchOp(dispatchOperation)
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+    , mAbookAggregator(abook_aggregator)
+#endif
 {
     qDebug() << "TpApprover::TpApprover()";
+
+    mContext->setFinished();
 
     if (channels.count() == 1)
     {
@@ -73,8 +82,6 @@ void TpApprover::onDispatchOperationReady(Tp::PendingOperation *)
 {
     qDebug() << "TpApprover::ondispatchOperationReady()";
 
-    mContext->setFinished();
-
     Q_EMIT finished();
 }
 
@@ -95,22 +102,45 @@ void TpApprover::onChannelReady(Tp::PendingOperation *)
 {
 #ifdef HAVE_MAEMOCONTACTSELECTOR
     QString contactName;
-    const char *message;
     Tp::Contacts contacts = mChannel->groupContacts();
+    Tp::ContactPtr contact(NULL);
+    GList *abook_contacts;
+    OssoABookContact *abook_contact = NULL;
     QSet<Tp::ContactPtr>::const_iterator i = contacts.constBegin();
     while (i != contacts.constEnd())
     {
         qDebug() << *i;
         if (*i != mChannel->groupSelfContact())
         {
-            contactName = (*i)->alias();
+            contact = *i;
             break;
         }
         ++i;
     }
-    message = QString("Do you want to play chess with " + contactName + "?").toUtf8().data();
+    qDebug("Incoming channel from '%s'", contact->id().toUtf8().data());
+
+    abook_contacts = osso_abook_aggregator_find_contacts_for_im_contact 
+      (mAbookAggregator, contact->id().toUtf8().data(), NULL);
+    qDebug ("Abook contacts count: %u\n", g_list_length (abook_contacts));
+    if (abook_contacts != NULL)
+      abook_contact = OSSO_ABOOK_CONTACT (abook_contacts->data);
+    g_list_free (abook_contacts);
+
+    if (abook_contact)
+    {
+        contactName = osso_abook_contact_get_display_name (abook_contact);
+        qDebug("Contact name retrieven from the address book: '%s'", contactName.toUtf8().data());
+    }
+    else
+    {
+        contactName = contact->alias();
+        qDebug("Contact name retrieven from Telepathy: '%s'", contactName.toUtf8().data());
+    }
+
+
+    QString message("Do you want to play chess with " + contactName + "?");
     GtkWidget *note = hildon_note_new_confirmation (NULL,
-                    message);
+                    message.toUtf8().data());
 
     int ret = gtk_dialog_run (GTK_DIALOG (note));
     gtk_widget_destroy (GTK_WIDGET (note));

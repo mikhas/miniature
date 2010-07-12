@@ -70,14 +70,26 @@ MPreGame(QObject *parent)
 
     m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(client), "Miniature");
 
-    Tp::SharedPtr<TpGame::TpApproverManager> approverManager;
-    approverManager = Tp::SharedPtr<TpGame::TpApproverManager>(new TpGame::TpApproverManager(0));
-    m_client_registrar->registerClient(Tp::AbstractClientPtr::dynamicCast(approverManager), "MiniatureApprover");
+    TpGame::TpApproverManager *approverManager(new TpGame::TpApproverManager(0));
+    /* Do not register approverManager before its contact aggregator is ready */
+    connect(approverManager, SIGNAL(contactAggregatorReady()),
+            this, SLOT(registerApprover()),
+            Qt::UniqueConnection);
 }
 
 MPreGame::
 ~MPreGame()
 {}
+
+void MPreGame::
+registerApprover()
+{
+    Tp::SharedPtr<TpGame::TpApproverManager> approverManager
+        (qobject_cast<TpGame::TpApproverManager*>(sender()));
+    m_client_registrar->registerClient(
+        Tp::AbstractClientPtr::dynamicCast(approverManager),
+        "MiniatureApprover");
+}
 
 void MPreGame::
 enableCentralMenu()

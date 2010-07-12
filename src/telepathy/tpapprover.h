@@ -23,9 +23,15 @@
 #ifndef TPAPPROVER_H
 #define TPAPPROVER_H
 
+#include <config.h>
+
 #include <QObject>
 
 #include <TelepathyQt4/Channel>
+
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+#include <libosso-abook/osso-abook.h>
+#endif              
 
 namespace TpGame
 {
@@ -50,6 +56,9 @@ private:
     TpApprover(const Tp::MethodInvocationContextPtr<> &context,
                const QList<Tp::ChannelPtr> &channels,
                const Tp::ChannelDispatchOperationPtr &dispatchOperation,
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+               OssoABookAggregator *abook_aggregator,
+#endif
                QObject *parent);
 
 private:
@@ -57,6 +66,9 @@ private:
     QList<Tp::ChannelPtr> mChannels;
     Tp::ChannelPtr mChannel;
     Tp::ChannelDispatchOperationPtr mDispatchOp;
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+    OssoABookAggregator *mAbookAggregator;
+#endif
 
     friend class TpApproverManager;
 };

@@ -80,6 +80,7 @@ private Q_SLOTS:
     void enableCentralWaitContact();
     void windowDestroyed();
     void gameDestroyed();
+    void registerApprover();
 
 private:
     void setupGame(MGame *game);
