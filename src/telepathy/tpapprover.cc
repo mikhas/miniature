@@ -48,10 +48,6 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
 {
     qDebug() << "TpApprover::TpApprover()";
 
-    connect(mDispatchOp->becomeReady(),
-            SIGNAL(finished(Tp::PendingOperation *)),
-            SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
-
     if (channels.count() == 1)
     {
         mChannel = channels.at(0);
@@ -88,6 +84,10 @@ void TpApprover::onReadyToBeClosed(Tp::PendingOperation *)
     {
         mChannels.at(i)->requestClose();
     }
+
+    connect(mDispatchOp->becomeReady(),
+            SIGNAL(finished(Tp::PendingOperation *)),
+            SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
 }
 
 void TpApprover::onChannelReady(Tp::PendingOperation *)
@@ -127,6 +127,10 @@ void TpApprover::onChannelReady(Tp::PendingOperation *)
 #else
     mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
 #endif
+
+    connect(mDispatchOp->becomeReady(),
+            SIGNAL(finished(Tp::PendingOperation *)),
+            SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
 }
 
 
