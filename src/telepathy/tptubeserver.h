@@ -2,7 +2,7 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
- *              Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
+ * @author Dariusz Mikulski <dariusz.mikulski@collabora.co.uk>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify

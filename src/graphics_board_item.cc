@@ -3,6 +3,10 @@
  *
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
  * Copyright (C) 2009 Mathias Hasselmann <mathias.hasselmann@maemo.org>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
+ * @author Michael Hasselmann <michael@taschenorakel.de>
+ * @author Mathias Hasselmann <mathias.hasselmann@maemo.org>
+ * @author Alban Crequy <alban.crequy@collabora.co.uk>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify

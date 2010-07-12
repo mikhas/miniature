@@ -2,6 +2,9 @@
  * you play and learn wherever you go.
  *
  * Copyright (C) 2010 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
+ * @author Michael Hasselmann <michael@taschenorakel.de>
+ * @author Alban Crequy <alban.crequy@collabora.co.uk>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify

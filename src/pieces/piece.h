@@ -3,6 +3,10 @@
  *
  * Copyright (C) 2009 Dennis Stötzel <kore@meeQ.de>
  * Copyright (C) 2009 Michael Hasselmann <michael@taschenorakel.de>
+ * Copyright (C) 2010 Collabora Ltd. <http://www.collabora.co.uk/>
+ * @author Dennis Stötzel <kore@meeQ.de>
+ * @author Michael Hasselmann <michael@taschenorakel.de>
+ * @author Alban Crequy <alban.crequy@collabora.co.uk>
  *
  *
  * Miniature is free software: you can redistribute it and/or modify
