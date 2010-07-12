@@ -40,6 +40,7 @@ public:
 private Q_SLOTS:
     void onDispatchOperationReady(Tp::PendingOperation* );
     void onReadyToBeClosed(Tp::PendingOperation* );
+    void onChannelReady(Tp::PendingOperation* );
 
 Q_SIGNALS:
     void finished();
@@ -53,6 +54,7 @@ private:
 private:
     Tp::MethodInvocationContextPtr<> mContext;
     QList<Tp::ChannelPtr> mChannels;
+    Tp::ChannelPtr mChannel;
     Tp::ChannelDispatchOperationPtr mDispatchOp;
 
     friend class TpApproverManager;

@@ -23,6 +23,7 @@
 #include "tpapprover.h"
 
 #include <TelepathyQt4/Contact>
+#include <TelepathyQt4/Channel>
 #include <TelepathyQt4/Connection>
 #include <TelepathyQt4/ReferencedHandles>
 #include <TelepathyQt4/PendingReady>
@@ -51,16 +52,12 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
             SIGNAL(finished(Tp::PendingOperation *)),
             SLOT(onDispatchOperationReady(Tp::PendingOperation* )));
 
-#ifdef HAVE_MAEMOCONTACTSELECTOR
-    GtkWidget *note = hildon_note_new_confirmation (NULL,
-                    "Do you want to play chess?");
-
-    int i = gtk_dialog_run (GTK_DIALOG (note));
-    gtk_widget_destroy (GTK_WIDGET (note));
-
-    if (i == GTK_RESPONSE_OK)
+    if (channels.count() == 1)
     {
-        mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+        mChannel = channels.at(0);
+        connect(mChannel->becomeReady(),
+                SIGNAL(finished(Tp::PendingOperation *)),
+                SLOT(onChannelReady(Tp::PendingOperation *)));
     }
     else
     {
@@ -68,9 +65,6 @@ TpApprover::TpApprover(const Tp::MethodInvocationContextPtr<> &context,
                 SIGNAL(finished(Tp::PendingOperation *)),
                 SLOT(onReadyToBeClosed(Tp::PendingOperation *)));
     }
-#else
-    mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
-#endif
 }
 
 TpApprover::~TpApprover()
@@ -95,5 +89,45 @@ void TpApprover::onReadyToBeClosed(Tp::PendingOperation *)
         mChannels.at(i)->requestClose();
     }
 }
+
+void TpApprover::onChannelReady(Tp::PendingOperation *)
+{
+#ifdef HAVE_MAEMOCONTACTSELECTOR
+    QString contactName;
+    const char *message;
+    Tp::Contacts contacts = mChannel->groupContacts();
+    QSet<Tp::ContactPtr>::const_iterator i = contacts.constBegin();
+    while (i != contacts.constEnd())
+    {
+        qDebug() << *i;
+        if (*i != mChannel->groupSelfContact())
+        {
+            contactName = (*i)->alias();
+            break;
+        }
+        ++i;
+    }
+    message = QString("Do you want to play chess with " + contactName + "?").toUtf8().data();
+    GtkWidget *note = hildon_note_new_confirmation (NULL,
+                    message);
+
+    int ret = gtk_dialog_run (GTK_DIALOG (note));
+    gtk_widget_destroy (GTK_WIDGET (note));
+
+    if (ret == GTK_RESPONSE_OK)
+    {
+        mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+    }
+    else
+    {
+        connect(mDispatchOp->claim (),
+                SIGNAL(finished(Tp::PendingOperation *)),
+                SLOT(onReadyToBeClosed(Tp::PendingOperation *)));
+    }
+#else
+    mDispatchOp->handleWith (QString("org.freedesktop.Telepathy.Client.Miniature"));
+#endif
+}
+
 
 } // namespace TpGame
