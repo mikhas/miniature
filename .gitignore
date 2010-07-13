@@ -8,22 +8,30 @@
 .deps
 .dirstamp
 
+tags
+TAGS
+
 /COPYING
 /INSTALL
 /Makefile
 /Makefile.in
+/tools/Makefile
+/tools/Makefile.in
+/extensions/Makefile
+/extensions/Makefile.in
 /aclocal.m4
 /autom4te.cache
 /config.*
 /configure
 /data/miniature.desktop
-/data/org.maemo.miniature.service
+/data/*.service
 /debian/*.substvars
 /debian/files
 /debian/miniature
 /debian/stamp-*
 /src/miniature
 /stamp-h1
+/libtool
 
 /build
 !build/autotroll.m4
