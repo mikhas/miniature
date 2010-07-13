@@ -1,14 +1,20 @@
 include $(top_srcdir)/build/autotroll.mk
+SUBDIRS = extensions
 
 ACLOCAL_AMFLAGS = -I build
 
 gamesdir = $(prefix)/games
 games_PROGRAMS = src/miniature
 
+if HAVE_MAEMOCONTACTSELECTOR
+TELEPATHY_EXTENSION=$(top_builddir)/extensions/libminiature-extensions.la
+endif
+
 src_miniature_CXXFLAGS = $(MINIATURE_CFLAGS) $(MAEMOCONTACTSELECTOR_CFLAGS) $(QT_CXXFLAGS) -Wall -Werror -I./src $(AM_CXXFLAGS)
 src_miniature_CPPFLAGS = $(QT_CPPFLAGS)
 src_miniature_LDFLAGS  = $(QT_LDFLAGS) $(AM_LDFLAGS)
-src_miniature_LDADD = $(MINIATURE_LIBS) $(MAEMOCONTACTSELECTOR_LIBS) $(QT_LIBS)
+src_miniature_LDADD = $(MINIATURE_LIBS) $(MAEMOCONTACTSELECTOR_LIBS) $(QT_LIBS) \
+	$(TELEPATHY_EXTENSION)
 
 # for each binary, list the sources it depends on, inlucding headers and moc files
 src_miniature_SOURCES = \

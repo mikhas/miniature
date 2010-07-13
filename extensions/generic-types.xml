@@ -1,0 +1,223 @@
+<tp:generic-types
+  xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+
+  <tp:simple-type name="Unix_Timestamp" type="u">
+    <tp:docstring>An unsigned 32-bit integer representing time as the number
+      of seconds elapsed since the Unix epoch
+      (1970-01-01T00:00:00Z)</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="Unix_Timestamp64" type="t">
+    <tp:docstring>An unsigned 64-bit integer representing time as the number
+      of seconds elapsed since the Unix epoch
+      (1970-01-01T00:00:00Z)</tp:docstring>
+
+    <tp:rationale>The Text interface is the only user of Unix_Timestamp so
+      far, and we'd like to be Y2038 compatible in future
+      interfaces.</tp:rationale>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Bus_Name" type="s">
+    <tp:docstring>A string representing a D-Bus bus name - either a well-known
+      name like "org.freedesktop.Telepathy.MissionControl" or a unique name
+      like ":1.123"</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Well_Known_Name" type="s">
+    <tp:docstring>A string representing a D-Bus well-known
+      name like "org.freedesktop.Telepathy.MissionControl".</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Unique_Name" type="s">
+    <tp:docstring>A string representing a D-Bus unique name, such as
+      ":1.123"</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Interface" type="s">
+    <tp:docstring>An ASCII string representing a D-Bus interface - two or more
+      elements separated by dots, where each element is a non-empty
+      string of ASCII letters, digits and underscores, not starting with
+      a digit. The maximum total length is 255 characters. For example,
+      "org.freedesktop.DBus.Peer".</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Error_Name" type="s">
+    <tp:docstring>An ASCII string representing a D-Bus error. This is
+      syntactically the same as a <tp:type>DBus_Interface</tp:type>, but the
+      meaning is different.</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Signature" type="s">
+    <tp:docstring>A string representing a D-Bus signature
+      (the 'g' type isn't used because of poor interoperability, particularly
+      with dbus-glib)</tp:docstring>
+  </tp:simple-type>
+
+  <tp:struct name="DBus_Tube_Member" array-name="DBus_Tube_Member_List">
+     <tp:docstring>A struct (handle, unique name) representing a participant
+       in a D-Bus tube, as returned by GetDBusNames on the Tubes channel
+       type, and as seen in the DBusNamesChanged signal.</tp:docstring>
+     <tp:member type="u" tp:type="Contact_Handle" name="Handle"/>
+     <tp:member type="s" tp:type="DBus_Unique_Name" name="Unique_Name"/>
+  </tp:struct>
+
+  <tp:simple-type name="DBus_Member" type="s">
+    <tp:docstring>An ASCII string representing a D-Bus method, signal
+      or property name - a non-empty string of ASCII letters, digits and
+      underscores, not starting with a digit, with a maximum length of 255
+      characters. For example, "Ping".</tp:docstring>
+  </tp:simple-type>
+
+  <tp:simple-type name="DBus_Qualified_Member" type="s">
+    <tp:docstring>A string representing the full name of a D-Bus method,
+      signal or property, consisting of a DBus_Interface, followed by
+      a dot, followed by a DBus_Member. For example,
+      "org.freedesktop.DBus.Peer.Ping".</tp:docstring>
+  </tp:simple-type>
+
+  <tp:mapping name="Qualified_Property_Value_Map"
+    array-name="Qualified_Property_Value_Map_List">
+    <tp:docstring>A mapping from strings representing D-Bus
+      properties (by their namespaced names) to their values.</tp:docstring>
+    <tp:member type="s" name="Key" tp:type="DBus_Qualified_Member">
+      <tp:docstring>
+        A D-Bus interface name, followed by a dot and a D-Bus property name.
+      </tp:docstring>
+    </tp:member>
+    <tp:member type="v" name="Value">
+      <tp:docstring>
+        The value of the property.
+      </tp:docstring>
+    </tp:member>
+  </tp:mapping>
+
+  <tp:mapping name="String_Variant_Map" array-name="String_Variant_Map_List">
+    <tp:docstring>A mapping from strings to variants representing extra
+      key-value pairs.</tp:docstring>
+    <tp:member type="s" name="Key"/>
+    <tp:member type="v" name="Value"/>
+  </tp:mapping>
+
+  <tp:mapping name="String_String_Map">
+    <tp:docstring>A mapping from strings to strings representing extra
+      key-value pairs.</tp:docstring>
+    <tp:member type="s" name="Key"/>
+    <tp:member type="s" name="Value"/>
+  </tp:mapping>
+
+  <tp:struct name="Requestable_Channel_Class"
+    array-name="Requestable_Channel_Class_List">
+    <tp:added version="0.17.11">(as stable API)</tp:added>
+    <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
+      <p>Structure representing a class of channels that can be requested,
+        identified by a set of properties that identify that class of
+        channel.</p>
+
+      <tp:rationale>
+        <p>This will often just be the channel type and the handle type,
+          but can include other properties of the channel - for instance,
+          encrypted channels might require properties that
+          unencrypted channels do not, like an encryption key.</p>
+      </tp:rationale>
+
+      <p>In some cases, these classes of channel may overlap, in the sense
+        that one class fixes all the properties that another class does,
+        plus some more properties.</p>
+
+      <tp:rationale>
+        <p>For older clients to still be able to understand how to request
+          channels in the presence of a hypothetical "encryption" interface,
+          we'd need to represent it like this:</p>
+
+        <ul>
+          <li>class 1: ChannelType = Text, TargetHandleType = CONTACT</li>
+          <li>class 2: Channel.ChannelType = Text,
+            Channel.TargetHandleType = CONTACT,
+            Encryption.Encrypted = TRUE</li>
+        </ul>
+      </tp:rationale>
+    </tp:docstring>
+
+    <tp:member name="Fixed_Properties" type="a{sv}"
+      tp:type="Channel_Class">
+      <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
+        <p>The property values that identify this requestable channel class.
+          These properties MUST be included in requests for a channel of this
+          class, and MUST take these values.</p>
+
+        <p>Clients that do not understand the semantics of all the
+          Fixed_Properties MUST NOT request channels of this class, since
+          they would be unable to avoid making an incorrect request.</p>
+
+        <p>This implies that connection managers wishing to make channels
+          available to old or minimal clients SHOULD have a channel class
+          with the minimum number of Fixed_Properties, and MAY additionally
+          have channel classes with extra Fixed_Properties.</p>
+      </tp:docstring>
+    </tp:member>
+
+    <tp:member name="Allowed_Properties" type="as"
+      tp:type="DBus_Qualified_Member[]">
+      <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
+        <p>Properties that MAY be set when requesting a channel of this
+          channel type and handle type.</p>
+
+        <p>This array MUST NOT include properties that are in the
+          Fixed_Properties mapping.</p>
+
+        <p>Properties in this array may either be required or optional,
+          according to their documented semantics.</p>
+
+        <tp:rationale>
+          <p>For instance, if
+            TargetHandleType takes a value that is not Handle_Type_None,
+            one or the other of TargetHandle and TargetID is required.
+            Clients are expected to understand the documented relationship
+            between the properties, so we do not have separate arrays
+            of required and optional properties.</p>
+        </tp:rationale>
+
+        <p>If this array contains the
+          <tp:dbus-ref namespace="org.freedesktop.Telepathy.Channel.FUTURE">Bundle</tp:dbus-ref>
+          property, then this class of channel can be combined with other
+          channels with that property in a request, or added to an existing
+          bundle. If not, this signifies that the connection manager is
+          unable to mark channels of this class as part of a bundle - this
+          means that to the remote contact they are likely to be
+          indistinguishable from channels requested separately.</p>
+      </tp:docstring>
+    </tp:member>
+  </tp:struct>
+
+  <tp:mapping name="Channel_Class" array-name="Channel_Class_List">
+    <tp:added version="0.17.11">(as stable API)</tp:added>
+    <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
+      <p>Mapping representing a class of channels that can be requested
+        from a connection manager, can be handled by a user interface,
+        are supported by a contact, etc.</p>
+
+      <p>Classes of channel are identified by the fixed values of
+        a subset of their properties.</p>
+
+      <p>Channel classes SHOULD always include the keys
+        <tp:dbus-ref>org.freedesktop.Telepathy.Channel.ChannelType</tp:dbus-ref>
+        and
+        <tp:dbus-ref>org.freedesktop.Telepathy.Channel.TargetHandleType</tp:dbus-ref>.
+        </p>
+    </tp:docstring>
+
+    <tp:member type="s" name="Key" tp:type="DBus_Qualified_Member">
+      <tp:docstring>
+        A D-Bus interface name, followed by a dot and a D-Bus property name.
+      </tp:docstring>
+    </tp:member>
+
+    <tp:member type="v" name="Value">
+      <tp:docstring>
+        The value of the property.
+      </tp:docstring>
+    </tp:member>
+  </tp:mapping>
+
+
+</tp:generic-types>

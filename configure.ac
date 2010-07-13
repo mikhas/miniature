@@ -4,6 +4,8 @@ AC_CONFIG_MACRO_DIR([build])
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_PREREQ([2.57])
 AC_CONFIG_HEADERS([config.h])
+AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 
 AM_INIT_AUTOMAKE([1.8.5 no-define subdir-objects])
 AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, e.g. -I <macro dir>])
@@ -29,6 +31,14 @@ PKG_CHECK_MODULES([MINIATURE], [TelepathyQt4 >= 0.2.0])
 AC_SUBST([MINIATURE_CFLAGS])
 AC_SUBST([MINIATURE_LIBS])
 
+AC_CHECK_PROGS([XSLTPROC], [xsltproc])
+if test -z "$XSLTPROC"; then
+  AC_MSG_ERROR([xsltproc (from libxslt) is required])
+fi
+
+GLIB_GENMARSHAL=`$PKG_CONFIG glib-2.0 --variable=glib_genmarshal`
+AC_SUBST(GLIB_GENMARSHAL)
+
 # phonon and xmlpatterns are webkit dependencies,
 # and we want the configure check to complain when they are missing.
 # TODO: how to remove the opengl dependency when configured without opengl?
@@ -51,6 +61,8 @@ if test -z "x$desktopentrydir"; then
 fi
 
 AC_CONFIG_FILES([Makefile
+                 extensions/Makefile
+                 tools/Makefile
                  data/miniature.desktop
                  data/org.maemo.miniature.service
                  data/org.freedesktop.Telepathy.Client.MiniatureApprover.service

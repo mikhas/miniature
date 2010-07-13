@@ -20,12 +20,15 @@
 
 #include <glib.h>
 
+#include <config.h>
+
 #include <telepathy-glib/dbus.h>
 #include <telepathy-glib/interfaces.h>
 #include <telepathy-glib/util.h>
 #include <telepathy-glib/proxy-subclass.h>
 #include <telepathy-glib/handle.h>
 #include <telepathy-glib/connection.h>
+#include "extensions/extensions.h"
 
 #include "contact-chooser.h"
 
@@ -225,7 +228,7 @@ strreplace (const gchar *string,
 }
 
 static void
-get_contact_caps_cb (TpConnection *proxy,
+get_contact_caps_cb (TpProxy *proxy,
     GHashTable *contact_caps,
     const GError *error,
     gpointer user_data,
@@ -336,7 +339,7 @@ call_table_foreach (gpointer key,
     gpointer user_data)
 {
   MiniatureContactChooserPrivate *priv = GET_PRIVATE (user_data);
-  TpConnection *conn;
+  TpProxy *proxy;
   gchar *bus_name;
   const gchar *connection_path;
 
@@ -347,22 +350,26 @@ call_table_foreach (gpointer key,
 
   bus_name = strreplace (connection_path + 1, "/", ".");
 
-  conn = tp_connection_new (priv->dbus, bus_name,
-      mc_account_get_connection_path (account), NULL);
+  proxy = (TpProxy *) g_object_new (TP_TYPE_PROXY,
+      "dbus-daemon", priv->dbus,
+      "dbus-connection", ((TpProxy *) priv->dbus)->dbus_connection,
+      "bus-name", bus_name,
+      "object-path", mc_account_get_connection_path (account),
+      NULL);
 
-  tp_proxy_add_interface_by_id ((TpProxy *)conn,
-      TP_IFACE_QUARK_CONNECTION_INTERFACE_CONTACT_CAPABILITIES);
+  tp_proxy_add_interface_by_id (proxy,
+      MINIATURE_IFACE_QUARK_CONNECTION_INTERFACE_CONTACT_CAPABILITIES);
 
   g_signal_emit (user_data, signals[WORKING], 0);
 
   priv->calls_in_progress++;
-  tp_cli_connection_interface_contact_capabilities_call_get_contact_capabilities (
-      conn, -1, handles, get_contact_caps_cb,
+  miniature_cli_connection_interface_contact_capabilities_call_get_contact_capabilities (
+      proxy, -1, handles, get_contact_caps_cb,
       g_strdup (tp_proxy_get_object_path (account)), (GDestroyNotify) g_free,
       G_OBJECT (user_data));
 
   g_free (bus_name);
-  g_object_unref (conn);
+  g_object_unref (proxy);
 }
 
 static void
@@ -483,6 +490,7 @@ row_inserted_cb (GtkTreeModel *model,
   g_object_unref (contact);
 }
 
+#ifdef HAVE_MAEMOCONTACTSELECTOR
 static void
 roster_ready_cb (OssoABookWaitable *waitable G_GNUC_UNUSED,
     const GError *error,
@@ -535,6 +543,7 @@ roster_ready_cb (OssoABookWaitable *waitable G_GNUC_UNUSED,
   g_signal_connect (model, "row-inserted", G_CALLBACK (row_inserted_cb), self);
 
 }
+#endif
 
 static gboolean
 visible_func (GtkTreeModel *model,
@@ -542,8 +551,7 @@ visible_func (GtkTreeModel *model,
     gpointer user_data)
 {
   MiniatureContactChooserPrivate *priv;
-  //gboolean out = FALSE;  // All contacts visible for now
-  gboolean out = TRUE;
+  gboolean out = FALSE;
   GList *roster_contacts, *l;
   OssoABookContact *contact;
 
@@ -622,8 +630,10 @@ miniature_contact_chooser_constructed (GObject *self)
   model = OSSO_ABOOK_CONTACT_MODEL (
       osso_abook_tree_view_get_base_model (OSSO_ABOOK_TREE_VIEW (self)));
   roster = osso_abook_list_store_get_roster (OSSO_ABOOK_LIST_STORE (model));
+#ifdef HAVE_MAEMOCONTACTSELECTOR
   osso_abook_waitable_call_when_ready (OSSO_ABOOK_WAITABLE (roster),
       roster_ready_cb, self, NULL);
+#endif
 }
 
 static void
@@ -707,12 +717,12 @@ miniature_contact_chooser_can_send_to_roster_contact (MiniatureContactChooser *s
       tp_proxy_get_object_path (account));
 
   if (table == NULL)
-    return TRUE; // FIXME: do not filter yet
+    return FALSE;
 
   lookup = g_hash_table_lookup (table, GUINT_TO_POINTER (handle));
 
   if (lookup != NULL && GPOINTER_TO_INT (lookup))
     return TRUE;
 
-  return TRUE; // FIXME: do not filter yet
+  return FALSE;
 }
