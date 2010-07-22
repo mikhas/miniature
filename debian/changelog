@@ -1,3 +1,14 @@
+miniature (0.1.10-3) unstable; urgency=low
+
+  * Filter contacts on their capabilities: Do not show them in the contact
+    selector if they cannot do telepathy stream tube of type Miniature
+  * Retrieve the contact name from the addressbook and display "Do you want to
+    play chess with xxx?" with that name
+  * Display the name of the contact in the telepathy approver
+  * Fix crash: destroy TpApprover after finishing using it
+
+ -- Michael Hasselmann <michael@taschenorakel.de>  Wed,22 Jul 2010 09:33:00 +0300
+
 miniature (0.1.9-3) unstable; urgency=low
 
   * Added P2P support.
