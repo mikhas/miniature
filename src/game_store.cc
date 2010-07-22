@@ -55,6 +55,13 @@ getIndex() const
     return m_index;
 }
 
+const MPosition & MGameStore::
+getCurrentPosition() const
+{
+    Q_ASSERT(m_game.size() > m_index);
+    return m_game.at(m_index);
+}
+
 void MGameStore::
 setupStartPosition()
 {
@@ -133,7 +140,7 @@ onPositionRequested(int index)
 }
 
 void MGameStore::
-onCandidateMoveConfirmed(MPosition &pos)
+onCandidateMoveConfirmed(const MPosition &pos)
 {
     qDebug() << "MGameStore::onCandidateMoveConfirmed";
     m_candidate_move.deSelect();
@@ -144,16 +151,12 @@ onCandidateMoveConfirmed(MPosition &pos)
                              : blackToMove(pos));
 }
 
-MPosition MGameStore::
+void MGameStore::
 onCandidateMoveConfirmed()
 {
     // Assumption: The move is already visible on the board, hence we only add
     // the transitional position to the position list.
-    MPosition pos = MPosition(m_candidate_move.getPosition());
-
-    onCandidateMoveConfirmed(pos);
-
-    return pos;
+    onCandidateMoveConfirmed(m_candidate_move.getPosition());
 }
 
 void MGameStore::

@@ -52,6 +52,9 @@ public:
     //! Returns the index of the current position.
     int getIndex() const;
 
+    //! Returns current position.
+    const MPosition & getCurrentPosition() const;
+
     /*!
      *  Creates a MPosition with the default chess start position and stores it
      *  in m_game.
@@ -80,9 +83,11 @@ public Q_SLOTS:
     /*!
      *  Adds the selected candidate move to the store and emits {white,
      *  black}ToMove.
+     *  @param[in] pos The new position (optional, overrides candidate move's
+     *                 position
      */
-    MPosition onCandidateMoveConfirmed();
-    void onCandidateMoveConfirmed(MPosition &pos);
+    void onCandidateMoveConfirmed();
+    void onCandidateMoveConfirmed(const MPosition &pos);
 
     /*!
      *  Evaluates the selected piece and emits candidatePieceSelected,

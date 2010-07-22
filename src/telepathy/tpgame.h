@@ -63,7 +63,7 @@ public Q_SLOTS:
 
     void sendNewGame(bool whiteChoosed = false);
     void sendNewGameAccept();
-    void sendMove(QString &fenPos);
+    void sendMove(const QString &fenPos);
     void sendTakeBack();
     void sendTakeBackAccept();
     void sendDraw();

@@ -232,7 +232,7 @@ void Game::joinGame()
 #else
     m_accounts_dialog->show();
 #endif
-    
+
     Q_EMIT initialized();
 }
 
@@ -431,7 +431,7 @@ void Game::sendNewGameAccept()
     mStream << QString("New game accept");
 }
 
-void Game::sendMove(QString &fenPos)
+void Game::sendMove(const QString &fenPos)
 {
     qDebug() << "Game::sendMove()" << fenPos;
 

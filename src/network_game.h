@@ -28,6 +28,8 @@
 #include <telepathy/tpgame.h>
 #include <telepathy/tptubeclient.h>
 
+#include <memory>
+
 namespace Miniature
 {
 
@@ -42,35 +44,38 @@ public:
     virtual ~MNetworkGame();
 
 public Q_SLOTS:
-    void hostGame(TpGame::TubeClient *, const Tp::ContactPtr &);
+    void hostGame(TpGame::TubeClient *tube_client,
+                  const Tp::ContactPtr &contact);
     void joinGame();
     void disconnect();
     void newGame();
-    void setupOutgoingTube(TpGame::TubeClient *, const Tp::ContactPtr &);
+    void setupOutgoingTube(TpGame::TubeClient *tube_client,
+                           const Tp::ContactPtr &contact);
 
 Q_SIGNALS:
     void disconnected();
     void connected();
 
 private Q_SLOTS:
-    void hostGameConnected();
-    void joinGameConnected();
+    void onHostGameConnected();
+    void onJoinGameConnected();
     void onConfirmButtonPressed();
-    void receivedNewGame(bool white_chose);
-    void receivedMove(const QString& fen);
+    void onNewGameReceived(bool has_white_chosen);
+    void onMoveReceived(const QString &fen);
 
 protected:
     virtual bool isWhiteAtBottom() const;
     virtual bool isBlackAtBottom() const;
 
 private:
+    void connectTpGameSignals();
     void setupDashboard();
     void onWhiteToMove(const MPosition &position);
     void onBlackToMove(const MPosition &position);
     void endTurn();
 
     // TODO: turn this int some interface later, once we have inet + tp.
-    TpGame::Game *m_tp_game;
+    std::auto_ptr<TpGame::Game> m_tp_game;
 
     bool m_white_at_bottom;
 };

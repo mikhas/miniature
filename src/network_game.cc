@@ -41,13 +41,18 @@ void MNetworkGame::
 hostGame(TpGame::TubeClient *tube_client, const Tp::ContactPtr &contact)
 {
     qDebug() << "MNetworkGame::hostGame()";
-    delete m_tp_game;
-    m_tp_game = new TpGame::Game(this);
-    connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(connected()), SLOT(hostGameConnected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(receivedNewGame(bool)), SLOT(receivedNewGame(bool)), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(receivedMove(const QString&)), SLOT(receivedMove(const QString&)), Qt::UniqueConnection);
+    m_tp_game.reset(new TpGame::Game);
+
+    connectTpGameSignals();
+
+    connect(m_tp_game.get(), SIGNAL(connected()),
+            this,            SLOT(onHostGameConnected()),
+            Qt::UniqueConnection);
+
+    connect(m_tp_game.get(), SIGNAL(newGameReceived(bool)),
+            this,            SLOT(onNewGameReceived(bool)),
+            Qt::UniqueConnection);
+
     m_tp_game->hostGame(tube_client, contact);
 }
 
@@ -61,22 +66,41 @@ setupOutgoingTube(TpGame::TubeClient *tube_client, const Tp::ContactPtr &contact
 void MNetworkGame::
 joinGame()
 {
-    delete m_tp_game;
-    m_tp_game = new TpGame::Game(this);
-    connect(m_tp_game, SIGNAL(disconnected()), this, SIGNAL(disconnected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(connected()), SIGNAL(connected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(connected()), SLOT(joinGameConnected()), Qt::UniqueConnection);
-    connect(m_tp_game, SIGNAL(receivedMove(const QString&)), SLOT(receivedMove(const QString&)), Qt::UniqueConnection);
+    m_tp_game.reset(new TpGame::Game);
+    connectTpGameSignals();
+
+    connect(m_tp_game.get(), SIGNAL(connected()),
+            this,            SLOT(onJoinGameConnected()),
+            Qt::UniqueConnection);
+
     m_tp_game->joinGame();
 }
 
 void MNetworkGame::
 disconnect()
 {
-    if(m_tp_game)
-        delete m_tp_game;
-
+    m_tp_game.reset(0);
     Q_EMIT disconnected();
+}
+
+void MNetworkGame::
+connectTpGameSignals()
+{
+    connect(m_tp_game.get(), SIGNAL(disconnected()),
+            this,            SIGNAL(disconnected()),
+            Qt::UniqueConnection);
+
+    connect(m_tp_game.get(), SIGNAL(connected()),
+            this,            SIGNAL(connected()),
+            Qt::UniqueConnection);
+
+    connect(m_tp_game.get(), SIGNAL(newGameReceived(bool)),
+            this,            SLOT(onNewGameReceived(bool)),
+            Qt::UniqueConnection);
+
+    connect(m_tp_game.get(), SIGNAL(moveReceived(QString)),
+            this,            SLOT(onMoveReceived(QString)),
+            Qt::UniqueConnection);
 }
 
 void MNetworkGame::
@@ -84,7 +108,7 @@ setupDashboard()
 {
     qDebug() << "MNetworkGame::setupDashboard()";
 
-    Q_ASSERT(0 != m_board_view);
+    Q_ASSERT(m_board_view);
 
     m_board_view->addChatbox();
     m_board_view->addDashboard(MBoardView::ALIGN_BOTTOM);
@@ -121,13 +145,13 @@ endTurn()
 }
 
 void MNetworkGame::
-hostGameConnected()
+onHostGameConnected()
 {
     m_white_at_bottom = true;
 }
 
 void MNetworkGame::
-joinGameConnected()
+onJoinGameConnected()
 {
     m_white_at_bottom = false;
 
@@ -169,9 +193,9 @@ newGame()
 }
 
 void MNetworkGame::
-receivedNewGame(bool white_chosed)
+onNewGameReceived(bool has_white_chosen)
 {
-    m_white_at_bottom = !white_chosed;
+    m_white_at_bottom = !has_white_chosen;
     newGame();
 }
 
@@ -179,14 +203,12 @@ void MNetworkGame::
 onConfirmButtonPressed()
 {
     endTurn();
-    MPosition pos = m_store->onCandidateMoveConfirmed();
-
-    QString fenPos = pos.asFen();
-    m_tp_game->sendMove(fenPos);
+    m_store->onCandidateMoveConfirmed();
+    m_tp_game->sendMove(m_store->getCurrentPosition().asFen());
 }
 
 void MNetworkGame::
-receivedMove(const QString &fen)
+onMoveReceived(const QString &fen)
 {
     MPosition pos(pos.fromFen(fen));
     qDebug() << "fenPos:" << pos.asFen();
