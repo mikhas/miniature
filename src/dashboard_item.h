@@ -68,6 +68,7 @@ Q_SIGNALS:
     void adjournAccepted();          /*!< accepted to adjourn the game >*/
     void resignButtonPressed();      /*!< the player wants to give up >*/
     void resignConfirmed();          /*!< the player gave up >*/
+    void restoreButtonPressed();     /*!< the player wants to restore game >*/
     void abortGameButtonPressed();   /*!< the player wants to end the game >*/
     void abortGameConfirmed();       /*!< the player aborted the game >*/
     void showGameLogButtonPressed(); /*!< the player wants to see the game log >*/

@@ -31,6 +31,8 @@
 namespace Miniature
 {
 
+typedef QSharedPointer<QSettings> SharedSettings;
+
 /*! This class stores the half moves of a game (and maybe even *games*, at a later point) and
  *  provides signals for position changes (e.g., when navigating through a game or setting up a
  *  position). It is unaware of the UI.
@@ -43,7 +45,8 @@ class MGameStore
 public:
     typedef QList<MPosition> MPositionList;
 
-    explicit MGameStore(QObject *parent = 0);
+    explicit MGameStore(const SharedSettings &settings,
+                        QObject *parent = 0);
     virtual ~MGameStore();
 
     //! Empties game store and resets to \a start_position.
@@ -67,6 +70,9 @@ public:
     //! \sa hasWhiteToMove - added for completeness wrt. signals.
     bool hasBlackToMove() const;
 
+    //! Can be checked to see whether anything was stored in our QSettings.
+    bool haveLastGameStored() const;
+
 Q_SIGNALS:
     void whiteToMove(const MPosition &position);
     void blackToMove(const MPosition &position);
@@ -79,6 +85,9 @@ Q_SIGNALS:
 public Q_SLOTS:
     //! Sets position to index and emits {white,black}ToMove.
     void onPositionRequested(int index);
+
+    //! Restores last game from QSettings
+    void onRestoreLastGameRequested();
 
     /*!
      *  Adds the selected candidate move to the store and emits {white,
@@ -116,6 +125,7 @@ private:
         confirm moves so the UI needs to be able to show candidate moves that
         will never be part of the game history. >*/
     int m_index; /*!< An index to the positions stored in m_game. >*/
+    SharedSettings m_settings; /*!< Store/Retrieve the current game in via QSetting. >*/
 };
 
 }

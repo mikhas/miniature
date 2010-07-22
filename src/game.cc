@@ -32,7 +32,7 @@ MGame(const MSharedGameLog &log, QObject *parent)
     , m_board_view(0)
     , m_log(log)
     , m_board(0)
-    , m_store(new MGameStore(this))
+    , m_store(new MGameStore(SharedSettings(new QSettings("Maemo", "Miniature")), this))
     , m_dashboard(0)
 {
     qDebug() << "MGame::MGame()";
@@ -337,6 +337,10 @@ connectDashboardToGame(MDashboardItem *const dashboard)
     // Connect abort game requests
     connect(dashboard, SIGNAL(abortGameButtonPressed()),
             dashboard, SLOT(showAbortGameConfirmation()));
+
+    // Connect restore game requests
+    connect(dashboard, SIGNAL(restoreButtonPressed()),
+            m_store,   SLOT(onRestoreLastGameRequested()));
 
     // Connect game log requests
     QSignalMapper *mapper = new QSignalMapper(this);

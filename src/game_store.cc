@@ -25,11 +25,16 @@
 
 using namespace Miniature;
 
+namespace {
+    const QString current_game_settings_key("gameStore/currentGame");
+}
+
 MGameStore::
-MGameStore(QObject *parent)
-: QObject(parent),
-  m_candidate_move(MPosition()),
-  m_index(-1)
+MGameStore(const SharedSettings &settings, QObject *parent)
+    : QObject(parent),
+      m_candidate_move(MPosition()),
+      m_index(-1),
+      m_settings(settings)
 {}
 
 MGameStore::
@@ -121,6 +126,17 @@ hasBlackToMove() const
     return !hasWhiteToMove();
 }
 
+bool MGameStore::
+haveLastGameStored() const
+{
+    const QStringList game_as_fen = m_settings->value(current_game_settings_key)
+                                    .toStringList();
+    qDebug() << "MGS::hLGS - "
+             << game_as_fen;
+
+    return !game_as_fen.empty();
+}
+
 void MGameStore::
 onPositionRequested(int index)
 {
@@ -140,12 +156,44 @@ onPositionRequested(int index)
 }
 
 void MGameStore::
+onRestoreLastGameRequested()
+{
+    const QStringList game_as_fen = m_settings->value(current_game_settings_key)
+                                    .toStringList();
+
+    if (game_as_fen.empty())
+        return;
+
+    m_index = -1;
+    m_game.clear();
+
+    Q_FOREACH(QString fen, game_as_fen)
+    {
+        // TODO: emit correct signal from restored game position:
+        m_game.insert(++m_index, MPosition::fromFen(fen));
+    }
+
+    onPositionRequested(m_index);
+}
+
+void MGameStore::
 onCandidateMoveConfirmed(const MPosition &pos)
 {
     qDebug() << "MGameStore::onCandidateMoveConfirmed";
     m_candidate_move.deSelect();
     m_candidate_move = mHalfMove(pos);
     m_game.insert(++m_index, pos);
+
+    QStringList game_as_fen;
+    for (MPositionList::iterator iter = m_game.begin();
+         iter != m_game.end();
+         ++iter)
+    {
+        game_as_fen.append((*iter).asFen());
+    }
+
+    m_settings->setValue(current_game_settings_key,
+                        game_as_fen);
 
     Q_EMIT (hasWhiteToMove() ? whiteToMove(pos)
                              : blackToMove(pos));

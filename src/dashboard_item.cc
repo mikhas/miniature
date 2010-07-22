@@ -85,7 +85,7 @@ setupUi()
     QPalette palette;
     palette.setColor(QPalette::Window, Qt::black); // TODO: This - the use of black - is not ok, either.
     m_requests_dialog->setPalette(palette);
-    m_requests_dialog->setZValue(1); // make sure it is drawn on top of its siblings, the buttons.
+    m_requests_dialog->setZValue(2); // make sure it is drawn on top of its siblings, the buttons.
     m_requests_dialog->setEnabled(false);
     m_requests_dialog->hide();
 
@@ -378,40 +378,21 @@ showRequestsMenu()
     if(!m_requests_dialog->widget())
     {
         QWidget *dialog = new QWidget;
-        dialog->resize(portrait_width, portrait_height + 60);
+        dialog->resize(portrait_width, portrait_height);
 
         QVBoxLayout *vbox = new QVBoxLayout;
         dialog->setLayout(vbox);
 
-        QLabel *title = new QLabel(tr("?? Request Menu"));
-        title->setAlignment(Qt::AlignCenter);
-        vbox->addWidget(title);
-
-        QWidget *grid_widget = new QWidget;
-        vbox->addWidget(grid_widget);
-
-        QGridLayout *grid = new QGridLayout;
-        grid->setColumnMinimumWidth(0, portrait_width * 0.5 - 12);
-        grid->setColumnMinimumWidth(1, portrait_width * 0.5 - 12);
-        grid_widget->setLayout(grid);
-
-        QPushButton *pause_button = new QPushButton(tr("?? Pause Game"));
-        grid->addWidget(pause_button, 0, 0);
-
-        QPushButton *draw_button = new QPushButton(tr("?? Propose Draw"));
-        connect(draw_button, SIGNAL(pressed()), dialog, SLOT(hide()));
-        connect(draw_button, SIGNAL(pressed()), this, SIGNAL(drawButtonPressed()));
-        grid->addWidget(draw_button, 0, 1);
-
-        QPushButton *adjourn_button = new QPushButton(tr("?? Adjourn Game"));
-        connect(adjourn_button, SIGNAL(pressed()), dialog, SLOT(hide()));
-        connect(adjourn_button, SIGNAL(pressed()), this, SIGNAL(adjournButtonPressed()));
-        grid->addWidget(adjourn_button, 1, 0);
-
-        QPushButton *resign_button = new QPushButton(tr("?? Resign"));
+        QPushButton *resign_button = new QPushButton(tr("Resign"));
         connect(resign_button, SIGNAL(pressed()), dialog, SLOT(hide()));
         connect(resign_button, SIGNAL(pressed()), this, SIGNAL(resignButtonPressed()));
-        grid->addWidget(resign_button, 1, 1);
+        vbox->addWidget(resign_button);
+
+
+        QPushButton *restore_button = new QPushButton(tr("Restore Last Game"));
+        connect(restore_button, SIGNAL(pressed()), dialog, SLOT(hide()));
+        connect(restore_button, SIGNAL(pressed()), this, SIGNAL(restoreButtonPressed()));
+        vbox->addWidget(restore_button);
 
         m_requests_dialog->setWidget(dialog);
         dialog->show();
