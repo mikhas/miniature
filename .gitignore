@@ -1,0 +1,9 @@
+*.swp
+*.pro.user
+.moc
+.obj
+*.o
+*.so
+Makefile
+lib*.so.*
+*.swo
