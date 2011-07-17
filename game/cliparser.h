@@ -60,6 +60,10 @@ public:
     Q_SIGNAL void commandFound(Command cmd,
                                const QString &data = QString());
 
+    //! Enable/Disable the command line interface.
+    //! @param enable enable/disable.
+    static void setEnabled(bool enable);
+
 private:
     Q_SLOT void asyncReadInput();
 };

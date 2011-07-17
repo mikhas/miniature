@@ -26,6 +26,7 @@ namespace {
     const QString CmdNew("new");
     const QString CmdQuit("quit");
     const QString CmdMove("move");
+    bool g_enabled = true;
 
     QString readFromStdIn()
     {
@@ -52,7 +53,9 @@ CliParser::~CliParser()
 
 void CliParser::readInput()
 {
-    QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
+    if (g_enabled) {
+        QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
+    }
 }
 
 void CliParser::onInputReady()
@@ -69,9 +72,14 @@ void CliParser::onInputReady()
                && result.left(CmdMove.size()) == CmdMove) {
         emit commandFound(CommandMove,
                           QString(result.right(result.size() - CmdMove.size() - 1)));
-    } else {
+    } else if (g_enabled) {
         QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
     }
+}
+
+void CliParser::setEnabled(bool enable)
+{
+    g_enabled = enable;
 }
 
 void CliParser::asyncReadInput()
