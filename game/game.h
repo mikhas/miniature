@@ -36,9 +36,9 @@ class Game
     Q_OBJECT
 
 private:
-    SharedAbstractSide m_local; //!< Side of the local player.
-    SharedAbstractSide m_remote; //!< Side of the remote player.
-    SharedAbstractSide m_active; //!< Points to active side.
+    const QScopedPointer<GamePrivate> d_ptr;
+    Q_DECLARE_PRIVATE(Game)
+    Q_DISABLE_COPY(Game)
 
 public:
     //! C'tor

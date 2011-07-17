@@ -34,29 +34,44 @@ namespace {
 
 namespace Game {
 
+class GamePrivate
+{
+public:
+    SharedAbstractSide local; //!< Side of the local player.
+    SharedAbstractSide remote; //!< Side of the remote player.
+    SharedAbstractSide active; //!< Points to active side.
+
+    explicit GamePrivate(AbstractSide *new_local,
+                         AbstractSide *new_remote)
+        : local(new_local)
+        , remote(new_remote)
+        , active(local)// FIXME: Set correct active side (could be remote) already during construction!
+    {
+        if (local.isNull() || remote.isNull()) {
+            qCritical() << __PRETTY_FUNCTION__
+                        << "Creating Game instance with invalid sides is not allowed.";
+        }
+
+        // Take over ownership:
+        local->setParent(0);
+        remote->setParent(0);
+    }
+};
+
 Game::Game(AbstractSide *local,
            AbstractSide *remote,
            QObject *parent)
     : QObject(parent)
-    , m_local(local)
-    , m_remote(remote)
-    , m_active(m_local) // FIXME: Set correct active side (could be remote) already during construction!
+    , d_ptr(new GamePrivate(local, remote))
 {
-    if (m_local.isNull() || m_remote.isNull()) {
-        qCritical() << __PRETTY_FUNCTION__
-                    << "Creating Game instance with invalid sides is not allowed.";
-    }
+    Q_D(Game);
 
-    // Take over ownership:
-    m_local->setParent(0);
-    m_remote->setParent(0);
-
-    connect(m_local.data(), SIGNAL(moveEnded(Move)),
-            this,           SLOT(onMoveEnded(Move)),
+    connect(d->local.data(), SIGNAL(moveEnded(Move)),
+            this,            SLOT(onMoveEnded(Move)),
             Qt::UniqueConnection);
 
-    connect(m_remote.data(), SIGNAL(moveEnded(Move)),
-            this,            SLOT(onMoveEnded(Move)),
+    connect(d->remote.data(), SIGNAL(moveEnded(Move)),
+            this,             SLOT(onMoveEnded(Move)),
             Qt::UniqueConnection);
 
 #ifdef MINIATURE_CLI_ENABLED
@@ -70,29 +85,34 @@ Game::~Game()
 
 void Game::start()
 {
-    m_active = m_local;
-    m_active->startMove(Move());
-    printTurnMessage(m_active->identifier());
+    Q_D(Game);
+
+    d->active = d->local;
+    d->active->startMove(Move());
+    printTurnMessage(d->active->identifier());
 }
 
 const SharedAbstractSide &Game::activeSide() const
 {
-    return m_active;
+    Q_D(const Game);
+    return d->active;
 }
 
 void Game::onMoveEnded(const Move &move)
 {
-    if (sender() != m_active.data()) {
+    Q_D(Game);
+
+    if (sender() != d->active.data()) {
         qWarning() << __PRETTY_FUNCTION__
                    << "Move received from inactive side, ignoring.";
         return;
     }
 
-    m_active = (m_active == m_local ? m_remote
-                                    : m_local);
+    d->active = (d->active == d->local ? d->remote
+                                       : d->local);
 
-    m_active->startMove(move);
-    printTurnMessage(m_active->identifier());
+    d->active->startMove(move);
+    printTurnMessage(d->active->identifier());
 }
 
 void Game::waitForInput()
