@@ -7,7 +7,17 @@ QT -= gui
 
 HEADERS += \
     game.h \
+    abstractside.h \
+    localside.h \
+    move.h \
+    position.h \
+    square.h \
 
 SOURCES += \
     game.cc \
+    abstractside.cc \
+    localside.cc \
+    move.cc \
+    position.cc \
+    square.cc \
 

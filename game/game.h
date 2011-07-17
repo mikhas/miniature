@@ -21,7 +21,10 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "abstractside.h"
+
 #include <QtCore>
+#include <memory>
 
 namespace Game {
 
@@ -31,12 +34,25 @@ class Game
 {
     Q_OBJECT
 
+private:
+    typedef std::auto_ptr<AbstractSide> AutoAbstractSide;
+    AutoAbstractSide m_local; //!< Side of the local player.
+    AutoAbstractSide m_remote; //!< Side of the remote player.
+    AbstractSide *m_active; //!< Pointer to active side.
+
 public:
     explicit Game(QObject *parent = 0);
     virtual ~Game();
 
     //! Starts game.
     void start();
+
+    //! Active side.
+    const AbstractSide &activeSide() const;
+
+    //! One side ended and submitted a move.
+    Q_SLOT void onMoveEnded(const AbstractSide &side,
+                            const Move &move);
 
     //! Waits for input on command line.
     Q_SLOT void waitForInput();

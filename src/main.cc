@@ -26,8 +26,7 @@
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-    Game::Game *g = new Game::Game(&app);
-    g->start();
+    new Game::Game(&app);
 
     return app.exec();
 }
