@@ -48,6 +48,9 @@ public:
 
     //! \reimp
     virtual void startMove(const Move &move);
+
+    //! Waits for input, such as moves.
+    Q_SLOT void waitForInput();
 };
 
 } // namespace Game
