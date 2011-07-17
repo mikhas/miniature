@@ -7,6 +7,7 @@ QT -= gui
 
 HEADERS += \
     game.h \
+    cliparser.h \
     abstractside.h \
     localside.h \
     gnuchess.h \
@@ -16,6 +17,7 @@ HEADERS += \
 
 SOURCES += \
     game.cc \
+    cliparser.cc \
     abstractside.cc \
     localside.cc \
     gnuchess.cc \
