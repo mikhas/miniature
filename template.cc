@@ -22,11 +22,11 @@
 
 namespace Miniature {
 
-SomeClass::Game(QObject *parent)
+SomeClass::SomeClass(QObject *parent)
     : QObject(parent)
 {}
 
-SomeClass::~Game()
+SomeClass::~SomeClass()
 {}
 
 } // namespace Miniature

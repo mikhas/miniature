@@ -30,6 +30,7 @@ class SomeClass
     : public QObject
 {
     Q_OBJECT
+    Q_DISABLE_COPY(SomeClass)
 
 public:
     explicit SomeClass(QObject *parent = 0);

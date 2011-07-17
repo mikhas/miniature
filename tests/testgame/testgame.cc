@@ -35,6 +35,9 @@ private:
 
     Q_SLOT void testMoveSequence()
     {
+        // After each valid move, active side should switch. So we can test a
+        // valid move sequence simply by checking the active side against the
+        // expected value.
         Game::AbstractSide *white = new Game::LocalSide("white");
         Game::AbstractSide *black = new Game::LocalSide("white");
         Game::Game subject(white, black);
