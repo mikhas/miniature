@@ -22,6 +22,7 @@
 
 namespace {
     const char * const GnuChessCmd = "/usr/games/gnuchess";
+    const QString CmdMove("My move is :");
 }
 
 namespace Game {
@@ -59,8 +60,6 @@ void GnuChess::init()
 
     m_state = Ready;
     emit ready();
-
-    qDebug() << __PRETTY_FUNCTION__;
 }
 
 AbstractSide::SideState GnuChess::state() const
@@ -76,14 +75,18 @@ const QString &GnuChess::identifier() const
 
 void GnuChess::startMove(const Move &move)
 {
-    Q_UNUSED(move)
+    m_proc.write(move.notation.toLatin1().append("\n"));
+    m_proc.waitForBytesWritten();
 }
 
 void GnuChess::onReadyRead()
 {
     while (m_proc.canReadLine()) {
-        qWarning() << __PRETTY_FUNCTION__ << __LINE__;
-        qWarning() << m_proc.readLine();
+        QString result(m_proc.readLine());
+        if (result.startsWith(CmdMove)) {
+            emit moveEnded(Move(Position(), Square(), Square(),
+                                QString(result.right(result.size() - CmdMove.size() - 1))));
+        }
     }
 }
 

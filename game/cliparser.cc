@@ -68,7 +68,7 @@ void CliParser::onInputReady()
     } else if ((m_flags & CommandMove)
                && result.left(CmdMove.size()) == CmdMove) {
         emit commandFound(CommandMove,
-                          QString(result.right(result.size() - CmdMove.size())));
+                          QString(result.right(result.size() - CmdMove.size() - 1)));
     } else {
         QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
     }

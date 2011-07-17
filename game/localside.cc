@@ -20,8 +20,6 @@
 
 #include "localside.h"
 
-#include <iostream>
-
 namespace Game {
 
 LocalSide::LocalSide(const QString &identifier)
@@ -58,7 +56,12 @@ AbstractSide::SideState LocalSide::state() const
 
 void LocalSide::startMove(const Move &move)
 {
-    Q_UNUSED(move)
+    if (not move.notation.isEmpty()) {
+        static QTextStream out(stdout);
+        out << move.notation;
+        out.flush();
+    }
+
     m_parser.readInput();
 }
 
@@ -68,6 +71,10 @@ void LocalSide::onCommandFound(Command command,
     switch(command) {
     case CommandQuit:
         qApp->exit();
+        break;
+
+    case CommandMove:
+        emit moveEnded(Move(Position(), Square(), Square(), data));
         break;
 
     default:
