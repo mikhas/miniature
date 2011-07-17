@@ -34,18 +34,29 @@ namespace {
 
 namespace Game {
 
-Game::Game(QObject *parent)
+Game::Game(AbstractSide *local,
+           AbstractSide *remote,
+           QObject *parent)
     : QObject(parent)
-    , m_local(new LocalSide("White"))
-    , m_remote(new LocalSide("Black"))
-    , m_active(m_local.get()) // FIXME: Set correct active side (could be remote) already during construction!
+    , m_local(local)
+    , m_remote(remote)
+    , m_active(m_local) // FIXME: Set correct active side (could be remote) already during construction!
 {
-    connect(m_local.get(), SIGNAL(moveEnded(AbstractSide, Move)),
-            this,          SLOT(onMoveEnded(AbstractSide, Move)),
+    if (m_local.isNull() || m_remote.isNull()) {
+        qCritical() << __PRETTY_FUNCTION__
+                    << "Creating Game instance with invalid sides is not allowed.";
+    }
+
+    // Take over ownership:
+    m_local->setParent(0);
+    m_remote->setParent(0);
+
+    connect(m_local.data(), SIGNAL(moveEnded(Move)),
+            this,           SLOT(onMoveEnded(Move)),
             Qt::UniqueConnection);
 
-    connect(m_remote.get(), SIGNAL(moveEnded(AbstractSide, Move)),
-            this,           SLOT(onMoveEnded(AbstractSide, Move)),
+    connect(m_remote.data(), SIGNAL(moveEnded(Move)),
+            this,            SLOT(onMoveEnded(Move)),
             Qt::UniqueConnection);
 
 #ifdef MINIATURE_CLI_ENABLED
@@ -59,27 +70,26 @@ Game::~Game()
 
 void Game::start()
 {
-    m_active = m_local.get();
+    m_active = m_local;
     m_active->startMove(Move());
     printTurnMessage(m_active->identifier());
 }
 
-const AbstractSide &Game::activeSide() const
+const SharedAbstractSide &Game::activeSide() const
 {
-    return *m_active;
+    return m_active;
 }
 
-void Game::onMoveEnded(const AbstractSide &side,
-                       const Move &move)
+void Game::onMoveEnded(const Move &move)
 {
-    if (&side != m_active) {
+    if (sender() != m_active.data()) {
         qWarning() << __PRETTY_FUNCTION__
                    << "Move received from inactive side, ignoring.";
         return;
     }
 
-    m_active = (m_active == m_local.get() ? m_remote.get()
-                                          : m_local.get());
+    m_active = (m_active == m_local ? m_remote
+                                    : m_local);
 
     m_active->startMove(move);
     printTurnMessage(m_active->identifier());

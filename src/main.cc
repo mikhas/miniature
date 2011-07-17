@@ -19,6 +19,7 @@
  */
 
 #include "game.h"
+#include "localside.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -26,7 +27,10 @@
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-    new Game::Game(&app);
+    // TODO: Move into a proper Miniature class that can setup games.
+    new Game::Game(new Game::LocalSide("white"),
+                   new Game::LocalSide("black"),
+                   &app);
 
     return app.exec();
 }
