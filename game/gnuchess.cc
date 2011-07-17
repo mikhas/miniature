@@ -18,30 +18,27 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTUTILS_H
-#define TESTUTILS_H
+#include "gnuchess.h"
 
-#include <QtCore>
-#include <QtTest>
+namespace Game {
 
-#define CREATE_EMPTY_DEFAULT_SLOTS \
-    Q_SLOT void initTestCase() {} \
-    Q_SLOT void cleanupTestCase() {} \
-    Q_SLOT void init() {} \
-    Q_SLOT void cleanup() {}
+GnuChess::GnuChess(const QString &identifier)
+    : AbstractSide(identifier)
+    , m_identifier(identifier)
+    , m_proc()
+{}
 
-namespace TestUtils {
+GnuChess::~GnuChess()
+{}
 
-// Wait for signal or timeout; use SIGNAL macro for signal
-void waitForSignal(QObject *sender, const char *signal, int timeout = 1000) {
-    QSignalSpy spy(sender, signal);
-    QElapsedTimer timer;
-    timer.start();
-    while (spy.count() == 0 && timer.elapsed() < timeout) {
-        QTest::qWait(20);
-    }
+const QString &GnuChess::identifier() const
+{
+    return m_identifier;
 }
 
-} // namespace TestUtils
+void GnuChess::startMove(const Move &move)
+{
+    Q_UNUSED(move)
+}
 
-#endif // TESTUTILS_H
+} // namespace Game

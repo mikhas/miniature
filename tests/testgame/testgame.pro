@@ -4,10 +4,13 @@ include(../config.pri)
 
 TEMPLATE=app
 TARGET=testgame
-QT -= gui
 
 DEFINES += MINIATURE_LIB_PATH=\\\"$${PWD}/$${GAME_DIR}\\\"
 DEFINES += MINIATURE_BIN=\\\"$${PWD}/$${SRC_DIR}/miniature\\\"
+
+HEADERS += \
+    $${TESTS_DIR_PREFIX}/testutils.h
+
 SOURCES += \
     testgame.cc \
 

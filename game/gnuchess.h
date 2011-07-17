@@ -18,30 +18,41 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTUTILS_H
-#define TESTUTILS_H
+#ifndef GNUCHESS_H
+#define GNUCHESS_H
+
+#include "move.h"
+#include "abstractside.h"
 
 #include <QtCore>
-#include <QtTest>
 
-#define CREATE_EMPTY_DEFAULT_SLOTS \
-    Q_SLOT void initTestCase() {} \
-    Q_SLOT void cleanupTestCase() {} \
-    Q_SLOT void init() {} \
-    Q_SLOT void cleanup() {}
+namespace Game {
 
-namespace TestUtils {
+//! Controls game.
+class GnuChess
+    : public AbstractSide
+{
+    Q_OBJECT
+    Q_DISABLE_COPY(GnuChess)
 
-// Wait for signal or timeout; use SIGNAL macro for signal
-void waitForSignal(QObject *sender, const char *signal, int timeout = 1000) {
-    QSignalSpy spy(sender, signal);
-    QElapsedTimer timer;
-    timer.start();
-    while (spy.count() == 0 && timer.elapsed() < timeout) {
-        QTest::qWait(20);
-    }
-}
+private:
+    const QString m_identifier;
+    QProcess m_proc;
 
-} // namespace TestUtils
+public:
+    //! \reimp
+    explicit GnuChess(const QString &identifier);
 
-#endif // TESTUTILS_H
+    //! \reimp
+    virtual ~GnuChess();
+
+    //! \reimp
+    virtual const QString &identifier() const;
+
+    //! \reimp
+    virtual void startMove(const Move &move);
+};
+
+} // namespace Game
+
+#endif // GNUCHESS_H
