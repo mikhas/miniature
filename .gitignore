@@ -7,3 +7,5 @@
 Makefile
 lib*.so.*
 *.swo
+tests/testgame/testgame
+src/miniature
