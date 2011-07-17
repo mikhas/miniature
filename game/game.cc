@@ -41,6 +41,9 @@ public:
     SharedAbstractSide remote; //!< Side of the remote player.
     SharedAbstractSide active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
+#ifdef MINIATURE_CLI_ENABLED
+    CliParser parser; //!< Parses the command line for commands.
+#endif
 
     explicit GamePrivate(AbstractSide *new_local,
                          AbstractSide *new_remote)
@@ -48,6 +51,9 @@ public:
         , remote(new_remote)
         , active(local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
+#ifdef MINIATURE_CLI_ENABLED
+        , parser(CommandFlags(CommandNew | CommandQuit))
+#endif
     {
         if (local.isNull() || remote.isNull()) {
             qCritical() << __PRETTY_FUNCTION__
@@ -68,17 +74,15 @@ Game::Game(AbstractSide *local,
 {
     Q_D(Game);
 
-    connect(d->local.data(), SIGNAL(moveEnded(Move)),
-            this,            SLOT(onMoveEnded(Move)),
-            Qt::UniqueConnection);
-
-    connect(d->remote.data(), SIGNAL(moveEnded(Move)),
-            this,             SLOT(onMoveEnded(Move)),
-            Qt::UniqueConnection);
+    connectSide(d->local);
+    connectSide(d->remote);
 
 #ifdef MINIATURE_CLI_ENABLED
     std::cout << "Welcome to Miniature!" << std::endl;
-    QTimer::singleShot(0, this, SLOT(waitForInput())); // wait for mainloop
+    connect(&d->parser, SIGNAL(commandFound(Command,QString)),
+            this,       SLOT(onCommandFound(Command,QString)));
+
+    d->parser.readInput();
 #endif
 }
 
@@ -88,11 +92,8 @@ Game::~Game()
 void Game::start()
 {
     Q_D(Game);
-
-    d->state = Game::Started;
-    d->active = d->local;
-    d->active->startMove(Move());
-    printTurnMessage(d->active->identifier());
+    d->local->init();
+    d->remote->init();
 }
 
 const SharedAbstractSide &Game::activeSide() const
@@ -124,18 +125,46 @@ void Game::onMoveEnded(const Move &move)
     printTurnMessage(d->active->identifier());
 }
 
-void Game::waitForInput()
+void Game::connectSide(const SharedAbstractSide &side)
 {
-#ifdef MINIATURE_CLI_ENABLED
-    std::string cmd;
+    connect(side.data(), SIGNAL(moveEnded(Move)),
+            this,        SLOT(onMoveEnded(Move)),
+            Qt::UniqueConnection);
 
-    getline(std::cin, cmd);
-    if (cmd == "start") {
-        start();
-    } else {
-        QTimer::singleShot(0, this, SLOT(waitForInput())); // wait for mainloop
+    connect(side.data(), SIGNAL(ready()),
+            this,        SLOT(onSideReady()));
+}
+
+void Game::onSideReady()
+{
+    Q_D(Game);
+
+    if (d->local->state() == AbstractSide::NotReady
+        || d->remote->state() == AbstractSide::NotReady) {
+        return;
     }
-#endif
+
+    d->state = Game::Started;
+    d->active = d->local;
+    d->active->startMove(Move());
+    printTurnMessage(d->active->identifier());
+}
+
+void Game::onCommandFound(Command command,
+                          const QString &data)
+{
+    switch(command) {
+    case CommandNew:
+        start();
+        break;
+
+    case CommandQuit:
+        qApp->exit();
+        break;
+
+    default:
+        break;
+    }
 }
 
 } // namespace Game

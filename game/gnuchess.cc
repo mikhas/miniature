@@ -20,16 +20,54 @@
 
 #include "gnuchess.h"
 
+namespace {
+    const char * const GnuChessCmd = "/usr/games/gnuchess";
+}
+
 namespace Game {
 
 GnuChess::GnuChess(const QString &identifier)
     : AbstractSide(identifier)
     , m_identifier(identifier)
+    , m_state(NotReady)
     , m_proc()
-{}
+{
+    connect(&m_proc, SIGNAL(readyRead()),
+            this,    SLOT(onReadyRead()),
+            Qt::UniqueConnection);
+}
 
 GnuChess::~GnuChess()
-{}
+{
+    m_proc.kill();
+    m_proc.waitForFinished();
+}
+
+void GnuChess::init()
+{
+    if (m_proc.state() != QProcess::NotRunning) {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Process already running. Did you call init() twice?";
+    }
+
+    m_proc.start(GnuChessCmd, QIODevice::ReadWrite | QIODevice::Unbuffered);
+    m_proc.setReadChannel(QProcess::StandardOutput);
+
+    if (m_proc.state() != QProcess::Running) {
+        m_proc.waitForStarted();
+    }
+
+    m_state = Ready;
+    emit ready();
+
+    qDebug() << __PRETTY_FUNCTION__;
+}
+
+AbstractSide::SideState GnuChess::state() const
+{
+    return m_state;
+}
+
 
 const QString &GnuChess::identifier() const
 {
@@ -39,6 +77,14 @@ const QString &GnuChess::identifier() const
 void GnuChess::startMove(const Move &move)
 {
     Q_UNUSED(move)
+}
+
+void GnuChess::onReadyRead()
+{
+    while (m_proc.canReadLine()) {
+        qWarning() << __PRETTY_FUNCTION__ << __LINE__;
+        qWarning() << m_proc.readLine();
+    }
 }
 
 } // namespace Game

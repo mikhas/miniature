@@ -27,7 +27,14 @@ namespace Game {
 LocalSide::LocalSide(const QString &identifier)
     : AbstractSide(identifier)
     , m_identifier(identifier)
-{}
+    , m_state(NotReady)
+#ifdef MINIATURE_CLI_ENABLED
+    , m_parser(CommandFlags(CommandNew | CommandMove | CommandQuit))
+#endif
+{
+    connect(&m_parser, SIGNAL(commandFound(Command,QString)),
+            this,      SLOT(onCommandFound(Command,QString)));
+}
 
 LocalSide::~LocalSide()
 {}
@@ -37,30 +44,35 @@ const QString &LocalSide::identifier() const
     return m_identifier;
 }
 
+void LocalSide::init()
+{
+    // Nothing to do, just report readiness:
+    m_state = Ready;
+    emit ready();
+}
+
+AbstractSide::SideState LocalSide::state() const
+{
+    return m_state;
+}
+
 void LocalSide::startMove(const Move &move)
 {
     Q_UNUSED(move)
-    QTimer::singleShot(0, this, SLOT(waitForInput())); // wait for mainloop
+    m_parser.readInput();
 }
 
-void LocalSide::waitForInput()
+void LocalSide::onCommandFound(Command command,
+                               const QString &data)
 {
-#ifdef MINIATURE_CLI_ENABLED
-    const std::string moveCmd("move");
-    std::string cmd;
-
-    getline(std::cin, cmd);
-    if (cmd == "quit") {
-        std::cout << "Shutting down. Good bye!" << std::endl;
+    switch(command) {
+    case CommandQuit:
         qApp->exit();
-    } else if (not cmd.compare(0, moveCmd.size(), moveCmd)) {
-        const Move m(Position(), Square(), Square(),
-                     QString(cmd.substr(moveCmd.size()).c_str()));
-        emit moveEnded(m);
-    } else {
-        QTimer::singleShot(0, this, SLOT(waitForInput())); // wait for mainloop
+        break;
+
+    default:
+        break;
     }
-#endif
 }
 
 } // namespace Game

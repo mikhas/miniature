@@ -37,6 +37,7 @@ class GnuChess
 
 private:
     const QString m_identifier;
+    SideState m_state;
     QProcess m_proc;
 
 public:
@@ -47,10 +48,18 @@ public:
     virtual ~GnuChess();
 
     //! \reimp
+    virtual void init();
+
+    //! \reimp
+    virtual SideState state() const;
+
+    //! \reimp
     virtual const QString &identifier() const;
 
     //! \reimp
     virtual void startMove(const Move &move);
+
+    Q_SLOT void onReadyRead();
 };
 
 } // namespace Game

@@ -22,6 +22,7 @@
 #define GAME_H
 
 #include "abstractside.h"
+#include "cliparser.h"
 
 #include <QtCore>
 
@@ -62,12 +63,24 @@ public:
     //! Active side.
     const SharedAbstractSide &activeSide() const;
 
+private:
     //! One side ended and submitted a move.
     //! @param move the submitted move.
     Q_SLOT void onMoveEnded(const Move &move);
 
-    //! Waits for input on command line.
-    Q_SLOT void waitForInput();
+    //! Connects common parts for each side with controller.
+    //! @param side the side to connect.
+    void connectSide(const SharedAbstractSide &side);
+
+    //! Used to sync with side backends; start when all backends report
+    //! readiness.
+    Q_SLOT void onSideReady();
+
+    //! Handle input from command line interface.
+    //! @command the found command.
+    //! @data the data that belongs to the command.
+    Q_SLOT void onCommandFound(Command command,
+                               const QString &data);
 };
 
 } // namespace Game

@@ -41,10 +41,25 @@ class AbstractSide
     Q_OBJECT
 
 public:
+    enum SideState {
+        NotReady,
+        Ready
+    };
+
     //! C'tor
     //! @param identifier the identifier for this side.
     explicit AbstractSide(const QString &identifier);
     virtual ~AbstractSide() = 0;
+
+    //! Initialize parts of the backend that are costly or require a main loop.
+    virtual void init() = 0;
+
+    //! Notify others that this component is ready now, usually triggered after
+    //! init() was called.
+    Q_SIGNAL void ready();
+
+    //! Returns current state.
+    virtual SideState state() const = 0;
 
     //! Returns identifier for this side.
     virtual const QString &identifier() const = 0;

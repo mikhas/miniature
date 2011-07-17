@@ -22,6 +22,7 @@
 #define LOCALSIDE_H
 
 #include "abstractside.h"
+#include "cliparser.h"
 
 #include <QtCore>
 
@@ -35,6 +36,8 @@ class LocalSide
 
 private:
     const QString m_identifier;
+    SideState m_state;
+    CliParser m_parser;
 
 public:
     //! \reimp
@@ -44,13 +47,22 @@ public:
     virtual ~LocalSide();
 
     //! \reimp
+    virtual void init();
+
+    //! \reimp
+    virtual SideState state() const;
+
+    //! \reimp
     virtual const QString &identifier() const;
 
     //! \reimp
     virtual void startMove(const Move &move);
 
-    //! Waits for input, such as moves.
-    Q_SLOT void waitForInput();
+    //! Handle input from command line interface.
+    //! @command the found command.
+    //! @data the data that belongs to the command.
+    Q_SLOT void onCommandFound(Command command,
+                               const QString &data);
 };
 
 } // namespace Game
