@@ -41,6 +41,12 @@ private:
     Q_DISABLE_COPY(Game)
 
 public:
+    enum GameState {
+        Idle,
+        Started,
+        Ended
+    };
+
     //! C'tor
     //! @param local the local side, Game takes ownership.
     //! @param remote the remote side, Game takes ownership.

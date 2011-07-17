@@ -40,12 +40,14 @@ public:
     SharedAbstractSide local; //!< Side of the local player.
     SharedAbstractSide remote; //!< Side of the remote player.
     SharedAbstractSide active; //!< Points to active side.
+    Game::GameState state; //!< The game's state.
 
     explicit GamePrivate(AbstractSide *new_local,
                          AbstractSide *new_remote)
         : local(new_local)
         , remote(new_remote)
         , active(local)// FIXME: Set correct active side (could be remote) already during construction!
+        , state(Game::Idle)
     {
         if (local.isNull() || remote.isNull()) {
             qCritical() << __PRETTY_FUNCTION__
@@ -87,6 +89,7 @@ void Game::start()
 {
     Q_D(Game);
 
+    d->state = Game::Started;
     d->active = d->local;
     d->active->startMove(Move());
     printTurnMessage(d->active->identifier());
@@ -101,6 +104,12 @@ const SharedAbstractSide &Game::activeSide() const
 void Game::onMoveEnded(const Move &move)
 {
     Q_D(Game);
+
+    if (d->state != Game::Started) {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Game not started yet, ignoring.";
+        return;
+    }
 
     if (sender() != d->active.data()) {
         qWarning() << __PRETTY_FUNCTION__

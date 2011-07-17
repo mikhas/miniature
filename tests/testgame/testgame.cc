@@ -19,6 +19,8 @@
  */
 
 #include "testutils.h"
+#include "game.h"
+#include "localside.h"
 
 #include <QtCore>
 #include <QtTest>
@@ -30,6 +32,32 @@ class TestGame
 
 private:
     CREATE_EMPTY_DEFAULT_SLOTS
+
+    Q_SLOT void testMoveSequence()
+    {
+        Game::AbstractSide *white = new Game::LocalSide("white");
+        Game::AbstractSide *black = new Game::LocalSide("white");
+        Game::Game subject(white, black);
+        QCOMPARE(subject.activeSide().data(), white);
+
+        // Trying to submit move before starting game => ignore:
+        emit white->moveEnded(Game::Move());
+        QCOMPARE(subject.activeSide().data(), white);
+
+        subject.start();
+
+        // Switch sides after submitting move:
+        emit white->moveEnded(Game::Move());
+        QCOMPARE(subject.activeSide().data(), black);
+
+        // Trying to submit move twice in a row => ignore:
+        emit white->moveEnded(Game::Move());
+        QCOMPARE(subject.activeSide().data(), black);
+
+        // Switch sides again after submitting move:
+        emit black->moveEnded(Game::Move());
+        QCOMPARE(subject.activeSide().data(), white);
+    }
 
     Q_SLOT void testCli()
     {
