@@ -33,8 +33,8 @@
 namespace TestUtils {
 
 // Wait for signal or timeout; use SIGNAL macro for signal
-void waitForSignal(QObject *sender, const char *signal, int timeout = 1000) {
-    QSignalSpy spy(sender, signal);
+void waitForSignal(const QSignalSpy &spy,
+                   int timeout = 1000) {
     QElapsedTimer timer;
     timer.start();
     while (spy.count() == 0 && timer.elapsed() < timeout) {

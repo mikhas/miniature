@@ -22,6 +22,7 @@
 #include "game.h"
 #include "localside.h"
 #include "gnuchess.h"
+#include "move.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -64,22 +65,6 @@ private:
 
         // Switch sides again after submitting move:
         emit black->moveEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), white);
-    }
-
-    Q_SLOT void testGnuChess()
-    {
-        qRegisterMetaType<Move>();
-
-        Game::AbstractSide *white = new Game::LocalSide("white");
-        Game::AbstractSide *black = new Game::GnuChess("black");
-        Game::Game subject(white, black);
-        QCOMPARE(subject.activeSide().data(), white);
-
-        subject.start();
-        emit white->moveEnded(Move());
-
-        TestUtils::waitForSignal(black, SIGNAL(moveEnded(Move)), 100);
         QCOMPARE(subject.activeSide().data(), white);
     }
 
