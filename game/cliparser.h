@@ -44,7 +44,6 @@ class CliParser
 
 private:
     CommandFlags m_flags;
-    QFutureWatcher<QString> m_input_watcher;
 
 public:
     explicit CliParser(CommandFlags flags,

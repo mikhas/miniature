@@ -26,6 +26,8 @@ namespace {
     const QString CmdNew("new");
     const QString CmdQuit("quit");
     const QString CmdMove("move");
+    QFutureWatcher<QString> g_input_watcher;
+    bool g_waiting_for_input = false;
     bool g_enabled = true;
 
     QString readFromStdIn()
@@ -42,9 +44,8 @@ CliParser::CliParser(CommandFlags flags,
                      QObject *parent)
     : QObject(parent)
     , m_flags(flags)
-    , m_input_watcher()
 {
-    connect(&m_input_watcher, SIGNAL(finished()),
+    connect(&g_input_watcher, SIGNAL(finished()),
             this,             SLOT(onInputReady()));
 }
 
@@ -53,14 +54,15 @@ CliParser::~CliParser()
 
 void CliParser::readInput()
 {
-    if (g_enabled) {
+    if (g_enabled && not g_waiting_for_input) {
         QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
     }
 }
 
 void CliParser::onInputReady()
 {
-    const QString result(m_input_watcher.future().result().toLower());
+    const QString result(g_input_watcher.future().result().toLower());
+    g_waiting_for_input = false;
 
     if ((m_flags & CommandNew)
         && result == CmdNew ) {
@@ -84,8 +86,9 @@ void CliParser::setEnabled(bool enable)
 
 void CliParser::asyncReadInput()
 {
+    g_waiting_for_input = true;
     QFuture<QString> future = QtConcurrent::run(readFromStdIn);
-    m_input_watcher.setFuture(future);
+    g_input_watcher.setFuture(future);
 }
 
 } // namespace Game
