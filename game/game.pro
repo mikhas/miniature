@@ -8,6 +8,7 @@ QT -= gui
 HEADERS += \
     game.h \
     cliparser.h \
+    linereader.h \
     directinputdevice.h \
     abstractside.h \
     localside.h \
@@ -19,6 +20,7 @@ HEADERS += \
 SOURCES += \
     game.cc \
     cliparser.cc \
+    linereader.cc \
     directinputdevice.cc \
     abstractside.cc \
     localside.cc \
@@ -26,4 +28,3 @@ SOURCES += \
     move.cc \
     position.cc \
     square.cc \
-
