@@ -44,6 +44,7 @@ class CliParser
 
 private:
     CommandFlags m_flags;
+    bool m_waiting_for_input;
 
 public:
     explicit CliParser(CommandFlags flags,
@@ -53,18 +54,17 @@ public:
     //! Reads input from command line, non-blocking.
     void readInput();
 
-    //! Processes input from command line.
-    Q_SLOT void onInputReady();
-
     Q_SIGNAL void commandFound(Command cmd,
                                const QString &data = QString());
 
-    //! Enable/Disable the command line interface.
-    //! @param enable enable/disable.
-    static void setEnabled(bool enable);
+    //! Sets shared input device for all parser instances, defaults to
+    //! a non-blocking reading device for standard input. An empty shared
+    //! pointer will disable all input handling.
+    //! @param device the shared device.
+    static void setInputDevice(const QSharedPointer<QIODevice> &device);
 
 private:
-    Q_SLOT void asyncReadInput();
+    Q_SLOT void onLineFound(const QByteArray &line);
 };
 
 } // namespace Game

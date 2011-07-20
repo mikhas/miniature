@@ -19,23 +19,16 @@
  */
 
 #include "cliparser.h"
-
-#include <iostream>
+#include "linereader.h"
 
 namespace {
     const QString CmdNew("new");
     const QString CmdQuit("quit");
     const QString CmdMove("move");
-    QFutureWatcher<QString> g_input_watcher;
-    bool g_waiting_for_input = false;
-    bool g_enabled = true;
 
-    QString readFromStdIn()
-    {
-        std::string cmd;
-        getline(std::cin, cmd);
-        return QString(cmd.c_str());
-    }
+    // Shared among all CliParser instances, which allows us to filter the same
+    // differently, depending on the commands we're interested in.
+    Game::LineReader g_line_reader;
 }
 
 namespace Game {
@@ -44,9 +37,10 @@ CliParser::CliParser(CommandFlags flags,
                      QObject *parent)
     : QObject(parent)
     , m_flags(flags)
+    , m_waiting_for_input(false)
 {
-    connect(&g_input_watcher, SIGNAL(finished()),
-            this,             SLOT(onInputReady()));
+    connect(&g_line_reader, SIGNAL(lineFound(QByteArray)),
+                this,       SLOT(onLineFound(QByteArray)));
 }
 
 CliParser::~CliParser()
@@ -54,15 +48,22 @@ CliParser::~CliParser()
 
 void CliParser::readInput()
 {
-    if (g_enabled && not g_waiting_for_input) {
-        QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
-    }
+    g_line_reader.init();
+    m_waiting_for_input = true;
 }
 
-void CliParser::onInputReady()
+void CliParser::setInputDevice(const QSharedPointer<QIODevice> &device)
 {
-    const QString result(g_input_watcher.future().result().toLower());
-    g_waiting_for_input = false;
+    g_line_reader.setInputDevice(device);
+}
+
+void CliParser::onLineFound(const QByteArray &line)
+{
+    if (not m_waiting_for_input) {
+        return;
+    }
+
+    QString result(line);
 
     if ((m_flags & CommandNew)
         && result == CmdNew ) {
@@ -74,21 +75,7 @@ void CliParser::onInputReady()
                && result.left(CmdMove.size()) == CmdMove) {
         emit commandFound(CommandMove,
                           QString(result.right(result.size() - CmdMove.size() - 1)));
-    } else if (g_enabled) {
-        QTimer::singleShot(0, this, SLOT(asyncReadInput())); // wait for mainloop
     }
-}
-
-void CliParser::setEnabled(bool enable)
-{
-    g_enabled = enable;
-}
-
-void CliParser::asyncReadInput()
-{
-    g_waiting_for_input = true;
-    QFuture<QString> future = QtConcurrent::run(readFromStdIn);
-    g_input_watcher.setFuture(future);
 }
 
 } // namespace Game
