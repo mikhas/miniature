@@ -7,7 +7,7 @@ QT -= gui
 
 HEADERS += \
     game.h \
-    cliparser.h \
+    commandparser.h \
     linereader.h \
     directinputdevice.h \
     abstractside.h \
@@ -19,7 +19,7 @@ HEADERS += \
 
 SOURCES += \
     game.cc \
-    cliparser.cc \
+    commandparser.cc \
     linereader.cc \
     directinputdevice.cc \
     abstractside.cc \

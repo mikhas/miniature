@@ -22,7 +22,7 @@
 #define LOCALSIDE_H
 
 #include "abstractside.h"
-#include "cliparser.h"
+#include "commandparser.h"
 
 #include <QtCore>
 
@@ -37,7 +37,7 @@ class LocalSide
 private:
     const QString m_identifier;
     SideState m_state;
-    CliParser m_parser;
+    CommandParser m_parser;
 
 public:
     //! \reimp

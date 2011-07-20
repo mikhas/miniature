@@ -42,7 +42,7 @@ public:
     SharedAbstractSide active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
 #ifdef MINIATURE_CLI_ENABLED
-    CliParser parser; //!< Parses the command line for commands.
+    CommandParser parser; //!< Parses the command line for commands.
 #endif
 
     explicit GamePrivate(AbstractSide *new_local,
@@ -153,6 +153,8 @@ void Game::onSideReady()
 void Game::onCommandFound(Command command,
                           const QString &data)
 {
+    Q_UNUSED(data)
+
     switch(command) {
     case CommandNew:
         start();

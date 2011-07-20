@@ -22,7 +22,7 @@
 #define GAME_H
 
 #include "abstractside.h"
-#include "cliparser.h"
+#include "commandparser.h"
 
 #include <QtCore>
 

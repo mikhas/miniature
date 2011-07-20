@@ -23,7 +23,7 @@
 #include "localside.h"
 #include "gnuchess.h"
 #include "move.h"
-#include "cliparser.h"
+#include "commandparser.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -88,7 +88,10 @@ public:
     Q_SLOT void run()
     {
         qRegisterMetaType<Move>();
-        Game::CliParser::setEnabled(false);
+
+        //! Disables all CLI parsers:
+        QSharedPointer<QIODevice> empty;
+        Game::CommandParser::setInputDevice(empty);
 
         Game::LocalSide *white = new Game::LocalSide("white");
         Game::GnuChess  *black = new Game::GnuChess("black");

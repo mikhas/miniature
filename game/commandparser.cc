@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cliparser.h"
+#include "commandparser.h"
 #include "linereader.h"
 
 namespace {
@@ -33,8 +33,8 @@ namespace {
 
 namespace Game {
 
-CliParser::CliParser(CommandFlags flags,
-                     QObject *parent)
+CommandParser::CommandParser(CommandFlags flags,
+                             QObject *parent)
     : QObject(parent)
     , m_flags(flags)
     , m_waiting_for_input(false)
@@ -43,21 +43,21 @@ CliParser::CliParser(CommandFlags flags,
                 this,       SLOT(onLineFound(QByteArray)));
 }
 
-CliParser::~CliParser()
+CommandParser::~CommandParser()
 {}
 
-void CliParser::readInput()
+void CommandParser::readInput()
 {
     g_line_reader.init();
     m_waiting_for_input = true;
 }
 
-void CliParser::setInputDevice(const QSharedPointer<QIODevice> &device)
+void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
 {
     g_line_reader.setInputDevice(device);
 }
 
-void CliParser::onLineFound(const QByteArray &line)
+void CommandParser::onLineFound(const QByteArray &line)
 {
     if (not m_waiting_for_input) {
         return;

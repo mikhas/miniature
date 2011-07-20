@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CLIPARSER_H
-#define CLIPARSER_H
+#ifndef COMMANDPARSER_H
+#define COMMANDPARSER_H
 
 #include <QtCore>
 
@@ -35,23 +35,31 @@ enum Command {
 Q_ENUMS(Command)
 Q_DECLARE_FLAGS(CommandFlags, Command)
 
-//! Listens on stdin and parses for commands.
-class CliParser
+//! Reads input from an input device and translates it into commands.
+//! Clients of this class can list the commands they're interested in through
+//! the CommpandParser's c'tor. To retrieve commands, clients hook up to the
+//! commandFound signal.
+class CommandParser
     : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(CliParser)
+    Q_DISABLE_COPY(CommandParser)
 
 private:
     CommandFlags m_flags;
     bool m_waiting_for_input;
 
 public:
-    explicit CliParser(CommandFlags flags,
-                       QObject *parent = 0);
-    virtual ~CliParser();
+    //! C'tor
+    //! @param flags the commands that should be filtered. Other commands will
+    //!        be ignored by this instance.
+    //! @param parent the owner of this instance (optional).
+    explicit CommandParser(CommandFlags flags,
+                           QObject *parent = 0);
+    virtual ~CommandParser();
 
-    //! Reads input from command line, non-blocking.
+    //! Reads input from any QIODevice
+    //! \sa setInputDevice
     void readInput();
 
     Q_SIGNAL void commandFound(Command cmd,
@@ -69,4 +77,4 @@ private:
 
 } // namespace Game
 
-#endif // CLIPARSER_H
+#endif // COMMANDPARSER_H
