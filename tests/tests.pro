@@ -8,4 +8,5 @@ CONFIG += ordered qt
 SUBDIRS = \
     testgame \
     testgnuchess \
+    testcommandparser \
 
