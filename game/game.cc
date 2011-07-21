@@ -41,9 +41,7 @@ public:
     SharedAbstractSide remote; //!< Side of the remote player.
     SharedAbstractSide active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
-#ifdef MINIATURE_CLI_ENABLED
     CommandParser parser; //!< Parses the command line for commands.
-#endif
 
     explicit GamePrivate(AbstractSide *new_local,
                          AbstractSide *new_remote)
@@ -51,9 +49,7 @@ public:
         , remote(new_remote)
         , active(local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
-#ifdef MINIATURE_CLI_ENABLED
         , parser(CommandFlags(CommandNew | CommandQuit))
-#endif
     {
         if (local.isNull() || remote.isNull()) {
             qCritical() << __PRETTY_FUNCTION__
@@ -77,13 +73,11 @@ Game::Game(AbstractSide *local,
     connectSide(d->local);
     connectSide(d->remote);
 
-#ifdef MINIATURE_CLI_ENABLED
     std::cout << "Welcome to Miniature!" << std::endl;
     connect(&d->parser, SIGNAL(commandFound(Command,QString)),
             this,       SLOT(onCommandFound(Command,QString)));
 
     d->parser.readInput();
-#endif
 }
 
 Game::~Game()

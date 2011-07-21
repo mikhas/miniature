@@ -26,9 +26,11 @@ namespace {
     const QString CmdQuit("quit");
     const QString CmdMove("move");
 
+#ifdef MINIATURE_CLI_ENABLED
     // Shared among all CliParser instances, which allows us to filter the same
     // differently, depending on the commands we're interested in.
     Game::LineReader g_line_reader;
+#endif
 }
 
 namespace Game {
@@ -39,8 +41,10 @@ CommandParser::CommandParser(CommandFlags flags,
     , m_flags(flags)
     , m_waiting_for_input(false)
 {
+#ifdef MINIATURE_CLI_ENABLED
     connect(&g_line_reader, SIGNAL(lineFound(QByteArray)),
                 this,       SLOT(onLineFound(QByteArray)));
+#endif
 }
 
 CommandParser::~CommandParser()
@@ -48,13 +52,19 @@ CommandParser::~CommandParser()
 
 void CommandParser::readInput()
 {
+#ifdef MINIATURE_CLI_ENABLED
     g_line_reader.init();
+#endif
     m_waiting_for_input = true;
 }
 
 void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
 {
+#ifndef MINIATURE_CLI_ENABLED
+    Q_UNUSED(device)
+#else
     g_line_reader.setInputDevice(device);
+#endif
 }
 
 void CommandParser::onLineFound(const QByteArray &line)

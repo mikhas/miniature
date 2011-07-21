@@ -26,9 +26,7 @@ LocalSide::LocalSide(const QString &identifier)
     : AbstractSide(identifier)
     , m_identifier(identifier)
     , m_state(NotReady)
-#ifdef MINIATURE_CLI_ENABLED
     , m_parser(CommandFlags(CommandMove))
-#endif
 {
     connect(&m_parser, SIGNAL(commandFound(Command,QString)),
             this,      SLOT(onCommandFound(Command,QString)));
