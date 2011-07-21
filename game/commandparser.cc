@@ -27,7 +27,7 @@ namespace {
     const QString CmdMove("move");
 
 #ifdef MINIATURE_CLI_ENABLED
-    // Shared among all CliParser instances, which allows us to filter the same
+    // Shared among all CommandParser instances, which allows us to filter the same
     // differently, depending on the commands we're interested in.
     Game::LineReader g_line_reader;
 #endif
@@ -35,11 +35,22 @@ namespace {
 
 namespace Game {
 
+class CommandParserPrivate
+{
+public:
+    CommandFlags flags;
+    bool waiting_for_input;
+
+    explicit CommandParserPrivate(CommandFlags new_flags)
+        : flags(new_flags)
+        , waiting_for_input(false)
+    {}
+};
+
 CommandParser::CommandParser(CommandFlags flags,
                              QObject *parent)
     : QObject(parent)
-    , m_flags(flags)
-    , m_waiting_for_input(false)
+    , d_ptr(new CommandParserPrivate(flags))
 {
 #ifdef MINIATURE_CLI_ENABLED
     connect(&g_line_reader, SIGNAL(lineFound(QByteArray)),
@@ -52,10 +63,11 @@ CommandParser::~CommandParser()
 
 void CommandParser::readInput()
 {
+    Q_D(CommandParser);
 #ifdef MINIATURE_CLI_ENABLED
     g_line_reader.init();
 #endif
-    m_waiting_for_input = true;
+    d->waiting_for_input = true;
 }
 
 void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
@@ -69,19 +81,20 @@ void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
 
 void CommandParser::onLineFound(const QByteArray &line)
 {
-    if (not m_waiting_for_input) {
+    Q_D(const CommandParser);
+    if (not d->waiting_for_input) {
         return;
     }
 
     QString result(line);
 
-    if ((m_flags & CommandNew)
+    if ((d->flags & CommandNew)
         && result == CmdNew ) {
         emit commandFound(CommandNew);
-    } else if ((m_flags & CommandQuit)
+    } else if ((d->flags & CommandQuit)
                && result == CmdQuit) {
         emit commandFound(CommandQuit);
-    } else if ((m_flags & CommandMove)
+    } else if ((d->flags & CommandMove)
                && result.left(CmdMove.size()) == CmdMove) {
         emit commandFound(CommandMove,
                           QString(result.right(result.size() - CmdMove.size() - 1)));

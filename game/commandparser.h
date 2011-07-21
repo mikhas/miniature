@@ -34,6 +34,7 @@ enum Command {
 
 Q_ENUMS(Command)
 Q_DECLARE_FLAGS(CommandFlags, Command)
+class CommandParserPrivate;
 
 //! Reads input from an input device and translates it into commands.
 //! Clients of this class can list the commands they're interested in through
@@ -43,11 +44,11 @@ class CommandParser
     : public QObject
 {
     Q_OBJECT
+    Q_DECLARE_PRIVATE(CommandParser)
     Q_DISABLE_COPY(CommandParser)
 
 private:
-    CommandFlags m_flags;
-    bool m_waiting_for_input;
+    const QScopedPointer<CommandParserPrivate> d_ptr;
 
 public:
     //! C'tor
