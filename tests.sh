@@ -1,4 +1,12 @@
-LD_LIBRARY_PATH=game tests/testgame/testgame
-LD_LIBRARY_PATH=game tests/testgnuchess/testgnuchess
-LD_LIBRARY_PATH=game tests/testcommandparser/testcommandparser
-#tests/test-cli.py
+#!/bin/bash
+
+for test in testgame testgnuchess testcommandparser
+do
+    echo "Running ${test} ..."
+    if [ ${VERBOSE+1} ]
+    then
+        LD_LIBRARY_PATH=game tests/${test}/${test}
+    else
+        LD_LIBRARY_PATH=game tests/${test}/${test} 2>&1 | grep 'Totals:'
+    fi
+done
