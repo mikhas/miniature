@@ -22,10 +22,21 @@
 #define DIRECTINPUTDEVICE_H
 
 #include <QtCore>
+#ifdef Q_OS_LINUX
 #include <termios.h>
+#else
+struct termios {};
+#endif
 
 namespace Game {
-
+//! A direct input device for stdin, based on QIODevice. Supports unbuffered,
+//! non-blocking read (use QIODevice::Unbuffered | QIODevice::ReadyOnly).
+//! Open the device and connect to the readyRead signal, then extract data.
+//!
+//! Can be used in a semi-direct mode (if opened with QIODevice::ReadyOnly but
+//! without QIODevice::Unbuffered), where the readyRead signal is emitted after
+//! a timeout (default: 100ms) or after a certain buffer limit (default: 8) is
+//! reached. \sa setLimits
 class DirectInputDevice
     : public QIODevice
 {
@@ -34,6 +45,8 @@ class DirectInputDevice
 
 private:
     QByteArray m_buf;
+    qint64 m_max_buf_size;
+    QTimer m_buf_timer;
     QScopedPointer<QSocketNotifier> m_notifier;
     struct termios m_terminal_attributes;
 
@@ -52,18 +65,26 @@ public:
 
     //! \reimp
     virtual qint64 readData(char *data,
-                            qint64 maxSize);
+                            qint64 buf_size);
     //! \reimp
     //! Writing to stdin is not supported.
     virtual qint64 writeData(const char *,
                              qint64);
 
     //! \reimp
-    qint64 bytesAvailable() const;
+    virtual qint64 bytesAvailable() const;
+
+    //! Sets buffer limit and timeout. Triggers readyRead on whatever is hit
+    //! first. Allows for semi-direct input (can be more efficient for larger
+    //! streams of data).
+    //! @param buf_size the maximum buffer size.
+    //! @param timeout the timeout, in ms.
+    void setLimits(qint64 buf_size,
+                   int timeout);
 
 private:
     //! Gets called whenever new input is available on stdin.
-    Q_SLOT void onSocketActivated(int socket);
+    Q_SLOT void onSocketActivated(int);
 };
 
 } // namespace Game

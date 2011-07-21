@@ -20,29 +20,44 @@
 
 #include "directinputdevice.h"
 
+#ifdef Q_OS_LINUX
 #include <stdio.h>
 #include <unistd.h>
+#endif
 
 namespace Game {
 
-// TODO: Support flexible input buffering - say, timeout vs max buf size, whatever is reached first.
 DirectInputDevice::DirectInputDevice(QObject *parent)
     : QIODevice(parent)
     , m_buf()
+    , m_max_buf_size(8)
+    , m_buf_timer()
     , m_notifier()
     , m_terminal_attributes()
 {
+#ifdef Q_OS_LINUX
     tcgetattr(fileno(stdin), &m_terminal_attributes);
+
+    m_buf_timer.setInterval(100);
+    m_buf_timer.setSingleShot(true);
+    connect(&m_buf_timer, SIGNAL(timeout()),
+            this,         SIGNAL(readyRead()));
+#endif
 }
 
 DirectInputDevice::~DirectInputDevice()
 {
+#ifdef Q_OS_LINUX
     // Restore terminal attributes
     tcsetattr(fileno(stdin), TCSANOW, &m_terminal_attributes);
+#endif
 }
 
 bool DirectInputDevice::open(OpenMode mode)
 {
+#ifndef Q_OS_LINUX
+    Q_UNUSED(mode)
+#else
     if (m_notifier.isNull()) {
         m_notifier.reset(new QSocketNotifier(fileno(stdin), QSocketNotifier::Read));
         connect(m_notifier.data(), SIGNAL(activated(int)),
@@ -62,21 +77,28 @@ bool DirectInputDevice::open(OpenMode mode)
         return result;
     }
 
+#endif
     return false;
 }
 
 void DirectInputDevice::close()
 {
+#ifdef Q_OS_LINUX
     QIODevice::close();
 
     // Restore terminal attributes & get rid of socket notifier:
     tcsetattr(fileno(stdin), TCSANOW, &m_terminal_attributes);
     m_notifier.reset();
+#endif
 }
 
 qint64 DirectInputDevice::readData(char *data,
-                                   qint64 maxSize)
+                                   qint64 buf_size)
 {
+#ifndef Q_OS_LINUX
+    Q_UNUSED(data)
+    Q_UNUSED(buf_size)
+#else
     if (not data) {
         return -1;
     }
@@ -85,11 +107,12 @@ qint64 DirectInputDevice::readData(char *data,
         return -1;
     }
 
-    const qint64 cpy_size(qMin<qint64>(maxSize, m_buf.size()));
+    const qint64 cpy_size(qMin<qint64>(buf_size, m_buf.size()));
     const QByteArray &tmp(m_buf.left(cpy_size));
     m_buf.remove(0, cpy_size);
     strcpy(data, tmp.data());
     return tmp.size();
+#endif
 }
 
 qint64 DirectInputDevice::writeData(const char *,
@@ -103,16 +126,33 @@ qint64 DirectInputDevice::bytesAvailable() const
     return m_buf.size();
 }
 
+void DirectInputDevice::setLimits(qint64 buf_size,
+                                  int timeout)
+{
+    m_max_buf_size = buf_size;
+    m_buf_timer.setInterval(timeout);
+}
+
 void DirectInputDevice::onSocketActivated(int)
 {
+#ifdef Q_OS_LINUX
     const int ch = getchar();
     if (ch != EOF) {
         m_buf.append(static_cast<char>(ch));
-        emit readyRead();
+
+        if (openMode() & QIODevice::Unbuffered) {
+            emit readyRead();
+        } else if (m_buf.size() >= m_max_buf_size) {
+                m_buf_timer.stop();
+                emit readyRead();
+        } else if (not m_buf_timer.isActive()) {
+            m_buf_timer.start();
+        }
     } else {
         qDebug() << __PRETTY_FUNCTION__ << "closing shop";
         close();
     }
+#endif
 }
 
 } // namespace Game
