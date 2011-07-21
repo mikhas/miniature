@@ -30,7 +30,8 @@ namespace Game {
 
 class GamePrivate;
 
-//! Controls game.
+//! A Game instance represents exactly one game. A game goes from Idle =>
+//! Started => Ended and cannot be restarted.
 class Game
     : public QObject
 {

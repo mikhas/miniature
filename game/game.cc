@@ -86,8 +86,13 @@ Game::~Game()
 void Game::start()
 {
     Q_D(Game);
-    d->local->init();
-    d->remote->init();
+
+    // A Game instance represents exactly one game. Restarts will need to
+    // create new game instances.
+    if (d->state == Game::Idle) {
+        d->local->init();
+        d->remote->init();
+    }
 }
 
 const SharedAbstractSide &Game::activeSide() const
