@@ -80,18 +80,21 @@ void LineReader::onReadyRead()
         return;
     }
 
-    const QByteArray tmp(m_device->read(256));
-    out << tmp;
-    out.flush();
+    int next_newline_pos = -1;
+    do {
+        const QByteArray tmp(m_device->read(256));
+        out << tmp;
+        out.flush();
 
-    m_buffer.append(tmp);
-    const int cut_off = m_buffer.indexOf('\n');
-    QByteArray line(m_buffer.left(cut_off));
-    m_buffer.remove(0, cut_off == -1 ? -1 : cut_off + 1);
+        m_buffer.append(tmp);
+        next_newline_pos = m_buffer.indexOf('\n');
+        QByteArray line(m_buffer.left(next_newline_pos));
+        m_buffer.remove(0, next_newline_pos == -1 ? -1 : next_newline_pos + 1);
 
-    if (not line.isEmpty()) {
-        emit lineFound(line);
-    }
+        if (not line.isEmpty()) {
+            emit lineFound(line);
+        }
+    } while (next_newline_pos != -1);
 }
 
 } // namespace Game
