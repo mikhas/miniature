@@ -19,7 +19,7 @@
  */
 
 #include "game.h"
-#include "localside.h"
+#include "move.h"
 
 #include <iostream>
 

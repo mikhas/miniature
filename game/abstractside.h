@@ -21,12 +21,11 @@
 #ifndef SIDE_H
 #define SIDE_H
 
-#include "move.h"
-
-#include <QObject>
+#include <QtCore>
 
 namespace Game {
 
+class Move;
 class AbstractSide;
 typedef QSharedPointer<AbstractSide> SharedAbstractSide;
 

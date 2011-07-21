@@ -19,6 +19,7 @@
  */
 
 #include "localside.h"
+#include "move.h"
 
 namespace Game {
 
