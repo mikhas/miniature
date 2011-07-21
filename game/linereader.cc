@@ -59,9 +59,9 @@ void LineReader::setInputDevice(const QSharedPointer<QIODevice> &device)
 
     if (not m_device.isNull()) {
         disconnect(m_device.data(), SIGNAL(readyRead()), this, 0);
+        m_device->close();
     }
 
-    m_device->close();
     m_device = device;
 
     if (m_device.isNull()) {
