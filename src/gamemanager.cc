@@ -19,14 +19,21 @@
  */
 
 #include "gamemanager.h"
+#include "game.h"
 
 namespace Miniature {
 
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
+    , m_mode(GameModeLocalEngine)
 {}
 
 GameManager::~GameManager()
 {}
+
+void GameManager::setGameMode(GameMode mode)
+{
+    m_mode = mode;
+}
 
 } // namespace Miniature

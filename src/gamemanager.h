@@ -33,8 +33,23 @@ class GameManager
     Q_DISABLE_COPY(GameManager)
 
 public:
+    enum GameMode {
+        GameModeLocalEngine,
+        GameModeLocalHuman,
+        GameModeRemoteFics,
+        GameModeRemoteP2P
+    };
+
+private:
+    GameMode m_mode;
+
+public:
     explicit GameManager(QObject *parent = 0);
     virtual ~GameManager();
+
+    //! Sets the game mode for the next games. Running games are not affected.
+    //! @param mode the game mode
+    Q_SLOT void setGameMode(GameMode mode);
 };
 
 } // namespace Miniature

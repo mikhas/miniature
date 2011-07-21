@@ -39,11 +39,11 @@ class CommandParserPrivate
 {
 public:
     CommandFlags flags;
-    bool waiting_for_input;
+    bool enabled;
 
     explicit CommandParserPrivate(CommandFlags new_flags)
         : flags(new_flags)
-        , waiting_for_input(false)
+        , enabled(false)
     {}
 };
 
@@ -61,13 +61,16 @@ CommandParser::CommandParser(CommandFlags flags,
 CommandParser::~CommandParser()
 {}
 
-void CommandParser::readInput()
+void CommandParser::setEnabled(bool enable)
 {
     Q_D(CommandParser);
+    d->enabled = enable;
+
 #ifdef MINIATURE_CLI_ENABLED
-    g_line_reader.init();
+    if (d->enabled) {
+        g_line_reader.init();
+    }
 #endif
-    d->waiting_for_input = true;
 }
 
 void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
@@ -82,7 +85,7 @@ void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
 void CommandParser::onLineFound(const QByteArray &line)
 {
     Q_D(const CommandParser);
-    if (not d->waiting_for_input) {
+    if (not d->enabled) {
         return;
     }
 

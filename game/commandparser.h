@@ -59,9 +59,10 @@ public:
                            QObject *parent = 0);
     virtual ~CommandParser();
 
-    //! Reads input from any QIODevice
+    //! Enables command parsing. Initializes input device backend if required.
+    //! @param enable whether to enable command parsing.
     //! \sa setInputDevice
-    void readInput();
+    void setEnabled(bool enable);
 
     Q_SIGNAL void commandFound(Command cmd,
                                const QString &data = QString());

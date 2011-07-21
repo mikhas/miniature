@@ -61,7 +61,7 @@ void LocalSide::startMove(const Move &move)
         out.flush();
     }
 
-    m_parser.readInput();
+    m_parser.setEnabled(true);
 }
 
 void LocalSide::onCommandFound(Command command,

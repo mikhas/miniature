@@ -77,7 +77,7 @@ Game::Game(AbstractSide *local,
     connect(&d->parser, SIGNAL(commandFound(Command,QString)),
             this,       SLOT(onCommandFound(Command,QString)));
 
-    d->parser.readInput();
+    d->parser.setEnabled(true);
 }
 
 Game::~Game()

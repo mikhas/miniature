@@ -154,9 +154,9 @@ private:
         // Does not parse any commands:
         CommandParser p2(Game::CommandFlags(Game::CommandNone));
 
-        p0.readInput();
-        p1.readInput();
-        p2.readInput();
+        p0.setEnabled(true);
+        p1.setEnabled(true);
+        p2.setEnabled(true);
 
         CommandCounter c0;
         CommandCounter c1;
@@ -186,7 +186,7 @@ private:
         const int TimeOut(20);
         CommandParser parser(Game::CommandFlags(Game::CommandMove));
         CommandCounter counter;
-        parser.readInput();
+        parser.setEnabled(true);
 
         QSharedPointer<TestInputDevice> input(new TestInputDevice);
         Game::CommandParser::setInputDevice(input);
@@ -222,7 +222,7 @@ private:
         QCOMPARE(counter.m_counters.at(2), 0);
 
         // Internal LineReader opens device as ReadOnly, by default:
-        parser.readInput();
+        parser.setEnabled(true);
         input->open(QIODevice::ReadWrite);
 
         input->write("quit\n");
