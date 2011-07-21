@@ -32,102 +32,53 @@
 // Need to import symbol so that slot/signal signature stays same, for moc.
 using Game::Move;
 Q_DECLARE_METATYPE(Move)
+
 class TestGnuChess
     : public QObject
 {
     Q_OBJECT
 
 private:
-    QScopedPointer<QSignalSpy> m_spy;
-    QScopedPointer<Game::Game> m_game;
+    QScopedPointer<QApplication> m_app;
     QTextStream m_out;
-    bool m_result;
 
-    template<class T>
-    void compare(const T &a, const T &b)
+    Q_SLOT void initTestCase()
     {
-        m_result = (m_result && a == b);
-
-        if (a != b) {
-            m_out << "FAIL: " << __PRETTY_FUNCTION__ << "\n"
-                  << "      " << "got " << a << ", expected: " << b << "\n"; 
-            cleanup();
-        }
+        m_app.reset(TestUtils::createApp("testgnuchess"));
     }
 
-    void cleanup()
-    {
-        if (m_result) {
-            m_out << "SUCCESS\n";
-        } else {
-            m_out << "FAILURE\n";
-        }
-
-        m_out.flush();
-        qApp->exit();
-    }
-
-    void wait(QObject *obj, const char *signal, int timeout = 5000)
-    {
-        Q_UNUSED(signal)
-        QEventLoop loop;
-        connect(obj, signal, &loop, SLOT(quit()));
-        QTimer::singleShot(timeout, &loop, SLOT(quit()));
-        loop.exec();
-    }
-
-public:
-    explicit TestGnuChess()
-        : QObject()
-        , m_out(stdout)
-        , m_result(true)
-    {
-        m_out << "Starting TestGnuChess\n";
-    }
-
-    Q_SLOT void run()
+    Q_SLOT void testShortMatch()
     {
         qRegisterMetaType<Move>();
 
-        //! Disables all CLI parsers:
+        //! Disables all command line parsing:
         QSharedPointer<QIODevice> empty;
         Game::CommandParser::setInputDevice(empty);
 
         Game::LocalSide *white = new Game::LocalSide("white");
         Game::GnuChess  *black = new Game::GnuChess("black");
-        m_spy.reset(new QSignalSpy(black, SIGNAL(moveEnded(Move))));
-        m_game.reset(new Game::Game(white, black));
-        compare<Game::AbstractSide *>(m_game->activeSide().data(), white);
+        QSignalSpy whiteSpy(white, SIGNAL(moveEnded(Move)));
+        QSignalSpy blackSpy(black, SIGNAL(moveEnded(Move)));
+        Game::Game game(white, black);
 
-        m_game->start();
+        QCOMPARE(game.activeSide().data(), white);
+
+        game.start();
         emit white->moveEnded(Move(Game::Position(), Game::Square(), Game::Square(),
                                    QString("g4")));
-        compare<Game::AbstractSide *>(m_game->activeSide().data(), black);
-
-        wait(black, SIGNAL(moveEnded(Move)));        
-        compare<int>(m_spy->count(), 1);
-        compare<Game::AbstractSide *>(m_game->activeSide().data(), white);
+        TestUtils::waitForSignal(black, SIGNAL(moveEnded(Move)));
+        QCOMPARE(game.activeSide().data(), white);
+        QCOMPARE(whiteSpy.count(), 1);
+        QCOMPARE(blackSpy.count(), 1);
 
         emit white->moveEnded(Move(Game::Position(), Game::Square(), Game::Square(),
                                    QString("f4")));
-        compare<Game::AbstractSide *>(m_game->activeSide().data(), black);
-
-        wait(black, SIGNAL(moveEnded(Move)));        
-        compare<int>(m_spy->count(), 2);
-        compare<Game::AbstractSide *>(m_game->activeSide().data(), white);
-
-        cleanup();
+        TestUtils::waitForSignal(black, SIGNAL(moveEnded(Move)));
+        QCOMPARE(game.activeSide().data(), white);
+        QCOMPARE(whiteSpy.count(), 2);
+        QCOMPARE(blackSpy.count(), 2);
     }
 };
 
-int main(int argc, char ** argv)
-{
-    QApplication app(argc, argv);
-
-    TestGnuChess testee;
-    QTimer::singleShot(0, &testee, SLOT(run()));
-
-    app.exec();
-}
-
+QTEST_APPLESS_MAIN(TestGnuChess)
 #include ".moc/testgnuchess.moc"

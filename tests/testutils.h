@@ -22,6 +22,7 @@
 #define TESTUTILS_H
 
 #include <QtCore>
+#include <QtGui>
 #include <QtTest>
 
 #define CREATE_EMPTY_DEFAULT_SLOTS \
@@ -32,7 +33,7 @@
 
 namespace TestUtils {
 
-// Wait for signal or timeout; use SIGNAL macro for signal
+// Wait for signal or timeout. Does not require event loop.
 void waitForSignal(const QSignalSpy &spy,
                    int timeout = 1000) {
     QElapsedTimer timer;
@@ -40,6 +41,26 @@ void waitForSignal(const QSignalSpy &spy,
     while (spy.count() == 0 && timer.elapsed() < timeout) {
         QTest::qWait(20);
     }
+}
+
+// Requires event loop. Use SIGNAL macro for signal parameter.
+void waitForSignal(QObject *obj,
+                   const char *signal,
+                   int timeout = 1000)
+{
+    Q_UNUSED(signal)
+    QEventLoop loop;
+    QObject::connect(obj, signal, &loop, SLOT(quit()));
+    QTimer::singleShot(timeout, &loop, SLOT(quit()));
+    loop.exec();
+}
+
+QApplication *createApp(const QString &app_name)
+{
+    static int argc = 1; \
+    static char* argv[] = { app_name.toLatin1().data() };
+    return new QApplication(argc, argv);
+
 }
 
 } // namespace TestUtils
