@@ -24,9 +24,10 @@
 namespace Game
 {
 
-LineReader::LineReader(QObject *parent)
-    : QObject(parent)
-    , m_device(new DirectInputDevice)
+LineReader::LineReader(QIODevice *device,
+                       QObject *parent)
+    : AbstractTokenizer(device, parent)
+    , m_device(device)
     , m_buffer()
     , m_init(false)
 {}
@@ -51,28 +52,6 @@ void LineReader::init()
     m_device->open(QIODevice::ReadOnly | QIODevice::Text | QIODevice::Unbuffered);
 }
 
-void LineReader::setInputDevice(const QSharedPointer<QIODevice> &device)
-{
-    if (m_device == device) {
-        return;
-    }
-
-    if (not m_device.isNull()) {
-        disconnect(m_device.data(), SIGNAL(readyRead()), this, 0);
-        m_device->close();
-    }
-
-    m_device = device;
-
-    if (m_device.isNull()) {
-        return;
-    }
-
-    // re-init
-    m_init = false;
-    init();
-}
-
 void LineReader::onReadyRead()
 {
     static QTextStream out(stdout);
@@ -92,7 +71,7 @@ void LineReader::onReadyRead()
         m_buffer.remove(0, next_newline_pos == -1 ? -1 : next_newline_pos + 1);
 
         if (not line.isEmpty()) {
-            emit lineFound(line);
+            emit tokenFound(line);
         }
     } while (next_newline_pos != -1);
 }

@@ -18,9 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "game.h"
-#include "localside.h"
-#include "gnuchess.h"
+#include "gamemanager.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -28,10 +26,9 @@
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-    // TODO: Move into a proper Miniature class that can setup games.
-    new Game::Game(new Game::LocalSide("white"),
-                   new Game::GnuChess("black"),
-                   &app);
+
+    Miniature::GameManager manager;
+    manager.startGame(Miniature::GameManager::GameModeLocalEngine);
 
     return app.exec();
 }

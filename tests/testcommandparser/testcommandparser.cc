@@ -20,6 +20,7 @@
 
 #include "commandparser.h"
 #include "testutils.h"
+#include "linereader.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -145,18 +146,18 @@ private:
         const int TimeOut(10);
         const QVector<int> emptyCounters(3, 0);
 
-        QSharedPointer<TestInputDevice> device(new TestInputDevice);
-        CommandParser::setInputDevice(device);
-        device->open(QIODevice::ReadWrite);
-
-        CommandParser p0(Game::CommandFlags(Game::CommandNew | Game::CommandQuit));
-        CommandParser p1(Game::CommandFlags(Game::CommandMove | Game::CommandQuit));
+        QIODevice *device = new TestInputDevice;
+        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
+        CommandParser p0(Game::CommandFlags(Game::CommandNew | Game::CommandQuit), tokenizer);
+        CommandParser p1(Game::CommandFlags(Game::CommandMove | Game::CommandQuit), tokenizer);
         // Does not parse any commands:
-        CommandParser p2(Game::CommandFlags(Game::CommandNone));
+        CommandParser p2(Game::CommandFlags(Game::CommandNone), tokenizer);
 
         p0.setEnabled(true);
         p1.setEnabled(true);
         p2.setEnabled(true);
+
+        device->open(QIODevice::ReadWrite);
 
         CommandCounter c0;
         CommandCounter c1;
@@ -184,22 +185,22 @@ private:
     Q_SLOT void testChoppedInput()
     {
         const int TimeOut(20);
-        CommandParser parser(Game::CommandFlags(Game::CommandMove));
+        QIODevice *device = new TestInputDevice;
+        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
+        CommandParser parser(Game::CommandFlags(Game::CommandMove), tokenizer);
         CommandCounter counter;
         parser.setEnabled(true);
 
-        QSharedPointer<TestInputDevice> input(new TestInputDevice);
-        Game::CommandParser::setInputDevice(input);
-        input->open(QIODevice::ReadWrite);
+        device->open(QIODevice::ReadWrite);
 
         connect(&parser,  SIGNAL(commandFound(Command, QString)),
                 &counter, SLOT(onCommandFound(Command, QString)));
 
-        input->write("mo");
+        device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(0), 0);
 
-        input->write("ve e4\n");
+        device->write("ve e4\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(0), 1);
     }
@@ -207,25 +208,25 @@ private:
     Q_SLOT void testInputBeforeReady()
     {
         const int TimeOut(20);
-        CommandParser parser(Game::CommandFlags(Game::CommandQuit));
+        QIODevice *device = new TestInputDevice;
+        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
+        CommandParser parser(Game::CommandFlags(Game::CommandQuit), tokenizer);
         CommandCounter counter;
 
-        QSharedPointer<TestInputDevice> input(new TestInputDevice);
-        Game::CommandParser::setInputDevice(input);
-        input->open(QIODevice::ReadWrite);
+        device->open(QIODevice::ReadWrite);
 
         connect(&parser,  SIGNAL(commandFound(Command, QString)),
                 &counter, SLOT(onCommandFound(Command, QString)));
 
-        input->write("quit\n");
+        device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 0);
 
         // Internal LineReader opens device as ReadOnly, by default:
         parser.setEnabled(true);
-        input->open(QIODevice::ReadWrite);
+        device->open(QIODevice::ReadWrite);
 
-        input->write("quit\n");
+        device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 1);
     }

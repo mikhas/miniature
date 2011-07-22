@@ -19,18 +19,11 @@
  */
 
 #include "commandparser.h"
-#include "linereader.h"
 
 namespace {
     const QString CmdNew("new");
     const QString CmdQuit("quit");
     const QString CmdMove("move");
-
-#ifdef MINIATURE_CLI_ENABLED
-    // Shared among all CommandParser instances, which allows us to filter the same
-    // differently, depending on the commands we're interested in.
-    Game::LineReader g_line_reader;
-#endif
 }
 
 namespace Game {
@@ -39,23 +32,27 @@ class CommandParserPrivate
 {
 public:
     CommandFlags flags;
+    SharedTokenizer tokenizer;
     bool enabled;
 
-    explicit CommandParserPrivate(CommandFlags new_flags)
+    explicit CommandParserPrivate(CommandFlags new_flags,
+                                  const SharedTokenizer &new_tokenizer)
         : flags(new_flags)
+        , tokenizer(new_tokenizer)
         , enabled(false)
     {}
 };
 
 CommandParser::CommandParser(CommandFlags flags,
+                             const SharedTokenizer &tokenizer,
                              QObject *parent)
     : QObject(parent)
-    , d_ptr(new CommandParserPrivate(flags))
+    , d_ptr(new CommandParserPrivate(flags, tokenizer))
 {
-#ifdef MINIATURE_CLI_ENABLED
-    connect(&g_line_reader, SIGNAL(lineFound(QByteArray)),
-                this,       SLOT(onLineFound(QByteArray)));
-#endif
+    if (not tokenizer.isNull()) {
+        connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
+                this,             SLOT(onTokenFound(QByteArray)));
+    }
 }
 
 CommandParser::~CommandParser()
@@ -66,23 +63,12 @@ void CommandParser::setEnabled(bool enable)
     Q_D(CommandParser);
     d->enabled = enable;
 
-#ifdef MINIATURE_CLI_ENABLED
-    if (d->enabled) {
-        g_line_reader.init();
+    if (d->enabled && not d->tokenizer.isNull()) {
+        d->tokenizer->init();
     }
-#endif
 }
 
-void CommandParser::setInputDevice(const QSharedPointer<QIODevice> &device)
-{
-#ifndef MINIATURE_CLI_ENABLED
-    Q_UNUSED(device)
-#else
-    g_line_reader.setInputDevice(device);
-#endif
-}
-
-void CommandParser::onLineFound(const QByteArray &line)
+void CommandParser::onTokenFound(const QByteArray &line)
 {
     Q_D(const CommandParser);
     if (not d->enabled) {

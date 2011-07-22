@@ -41,7 +41,6 @@ public:
     SharedAbstractSide remote; //!< Side of the remote player.
     SharedAbstractSide active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
-    CommandParser parser; //!< Parses the command line for commands.
 
     explicit GamePrivate(AbstractSide *new_local,
                          AbstractSide *new_remote)
@@ -49,7 +48,6 @@ public:
         , remote(new_remote)
         , active(local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
-        , parser(CommandFlags(CommandNew | CommandQuit))
     {
         if (local.isNull() || remote.isNull()) {
             qCritical() << __PRETTY_FUNCTION__
@@ -74,10 +72,6 @@ Game::Game(AbstractSide *local,
     connectSide(d->remote);
 
     std::cout << "Welcome to Miniature!" << std::endl;
-    connect(&d->parser, SIGNAL(commandFound(Command,QString)),
-            this,       SLOT(onCommandFound(Command,QString)));
-
-    d->parser.setEnabled(true);
 }
 
 Game::~Game()
@@ -99,6 +93,25 @@ const SharedAbstractSide &Game::activeSide() const
 {
     Q_D(const Game);
     return d->active;
+}
+
+void Game::onCommandFound(Command command,
+                          const QString &data)
+{
+    Q_UNUSED(data)
+
+    switch(command) {
+    case CommandNew:
+        start();
+        break;
+
+    case CommandQuit:
+        qApp->exit();
+        break;
+
+    default:
+        break;
+    }
 }
 
 void Game::onMoveEnded(const Move &move)
@@ -147,25 +160,6 @@ void Game::onSideReady()
     d->active = d->local;
     d->active->startMove(Move());
     printTurnMessage(d->active->identifier());
-}
-
-void Game::onCommandFound(Command command,
-                          const QString &data)
-{
-    Q_UNUSED(data)
-
-    switch(command) {
-    case CommandNew:
-        start();
-        break;
-
-    case CommandQuit:
-        qApp->exit();
-        break;
-
-    default:
-        break;
-    }
 }
 
 } // namespace Game

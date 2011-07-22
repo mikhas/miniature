@@ -51,10 +51,6 @@ private:
     {
         qRegisterMetaType<Move>();
 
-        //! Disables all command line parsing:
-        QSharedPointer<QIODevice> empty;
-        Game::CommandParser::setInputDevice(empty);
-
         Game::LocalSide *white = new Game::LocalSide("white");
         Game::GnuChess  *black = new Game::GnuChess("black");
         QSignalSpy whiteSpy(white, SIGNAL(moveEnded(Move)));

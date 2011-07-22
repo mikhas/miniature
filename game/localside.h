@@ -22,7 +22,7 @@
 #define LOCALSIDE_H
 
 #include "abstractside.h"
-#include "commandparser.h"
+#include "commandparser.h" // TODO: move Command into common namespace.
 
 #include <QtCore>
 
@@ -37,7 +37,6 @@ class LocalSide
 private:
     const QString m_identifier;
     SideState m_state;
-    CommandParser m_parser;
 
 public:
     //! \reimp

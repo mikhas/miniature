@@ -21,35 +21,33 @@
 #ifndef LINEREADER_H
 #define LINEREADER_H
 
+#include "abstracttokenizer.h"
+
 #include <QtCore>
 
 namespace Game {
 
 //! Async device reader, tokenizes input into lines.
 class LineReader
-    : public QObject
+    : public AbstractTokenizer
 {
     Q_OBJECT
 
 private:
-    QSharedPointer<QIODevice> m_device;
+    QScopedPointer<QIODevice> m_device;
     QByteArray m_buffer;
     bool m_init;
 
 public:
-    explicit LineReader(QObject *parent = 0);
+    //! \reimp
+    explicit LineReader(QIODevice *device,
+                        QObject *parent = 0);
+
+    //! \reimp
     virtual ~LineReader();
 
-    //! Initiates the reader, starts reading.
+    //! \reimp
     void init();
-
-    //! Emitted when a line was read.
-    //! @param line the line that was found.
-    Q_SIGNAL void lineFound(const QByteArray &line);
-
-    //! Set a new input device.
-    //! @param device the input device.
-    void setInputDevice(const QSharedPointer<QIODevice> &device);
 
 private:
     //! Processes input from command line and emits lineFound when a line was

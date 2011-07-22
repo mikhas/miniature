@@ -20,20 +20,57 @@
 
 #include "gamemanager.h"
 #include "game.h"
+#include "localside.h" // TODO: Have a side factory to prevent this class from depending on those headers
+#include "gnuchess.h" // TODO: see above
+#include "linereader.h"
+#include "directinputdevice.h"
+
+using Game::Command;
 
 namespace Miniature {
 
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
-    , m_mode(GameModeLocalEngine)
 {}
 
 GameManager::~GameManager()
 {}
 
-void GameManager::setGameMode(GameMode mode)
+void GameManager::startGame(GameMode mode)
 {
-    m_mode = mode;
+    switch(mode) {
+    case GameModeLocalEngine:
+        m_games.append(QPointer<Game::Game>(createLocalEngineGame()));
+        break;
+
+    default:
+        break;
+    }
 }
+
+Game::Game *GameManager::createLocalEngineGame()
+{
+    Game::SharedTokenizer tokenizer(new Game::LineReader(new Game::DirectInputDevice)); // TODO: hide dependencies behind factory!
+    static Game::CommandParser game_parser(Game::CommandFlags(Game::CommandNew | Game::CommandQuit),
+                                           tokenizer);
+    static Game::CommandParser local_parser(Game::CommandFlags(Game::CommandMove),
+                                            tokenizer);
+
+    Game::LocalSide *local = new Game::LocalSide("white");
+    Game::GnuChess *remote = new Game::GnuChess("black");
+    Game::Game *game = new Game::Game(local, remote, this);
+
+    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
+            local,         SLOT(onCommandFound(Command, QString)));
+
+    connect(&game_parser, SIGNAL(commandFound(Command, QString)),
+            game,         SLOT(onCommandFound(Command, QString)));
+
+    local_parser.setEnabled(true);
+    game_parser.setEnabled(true);
+
+    return game;
+}
+
 
 } // namespace Miniature

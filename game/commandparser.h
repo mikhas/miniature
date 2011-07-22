@@ -21,6 +21,8 @@
 #ifndef COMMANDPARSER_H
 #define COMMANDPARSER_H
 
+#include "abstracttokenizer.h"
+
 #include <QtCore>
 
 namespace Game {
@@ -54,8 +56,11 @@ public:
     //! C'tor
     //! @param flags the commands that should be filtered. Other commands will
     //!        be ignored by this instance.
+    //! @param tokenizer the (shared) tokenizer for this parser. Multiple
+    //!                  parsers can be attached to the same tokenizer stream.
     //! @param parent the owner of this instance (optional).
     explicit CommandParser(CommandFlags flags,
+                           const SharedTokenizer &tokenizer,
                            QObject *parent = 0);
     virtual ~CommandParser();
 
@@ -67,14 +72,8 @@ public:
     Q_SIGNAL void commandFound(Command cmd,
                                const QString &data = QString());
 
-    //! Sets shared input device for all parser instances, defaults to
-    //! a non-blocking reading device for standard input. An empty shared
-    //! pointer will disable all input handling.
-    //! @param device the shared device.
-    static void setInputDevice(const QSharedPointer<QIODevice> &device);
-
 private:
-    Q_SLOT void onLineFound(const QByteArray &line);
+    Q_SLOT void onTokenFound(const QByteArray &line);
 };
 
 } // namespace Game

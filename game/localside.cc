@@ -27,11 +27,7 @@ LocalSide::LocalSide(const QString &identifier)
     : AbstractSide(identifier)
     , m_identifier(identifier)
     , m_state(NotReady)
-    , m_parser(CommandFlags(CommandMove))
-{
-    connect(&m_parser, SIGNAL(commandFound(Command,QString)),
-            this,      SLOT(onCommandFound(Command,QString)));
-}
+{}
 
 LocalSide::~LocalSide()
 {}
@@ -60,8 +56,6 @@ void LocalSide::startMove(const Move &move)
         out << move.notation;
         out.flush();
     }
-
-    m_parser.setEnabled(true);
 }
 
 void LocalSide::onCommandFound(Command command,

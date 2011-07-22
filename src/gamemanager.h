@@ -21,6 +21,8 @@
 #ifndef GAMEMANAGER_H
 #define GAMEMANAGER_H
 
+#include "game.h"
+
 #include <QtCore>
 
 namespace Miniature {
@@ -41,15 +43,18 @@ public:
     };
 
 private:
-    GameMode m_mode;
+    QList<QPointer<Game::Game> > m_games;
 
 public:
     explicit GameManager(QObject *parent = 0);
     virtual ~GameManager();
 
-    //! Sets the game mode for the next games. Running games are not affected.
+    //! Starts game with specified game mode.
     //! @param mode the game mode
-    Q_SLOT void setGameMode(GameMode mode);
+    Q_SLOT void startGame(GameMode mode);
+
+private:
+    Game::Game *createLocalEngineGame();
 };
 
 } // namespace Miniature

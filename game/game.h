@@ -22,7 +22,7 @@
 #define GAME_H
 
 #include "abstractside.h"
-#include "commandparser.h"
+#include "commandparser.h" // TODO: only needed for Command => move to common namespace
 
 #include <QtCore>
 
@@ -64,6 +64,12 @@ public:
     //! Active side.
     const SharedAbstractSide &activeSide() const;
 
+    //! Handle input from command line interface.
+    //! @command the found command.
+    //! @data the data that belongs to the command.
+    Q_SLOT void onCommandFound(Command command,
+                               const QString &data);
+
 private:
     //! One side ended and submitted a move.
     //! @param move the submitted move.
@@ -76,12 +82,6 @@ private:
     //! Used to sync with side backends; start when all backends report
     //! readiness.
     Q_SLOT void onSideReady();
-
-    //! Handle input from command line interface.
-    //! @command the found command.
-    //! @data the data that belongs to the command.
-    Q_SLOT void onCommandFound(Command command,
-                               const QString &data);
 };
 
 } // namespace Game
