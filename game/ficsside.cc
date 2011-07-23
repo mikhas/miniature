@@ -20,13 +20,121 @@
 
 #include "ficsside.h"
 #include "move.h"
+#include "abstracttokenizer.h"
 
 namespace Game {
 
-FicsSide::FicsSide(const QString &identifier)
+AbstractLink::AbstractLink(QObject *parent)
+    : QObject(parent)
+{}
+
+AbstractLink::~AbstractLink()
+{}
+
+AbstractLink::State AbstractLink::state() const
+{
+    return StateIdle;
+}
+
+FicsLink::FicsLink(QObject *parent)
+    : AbstractLink(parent)
+    , m_channel()
+    , m_buffer()
+    , m_username()
+    , m_password()
+    , m_state(StateIdle)
+{
+    connect(&m_channel, SIGNAL(readyRead()),
+            this,       SLOT(onReadyRead()));
+
+    connect(&m_channel, SIGNAL(hostFound()),
+            this,       SLOT(onHostFound()));
+}
+
+FicsLink::~FicsLink()
+{}
+
+AbstractLink::State FicsLink::state() const
+{
+    return m_state;
+}
+
+void FicsLink::login(const QString &username,
+                     const QString &password)
+{
+    if (m_state == StateLoginPending || m_state == StateReady) {
+        return;
+    }
+
+    m_state = StateLoginPending;
+    emit stateChanged(m_state);
+
+    m_username = username;
+    m_password = password;
+
+    m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+}
+
+void FicsLink::close()
+{
+    m_channel.close();
+    m_state = StateIdle;
+    emit stateChanged(m_state);
+}
+
+void FicsLink::onReadyRead()
+{
+    switch(m_state) {
+    case StateLoginFailed:
+    case StateLoginPending: {
+        int next_newline_pos = -1;
+        const bool enable_echo = false;
+        do {
+            processLogin(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo));
+        } while (next_newline_pos != -1);
+    } break;
+
+    case StateIdle:
+        (void) m_channel.readAll();
+        break;
+
+    case StateReady: 
+        m_buffer.append(m_channel.readAll());
+        break;
+    }
+}
+
+void FicsLink::processLogin(const QByteArray &line)
+{
+    static const QByteArray confirm_login("Press return to enter the server as");
+    if (line.contains(confirm_login)) {
+        // Confirm login:
+        m_channel.write("\n");
+
+        // Just for testing - find assigned username (assumes we logged in as guest):
+        m_username = line.mid(confirm_login.length() + 2,
+                              line.length() - confirm_login.length() - 4);
+        qDebug() << m_username;
+        m_state = StateReady;
+        emit stateChanged(m_state);
+    }
+}
+
+void FicsLink::onHostFound()
+{
+    if (m_state == StateLoginPending) {
+        m_channel.write(m_username.toLatin1());
+        m_channel.write("\n");
+    }
+    // TODO: Handle retry attempts here.
+}
+
+FicsSide::FicsSide(const QString &identifier,
+                   AbstractLink *link)
     : AbstractSide(identifier)
     , m_identifier(identifier)
     , m_state(NotReady)
+    , m_link(link)
 {}
 
 FicsSide::~FicsSide()

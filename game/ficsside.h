@@ -25,22 +25,97 @@
 #include "abstractside.h"
 
 #include <QtCore>
+#include <QtNetwork/QTcpSocket>
 
 namespace Game
 {
+
+class AbstractLink
+    : public QObject
+{
+    Q_OBJECT
+    Q_DISABLE_COPY(AbstractLink)
+
+public:
+    enum State {
+        StateIdle,
+        StateLoginPending,
+        StateLoginFailed,
+        StateReady
+    };
+
+    Q_ENUMS(State)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
+
+    explicit AbstractLink(QObject *parent = 0);
+    virtual ~AbstractLink() = 0;
+
+    virtual State state() const = 0;
+    Q_SIGNAL void stateChanged(State state);
+
+    virtual void login(const QString &username,
+                       const QString &password) = 0;
+
+    virtual void close() = 0;
+
+    //! Emitted when a command was found in tokenizer stream.
+    //! @param cmd the found command.
+    //! @param data the data for this command.
+    Q_SIGNAL void commandFound(Command cmd,
+                               const QString &data = QString());
+};
+
+class FicsLink
+    : public AbstractLink
+{
+    Q_OBJECT
+    Q_DISABLE_COPY(FicsLink)
+
+private:
+    QTcpSocket m_channel;
+    QByteArray m_buffer;
+    QString m_username;
+    QString m_password;
+    State m_state;
+
+public:
+    //! \reimp
+    explicit FicsLink(QObject *parent = 0);
+    virtual ~FicsLink();
+    virtual State state() const;
+    virtual void login(const QString &username,
+                       const QString &password);
+    virtual void close();
+    //! \reimp_end
+
+private:
+    Q_SLOT void onReadyRead();
+    void processLogin(const QByteArray &line);
+    Q_SLOT void onHostFound();
+};
 
 //! Implement a backend for FICS (freechess.org).
 //! Can be feeded by Game::FicsParser.
 class FicsSide
     : public AbstractSide
 {
+    Q_OBJECT
+    Q_DISABLE_COPY(FicsSide)
+
 private:
     const QString m_identifier;
+    const QString m_password;
     SideState m_state;
+    QScopedPointer<AbstractLink> m_link;
 
 public:
+    //! C'tor
+    //! @param identifier the identifier for this side.
+    //! @param link the FICS link, instance takes ownership.
+    explicit FicsSide(const QString &identifier,
+                      AbstractLink *link);
+
     //! \reimp
-    explicit FicsSide(const QString &identifier);
     virtual ~FicsSide();
     virtual void init();
     virtual SideState state() const;

@@ -32,13 +32,20 @@
 using Game::Move;
 Q_DECLARE_METATYPE(Move)
 
+using Game::AbstractLink;
+
 class TestGame
     : public QObject
 {
     Q_OBJECT
 
 private:
-    CREATE_EMPTY_DEFAULT_SLOTS
+    QScopedPointer<QApplication> m_app;
+
+    Q_SLOT void initTestCase()
+    {
+        m_app.reset(TestUtils::createApp("testgame"));
+    }
 
     Q_SLOT void testLocalGame()
     {
@@ -71,12 +78,17 @@ private:
 
     Q_SLOT void testFicsGame()
     {
-        // TODO: Stub the server.
         Game::AbstractSide *local = new Game::LocalSide("local");
-        Game::AbstractSide *fics = new Game::FicsSide("FICS");
-        Game::Game subject(local, fics);
 
+        // TODO: Stub the shared link.
+        Game::FicsLink *link = new Game::FicsLink;
+        link->login("guest", "");
+        TestUtils::waitForSignal(link, SIGNAL(stateChanged(State)), 5000);
+        Game::AbstractSide *fics = new Game::FicsSide("FICS", link);
+
+        Game::Game subject(local, fics);
         subject.start();
+
         emit local->moveEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), fics);
     }
