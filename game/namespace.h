@@ -32,7 +32,11 @@ enum Command
     CommandNone = 0, //!< Can be used as a default value or for unrecognized commands.
     CommandNew = 0x1,
     CommandMove = 0x2,
-    CommandQuit = 0x4
+    CommandQuit = 0x4,
+    CommandLogin = 0x8,
+    CommandSeek = 0x10,
+    CommandJoin = 0x20,
+    CommandObserve = 0x40
 };
 
 //Q_ENUMS(Command)
