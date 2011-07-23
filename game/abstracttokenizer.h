@@ -25,6 +25,21 @@
 
 namespace Game {
 
+//! Scans and returns a line from device, filling up buffer with partial reads.
+//! Newlines are normalized: CR => LF, CRLF => LF, LF => LF. This only affects
+//! the buffer as the returned scanned line will never return newlines.
+//! @param newline_pos the position of the next newline read from device,
+//!                    or -1 if none found.
+//! @param device the IO device which provides the input.
+//! @param buffer the buffer to fill up with partial reads (that is, if no
+//!               newline was found so far). Whenever a line is scaned, the
+//!               line is removed from the buffer.
+//! @param echo_enabled whether to display read data on stdout.
+const QByteArray scanLine(int *newline_pos,
+                          QIODevice *device,
+                          QByteArray *buffer,
+                          bool echo_enabled = false);
+
 class AbstractTokenizer;
 typedef QSharedPointer<AbstractTokenizer> SharedTokenizer;
 

@@ -23,6 +23,61 @@
 namespace Game
 {
 
+const QByteArray scanLine(int *newline_pos,
+                          QIODevice *device,
+                          QByteArray *buffer,
+                          bool echo_enabled)
+{
+    const static int max_read = 2 << 12;
+
+    if (not newline_pos || not device || not buffer) {
+        return QByteArray();
+    }
+
+    if (echo_enabled) {
+        static QTextStream out(stdout);
+        const QByteArray tmp(device->read(max_read));
+        out << tmp;
+        out.flush();
+        buffer->append(tmp);
+    } else {
+        buffer->append(device->read(max_read));
+    }
+
+    QByteArray line;
+    int index = 0;
+    bool found_cr = false;
+    bool found_lf = false;
+    for (; index < buffer->length(); ++index) {
+        char curr = buffer->at(index);
+
+        if (found_cr || curr == '\n') {
+            found_lf = true;
+            break;
+        }
+
+        if (curr == '\r') {
+            found_cr = true;
+            continue;
+        }
+
+        found_cr = false;
+        line.append(curr);
+    }
+
+    if (not found_lf) {
+        *newline_pos = -1;
+        return QByteArray();
+    }
+
+    *newline_pos = index;
+
+    // It's possible that buffer only contains CR or LF, in which case we still
+    // want to remove one (or two) extra leading characters from buffer:
+    buffer->remove(0, index > 1 ? (index + (found_cr ? 2 : 1)) : 1);
+    return line;
+}
+
 AbstractTokenizer::AbstractTokenizer(QIODevice *,
                                      QObject *parent)
     : QObject(parent)

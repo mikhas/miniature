@@ -54,21 +54,14 @@ void LineReader::init()
 
 void LineReader::onReadyRead()
 {
-    static QTextStream out(stdout);
     if (m_device.isNull()) {
         return;
     }
 
     int next_newline_pos = -1;
+    const bool enable_echo = true;
     do {
-        const QByteArray tmp(m_device->read(256));
-        out << tmp;
-        out.flush();
-
-        m_buffer.append(tmp);
-        next_newline_pos = m_buffer.indexOf('\n');
-        QByteArray line(m_buffer.left(next_newline_pos));
-        m_buffer.remove(0, next_newline_pos == -1 ? -1 : next_newline_pos + 1);
+        const QByteArray line(scanLine(&next_newline_pos, m_device.data(), &m_buffer, enable_echo));
 
         if (not line.isEmpty()) {
             emit tokenFound(line);
