@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "commandparser.h"
+#include "localparser.h"
 #include "testutils.h"
 #include "linereader.h"
 
@@ -27,7 +27,7 @@
 #include <QtTest>
 
 using Game::Command;
-using Game::CommandParser;
+using Game::LocalParser;
 
 Q_DECLARE_METATYPE(QVector<int>)
 
@@ -95,7 +95,7 @@ public:
     }
 };
 
-class TestCommandParser
+class TestLocalParser
     : public QObject
 {
     Q_OBJECT
@@ -148,10 +148,10 @@ private:
 
         QIODevice *device = new TestInputDevice;
         Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        CommandParser p0(Game::CommandFlags(Game::CommandNew | Game::CommandQuit), tokenizer);
-        CommandParser p1(Game::CommandFlags(Game::CommandMove | Game::CommandQuit), tokenizer);
+        LocalParser p0(Game::CommandFlags(Game::CommandNew | Game::CommandQuit), tokenizer);
+        LocalParser p1(Game::CommandFlags(Game::CommandMove | Game::CommandQuit), tokenizer);
         // Does not parse any commands:
-        CommandParser p2(Game::CommandFlags(Game::CommandNone), tokenizer);
+        LocalParser p2(Game::CommandFlags(Game::CommandNone), tokenizer);
 
         p0.setEnabled(true);
         p1.setEnabled(true);
@@ -187,7 +187,7 @@ private:
         const int TimeOut(20);
         QIODevice *device = new TestInputDevice;
         Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        CommandParser parser(Game::CommandFlags(Game::CommandMove), tokenizer);
+        LocalParser parser(Game::CommandFlags(Game::CommandMove), tokenizer);
         CommandCounter counter;
         parser.setEnabled(true);
 
@@ -210,7 +210,7 @@ private:
         const int TimeOut(20);
         QIODevice *device = new TestInputDevice;
         Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        CommandParser parser(Game::CommandFlags(Game::CommandQuit), tokenizer);
+        LocalParser parser(Game::CommandFlags(Game::CommandQuit), tokenizer);
         CommandCounter counter;
 
         device->open(QIODevice::ReadWrite);
@@ -232,5 +232,5 @@ private:
     }
 };
 
-QTEST_APPLESS_MAIN(TestCommandParser)
-#include ".moc/testcommandparser.moc"
+QTEST_APPLESS_MAIN(TestLocalParser)
+#include ".moc/testlocalparser.moc"

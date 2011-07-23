@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "commandparser.h"
+#include "localparser.h"
 
 namespace {
     const QString CmdNew("new");
@@ -28,26 +28,26 @@ namespace {
 
 namespace Game {
 
-class CommandParserPrivate
+class LocalParserPrivate
 {
 public:
     CommandFlags flags;
     SharedTokenizer tokenizer;
     bool enabled;
 
-    explicit CommandParserPrivate(CommandFlags new_flags,
-                                  const SharedTokenizer &new_tokenizer)
+    explicit LocalParserPrivate(CommandFlags new_flags,
+                                const SharedTokenizer &new_tokenizer)
         : flags(new_flags)
         , tokenizer(new_tokenizer)
         , enabled(false)
     {}
 };
 
-CommandParser::CommandParser(CommandFlags flags,
-                             const SharedTokenizer &tokenizer,
-                             QObject *parent)
-    : QObject(parent)
-    , d_ptr(new CommandParserPrivate(flags, tokenizer))
+LocalParser::LocalParser(CommandFlags flags,
+                         const SharedTokenizer &tokenizer,
+                         QObject *parent)
+    : AbstractParser(flags, tokenizer, parent)
+    , d_ptr(new LocalParserPrivate(flags, tokenizer))
 {
     if (not tokenizer.isNull()) {
         connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
@@ -55,12 +55,12 @@ CommandParser::CommandParser(CommandFlags flags,
     }
 }
 
-CommandParser::~CommandParser()
+LocalParser::~LocalParser()
 {}
 
-void CommandParser::setEnabled(bool enable)
+void LocalParser::setEnabled(bool enable)
 {
-    Q_D(CommandParser);
+    Q_D(LocalParser);
     d->enabled = enable;
 
     if (d->enabled && not d->tokenizer.isNull()) {
@@ -68,14 +68,14 @@ void CommandParser::setEnabled(bool enable)
     }
 }
 
-void CommandParser::onTokenFound(const QByteArray &line)
+void LocalParser::onTokenFound(const QByteArray &token)
 {
-    Q_D(const CommandParser);
+    Q_D(const LocalParser);
     if (not d->enabled) {
         return;
     }
 
-    QString result(line);
+    QString result(token);
 
     if ((d->flags & CommandNew)
         && result == CmdNew ) {

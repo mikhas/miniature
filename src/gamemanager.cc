@@ -24,7 +24,7 @@
 #include "gnuchess.h" // TODO: see above
 #include "linereader.h"
 #include "directinputdevice.h"
-#include "commandparser.h"
+#include "localparser.h"
 
 using Game::Command;
 
@@ -52,10 +52,10 @@ void GameManager::startGame(GameMode mode)
 Game::Game *GameManager::createLocalEngineGame()
 {
     Game::SharedTokenizer tokenizer(new Game::LineReader(new Game::DirectInputDevice)); // TODO: hide dependencies behind factory!
-    static Game::CommandParser game_parser(Game::CommandFlags(Game::CommandNew | Game::CommandQuit),
-                                           tokenizer);
-    static Game::CommandParser local_parser(Game::CommandFlags(Game::CommandMove),
-                                            tokenizer);
+    static Game::LocalParser game_parser(Game::CommandFlags(Game::CommandNew | Game::CommandQuit),
+                                         tokenizer);
+    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
+                                          tokenizer);
 
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::GnuChess *remote = new Game::GnuChess("black");

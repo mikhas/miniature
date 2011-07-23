@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COMMANDPARSER_H
-#define COMMANDPARSER_H
+#ifndef ABSTRACTPARSER_H
+#define ABSTRACTPARSER_H
 
 #include "namespace.h"
 #include "abstracttokenizer.h"
@@ -28,21 +28,18 @@
 
 namespace Game {
 
-class CommandParserPrivate;
-
-//! Reads input from an input device and translates it into commands.
-//! Clients of this class can list the commands they're interested in through
-//! the CommpandParser's c'tor. To retrieve commands, clients hook up to the
+//! Command parser interface.
+//!
+//! Retreives input from tokenizer (async) and translates it into commands.
+//! Clients of this interface can list the commands they're interested in
+//! through the AbstractCommpandParser's c'tor (derived classes need to honor
+//! the command filtering). To retrieve commands, clients hook up to the
 //! commandFound signal.
-class CommandParser
+class AbstractParser
     : public QObject
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(CommandParser)
-    Q_DISABLE_COPY(CommandParser)
-
-private:
-    const QScopedPointer<CommandParserPrivate> d_ptr;
+    Q_DISABLE_COPY(AbstractParser)
 
 public:
     //! C'tor
@@ -51,23 +48,23 @@ public:
     //! @param tokenizer the (shared) tokenizer for this parser. Multiple
     //!                  parsers can be attached to the same tokenizer stream.
     //! @param parent the owner of this instance (optional).
-    explicit CommandParser(CommandFlags flags,
-                           const SharedTokenizer &tokenizer,
-                           QObject *parent = 0);
-    virtual ~CommandParser();
+    explicit AbstractParser(CommandFlags flags,
+                            const SharedTokenizer &tokenizer,
+                            QObject *parent = 0);
+    virtual ~AbstractParser() = 0;
 
-    //! Enables command parsing. Initializes input device backend if required.
+    //! Enables command parsing. Initializes input device backend for tokenizer
+    //! if required.
     //! @param enable whether to enable command parsing.
-    //! \sa setInputDevice
-    void setEnabled(bool enable);
+    virtual void setEnabled(bool enable) = 0;
 
+    //! Emitted when a command was found in tokenizer stream.
+    //! @param cmd the found command.
+    //! @param data the data for this command.
     Q_SIGNAL void commandFound(Command cmd,
                                const QString &data = QString());
-
-private:
-    Q_SLOT void onTokenFound(const QByteArray &line);
 };
 
 } // namespace Game
 
-#endif // COMMANDPARSER_H
+#endif // ABSTRACTPARSER_H

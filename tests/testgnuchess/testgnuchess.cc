@@ -23,7 +23,7 @@
 #include "localside.h"
 #include "gnuchess.h"
 #include "move.h"
-#include "commandparser.h"
+#include "localparser.h"
 
 #include <QtCore>
 #include <QtGui>

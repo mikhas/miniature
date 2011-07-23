@@ -10,4 +10,4 @@ lib*.so.*
 tests/testgame/testgame
 src/miniature
 tests/testgnuchess/testgnuchess
-tests/testcommandparser/testcommandparser
+tests/testlocalparser/testlocalparser

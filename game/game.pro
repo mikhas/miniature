@@ -8,7 +8,6 @@ QT -= gui
 HEADERS += \
     namespace.h \
     game.h \
-    commandparser.h \
     abstracttokenizer.h \
     linereader.h \
     directinputdevice.h \
@@ -18,10 +17,11 @@ HEADERS += \
     move.h \
     position.h \
     square.h \
+    localparser.h \
+    abstractparser.h \
 
 SOURCES += \
     game.cc \
-    commandparser.cc \
     abstracttokenizer.cc \
     linereader.cc \
     directinputdevice.cc \
@@ -31,3 +31,6 @@ SOURCES += \
     move.cc \
     position.cc \
     square.cc \
+    localparser.cc \
+    abstractparser.cc \
+
