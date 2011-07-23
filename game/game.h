@@ -22,7 +22,7 @@
 #define GAME_H
 
 #include "abstractside.h"
-#include "commandparser.h" // TODO: only needed for Command => move to common namespace
+#include "namespace.h"
 
 #include <QtCore>
 

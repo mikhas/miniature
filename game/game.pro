@@ -6,6 +6,7 @@ TARGET = $$GAME_TARGET
 QT -= gui
 
 HEADERS += \
+    namespace.h \
     game.h \
     commandparser.h \
     abstracttokenizer.h \

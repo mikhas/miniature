@@ -21,21 +21,13 @@
 #ifndef COMMANDPARSER_H
 #define COMMANDPARSER_H
 
+#include "namespace.h"
 #include "abstracttokenizer.h"
 
 #include <QtCore>
 
 namespace Game {
 
-enum Command {
-    CommandNone = 0,
-    CommandNew = 0x1,
-    CommandMove = 0x2,
-    CommandQuit = 0x4
-};
-
-Q_ENUMS(Command)
-Q_DECLARE_FLAGS(CommandFlags, Command)
 class CommandParserPrivate;
 
 //! Reads input from an input device and translates it into commands.

@@ -22,7 +22,7 @@
 #define LOCALSIDE_H
 
 #include "abstractside.h"
-#include "commandparser.h" // TODO: move Command into common namespace.
+#include "namespace.h"
 
 #include <QtCore>
 

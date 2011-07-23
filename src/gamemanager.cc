@@ -24,6 +24,7 @@
 #include "gnuchess.h" // TODO: see above
 #include "linereader.h"
 #include "directinputdevice.h"
+#include "commandparser.h"
 
 using Game::Command;
 
