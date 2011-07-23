@@ -41,22 +41,14 @@ private:
 public:
     //! \reimp
     explicit LocalSide(const QString &identifier);
-
-    //! \reimp
     virtual ~LocalSide();
-
-    //! \reimp
     virtual void init();
-
-    //! \reimp
     virtual SideState state() const;
-
-    //! \reimp
     virtual const QString &identifier() const;
-
-    //! \reimp
     virtual void startMove(const Move &move);
+    //! \reimp_end
 
+private:
     //! Handle input from command line interface.
     //! @command the found command.
     //! @data the data that belongs to the command.

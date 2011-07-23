@@ -42,12 +42,9 @@ public:
     //! \reimp
     explicit LineReader(QIODevice *device,
                         QObject *parent = 0);
-
-    //! \reimp
     virtual ~LineReader();
-
-    //! \reimp
     void init();
+    //! \reimp_end
 
 private:
     //! Processes input from command line and emits lineFound when a line was

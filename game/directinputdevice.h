@@ -55,24 +55,18 @@ public:
     explicit DirectInputDevice(QObject *parent = 0);
     virtual ~DirectInputDevice();
 
-    //! \reimp
     //! Opens non-blocking read from stdin.
     //! @param mode the open mode, must contain QIODevice::ReadOnly
     virtual bool open(OpenMode mode);
-
-    //! \reimp
     virtual void close();
-
-    //! \reimp
     virtual qint64 readData(char *data,
                             qint64 buf_size);
-    //! \reimp
+
     //! Writing to stdin is not supported.
     virtual qint64 writeData(const char *,
                              qint64);
-
-    //! \reimp
     virtual qint64 bytesAvailable() const;
+    //! \reimp_end
 
     //! Sets buffer limit and timeout. Triggers readyRead on whatever is hit
     //! first. Allows for semi-direct input (can be more efficient for larger

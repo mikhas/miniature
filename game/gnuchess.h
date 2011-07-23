@@ -43,22 +43,14 @@ private:
 public:
     //! \reimp
     explicit GnuChess(const QString &identifier);
-
-    //! \reimp
     virtual ~GnuChess();
-
-    //! \reimp
     virtual void init();
-
-    //! \reimp
     virtual SideState state() const;
-
-    //! \reimp
     virtual const QString &identifier() const;
-
-    //! \reimp
     virtual void startMove(const Move &move);
+    //! \reimp_end
 
+private:
     Q_SLOT void onReadyRead();
 };
 

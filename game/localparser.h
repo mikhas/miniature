@@ -43,11 +43,13 @@ private:
     const QScopedPointer<LocalParserPrivate> d_ptr;
 
 public:
+    //! \reimp
     explicit LocalParser(CommandFlags flags,
                          const SharedTokenizer &tokenizer,
                          QObject *parent = 0);
     virtual ~LocalParser();
     virtual void setEnabled(bool enable);
+    //! \reimp_end
 
 private:
     Q_SLOT void onTokenFound(const QByteArray &token);
