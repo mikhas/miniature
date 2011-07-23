@@ -19,6 +19,8 @@
  */
 
 #include "abstracttokenizer.h"
+#include "linereader.h"
+#include "directinputdevice.h"
 
 namespace Game
 {
@@ -76,6 +78,11 @@ const QByteArray scanLine(int *newline_pos,
     // want to remove one (or two) extra leading characters from buffer:
     buffer->remove(0, index > 1 ? (index + (found_cr ? 2 : 1)) : 1);
     return line;
+}
+
+AbstractTokenizer *createLocalInputTokenizer()
+{
+    return new Game::LineReader(new Game::DirectInputDevice);
 }
 
 AbstractTokenizer::AbstractTokenizer(QIODevice *,

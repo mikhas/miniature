@@ -25,6 +25,9 @@
 
 namespace Game {
 
+class AbstractTokenizer;
+typedef QSharedPointer<AbstractTokenizer> SharedTokenizer;
+
 //! Scans and returns a line from device, filling up buffer with partial reads.
 //! Newlines are normalized: CR => LF, CRLF => LF, LF => LF. This only affects
 //! the buffer as the returned scanned line will never return newlines.
@@ -40,8 +43,8 @@ const QByteArray scanLine(int *newline_pos,
                           QByteArray *buffer,
                           bool echo_enabled = false);
 
-class AbstractTokenizer;
-typedef QSharedPointer<AbstractTokenizer> SharedTokenizer;
+//! Creates an async tokenizer that reads from stdin.
+AbstractTokenizer *createLocalInputTokenizer();
 
 //! Async device reader, tokenizes input into lines.
 class AbstractTokenizer
