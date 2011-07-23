@@ -19,59 +19,116 @@
  */
 
 #include "gamemanager.h"
-#include "game.h"
-#include "localside.h" // TODO: Have a side factory to prevent this class from depending on those headers
-#include "gnuchess.h" // TODO: see above
-#include "linereader.h"
-#include "directinputdevice.h"
-#include "localparser.h"
+
+#include <game.h>
+#include <localside.h> // TODO: Have a side factory to prevent this class from depending on those headers
+#include <gnuchess.h> // TODO: see above
+#include <iostream>
 
 using Game::Command;
+
+namespace {
+    const Game::CommandFlags main_commands(Game::CommandNew | Game::CommandQuit
+                                           | Game::CommandLogin | Game::CommandSeek
+                                           | Game::CommandJoin | Game::CommandObserve);
+}
 
 namespace Miniature {
 
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
-{}
+    , m_games()
+    , m_tokenizer(Game::createLocalInputTokenizer())
+    , m_parser(main_commands, m_tokenizer)
+    , m_fics_link()
+{
+    connect(&m_parser, SIGNAL(commandFound(Command, QString)),
+            this,      SLOT(onCommandFound(Command, QString)));
+
+    m_parser.setEnabled(true);
+    std::cout << "Welcome to Miniature!" << std::endl;
+}
 
 GameManager::~GameManager()
 {}
 
 void GameManager::startGame(GameMode mode)
 {
+    Game::Game *game = 0;
+
     switch(mode) {
     case GameModeLocalEngine:
-        m_games.append(QPointer<Game::Game>(createLocalEngineGame()));
+        game = createLocalEngineGame();
+        break;
+
+    case GameModeRemoteFics:
+        game = createRemoteFicsGame();
+        break;
+
+    default:
+        break;
+    }
+
+    game->start();
+    m_games.append(QPointer<Game::Game>(game));
+}
+
+Game::Game *GameManager::createLocalEngineGame()
+{
+    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
+                                          m_tokenizer);
+    local_parser.setEnabled(true);
+
+    Game::LocalSide *local = new Game::LocalSide("white");
+    Game::GnuChess *remote = new Game::GnuChess("black");
+
+    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
+            local,         SLOT(onCommandFound(Command, QString)));
+
+    return new Game::Game(local, remote, this);
+}
+
+Game::Game *GameManager::createRemoteFicsGame()
+{
+    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
+                                          m_tokenizer);
+    local_parser.setEnabled(true);
+
+    Game::LocalSide *local = new Game::LocalSide("white");
+    Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link.data());
+
+    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
+            local,         SLOT(onCommandFound(Command, QString)));
+
+    return new Game::Game(local, remote, this);
+}
+
+void GameManager::onCommandFound(Command command,
+                                 const QString &data)
+{
+    Q_UNUSED(data)
+
+    switch(command) {
+    case Game::CommandLogin:
+        m_fics_link = QSharedPointer<Game::FicsLink>(new Game::FicsLink);
+        m_fics_link->login("guest", "");
+        break;
+
+    case Game::CommandJoin:
+        startGame(GameModeRemoteFics);
+        break;
+
+    case Game::CommandNew:
+        startGame(GameModeLocalEngine);
+        break;
+
+    case Game::CommandQuit:
+        qApp->exit();
         break;
 
     default:
         break;
     }
 }
-
-Game::Game *GameManager::createLocalEngineGame()
-{
-    Game::SharedTokenizer tokenizer(new Game::LineReader(new Game::DirectInputDevice)); // TODO: hide dependencies behind factory!
-    static Game::LocalParser game_parser(Game::CommandFlags(Game::CommandNew | Game::CommandQuit),
-                                         tokenizer);
-    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
-                                          tokenizer);
-
-    Game::LocalSide *local = new Game::LocalSide("white");
-    Game::GnuChess *remote = new Game::GnuChess("black");
-    Game::Game *game = new Game::Game(local, remote, this);
-
-    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
-            local,         SLOT(onCommandFound(Command, QString)));
-
-    connect(&game_parser, SIGNAL(commandFound(Command, QString)),
-            game,         SLOT(onCommandFound(Command, QString)));
-
-    local_parser.setEnabled(true);
-    game_parser.setEnabled(true);
-
-    return game;
-}
-
 
 } // namespace Miniature

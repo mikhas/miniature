@@ -30,6 +30,9 @@
 namespace Game
 {
 
+class AbstractLink;
+typedef QSharedPointer<AbstractLink> SharedLink;
+
 class AbstractLink
     : public QObject
 {
@@ -106,12 +109,13 @@ private:
     const QString m_identifier;
     const QString m_password;
     SideState m_state;
-    QScopedPointer<AbstractLink> m_link;
+    SharedLink m_link;
 
 public:
     //! C'tor
     //! @param identifier the identifier for this side.
-    //! @param link the FICS link, instance takes ownership.
+    //! @param link the FICS link, FicsSide takes ownership.
+    // FIXME: Link should *not* be owned, can be shared!
     explicit FicsSide(const QString &identifier,
                       AbstractLink *link);
 

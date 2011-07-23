@@ -26,9 +26,6 @@
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-
     Miniature::GameManager manager;
-    manager.startGame(Miniature::GameManager::GameModeLocalEngine);
-
     return app.exec();
 }

@@ -70,8 +70,6 @@ Game::Game(AbstractSide *local,
 
     connectSide(d->local);
     connectSide(d->remote);
-
-    std::cout << "Welcome to Miniature!" << std::endl;
 }
 
 Game::~Game()
@@ -93,25 +91,6 @@ const SharedAbstractSide &Game::activeSide() const
 {
     Q_D(const Game);
     return d->active;
-}
-
-void Game::onCommandFound(Command command,
-                          const QString &data)
-{
-    Q_UNUSED(data)
-
-    switch(command) {
-    case CommandNew:
-        start();
-        break;
-
-    case CommandQuit:
-        qApp->exit();
-        break;
-
-    default:
-        break;
-    }
 }
 
 void Game::onMoveEnded(const Move &move)

@@ -21,13 +21,18 @@
 #ifndef GAMEMANAGER_H
 #define GAMEMANAGER_H
 
-#include "game.h"
-
+#include <namespace.h>
+#include <game.h>
+#include <abstracttokenizer.h>
+#include <localparser.h>
+#include <ficsside.h>
 #include <QtCore>
 
 namespace Miniature {
 
-//! Controls game.
+using Game::Command;
+
+//! Responsible for initiating games. Also maintain a list of active games.
 class GameManager
     : public QObject
 {
@@ -44,6 +49,9 @@ public:
 
 private:
     QList<QPointer<Game::Game> > m_games;
+    Game::SharedTokenizer m_tokenizer;
+    Game::LocalParser m_parser;
+    QSharedPointer<Game::AbstractLink> m_fics_link;
 
 public:
     explicit GameManager(QObject *parent = 0);
@@ -53,8 +61,15 @@ public:
     //! @param mode the game mode
     Q_SLOT void startGame(GameMode mode);
 
-private:
+private:        
     Game::Game *createLocalEngineGame();
+    Game::Game *createRemoteFicsGame();
+
+    //! Handle input from command line interface.
+    //! @command the found command.
+    //! @data the data that belongs to the command.
+    Q_SLOT void onCommandFound(Command command,
+                               const QString &data);
 };
 
 } // namespace Miniature

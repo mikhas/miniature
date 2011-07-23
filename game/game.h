@@ -64,12 +64,6 @@ public:
     //! Active side.
     const SharedAbstractSide &activeSide() const;
 
-    //! Handle input from command line interface.
-    //! @command the found command.
-    //! @data the data that belongs to the command.
-    Q_SLOT void onCommandFound(Command command,
-                               const QString &data);
-
 private:
     //! One side ended and submitted a move.
     //! @param move the submitted move.
