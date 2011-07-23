@@ -51,7 +51,8 @@ LocalParser::LocalParser(CommandFlags flags,
 {
     if (not tokenizer.isNull()) {
         connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
-                this,             SLOT(onTokenFound(QByteArray)));
+                this,             SLOT(onTokenFound(QByteArray)),
+                Qt::UniqueConnection);
     }
 }
 

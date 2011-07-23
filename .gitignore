@@ -7,7 +7,8 @@
 Makefile
 lib*.so.*
 *.swo
-tests/testgame/testgame
 src/miniature
+tests/testgame/testgame
 tests/testgnuchess/testgnuchess
 tests/testlocalparser/testlocalparser
+tests/testficsparser/testficsparser

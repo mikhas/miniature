@@ -17,8 +17,9 @@ HEADERS += \
     move.h \
     position.h \
     square.h \
-    localparser.h \
     abstractparser.h \
+    localparser.h \
+    ficsparser.h \
 
 SOURCES += \
     game.cc \
@@ -31,6 +32,7 @@ SOURCES += \
     move.cc \
     position.cc \
     square.cc \
-    localparser.cc \
     abstractparser.cc \
+    localparser.cc \
+    ficsparser.cc \
 
