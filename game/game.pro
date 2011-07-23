@@ -20,6 +20,7 @@ HEADERS += \
     abstractparser.h \
     localparser.h \
     ficsparser.h \
+    ficsside.h \
 
 SOURCES += \
     game.cc \
@@ -35,4 +36,4 @@ SOURCES += \
     abstractparser.cc \
     localparser.cc \
     ficsparser.cc \
-
+    ficsside.cc \

@@ -22,6 +22,7 @@
 #include "game.h"
 #include "localside.h"
 #include "gnuchess.h"
+#include "ficsside.h"
 #include "move.h"
 
 #include <QtCore>
@@ -39,7 +40,7 @@ class TestGame
 private:
     CREATE_EMPTY_DEFAULT_SLOTS
 
-    Q_SLOT void testMoveSequence()
+    Q_SLOT void testLocalGame()
     {
         // After each valid move, active side should switch. So we can test a
         // valid move sequence simply by checking the active side against the
@@ -66,6 +67,18 @@ private:
         // Switch sides again after submitting move:
         emit black->moveEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), white);
+    }
+
+    Q_SLOT void testFicsGame()
+    {
+        // TODO: Stub the server.
+        Game::AbstractSide *local = new Game::LocalSide("local");
+        Game::AbstractSide *fics = new Game::FicsSide("FICS");
+        Game::Game subject(local, fics);
+
+        subject.start();
+        emit local->moveEnded(Game::Move());
+        QCOMPARE(subject.activeSide().data(), fics);
     }
 
     Q_SLOT void testCli()
