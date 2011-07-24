@@ -53,23 +53,23 @@ private:
 
         Game::LocalSide *white = new Game::LocalSide("white");
         Game::GnuChess  *black = new Game::GnuChess("black");
-        QSignalSpy whiteSpy(white, SIGNAL(moveEnded(Move)));
-        QSignalSpy blackSpy(black, SIGNAL(moveEnded(Move)));
+        QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Move)));
+        QSignalSpy blackSpy(black, SIGNAL(turnEnded(Move)));
         Game::Game game(white, black);
 
         QCOMPARE(game.activeSide().data(), white);
 
         game.start();
-        emit white->moveEnded(Move(Game::Position(), Game::Square(), Game::Square(),
+        emit white->turnEnded(Move(Game::Position(), Game::Square(), Game::Square(),
                                    QString("g4")));
-        TestUtils::waitForSignal(black, SIGNAL(moveEnded(Move)));
+        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Move)));
         QCOMPARE(game.activeSide().data(), white);
         QCOMPARE(whiteSpy.count(), 1);
         QCOMPARE(blackSpy.count(), 1);
 
-        emit white->moveEnded(Move(Game::Position(), Game::Square(), Game::Square(),
+        emit white->turnEnded(Move(Game::Position(), Game::Square(), Game::Square(),
                                    QString("f4")));
-        TestUtils::waitForSignal(black, SIGNAL(moveEnded(Move)));
+        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Move)));
         QCOMPARE(game.activeSide().data(), white);
         QCOMPARE(whiteSpy.count(), 2);
         QCOMPARE(blackSpy.count(), 2);

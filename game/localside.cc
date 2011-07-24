@@ -49,7 +49,7 @@ AbstractSide::SideState LocalSide::state() const
     return m_state;
 }
 
-void LocalSide::startMove(const Move &move)
+void LocalSide::startTurn(const Move &move)
 {
     if (not move.notation.isEmpty()) {
         static QTextStream out(stdout);
@@ -67,7 +67,7 @@ void LocalSide::onCommandFound(Command command,
         break;
 
     case CommandMove:
-        emit moveEnded(Move(Position(), Square(), Square(), data));
+        emit turnEnded(Move(Position(), Square(), Square(), data));
         break;
 
     default:

@@ -58,21 +58,21 @@ private:
         QCOMPARE(subject.activeSide().data(), white);
 
         // Trying to submit move before starting game => ignore:
-        emit white->moveEnded(Game::Move());
+        emit white->turnEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), white);
 
         subject.start();
 
         // Switch sides after submitting move:
-        emit white->moveEnded(Game::Move());
+        emit white->turnEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), black);
 
         // Trying to submit move twice in a row => ignore:
-        emit white->moveEnded(Game::Move());
+        emit white->turnEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), black);
 
         // Switch sides again after submitting move:
-        emit black->moveEnded(Game::Move());
+        emit black->turnEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), white);
     }
 
@@ -89,7 +89,7 @@ private:
         Game::Game subject(local, fics);
         subject.start();
 
-        emit local->moveEnded(Game::Move());
+        emit local->turnEnded(Game::Move());
         QCOMPARE(subject.activeSide().data(), fics);
     }
 

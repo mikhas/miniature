@@ -157,7 +157,7 @@ AbstractSide::SideState FicsSide::state() const
     return m_state;
 }
 
-void FicsSide::startMove(const Move &move)
+void FicsSide::startTurn(const Move &move)
 {
     Q_UNUSED(move)
 }

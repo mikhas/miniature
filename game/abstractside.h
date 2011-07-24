@@ -42,7 +42,7 @@ class AbstractSide
 public:
     enum SideState {
         NotReady,
-        Ready
+        Ready,
     };
 
     //! C'tor
@@ -63,13 +63,17 @@ public:
     //! Returns identifier for this side.
     virtual const QString &identifier() const = 0;
 
-    //! Emitted once move has ended.
+    //! Emitted when a move has been submitted. If it is was this side's turn
+    //! and the submitted move is invalid, then startMove will be called again
+    //! (as if the turn had just started). Otherwise incorrectly sent moves
+    //! will be silently discarded.
     //! @param move the submitted move.
-    Q_SIGNAL void moveEnded(const Move &move);
+    Q_SIGNAL void turnEnded(const Move &move);
 
-    //! Starts new move for this side.
+    //! Starts new turn for this side. If move is the same as last move, then
+    //! the submitted move was invalid.
     //! @param move the submitted move of the other side.
-    void virtual startMove(const Move &move) = 0;
+    void virtual startTurn(const Move &move) = 0;
 };
 
 } // namespace GAME

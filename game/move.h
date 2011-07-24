@@ -29,6 +29,7 @@
 namespace Game {
 
 //! Represents a move, POD struct.
+// TODO: implement equality operator.
 struct Move
 {
 public:

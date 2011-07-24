@@ -93,8 +93,9 @@ const SharedAbstractSide &Game::activeSide() const
     return d->active;
 }
 
-void Game::onMoveEnded(const Move &move)
+void Game::onTurnEnded(const Move &move)
 {
+    // TOOD: Validate move, call startTurn again with last valid move, on (still active) side.
     Q_D(Game);
 
     if (d->state != Game::Started) {
@@ -112,14 +113,14 @@ void Game::onMoveEnded(const Move &move)
     d->active = (d->active == d->local ? d->remote
                                        : d->local);
 
-    d->active->startMove(move);
+    d->active->startTurn(move);
     printTurnMessage(d->active->identifier());
 }
 
 void Game::connectSide(const SharedAbstractSide &side)
 {
-    connect(side.data(), SIGNAL(moveEnded(Move)),
-            this,        SLOT(onMoveEnded(Move)),
+    connect(side.data(), SIGNAL(turnEnded(Move)),
+            this,        SLOT(onTurnEnded(Move)),
             Qt::UniqueConnection);
 
     connect(side.data(), SIGNAL(ready()),
@@ -137,7 +138,7 @@ void Game::onSideReady()
 
     d->state = Game::Started;
     d->active = d->local;
-    d->active->startMove(Move());
+    d->active->startTurn(Move());
     printTurnMessage(d->active->identifier());
 }
 

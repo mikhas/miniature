@@ -45,7 +45,7 @@ public:
     virtual void init();
     virtual SideState state() const;
     virtual const QString &identifier() const;
-    virtual void startMove(const Move &move);
+    virtual void startTurn(const Move &move);
     //! \reimp_end
 
 private:

@@ -73,7 +73,7 @@ const QString &GnuChess::identifier() const
     return m_identifier;
 }
 
-void GnuChess::startMove(const Move &move)
+void GnuChess::startTurn(const Move &move)
 {
     m_proc.write(move.notation.toLatin1().append("\n"));
     m_proc.waitForBytesWritten();
@@ -84,7 +84,7 @@ void GnuChess::onReadyRead()
     while (m_proc.canReadLine()) {
         QString result(m_proc.readLine());
         if (result.startsWith(CmdMove)) {
-            emit moveEnded(Move(Position(), Square(), Square(),
+            emit turnEnded(Move(Position(), Square(), Square(),
                                 QString(result.right(result.size() - CmdMove.size() - 1))));
         }
     }

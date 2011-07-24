@@ -65,9 +65,9 @@ public:
     const SharedAbstractSide &activeSide() const;
 
 private:
-    //! One side ended and submitted a move.
+    //! One side ended turn and submitted a move.
     //! @param move the submitted move.
-    Q_SLOT void onMoveEnded(const Move &move);
+    Q_SLOT void onTurnEnded(const Move &move);
 
     //! Connects common parts for each side with controller.
     //! @param side the side to connect.
