@@ -21,9 +21,19 @@
 #include "localparser.h"
 
 namespace {
-    const QString CmdNew("new");
-    const QString CmdQuit("quit");
-    const QString CmdMove("move");
+    typedef QHash<Game::Command, QByteArray> CommandLookupTable;
+    CommandLookupTable createCommandLoopupTable()
+    {
+        CommandLookupTable result;
+        result.insert(Game::CommandNew, "new");
+        result.insert(Game::CommandQuit, "quit");
+        result.insert(Game::CommandMove, "move");
+        result.insert(Game::CommandLogin, "login");
+
+        return result;
+    }
+
+    const CommandLookupTable cmd_lookup_table = createCommandLoopupTable();
 }
 
 namespace Game {
@@ -41,6 +51,28 @@ public:
         , tokenizer(new_tokenizer)
         , enabled(false)
     {}
+
+    bool isCommand(Command cmd,
+                   const QByteArray &token) const
+    {
+        const QByteArray &val(cmd_lookup_table.value(cmd));
+        return ((flags & cmd) && token == val);
+    }
+
+    bool startsWithCommand(Command cmd,
+                           const QByteArray &token,
+                           QByteArray *val) const
+    {
+        *val = cmd_lookup_table.value(cmd);
+        return ((flags & cmd) && token.left(val->size()) == *val);
+    }
+
+    // FIXME: data should really be a QBA, not QString.
+    QString extractData(const QByteArray &val,
+                        const QByteArray &token) const
+    {
+        return token.right(token.size() - val.size() - 1);
+    }
 };
 
 LocalParser::LocalParser(CommandFlags flags,
@@ -76,18 +108,17 @@ void LocalParser::onTokenFound(const QByteArray &token)
         return;
     }
 
-    QString result(token);
+    // Byte representation of command:
+    QByteArray value;
 
-    if ((d->flags & CommandNew)
-        && result == CmdNew ) {
+    if (d->startsWithCommand(CommandMove, token, &value)) {
+        emit commandFound(CommandMove, d->extractData(value, token));
+    } else if (d->isCommand(CommandNew, token)) {
         emit commandFound(CommandNew);
-    } else if ((d->flags & CommandQuit)
-               && result == CmdQuit) {
+    } else if (d->isCommand(CommandQuit, token)) {
         emit commandFound(CommandQuit);
-    } else if ((d->flags & CommandMove)
-               && result.left(CmdMove.size()) == CmdMove) {
-        emit commandFound(CommandMove,
-                          QString(result.right(result.size() - CmdMove.size() - 1)));
+    } else if (d->isCommand(CommandLogin, token)) {
+        emit commandFound(CommandLogin);
     }
 }
 
