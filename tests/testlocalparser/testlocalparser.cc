@@ -72,7 +72,7 @@ public:
     Q_SIGNAL void ready();
 
     Q_SLOT void onCommandFound(Command cmd,
-                               const QString &)
+                               const QByteArray &)
     {
         switch (cmd) {
         case Game::CommandMove:
@@ -163,14 +163,14 @@ private:
         CommandCounter c1;
         CommandCounter c2;
 
-        connect(&p0, SIGNAL(commandFound(Command, QString)),
-                &c0, SLOT(onCommandFound(Command, QString)));
+        connect(&p0, SIGNAL(commandFound(Command, QByteArray)),
+                &c0, SLOT(onCommandFound(Command, QByteArray)));
 
-        connect(&p1, SIGNAL(commandFound(Command, QString)),
-                &c1, SLOT(onCommandFound(Command, QString)));
+        connect(&p1, SIGNAL(commandFound(Command, QByteArray)),
+                &c1, SLOT(onCommandFound(Command, QByteArray)));
 
-        connect(&p2, SIGNAL(commandFound(Command, QString)),
-                &c2, SLOT(onCommandFound(Command, QString)));
+        connect(&p2, SIGNAL(commandFound(Command, QByteArray)),
+                &c2, SLOT(onCommandFound(Command, QByteArray)));
 
         device->write(input);
         TestUtils::waitForSignal(&c0, SIGNAL(ready()), TimeOut);
@@ -193,8 +193,8 @@ private:
 
         device->open(QIODevice::ReadWrite);
 
-        connect(&parser,  SIGNAL(commandFound(Command, QString)),
-                &counter, SLOT(onCommandFound(Command, QString)));
+        connect(&parser,  SIGNAL(commandFound(Command, QByteArray)),
+                &counter, SLOT(onCommandFound(Command, QByteArray)));
 
         device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
@@ -215,8 +215,8 @@ private:
 
         device->open(QIODevice::ReadWrite);
 
-        connect(&parser,  SIGNAL(commandFound(Command, QString)),
-                &counter, SLOT(onCommandFound(Command, QString)));
+        connect(&parser,  SIGNAL(commandFound(Command, QByteArray)),
+                &counter, SLOT(onCommandFound(Command, QByteArray)));
 
         device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);

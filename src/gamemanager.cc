@@ -42,8 +42,8 @@ GameManager::GameManager(QObject *parent)
     , m_parser(main_commands, m_tokenizer)
     , m_fics_link()
 {
-    connect(&m_parser, SIGNAL(commandFound(Command, QString)),
-            this,      SLOT(onCommandFound(Command, QString)));
+    connect(&m_parser, SIGNAL(commandFound(Command, QByteArray)),
+            this,      SLOT(onCommandFound(Command, QByteArray)));
 
     m_parser.setEnabled(true);
     std::cout << "Welcome to Miniature!" << std::endl;
@@ -82,8 +82,8 @@ Game::Game *GameManager::createLocalEngineGame()
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::GnuChess *remote = new Game::GnuChess("black");
 
-    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
-            local,         SLOT(onCommandFound(Command, QString)));
+    connect(&local_parser, SIGNAL(commandFound(Command, QByteArray)),
+            local,         SLOT(onCommandFound(Command, QByteArray)));
 
     return new Game::Game(local, remote, this);
 }
@@ -97,14 +97,14 @@ Game::Game *GameManager::createRemoteFicsGame()
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link.data());
 
-    connect(&local_parser, SIGNAL(commandFound(Command, QString)),
-            local,         SLOT(onCommandFound(Command, QString)));
+    connect(&local_parser, SIGNAL(commandFound(Command, QByteArray)),
+            local,         SLOT(onCommandFound(Command, QByteArray)));
 
     return new Game::Game(local, remote, this);
 }
 
 void GameManager::onCommandFound(Command command,
-                                 const QString &data)
+                                 const QByteArray &data)
 {
     Q_UNUSED(data)
 

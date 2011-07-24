@@ -163,7 +163,7 @@ void FicsSide::startTurn(const Move &move)
 }
 
 void FicsSide::onCommandFound(Command command,
-                               const QString &data)
+                               const QByteArray &data)
 {
     Q_UNUSED(command)
     Q_UNUSED(data)

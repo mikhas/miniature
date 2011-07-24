@@ -59,7 +59,7 @@ void LocalSide::startTurn(const Move &move)
 }
 
 void LocalSide::onCommandFound(Command command,
-                               const QString &data)
+                               const QByteArray &data)
 {
     switch(command) {
     case CommandQuit:
@@ -67,7 +67,7 @@ void LocalSide::onCommandFound(Command command,
         break;
 
     case CommandMove:
-        emit turnEnded(Move(Position(), Square(), Square(), data));
+        emit turnEnded(Move(Position(), Square(), Square(), QString(data)));
         break;
 
     default:

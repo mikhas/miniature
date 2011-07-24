@@ -67,9 +67,8 @@ public:
         return ((flags & cmd) && token.left(val->size()) == *val);
     }
 
-    // FIXME: data should really be a QBA, not QString.
-    QString extractData(const QByteArray &val,
-                        const QByteArray &token) const
+    QByteArray extractData(const QByteArray &val,
+                           const QByteArray &token) const
     {
         return token.right(token.size() - val.size() - 1);
     }

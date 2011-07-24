@@ -62,7 +62,7 @@ public:
     //! @param cmd the found command.
     //! @param data the data for this command.
     Q_SIGNAL void commandFound(Command cmd,
-                               const QString &data = QString());
+                               const QByteArray &data = QByteArray());
 };
 
 } // namespace Game

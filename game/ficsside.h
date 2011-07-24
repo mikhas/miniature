@@ -65,7 +65,7 @@ public:
     //! @param cmd the found command.
     //! @param data the data for this command.
     Q_SIGNAL void commandFound(Command cmd,
-                               const QString &data = QString());
+                               const QByteArray &data = QByteArray());
 };
 
 class FicsLink
@@ -132,7 +132,7 @@ private:
     //! @command the found command.
     //! @data the data that belongs to the command.
     Q_SLOT void onCommandFound(Command command,
-                               const QString &data);
+                               const QByteArray &data);
 };
 
 } // namespace Game

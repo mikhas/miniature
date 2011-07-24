@@ -69,7 +69,7 @@ private:
     //! @command the found command.
     //! @data the data that belongs to the command.
     Q_SLOT void onCommandFound(Command command,
-                               const QString &data);
+                               const QByteArray &data);
 };
 
 } // namespace Miniature
