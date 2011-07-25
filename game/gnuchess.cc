@@ -23,6 +23,17 @@
 namespace {
     const char * const GnuChessCmd = "/usr/games/gnuchess";
     const QString CmdMove("My move is :");
+
+    bool kill(Q_PID pid,
+              const QString &signal)
+    {
+        QStringList args;
+        args.append("-s");
+        args.append(signal);
+        args.append(QString("%1").arg(pid));
+
+        return (0 == QProcess::execute("kill", args));
+    }
 }
 
 namespace Game {
@@ -71,6 +82,28 @@ AbstractSide::SideState GnuChess::state() const
 const QString &GnuChess::identifier() const
 {
     return m_identifier;
+}
+
+void GnuChess::runInBackground()
+{
+    if (m_state == NotReady) {
+        return;
+    }
+
+    if (kill(m_proc.pid(), "SIGTSTP")) {
+        m_state = RunInBackground;
+    }
+}
+
+void GnuChess::runInForeground()
+{
+    if (m_state != RunInBackground) {
+        return;
+    }
+
+    if (kill(m_proc.pid(), "SIGCONT")) {
+        m_state = Ready;
+    }
 }
 
 void GnuChess::startTurn(const Move &move)

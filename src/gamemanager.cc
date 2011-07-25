@@ -71,6 +71,17 @@ void GameManager::startGame(GameMode mode)
         break;
     }
 
+    // Suspend sides in other game instances first:
+    // TODO: provide activation API (for suspended games).
+    foreach(QPointer<Game::Game> current, m_games) {
+        if (not current) {
+            continue;
+        }
+
+        current->side(Game::SideLocal)->runInBackground();
+        current->side(Game::SideRemote)->runInBackground();
+    }
+
     game->start();
     m_games.append(QPointer<Game::Game>(game));
 }

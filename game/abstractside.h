@@ -44,6 +44,7 @@ public:
     enum SideState {
         NotReady,
         Ready,
+        RunInBackground
     };
 
     //! C'tor
@@ -63,6 +64,14 @@ public:
 
     //! Returns identifier for this side.
     virtual const QString &identifier() const = 0;
+
+    //! Let this side run in background. Backends should stop costly
+    //! computations and free resources where possible.
+    virtual void runInBackground() = 0;
+
+    //! Runs this side in foreground again, recovering from a previous
+    //! runInBackground call.
+    virtual void runInForeground() = 0;
 
     //! Emitted when a move has been submitted. If it is was this side's turn
     //! and the submitted move is invalid, then startMove will be called again

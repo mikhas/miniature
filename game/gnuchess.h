@@ -47,6 +47,8 @@ public:
     virtual void init();
     virtual SideState state() const;
     virtual const QString &identifier() const;
+    virtual void runInBackground();
+    virtual void runInForeground();
     virtual void startTurn(const Move &move);
     //! \reimp_end
 

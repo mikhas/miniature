@@ -32,11 +32,6 @@ LocalSide::LocalSide(const QString &identifier)
 LocalSide::~LocalSide()
 {}
 
-const QString &LocalSide::identifier() const
-{
-    return m_identifier;
-}
-
 void LocalSide::init()
 {
     // Nothing to do, just report readiness:
@@ -47,6 +42,27 @@ void LocalSide::init()
 AbstractSide::SideState LocalSide::state() const
 {
     return m_state;
+}
+
+const QString &LocalSide::identifier() const
+{
+    return m_identifier;
+}
+
+void LocalSide::runInBackground()
+{
+    if (m_state == NotReady) {
+        return;
+    }
+
+    m_state = RunInBackground;
+}
+
+void LocalSide::runInForeground()
+{
+    if (m_state == RunInBackground) {
+        m_state = Ready;
+    }
 }
 
 void LocalSide::startTurn(const Move &move)

@@ -29,10 +29,43 @@
 #include <QtGui>
 #include <QtTest>
 
+using Game::AbstractLink;
 using Game::Move;
 Q_DECLARE_METATYPE(Move)
 
-using Game::AbstractLink;
+// Need to wrap abstract type in something default-constructable:
+struct AbstractSideWrapper
+{
+    Game::AbstractSide *m_side;
+    AbstractSideWrapper(Game::AbstractSide *side = 0)
+        : m_side(side)
+    {}
+};
+Q_DECLARE_METATYPE(AbstractSideWrapper)
+
+class DummyLink
+    : public Game::AbstractLink
+{
+public:
+    explicit DummyLink(QObject *parent = 0)
+        : Game::AbstractLink(parent)
+    {}
+
+    virtual ~DummyLink()
+    {}
+
+    virtual Game::AbstractLink::State state() const
+    {
+        return Game::AbstractLink::StateIdle;
+    }
+
+    virtual void login(const QString &,
+                       const QString &)
+    {}
+
+    virtual void close()
+    {}
+};
 
 class TestGame
     : public QObject
@@ -91,6 +124,40 @@ private:
 
         emit local->turnEnded(Game::Move());
         QCOMPARE(subject.side(Game::SideActive).data(), fics);
+    }
+
+    Q_SLOT void testSideStates_data()
+    {
+        qRegisterMetaType<AbstractSideWrapper>();
+        DummyLink *link = new DummyLink(qApp);
+
+        QTest::addColumn<AbstractSideWrapper>("side_wrapper");
+        QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side"));
+        QTest::newRow("FICS") << AbstractSideWrapper(new Game::FicsSide("local", link));
+        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess"));
+    }
+
+    Q_SLOT void testSideStates()
+    {
+        QFETCH(AbstractSideWrapper, side_wrapper);
+        QScopedPointer<Game::AbstractSide> side(side_wrapper.m_side);
+
+        QCOMPARE(side->state(), Game::AbstractSide::NotReady);
+
+        // Cannot run in background before side was initialized:
+        side->runInBackground();
+        QCOMPARE(side->state(), Game::AbstractSide::NotReady);
+
+        side->init();
+        TestUtils::waitForSignal(side.data(), SIGNAL(ready()));
+        QCOMPARE(side->state(), Game::AbstractSide::Ready);
+
+        side->runInBackground();
+        QCOMPARE(side->state(), Game::AbstractSide::RunInBackground);
+
+        side->runInForeground();
+        QCOMPARE(side->state(), Game::AbstractSide::Ready);
+
     }
 
     Q_SLOT void testCli()

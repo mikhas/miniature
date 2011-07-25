@@ -140,14 +140,8 @@ FicsSide::FicsSide(const QString &identifier,
 FicsSide::~FicsSide()
 {}
 
-const QString &FicsSide::identifier() const
-{
-    return m_identifier;
-}
-
 void FicsSide::init()
 {
-    // TODO: Login to FICS
     m_state = Ready;
     emit ready();
 }
@@ -155,6 +149,27 @@ void FicsSide::init()
 AbstractSide::SideState FicsSide::state() const
 {
     return m_state;
+}
+
+const QString &FicsSide::identifier() const
+{
+    return m_identifier;
+}
+
+void FicsSide::runInBackground()
+{
+    if (m_state == NotReady) {
+        return;
+    }
+
+    m_state = RunInBackground;
+}
+
+void FicsSide::runInForeground()
+{
+    if (m_state == RunInBackground) {
+        m_state = Ready;
+    }
 }
 
 void FicsSide::startTurn(const Move &move)

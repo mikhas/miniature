@@ -74,6 +74,26 @@ private:
         QCOMPARE(whiteSpy.count(), 2);
         QCOMPARE(blackSpy.count(), 2);
     }
+
+    Q_SLOT void testRunInBackgroundForeground()
+    {
+        Game::GnuChess subject("GnuChess");
+        QSignalSpy spy(&subject, SIGNAL(turnEnded(Move)));
+
+        subject.init();
+        TestUtils::waitForSignal(&subject, SIGNAL(ready()));
+
+        subject.startTurn(Move(Game::Position(), Game::Square(), Game::Square(),
+                               QString("g4")));
+        subject.runInBackground();
+        QCOMPARE(subject.state(), Game::AbstractSide::RunInBackground);
+
+        subject.runInForeground();
+        QCOMPARE(subject.state(), Game::AbstractSide::Ready);
+
+        TestUtils::waitForSignal(&subject, SIGNAL(turnEnded(Move)), 5000);
+        QCOMPARE(spy.count(), 1);
+    }
 };
 
 QTEST_APPLESS_MAIN(TestGnuChess)
