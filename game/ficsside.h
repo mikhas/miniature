@@ -34,6 +34,8 @@ namespace Game
 class AbstractLink;
 typedef QSharedPointer<AbstractLink> SharedLink;
 
+//! Extends AbstractParser into a bidirectional link. Can be used to transmit
+//! and receive commands from a remote server.
 class AbstractLink
     : public AbstractParser
 {
@@ -41,6 +43,7 @@ class AbstractLink
     Q_DISABLE_COPY(AbstractLink)
 
 public:
+    //! The link's state.
     enum State {
         StateIdle,
         StateLoginPending,
@@ -56,13 +59,20 @@ public:
     virtual ~AbstractLink() = 0;
     //! \reimp_end
 
+    //! Returns state of this link.
     virtual State state() const = 0;
+
+    //! Emitted whenever state changes.
     Q_SIGNAL void stateChanged(State state);
 
+    //! Login to remote server.
+    //! @param username the username of the account.
+    //! @param password the password of the account.
     virtual void login(const QString &username,
                        const QString &password) = 0;
 };
 
+//! A link for FICS
 class FicsLink
     : public AbstractLink
 {
