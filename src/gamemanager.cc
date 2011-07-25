@@ -28,9 +28,10 @@
 using Game::Command;
 
 namespace {
-    const Game::CommandFlags main_commands(Game::CommandNew | Game::CommandQuit
-                                           | Game::CommandLogin | Game::CommandSeek
-                                           | Game::CommandJoin | Game::CommandObserve);
+    const Game::CommandFlags game_manager_commands(Game::CommandNew | Game::CommandQuit
+                                                   | Game::CommandLogin | Game::CommandSeek
+                                                   | Game::CommandJoin | Game::CommandObserve);
+    const Game::CommandFlags local_side_commands(Game::CommandMove);
 }
 
 namespace Miniature {
@@ -39,7 +40,8 @@ GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
     , m_tokenizer(Game::createLocalInputTokenizer())
-    , m_parser(main_commands, m_tokenizer)
+    , m_parser(game_manager_commands, m_tokenizer)
+    , m_local_side_parser(local_side_commands, m_tokenizer)
     , m_fics_link()
 {
     connect(&m_parser, SIGNAL(commandFound(Command, QByteArray)),
@@ -81,26 +83,30 @@ Game::Game *GameManager::createLocalEngineGame()
 
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::GnuChess *remote = new Game::GnuChess("black");
-
-    connect(&local_parser, SIGNAL(commandFound(Command, QByteArray)),
-            local,         SLOT(onCommandFound(Command, QByteArray)));
+    connectToParser(local);
 
     return new Game::Game(local, remote, this);
 }
 
 Game::Game *GameManager::createRemoteFicsGame()
 {
-    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
-                                          m_tokenizer);
-    local_parser.setEnabled(true);
-
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link.data());
-
-    connect(&local_parser, SIGNAL(commandFound(Command, QByteArray)),
-            local,         SLOT(onCommandFound(Command, QByteArray)));
+    connectToParser(local);
 
     return new Game::Game(local, remote, this);
+}
+
+void GameManager::connectToParser(Game::AbstractSide *side)
+{
+    // Only one side at a time can be connected to the parser for the local
+    // side (otherwise, local sides in inactive games would also receive
+    // commands):
+    m_local_side_parser.setEnabled(true);
+    m_local_side_parser.disconnect(SIGNAL(commandFound(Command, QByteArray)));
+    connect(&m_local_side_parser, SIGNAL(commandFound(Command, QByteArray)),
+            side,                 SLOT(onCommandFound(Command, QByteArray)),
+            Qt::UniqueConnection);
 }
 
 void GameManager::onCommandFound(Command command,

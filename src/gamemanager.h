@@ -51,6 +51,7 @@ private:
     QList<QPointer<Game::Game> > m_games;
     Game::SharedTokenizer m_tokenizer;
     Game::LocalParser m_parser;
+    Game::LocalParser m_local_side_parser;
     QSharedPointer<Game::AbstractLink> m_fics_link;
 
 public:
@@ -64,6 +65,7 @@ public:
 private:        
     Game::Game *createLocalEngineGame();
     Game::Game *createRemoteFicsGame();
+    void connectToParser(Game::AbstractSide *side);
 
     //! Handle input from command line interface.
     //! @command the found command.
