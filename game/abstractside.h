@@ -21,6 +21,8 @@
 #ifndef SIDE_H
 #define SIDE_H
 
+#include "namespace.h"
+
 #include <QtCore>
 
 namespace Game {
@@ -83,7 +85,13 @@ public:
     //! Starts new turn for this side. If move is the same as last move, then
     //! the submitted move was invalid.
     //! @param move the submitted move of the other side.
-    void virtual startTurn(const Move &move) = 0;
+    virtual void startTurn(const Move &move) = 0;
+
+    //! Handle input from command line interface or GUI
+    //! @command the found command.
+    //! @data the data that belongs to the command.
+    Q_SLOT virtual void onCommandFound(Command command,
+                                       const QByteArray &data) = 0;
 };
 
 } // namespace GAME

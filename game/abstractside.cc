@@ -29,5 +29,10 @@ AbstractSide::AbstractSide(const QString &)
 AbstractSide::~AbstractSide()
 {}
 
+// Empty impl to make MOC happy:
+void AbstractSide::onCommandFound(Command,
+                                  const QByteArray &)
+{}
+
 } // namespace Game
 

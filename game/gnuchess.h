@@ -50,6 +50,8 @@ public:
     virtual void runInBackground();
     virtual void runInForeground();
     virtual void startTurn(const Move &move);
+    virtual void onCommandFound(Command command,
+                                const QByteArray &data);
     //! \reimp_end
 
 private:

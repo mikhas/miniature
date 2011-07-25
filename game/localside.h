@@ -48,14 +48,9 @@ public:
     virtual void runInBackground();
     virtual void runInForeground();
     virtual void startTurn(const Move &move);
+    virtual void onCommandFound(Command command,
+                                const QByteArray &data);
     //! \reimp_end
-
-private:
-    //! Handle input from command line interface.
-    //! @command the found command.
-    //! @data the data that belongs to the command.
-    Q_SLOT void onCommandFound(Command command,
-                               const QByteArray &data);
 };
 
 } // namespace Game
