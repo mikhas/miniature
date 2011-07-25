@@ -173,6 +173,7 @@ void FicsLink::processLogin(const QByteArray &line)
     } else if (line.startsWith(fics_prompt)) {
         m_login_abort_timer.stop();
         m_extra_delimiter.clear();
+        configurePrompt();
         m_state = StateReady;
         emit stateChanged(m_state);
     }
@@ -192,6 +193,16 @@ void FicsLink::abortLogin()
     qDebug() << "Failed to login in with as" << m_username;
     m_state = StateLoginFailed;
     emit stateChanged(m_state);
+}
+
+void FicsLink::configurePrompt()
+{
+    if (m_state != StateReady) {
+        return;
+    }
+
+    m_channel.write("set style 12");
+    m_channel.write("\n");
 }
 
 FicsSide::FicsSide(const QString &identifier,

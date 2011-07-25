@@ -106,6 +106,7 @@ private:
     void processLogin(const QByteArray &line);
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
+    void configurePrompt();
 };
 
 //! Implement a backend for FICS (freechess.org).
