@@ -23,10 +23,12 @@
 
 namespace Game {
 
-LocalSide::LocalSide(const QString &identifier)
-    : AbstractSide(identifier)
+LocalSide::LocalSide(const QString &identifier,
+                     const SharedParser &parser)
+    : AbstractSide(identifier, parser)
     , m_identifier(identifier)
     , m_state(NotReady)
+    , m_parser(parser)
 {}
 
 LocalSide::~LocalSide()
@@ -56,12 +58,17 @@ void LocalSide::runInBackground()
     }
 
     m_state = RunInBackground;
+    disconnect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
+               this,            SLOT(onCommandFound(Command, QByteArray)));
 }
 
 void LocalSide::runInForeground()
 {
     if (m_state == RunInBackground) {
         m_state = Ready;
+        connect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
+                this,            SLOT(onCommandFound(Command, QByteArray)),
+                Qt::UniqueConnection);
     }
 }
 

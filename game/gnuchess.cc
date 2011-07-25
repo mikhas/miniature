@@ -38,11 +38,29 @@ namespace {
 
 namespace Game {
 
-GnuChess::GnuChess(const QString &identifier)
-    : AbstractSide(identifier)
+GnuChessParser::GnuChessParser(QObject *parent)
+    : AbstractParser(parent)
+{}
+
+GnuChessParser::~GnuChessParser()
+{}
+
+void GnuChessParser::setFlags(CommandFlags)
+{}
+
+void GnuChessParser::setEnabled(bool)
+{}
+
+void GnuChessParser::processToken(const QByteArray &)
+{}
+
+GnuChess::GnuChess(const QString &identifier,
+                   const SharedParser &parser)
+    : AbstractSide(identifier, parser)
     , m_identifier(identifier)
     , m_state(NotReady)
     , m_proc()
+    , m_parser(parser)
 {
     connect(&m_proc, SIGNAL(readyRead()),
             this,    SLOT(onReadyRead()),
@@ -92,6 +110,8 @@ void GnuChess::runInBackground()
 
     if (kill(m_proc.pid(), "SIGTSTP")) {
         m_state = RunInBackground;
+        disconnect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
+                   this,            SLOT(onCommandFound(Command, QByteArray)));
     }
 }
 
@@ -103,6 +123,9 @@ void GnuChess::runInForeground()
 
     if (kill(m_proc.pid(), "SIGCONT")) {
         m_state = Ready;
+        connect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
+                this,            SLOT(onCommandFound(Command, QByteArray)),
+                Qt::UniqueConnection);
     }
 }
 

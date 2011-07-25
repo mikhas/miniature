@@ -43,38 +43,6 @@ struct AbstractSideWrapper
 };
 Q_DECLARE_METATYPE(AbstractSideWrapper)
 
-class DummyLink
-    : public Game::AbstractLink
-{
-public:
-    explicit DummyLink(QObject *parent = 0)
-        : Game::AbstractLink(parent)
-    {}
-
-    virtual ~DummyLink()
-    {}
-
-    virtual Game::AbstractLink::State state() const
-    {
-        return Game::AbstractLink::StateIdle;
-    }
-
-    virtual void login(const QString &,
-                       const QString &)
-    {
-        emit stateChanged(Game::AbstractLink::StateLoginFailed);
-    }
-
-    virtual void setEnabled(bool)
-    {}
-
-    virtual void processToken(const QByteArray &)
-    {}
-
-    virtual void setFlags(Game::CommandFlags)
-    {}
-};
-
 class TestGame
     : public QObject
 {
@@ -93,8 +61,9 @@ private:
         // After each valid move, active side should switch. So we can test a
         // valid move sequence simply by checking the active side against the
         // expected value.
-        Game::AbstractSide *white = new Game::LocalSide("white");
-        Game::AbstractSide *black = new Game::LocalSide("white");
+        Game::SharedParser parser(new TestUtils::DummyLink);
+        Game::AbstractSide *white = new Game::LocalSide("white", parser);
+        Game::AbstractSide *black = new Game::LocalSide("white", parser);
         Game::Game subject(white, black);
         QCOMPARE(subject.side(Game::SideActive).data(), white);
 
@@ -119,10 +88,9 @@ private:
 
     Q_SLOT void testFicsGame()
     {
-        Game::AbstractSide *local = new Game::LocalSide("local");
+        Game::SharedLink link(new TestUtils::DummyLink);
+        Game::AbstractSide *local = new Game::LocalSide("local", link);
 
-        // TODO: Stub the shared link.
-        Game::SharedLink link(new DummyLink);
         link->login("guest", "");
         TestUtils::waitForSignal(link.data(), SIGNAL(stateChanged(State)), 5000);
         Game::AbstractSide *fics = new Game::FicsSide("FICS", link);
@@ -137,12 +105,12 @@ private:
     Q_SLOT void testSideStates_data()
     {
         qRegisterMetaType<AbstractSideWrapper>();
-        Game::SharedLink link(new DummyLink);
+        Game::SharedLink link(new TestUtils::DummyLink);
 
         QTest::addColumn<AbstractSideWrapper>("side_wrapper");
-        QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side"));
+        QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side", link));
         QTest::newRow("FICS") << AbstractSideWrapper(new Game::FicsSide("local", link));
-        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess"));
+        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess", link));
     }
 
     Q_SLOT void testSideStates()

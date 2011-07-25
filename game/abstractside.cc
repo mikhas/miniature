@@ -22,9 +22,14 @@
 
 namespace Game {
 
-AbstractSide::AbstractSide(const QString &)
+AbstractSide::AbstractSide(const QString &,
+                           const SharedParser &parser)
     : QObject()
-{}
+{
+    connect(parser.data(), SIGNAL(commandFound(Command, QByteArray)),
+            this,          SLOT(onCommandFound(Command, QByteArray)),
+            Qt::UniqueConnection);
+}
 
 AbstractSide::~AbstractSide()
 {}

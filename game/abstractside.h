@@ -22,6 +22,7 @@
 #define SIDE_H
 
 #include "namespace.h"
+#include "abstractparser.h"
 
 #include <QtCore>
 
@@ -51,7 +52,9 @@ public:
 
     //! C'tor
     //! @param identifier the identifier for this side.
-    explicit AbstractSide(const QString &identifier);
+    //! @param parser the (shared) parser instance.
+    explicit AbstractSide(const QString &identifier,
+                          const SharedParser &parser);
     virtual ~AbstractSide() = 0;
 
     //! Initialize parts of the backend that are costly or require a main loop.

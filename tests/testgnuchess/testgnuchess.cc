@@ -50,9 +50,10 @@ private:
     Q_SLOT void testShortMatch()
     {
         qRegisterMetaType<Move>();
+        Game::SharedParser parser(new TestUtils::DummyLink);
 
-        Game::LocalSide *white = new Game::LocalSide("white");
-        Game::GnuChess  *black = new Game::GnuChess("black");
+        Game::LocalSide *white = new Game::LocalSide("white", parser);
+        Game::GnuChess  *black = new Game::GnuChess("black", parser);
         QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Move)));
         QSignalSpy blackSpy(black, SIGNAL(turnEnded(Move)));
         Game::Game game(white, black);
@@ -77,7 +78,8 @@ private:
 
     Q_SLOT void testRunInBackgroundForeground()
     {
-        Game::GnuChess subject("GnuChess");
+        Game::SharedLink parser(new TestUtils::DummyLink);
+        Game::GnuChess subject("GnuChess", parser);
         QSignalSpy spy(&subject, SIGNAL(turnEnded(Move)));
 
         subject.init();

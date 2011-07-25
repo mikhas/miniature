@@ -21,6 +21,9 @@
 #ifndef TESTUTILS_H
 #define TESTUTILS_H
 
+#include "abstractparser.h"
+#include "ficsside.h" // TODO: move parser in separate file
+
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
@@ -62,6 +65,38 @@ QApplication *createApp(const QString &app_name)
     return new QApplication(argc, argv);
 
 }
+
+class DummyLink
+    : public Game::AbstractLink
+{
+public:
+    explicit DummyLink(QObject *parent = 0)
+        : Game::AbstractLink(parent)
+    {}
+
+    virtual ~DummyLink()
+    {}
+
+    virtual Game::AbstractLink::State state() const
+    {
+        return Game::AbstractLink::StateIdle;
+    }
+
+    virtual void login(const QString &,
+                       const QString &)
+    {
+        emit stateChanged(Game::AbstractLink::StateLoginFailed);
+    }
+
+    virtual void setEnabled(bool)
+    {}
+
+    virtual void processToken(const QByteArray &)
+    {}
+
+    virtual void setFlags(Game::CommandFlags)
+    {}
+};
 
 } // namespace TestUtils
 

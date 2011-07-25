@@ -50,14 +50,16 @@ public:
 private:
     QList<QPointer<Game::Game> > m_games;
     QScopedPointer<Game::AbstractTokenizer> m_tokenizer;
-    Game::LocalParser m_parser;
-    Game::LocalParser m_local_side_parser;
+    Game::SharedParser m_parser;
+    Game::SharedParser m_local_side_parser;
+    Game::SharedParser m_gnuchess_parser;
     QSharedPointer<Game::AbstractLink> m_fics_link;
 
 public:
     enum Parser {
         ParserGameManager,
-        ParserLocalSide
+        ParserLocalSide,
+        ParserGnuChess
     };
 
     explicit GameManager(QObject *parent = 0);
@@ -68,12 +70,11 @@ public:
     Q_SLOT void startGame(GameMode mode);
 
     //! Test API, exposes the internally used parser instance.
-    const Game::AbstractParser &parser(Parser type) const;
+    const Game::SharedParser &parser(Parser type) const;
 
 private:        
     Game::Game *createLocalEngineGame();
     Game::Game *createRemoteFicsGame();
-    void connectToParser(Game::AbstractSide *side);
 
     //! Handle input from command line interface.
     //! @command the found command.

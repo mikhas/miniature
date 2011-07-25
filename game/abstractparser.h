@@ -27,6 +27,9 @@
 
 namespace Game {
 
+class AbstractParser;
+typedef QSharedPointer<AbstractParser> SharedParser;
+
 //! Command parser interface. Can retrieve input from command line or graphical
 //! user interface and translate input into proper commands. Each AbstractSide
 //! backend might require its own parser implementation.

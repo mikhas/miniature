@@ -23,12 +23,30 @@
 
 #include "move.h"
 #include "abstractside.h"
+#include "abstractparser.h"
 
 #include <QtCore>
 
 namespace Game {
 
-//! Controls game.
+// Only a skeleton for now.
+class GnuChessParser
+    : public AbstractParser
+{
+    Q_OBJECT
+    Q_DISABLE_COPY(GnuChessParser)
+
+public:
+    //! \reimp
+    explicit GnuChessParser(QObject *parent = 0);
+    virtual ~GnuChessParser();
+    virtual void setFlags(CommandFlags flags);
+    virtual void setEnabled(bool enable);
+    virtual void processToken(const QByteArray &token);
+    //! \reimp
+};
+
+//! Gnuchess backend.
 class GnuChess
     : public AbstractSide
 {
@@ -39,10 +57,12 @@ private:
     const QString m_identifier;
     SideState m_state;
     QProcess m_proc;
+    SharedParser m_parser;
 
 public:
     //! \reimp
-    explicit GnuChess(const QString &identifier);
+    explicit GnuChess(const QString &identifier,
+                      const SharedParser &parser);
     virtual ~GnuChess();
     virtual void init();
     virtual SideState state() const;

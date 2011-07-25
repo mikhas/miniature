@@ -158,7 +158,7 @@ void FicsLink::onHostFound()
 
 FicsSide::FicsSide(const QString &identifier,
                    const SharedLink &link)
-    : AbstractSide(identifier)
+    : AbstractSide(identifier, link)
     , m_identifier(identifier)
     , m_state(NotReady)
     , m_link(link)
@@ -190,12 +190,17 @@ void FicsSide::runInBackground()
     }
 
     m_state = RunInBackground;
+    disconnect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
+               this,          SLOT(onCommandFound(Command, QByteArray)));
 }
 
 void FicsSide::runInForeground()
 {
     if (m_state == RunInBackground) {
         m_state = Ready;
+        connect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
+                this,          SLOT(onCommandFound(Command, QByteArray)),
+                Qt::UniqueConnection);
     }
 }
 

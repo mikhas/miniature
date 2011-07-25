@@ -37,10 +37,12 @@ class LocalSide
 private:
     const QString m_identifier;
     SideState m_state;
+    SharedParser m_parser;
 
 public:
     //! \reimp
-    explicit LocalSide(const QString &identifier);
+    explicit LocalSide(const QString &identifier,
+                       const SharedParser &parser);
     virtual ~LocalSide();
     virtual void init();
     virtual SideState state() const;
