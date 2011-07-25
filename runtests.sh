@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for test in testgame testgnuchess testlocalparser testficsparser
+for test in testgame testgnuchess testlocalparser
 do
     echo "Running ${test} ..."
     if [ ${VERBOSE+1} ]

@@ -20,7 +20,6 @@ HEADERS += \
     square.h \
     abstractparser.h \
     localparser.h \
-    ficsparser.h \
     ficsside.h \
 
 SOURCES += \
@@ -36,5 +35,4 @@ SOURCES += \
     square.cc \
     abstractparser.cc \
     localparser.cc \
-    ficsparser.cc \
     ficsside.cc \

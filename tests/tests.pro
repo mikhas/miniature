@@ -9,5 +9,3 @@ SUBDIRS = \
     testgame \
     testgnuchess \
     testlocalparser \
-    testficsparser \
-
