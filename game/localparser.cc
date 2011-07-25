@@ -107,8 +107,8 @@ void LocalParser::processToken(const QByteArray &token)
         emit commandFound(CommandNew);
     } else if (d->isCommand(CommandQuit, token)) {
         emit commandFound(CommandQuit);
-    } else if (d->isCommand(CommandLogin, token)) {
-        emit commandFound(CommandLogin);
+    } else if (d->startsWithCommand(CommandLogin, token, &value)) {
+        emit commandFound(CommandLogin, d->extractData(value, token));
     }
 }
 

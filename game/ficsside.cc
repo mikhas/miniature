@@ -44,7 +44,15 @@ FicsLink::FicsLink(QObject *parent)
     , m_password()
     , m_state(StateIdle)
     , m_enabled(false)
+    , m_login_abort_timer()
+    , m_extra_delimiter()
 {
+    m_login_abort_timer.setSingleShot(true);
+    m_login_abort_timer.setInterval(10000);
+
+    connect(&m_login_abort_timer, SIGNAL(timeout()),
+            this,                 SLOT(abortLogin()));
+
     connect(&m_channel, SIGNAL(readyRead()),
             this,       SLOT(onReadyRead()));
 
@@ -96,12 +104,17 @@ void FicsLink::login(const QString &username,
 
     m_state = StateLoginPending;
     emit stateChanged(m_state);
+    m_login_abort_timer.start();
 
     m_username = username;
     m_password = password;
 
     m_channel.write(m_username.toLatin1());
     m_channel.write("\n");
+
+    m_extra_delimiter.clear();
+    m_extra_delimiter.append(':');
+    m_extra_delimiter.append('%');
 }
 
 void FicsLink::processToken(const QByteArray &token)
@@ -129,23 +142,37 @@ void FicsLink::processToken(const QByteArray &token)
 void FicsLink::onReadyRead()
 {
     int next_newline_pos = -1;
-    const bool enable_echo = false;
+    const bool enable_echo = true;
     do {
-        processToken(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo));
+        processToken(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
     } while (next_newline_pos != -1);
 }
 
 void FicsLink::processLogin(const QByteArray &line)
 {
+    // TODO: write proper tokenizer?
     static const QByteArray confirm_login("Press return to enter the server as");
-    if (line.contains(confirm_login)) {
+    static const QByteArray enter_password("password");
+    static const QByteArray fics_prompt("fics");
+
+    if (line.startsWith(confirm_login)) {
+        m_login_abort_timer.stop();
+        m_login_abort_timer.start();
         // Confirm login:
         m_channel.write("\n");
 
-        // Just for testing - find assigned username (assumes we logged in as guest):
-        m_username = line.mid(confirm_login.length() + 2,
-                              line.length() - confirm_login.length() - 4);
-        qDebug() << m_username;
+        if (m_username == "guest") {
+            m_username = line.mid(confirm_login.length() + 2,
+                                  line.length() - confirm_login.length() - 4);
+        }
+    } else if (line.startsWith(enter_password)) {
+        m_login_abort_timer.stop();
+        m_login_abort_timer.start();
+        m_channel.write(m_password.toLatin1());
+        m_channel.write("\n");
+    } else if (line.startsWith(fics_prompt)) {
+        m_login_abort_timer.stop();
+        m_extra_delimiter.clear();
         m_state = StateReady;
         emit stateChanged(m_state);
     }
@@ -154,6 +181,17 @@ void FicsLink::processLogin(const QByteArray &line)
 void FicsLink::onHostFound()
 {
     // TODO: Handle retry attempts here.
+}
+
+void FicsLink::abortLogin()
+{
+    if (m_state != StateLoginPending) {
+        return;
+    }
+
+    qDebug() << "Failed to login in with as" << m_username;
+    m_state = StateLoginFailed;
+    emit stateChanged(m_state);
 }
 
 FicsSide::FicsSide(const QString &identifier,

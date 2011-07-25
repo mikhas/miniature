@@ -41,7 +41,8 @@ typedef QSharedPointer<AbstractTokenizer> SharedTokenizer;
 const QByteArray scanLine(int *newline_pos,
                           QIODevice *device,
                           QByteArray *buffer,
-                          bool echo_enabled = false);
+                          bool echo_enabled = false,
+                          QVector<char> extra_delimiter = QVector<char>());
 
 //! Creates an async tokenizer that reads from stdin.
 AbstractTokenizer *createLocalInputTokenizer();

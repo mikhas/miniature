@@ -28,7 +28,8 @@ namespace Game
 const QByteArray scanLine(int *newline_pos,
                           QIODevice *device,
                           QByteArray *buffer,
-                          bool echo_enabled)
+                          bool echo_enabled,
+                          QVector<char> extra_delimiter)
 {
     const static int max_read = 2 << 12;
 
@@ -53,7 +54,7 @@ const QByteArray scanLine(int *newline_pos,
     for (; index < buffer->length(); ++index) {
         char curr = buffer->at(index);
 
-        if (found_cr || curr == '\n') {
+        if (found_cr || curr == '\n' || extra_delimiter.contains(curr)) {
             found_lf = true;
             break;
         }

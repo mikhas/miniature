@@ -76,6 +76,8 @@ private:
     QString m_password;
     State m_state;
     bool m_enabled;
+    QTimer m_login_abort_timer;
+    QVector<char> m_extra_delimiter;
 
 public:
     //! \reimp
@@ -93,6 +95,7 @@ private:
     Q_SLOT void onReadyRead();
     void processLogin(const QByteArray &line);
     Q_SLOT void onHostFound();
+    Q_SLOT void abortLogin();
 };
 
 //! Implement a backend for FICS (freechess.org).
