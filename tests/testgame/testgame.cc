@@ -55,25 +55,25 @@ private:
         Game::AbstractSide *white = new Game::LocalSide("white");
         Game::AbstractSide *black = new Game::LocalSide("white");
         Game::Game subject(white, black);
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.side(Game::SideActive).data(), white);
 
         // Trying to submit move before starting game => ignore:
         emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.side(Game::SideActive).data(), white);
 
         subject.start();
 
         // Switch sides after submitting move:
         emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), black);
+        QCOMPARE(subject.side(Game::SideActive).data(), black);
 
         // Trying to submit move twice in a row => ignore:
         emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), black);
+        QCOMPARE(subject.side(Game::SideActive).data(), black);
 
         // Switch sides again after submitting move:
         emit black->turnEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.side(Game::SideActive).data(), white);
     }
 
     Q_SLOT void testFicsGame()
@@ -90,7 +90,7 @@ private:
         subject.start();
 
         emit local->turnEnded(Game::Move());
-        QCOMPARE(subject.activeSide().data(), fics);
+        QCOMPARE(subject.side(Game::SideActive).data(), fics);
     }
 
     Q_SLOT void testCli()

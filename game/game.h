@@ -61,8 +61,8 @@ public:
     //! Starts game.
     void start();
 
-    //! Active side.
-    const SharedAbstractSide &activeSide() const;
+    //! Returns specified side.
+    const SharedAbstractSide &side(Side side) const;
 
 private:
     //! One side ended turn and submitted a move.

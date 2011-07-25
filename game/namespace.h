@@ -70,10 +70,17 @@ enum File
     FileH
 };
 
+enum Side {
+    SideActive,
+    SideLocal,
+    SideRemote
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::CommandFlags)
 Q_DECLARE_METATYPE(Game::Rank)
 Q_DECLARE_METATYPE(Game::File)
+Q_DECLARE_METATYPE(Game::Side)
 
 #endif // NAMESPACE_H

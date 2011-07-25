@@ -27,6 +27,7 @@ namespace Game {
 
 class Move;
 class AbstractSide;
+// TODO: Turn into a weak pointer, if side instances are really not supposed to outlive Game instances?
 typedef QSharedPointer<AbstractSide> SharedAbstractSide;
 
 // This class must not depend on the following classes:

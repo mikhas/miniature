@@ -87,10 +87,22 @@ void Game::start()
     }
 }
 
-const SharedAbstractSide &Game::activeSide() const
+const SharedAbstractSide &Game::side(Side side) const
 {
     Q_D(const Game);
-    return d->active;
+    switch(side) {
+    case SideActive:
+        return d->active;
+    case SideLocal:
+        return d->local;
+    case SideRemote:
+        return d->remote;
+    }
+
+    qCritical() << __PRETTY_FUNCTION__
+                << "Should not be reached, invalid side queried!";
+    static SharedAbstractSide invalid;
+    return invalid;
 }
 
 void Game::onTurnEnded(const Move &move)
