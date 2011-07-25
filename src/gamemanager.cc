@@ -40,14 +40,24 @@ GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
     , m_tokenizer(Game::createLocalInputTokenizer())
-    , m_parser(game_manager_commands, m_tokenizer)
-    , m_local_side_parser(local_side_commands, m_tokenizer)
+    , m_parser()
+    , m_local_side_parser()
     , m_fics_link()
 {
+    m_parser.setFlags(game_manager_commands);
+    m_local_side_parser.setFlags(local_side_commands);
+
+    connect(m_tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
+            &m_parser,          SLOT(processToken(QByteArray)));
+
+    connect(m_tokenizer.data(),   SIGNAL(tokenFound(QByteArray)),
+            &m_local_side_parser, SLOT(processToken(QByteArray)));
+
     connect(&m_parser, SIGNAL(commandFound(Command, QByteArray)),
             this,      SLOT(onCommandFound(Command, QByteArray)));
 
     m_parser.setEnabled(true);
+    m_tokenizer->init();
     std::cout << "Welcome to Miniature!" << std::endl;
 }
 

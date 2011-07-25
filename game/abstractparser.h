@@ -22,24 +22,23 @@
 #define ABSTRACTPARSER_H
 
 #include "namespace.h"
-#include "abstracttokenizer.h"
 
 #include <QtCore>
 
 namespace Game {
 
 //! Command parser interface. Can retrieve input from command line or graphical
-//! user interface and translate input into proper commands.
+//! user interface and translate input into proper commands. Each AbstractSide
+//! backend might require its own parser implementation.
 //!
-//! For streamed input, it can make sense to use a tokenizer, which is shared
-//! among the instances. If a shared tokenizer is used, then a list of commands
-//! must be registered with each instance. Every unregistered command will be
-//! ignored. If two instances registered the same command - from the same
-//! tokenizer - then both instances may emit a commandFound, should the command
-//! be found in the common input stream.
+//! For streamed input, it can make sense to use an AbstractTokenizer. Simply
+//! connect a tokenizer's tokenFound signal to the processToken slot.
+//! For each instance, the range of accepted commands can be specified through
+//! setFlags. If two instances accept the same command - say, while reading
+//! from the same tokenizer - then both instances may emit a commandFound,
+//! should the command be found in the common input stream.
 //! To retrieve commands, clients hook up to the commandFound signal.
-//! A graphical user interface can bypass the input stream and forward-connect
-//! signals to the commandFound signal
+//! A graphical user interface can inject commands through processToken.
 class AbstractParser
     : public QObject
 {
@@ -47,20 +46,15 @@ class AbstractParser
     Q_DISABLE_COPY(AbstractParser)
 
 public:
-    //! C'tor - accepts all commands and handles tokenizer internally.
+    //! C'tor
     //! @param parent the owner of this instance (optional).
     explicit AbstractParser(QObject *parent = 0);
 
-    //! C'tor
-    //! @param flags the commands that should be filtered. Other commands will
-    //!        be ignored by this instance.
-    //! @param tokenizer the (shared) tokenizer for this parser. Multiple
-    //!                  parsers can be attached to the same tokenizer stream.
-    //! @param parent the owner of this instance (optional).
-    explicit AbstractParser(CommandFlags flags,
-                            const SharedTokenizer &tokenizer,
-                            QObject *parent = 0);
     virtual ~AbstractParser() = 0;
+
+    //! Specify commands that should be handled by this instance.
+    //! @param flags the command flags.
+    virtual void setFlags(CommandFlags flags) = 0;
 
     //! Enables command parsing. Initializes input device backend for tokenizer
     //! if required.

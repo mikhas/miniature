@@ -44,10 +44,9 @@ private:
 
 public:
     //! \reimp
-    explicit LocalParser(CommandFlags flags,
-                         const SharedTokenizer &tokenizer,
-                         QObject *parent = 0);
+    explicit LocalParser(QObject *parent = 0);
     virtual ~LocalParser();
+    virtual void setFlags(CommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual void processToken(const QByteArray &token);
     //! \reimp_end

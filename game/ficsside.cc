@@ -55,6 +55,10 @@ FicsLink::FicsLink(QObject *parent)
 FicsLink::~FicsLink()
 {}
 
+// Not supported, we always read everything from FICS.
+void FicsLink::setFlags(CommandFlags)
+{}
+
 void FicsLink::setEnabled(bool enable)
 {
     m_enabled = enable;

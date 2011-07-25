@@ -27,12 +27,6 @@ AbstractParser::AbstractParser(QObject *parent)
     : QObject(parent)
 {}
 
-AbstractParser::AbstractParser(CommandFlags,
-                               const SharedTokenizer &,
-                               QObject *parent)
-    : QObject(parent)
-{}
-
 AbstractParser::~AbstractParser()
 {}
 

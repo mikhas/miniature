@@ -95,6 +95,23 @@ public:
     }
 };
 
+namespace {
+    void setupParser(Game::AbstractParser *parser,
+                     CommandCounter *counter,
+                     Game::AbstractTokenizer *tokenizer,
+                     Game::CommandFlags flags)
+    {
+        parser->setFlags(flags);
+        parser->setEnabled(true);
+
+        QObject::connect(tokenizer, SIGNAL(tokenFound(QByteArray)),
+                         parser,    SLOT(processToken(QByteArray)));
+
+        QObject::connect(parser,  SIGNAL(commandFound(Command, QByteArray)),
+                         counter, SLOT(onCommandFound(Command, QByteArray)));
+    }
+}
+
 class TestLocalParser
     : public QObject
 {
@@ -147,30 +164,25 @@ private:
         const QVector<int> emptyCounters(3, 0);
 
         QIODevice *device = new TestInputDevice;
-        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        LocalParser p0(Game::CommandFlags(Game::CommandNew | Game::CommandQuit), tokenizer);
-        LocalParser p1(Game::CommandFlags(Game::CommandMove | Game::CommandQuit), tokenizer);
-        // Does not parse any commands:
-        LocalParser p2(Game::CommandFlags(Game::CommandNone), tokenizer);
+        Game::LineReader tokenizer(device);
 
-        p0.setEnabled(true);
-        p1.setEnabled(true);
-        p2.setEnabled(true);
-
-        device->open(QIODevice::ReadWrite);
-
+        Game::LocalParser p0;
         CommandCounter c0;
+        setupParser(&p0, &c0, &tokenizer,
+                    Game::CommandFlags(Game::CommandNew | Game::CommandQuit));
+
+        Game::LocalParser p1;
         CommandCounter c1;
+        setupParser(&p1, &c1, &tokenizer,
+                    Game::CommandFlags(Game::CommandMove | Game::CommandQuit));
+
+        Game::LocalParser p2;
         CommandCounter c2;
+        setupParser(&p2, &c2, &tokenizer,
+                    Game::CommandFlags(Game::CommandNone));
 
-        connect(&p0, SIGNAL(commandFound(Command, QByteArray)),
-                &c0, SLOT(onCommandFound(Command, QByteArray)));
-
-        connect(&p1, SIGNAL(commandFound(Command, QByteArray)),
-                &c1, SLOT(onCommandFound(Command, QByteArray)));
-
-        connect(&p2, SIGNAL(commandFound(Command, QByteArray)),
-                &c2, SLOT(onCommandFound(Command, QByteArray)));
+        tokenizer.init();
+        device->open(QIODevice::ReadWrite);
 
         device->write(input);
         TestUtils::waitForSignal(&c0, SIGNAL(ready()), TimeOut);
@@ -186,15 +198,15 @@ private:
     {
         const int TimeOut(20);
         QIODevice *device = new TestInputDevice;
-        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        LocalParser parser(Game::CommandFlags(Game::CommandMove), tokenizer);
+        Game::LineReader tokenizer(device);
+
+        Game::LocalParser parser;
         CommandCounter counter;
-        parser.setEnabled(true);
+        setupParser(&parser, &counter, &tokenizer,
+                    Game::CommandFlags(Game::CommandMove));
 
+        tokenizer.init();
         device->open(QIODevice::ReadWrite);
-
-        connect(&parser,  SIGNAL(commandFound(Command, QByteArray)),
-                &counter, SLOT(onCommandFound(Command, QByteArray)));
 
         device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
@@ -209,23 +221,22 @@ private:
     {
         const int TimeOut(20);
         QIODevice *device = new TestInputDevice;
-        Game::SharedTokenizer tokenizer(new Game::LineReader(device));
-        LocalParser parser(Game::CommandFlags(Game::CommandQuit), tokenizer);
-        CommandCounter counter;
+        Game::LineReader tokenizer(device);
 
+        Game::LocalParser parser;
+        CommandCounter counter;
+        setupParser(&parser, &counter, &tokenizer,
+                    Game::CommandFlags(Game::CommandQuit));
+
+        tokenizer.init();
         device->open(QIODevice::ReadWrite);
 
-        connect(&parser,  SIGNAL(commandFound(Command, QByteArray)),
-                &counter, SLOT(onCommandFound(Command, QByteArray)));
-
+        parser.setEnabled(false);
         device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 0);
 
-        // Internal LineReader opens device as ReadOnly, by default:
         parser.setEnabled(true);
-        device->open(QIODevice::ReadWrite);
-
         device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 1);

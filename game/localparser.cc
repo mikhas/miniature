@@ -42,13 +42,10 @@ class LocalParserPrivate
 {
 public:
     CommandFlags flags;
-    SharedTokenizer tokenizer;
     bool enabled;
 
-    explicit LocalParserPrivate(CommandFlags new_flags,
-                                const SharedTokenizer &new_tokenizer)
-        : flags(new_flags)
-        , tokenizer(new_tokenizer)
+    explicit LocalParserPrivate()
+        : flags(CommandNone)
         , enabled(false)
     {}
 
@@ -74,30 +71,24 @@ public:
     }
 };
 
-LocalParser::LocalParser(CommandFlags flags,
-                         const SharedTokenizer &tokenizer,
-                         QObject *parent)
-    : AbstractParser(flags, tokenizer, parent)
-    , d_ptr(new LocalParserPrivate(flags, tokenizer))
-{
-    if (not tokenizer.isNull()) {
-        connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
-                this,             SLOT(processToken(QByteArray)),
-                Qt::UniqueConnection);
-    }
-}
+LocalParser::LocalParser(QObject *parent)
+    : AbstractParser(parent)
+    , d_ptr(new LocalParserPrivate)
+{}
 
 LocalParser::~LocalParser()
 {}
+
+void LocalParser::setFlags(CommandFlags flags)
+{
+    Q_D(LocalParser);
+    d->flags = flags;
+}
 
 void LocalParser::setEnabled(bool enable)
 {
     Q_D(LocalParser);
     d->enabled = enable;
-
-    if (d->enabled && not d->tokenizer.isNull()) {
-        d->tokenizer->init();
-    }
 }
 
 void LocalParser::processToken(const QByteArray &token)

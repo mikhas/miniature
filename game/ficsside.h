@@ -81,6 +81,7 @@ public:
     //! \reimp
     explicit FicsLink(QObject *parent = 0);
     virtual ~FicsLink();
+    virtual void setFlags(CommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual State state() const;
     virtual void login(const QString &username,
