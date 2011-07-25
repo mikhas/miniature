@@ -65,7 +65,7 @@ public:
         emit stateChanged(Game::AbstractLink::StateLoginFailed);
     }
 
-    virtual void close()
+    virtual void setEnabled(bool)
     {}
 };
 

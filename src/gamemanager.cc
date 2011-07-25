@@ -130,6 +130,7 @@ void GameManager::onCommandFound(Command command,
     switch(command) {
     case Game::CommandLogin:
         m_fics_link = QSharedPointer<Game::FicsLink>(new Game::FicsLink);
+        m_fics_link->setEnabled(true);
         m_fics_link->login("guest", "");
         break;
 

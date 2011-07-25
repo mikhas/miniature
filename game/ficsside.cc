@@ -25,7 +25,7 @@
 namespace Game {
 
 AbstractLink::AbstractLink(QObject *parent)
-    : QObject(parent)
+    : AbstractParser(parent)
 {}
 
 AbstractLink::~AbstractLink()
@@ -43,6 +43,7 @@ FicsLink::FicsLink(QObject *parent)
     , m_username()
     , m_password()
     , m_state(StateIdle)
+    , m_enabled(false)
 {
     connect(&m_channel, SIGNAL(readyRead()),
             this,       SLOT(onReadyRead()));
@@ -54,6 +55,29 @@ FicsLink::FicsLink(QObject *parent)
 FicsLink::~FicsLink()
 {}
 
+void FicsLink::setEnabled(bool enable)
+{
+    m_enabled = enable;
+
+    if (not m_enabled) {
+        m_channel.disconnectFromHost();
+        m_channel.waitForDisconnected();
+
+        if (m_state != StateIdle) {
+            m_state = StateIdle;
+            emit stateChanged(m_state);
+        }
+    } else {
+        m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+        m_channel.waitForConnected();
+
+        if (m_state != StateReady) {
+            m_state = StateReady;
+            emit stateChanged(m_state);
+        }
+    }
+}
+
 AbstractLink::State FicsLink::state() const
 {
     return m_state;
@@ -62,7 +86,7 @@ AbstractLink::State FicsLink::state() const
 void FicsLink::login(const QString &username,
                      const QString &password)
 {
-    if (m_state == StateLoginPending || m_state == StateReady) {
+    if (m_state != StateReady) {
         return;
     }
 
@@ -72,14 +96,8 @@ void FicsLink::login(const QString &username,
     m_username = username;
     m_password = password;
 
-    m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
-}
-
-void FicsLink::close()
-{
-    m_channel.close();
-    m_state = StateIdle;
-    emit stateChanged(m_state);
+    m_channel.write(m_username.toLatin1());
+    m_channel.write("\n");
 }
 
 void FicsLink::onReadyRead()
@@ -122,10 +140,6 @@ void FicsLink::processLogin(const QByteArray &line)
 
 void FicsLink::onHostFound()
 {
-    if (m_state == StateLoginPending) {
-        m_channel.write(m_username.toLatin1());
-        m_channel.write("\n");
-    }
     // TODO: Handle retry attempts here.
 }
 

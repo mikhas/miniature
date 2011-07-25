@@ -23,6 +23,7 @@
 
 #include "namespace.h"
 #include "abstractside.h"
+#include "abstractparser.h"
 
 #include <QtCore>
 #include <QtNetwork/QTcpSocket>
@@ -34,7 +35,7 @@ class AbstractLink;
 typedef QSharedPointer<AbstractLink> SharedLink;
 
 class AbstractLink
-    : public QObject
+    : public AbstractParser
 {
     Q_OBJECT
     Q_DISABLE_COPY(AbstractLink)
@@ -50,22 +51,16 @@ public:
     Q_ENUMS(State)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
+    //! \reimp
     explicit AbstractLink(QObject *parent = 0);
     virtual ~AbstractLink() = 0;
+    //! \reimp_end
 
     virtual State state() const = 0;
     Q_SIGNAL void stateChanged(State state);
 
     virtual void login(const QString &username,
                        const QString &password) = 0;
-
-    virtual void close() = 0;
-
-    //! Emitted when a command was found in tokenizer stream.
-    //! @param cmd the found command.
-    //! @param data the data for this command.
-    Q_SIGNAL void commandFound(Command cmd,
-                               const QByteArray &data = QByteArray());
 };
 
 class FicsLink
@@ -80,15 +75,16 @@ private:
     QString m_username;
     QString m_password;
     State m_state;
+    bool m_enabled;
 
 public:
     //! \reimp
     explicit FicsLink(QObject *parent = 0);
     virtual ~FicsLink();
+    virtual void setEnabled(bool enable);
     virtual State state() const;
     virtual void login(const QString &username,
                        const QString &password);
-    virtual void close();
     //! \reimp_end
 
 private:

@@ -42,6 +42,10 @@ class AbstractParser
     Q_DISABLE_COPY(AbstractParser)
 
 public:
+    //! C'tor - accepts all commands and handles tokenizer internally.
+    //! @param parent the owner of this instance (optional).
+    explicit AbstractParser(QObject *parent = 0);
+
     //! C'tor
     //! @param flags the commands that should be filtered. Other commands will
     //!        be ignored by this instance.
