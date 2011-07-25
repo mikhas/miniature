@@ -75,12 +75,14 @@ void GameManager::startGame(GameMode mode)
     m_games.append(QPointer<Game::Game>(game));
 }
 
+const Game::AbstractParser &GameManager::parser(Parser type) const
+{
+    return (type == ParserGameManager ? m_parser
+                                      : m_local_side_parser);
+}
+
 Game::Game *GameManager::createLocalEngineGame()
 {
-    static Game::LocalParser local_parser(Game::CommandFlags(Game::CommandMove),
-                                          m_tokenizer);
-    local_parser.setEnabled(true);
-
     Game::LocalSide *local = new Game::LocalSide("white");
     Game::GnuChess *remote = new Game::GnuChess("black");
     connectToParser(local);

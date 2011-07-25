@@ -55,12 +55,20 @@ private:
     QSharedPointer<Game::AbstractLink> m_fics_link;
 
 public:
+    enum Parser {
+        ParserGameManager,
+        ParserLocalSide
+    };
+
     explicit GameManager(QObject *parent = 0);
     virtual ~GameManager();
 
     //! Starts game with specified game mode.
     //! @param mode the game mode
     Q_SLOT void startGame(GameMode mode);
+
+    //! Test API, exposes the internally used parser instance.
+    const Game::AbstractParser &parser(Parser type) const;
 
 private:        
     Game::Game *createLocalEngineGame();
