@@ -114,10 +114,9 @@ private:
 public:
     //! C'tor
     //! @param identifier the identifier for this side.
-    //! @param link the FICS link, FicsSide takes ownership.
-    // FIXME: Link should *not* be owned, can be shared!
+    //! @param link the shared FICS link.
     explicit FicsSide(const QString &identifier,
-                      AbstractLink *link);
+                      const SharedLink &link);
 
     //! \reimp
     virtual ~FicsSide();

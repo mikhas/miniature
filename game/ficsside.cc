@@ -130,7 +130,7 @@ void FicsLink::onHostFound()
 }
 
 FicsSide::FicsSide(const QString &identifier,
-                   AbstractLink *link)
+                   const SharedLink &link)
     : AbstractSide(identifier)
     , m_identifier(identifier)
     , m_state(NotReady)

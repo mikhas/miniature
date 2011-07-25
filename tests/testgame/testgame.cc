@@ -61,7 +61,9 @@ public:
 
     virtual void login(const QString &,
                        const QString &)
-    {}
+    {
+        emit stateChanged(Game::AbstractLink::StateLoginFailed);
+    }
 
     virtual void close()
     {}
@@ -114,9 +116,9 @@ private:
         Game::AbstractSide *local = new Game::LocalSide("local");
 
         // TODO: Stub the shared link.
-        Game::FicsLink *link = new Game::FicsLink;
+        Game::SharedLink link(new DummyLink);
         link->login("guest", "");
-        TestUtils::waitForSignal(link, SIGNAL(stateChanged(State)), 5000);
+        TestUtils::waitForSignal(link.data(), SIGNAL(stateChanged(State)), 5000);
         Game::AbstractSide *fics = new Game::FicsSide("FICS", link);
 
         Game::Game subject(local, fics);
@@ -129,7 +131,7 @@ private:
     Q_SLOT void testSideStates_data()
     {
         qRegisterMetaType<AbstractSideWrapper>();
-        DummyLink *link = new DummyLink(qApp);
+        Game::SharedLink link(new DummyLink);
 
         QTest::addColumn<AbstractSideWrapper>("side_wrapper");
         QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side"));

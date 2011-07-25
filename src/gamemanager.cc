@@ -104,7 +104,7 @@ Game::Game *GameManager::createLocalEngineGame()
 Game::Game *GameManager::createRemoteFicsGame()
 {
     Game::LocalSide *local = new Game::LocalSide("white");
-    Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link.data());
+    Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link);
     connectToParser(local);
 
     return new Game::Game(local, remote, this);
