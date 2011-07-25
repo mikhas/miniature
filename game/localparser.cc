@@ -82,7 +82,7 @@ LocalParser::LocalParser(CommandFlags flags,
 {
     if (not tokenizer.isNull()) {
         connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
-                this,             SLOT(onTokenFound(QByteArray)),
+                this,             SLOT(processToken(QByteArray)),
                 Qt::UniqueConnection);
     }
 }
@@ -100,7 +100,7 @@ void LocalParser::setEnabled(bool enable)
     }
 }
 
-void LocalParser::onTokenFound(const QByteArray &token)
+void LocalParser::processToken(const QByteArray &token)
 {
     Q_D(const LocalParser);
     if (not d->enabled) {

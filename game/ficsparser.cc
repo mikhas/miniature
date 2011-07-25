@@ -46,7 +46,7 @@ FicsParser::FicsParser(CommandFlags flags,
 {
     if (not tokenizer.isNull()) {
         connect(tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
-                this,             SLOT(onTokenFound(QByteArray)),
+                this,             SLOT(processToken(QByteArray)),
                 Qt::UniqueConnection);
     }
 }
@@ -60,7 +60,7 @@ void FicsParser::setEnabled(bool enable)
     d->enabled = enable;
 }
 
-void FicsParser::onTokenFound(const QByteArray &token)
+void FicsParser::processToken(const QByteArray &token)
 {
     emit commandFound(CommandNone, token);
 }

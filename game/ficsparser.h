@@ -39,14 +39,14 @@ private:
     const QScopedPointer<FicsParserPrivate> d_ptr;
 
 public:
+    //! \reimp
     explicit FicsParser(CommandFlags flags,
                         const SharedTokenizer &tokenizer,
                         QObject *parent = 0);
     virtual ~FicsParser();
     virtual void setEnabled(bool enable);
-
-private:
-    Q_SLOT void onTokenFound(const QByteArray &token);
+    virtual void processToken(const QByteArray &token);
+    //! \reimp_end
 };
 
 } // namespace Game

@@ -49,10 +49,8 @@ public:
                          QObject *parent = 0);
     virtual ~LocalParser();
     virtual void setEnabled(bool enable);
+    virtual void processToken(const QByteArray &token);
     //! \reimp_end
-
-private:
-    Q_SLOT void onTokenFound(const QByteArray &token);
 };
 
 } // namespace Game

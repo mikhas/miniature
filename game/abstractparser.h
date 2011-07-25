@@ -28,13 +28,18 @@
 
 namespace Game {
 
-//! Command parser interface.
+//! Command parser interface. Can retrieve input from command line or graphical
+//! user interface and translate input into proper commands.
 //!
-//! Retreives input from tokenizer (async) and translates it into commands.
-//! Clients of this interface can list the commands they're interested in
-//! through the AbstractCommpandParser's c'tor (derived classes need to honor
-//! the command filtering). To retrieve commands, clients hook up to the
-//! commandFound signal.
+//! For streamed input, it can make sense to use a tokenizer, which is shared
+//! among the instances. If a shared tokenizer is used, then a list of commands
+//! must be registered with each instance. Every unregistered command will be
+//! ignored. If two instances registered the same command - from the same
+//! tokenizer - then both instances may emit a commandFound, should the command
+//! be found in the common input stream.
+//! To retrieve commands, clients hook up to the commandFound signal.
+//! A graphical user interface can bypass the input stream and forward-connect
+//! signals to the commandFound signal
 class AbstractParser
     : public QObject
 {
@@ -67,6 +72,12 @@ public:
     //! @param data the data for this command.
     Q_SIGNAL void commandFound(Command cmd,
                                const QByteArray &data = QByteArray());
+
+    //! Processes a token. Graphical user interface may want to call this
+    //! method directly.
+    //! @param token the token to be processed. If the token could be
+    //!              translated into a command, commandFound will be emitted.
+    Q_SLOT virtual void processToken(const QByteArray &token) = 0;
 };
 
 } // namespace Game

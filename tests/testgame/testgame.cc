@@ -67,6 +67,9 @@ public:
 
     virtual void setEnabled(bool)
     {}
+
+    virtual void processToken(const QByteArray &)
+    {}
 };
 
 class TestGame

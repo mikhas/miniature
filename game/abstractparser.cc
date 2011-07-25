@@ -36,4 +36,8 @@ AbstractParser::AbstractParser(CommandFlags,
 AbstractParser::~AbstractParser()
 {}
 
+// Empty impl to make MOC happy.
+void AbstractParser::processToken(const QByteArray &)
+{}
+
 } // namespace Game

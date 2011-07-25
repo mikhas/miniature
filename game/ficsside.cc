@@ -100,26 +100,35 @@ void FicsLink::login(const QString &username,
     m_channel.write("\n");
 }
 
-void FicsLink::onReadyRead()
+void FicsLink::processToken(const QByteArray &token)
 {
+    if (not m_enabled || token.isEmpty()) {
+        return;
+    }
+
     switch(m_state) {
     case StateLoginFailed:
-    case StateLoginPending: {
-        int next_newline_pos = -1;
-        const bool enable_echo = false;
-        do {
-            processLogin(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo));
-        } while (next_newline_pos != -1);
-    } break;
+    case StateLoginPending:
+        processLogin(token);
+        break;
 
     case StateIdle:
         (void) m_channel.readAll();
         break;
 
-    case StateReady: 
+    case StateReady:
         m_buffer.append(m_channel.readAll());
         break;
     }
+}
+
+void FicsLink::onReadyRead()
+{
+    int next_newline_pos = -1;
+    const bool enable_echo = false;
+    do {
+        processToken(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo));
+    } while (next_newline_pos != -1);
 }
 
 void FicsLink::processLogin(const QByteArray &line)

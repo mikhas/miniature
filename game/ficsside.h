@@ -85,6 +85,7 @@ public:
     virtual State state() const;
     virtual void login(const QString &username,
                        const QString &password);
+    virtual void processToken(const QByteArray &token);
     //! \reimp_end
 
 private:
