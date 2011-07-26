@@ -22,6 +22,62 @@
 #include "move.h"
 #include "abstracttokenizer.h"
 
+namespace {
+    // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
+    const QRegExp match_record("\\s*(\\d+)\\s+(\\d+)\\s+(\\w+)\\s+(\\d+)\\s+(\\w+)"
+                               "\\s+\\[\\s*(\\w{1,3})\\s*(\\d+)\\s+(\\d+)\\s*\\]"
+                               "\\s+(\\d+):(\\d+)\\s+\\-\\s+(\\d+):(\\d+)\\s+"
+                               "\\((\\d+)\\-(\\d+)\\)\\s+(\\w):\\s+(\\d+)");
+
+    Game::Record parseRecord(const QByteArray &token)
+    {
+        Game::Record result;
+        bool converted = false;
+
+        result.valid = match_record.exactMatch(token);
+
+        result.id = match_record.cap(1).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.white.rating = match_record.cap(2).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.white.name = match_record.cap(3).toLatin1();
+        result.black.rating = match_record.cap(4).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.black.name = match_record.cap(5).toLatin1();
+        // TODO: parse game mode.
+        //result.mode = match_record.cap(6).toInt(&converted);
+        result.white.time_control = match_record.cap(7).toInt(&converted) * 60;
+        result.valid = result.valid && converted;
+        result.black.time_control = match_record.cap(8).toInt(&converted) * 60;
+        result.valid = result.valid && converted;
+        result.white.clock_time = match_record.cap(9).toInt(&converted) * 60
+                                + match_record.cap(10).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.black.clock_time = match_record.cap(11).toInt(&converted) * 60
+                                + match_record.cap(12).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.white.material_strength = match_record.cap(13).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.black.material_strength = match_record.cap(14).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.white_to_move = match_record.cap(15) == "W";
+        result.turn = match_record.cap(16).toInt(&converted);
+        result.valid = result.valid && converted;
+
+        return result;
+    }
+
+    void debugOutput(const Game::Record r)
+    {
+        qDebug() << r.valid
+                 << r.id << r.white.rating << r.white.name << r.black.rating << r.black.name
+                 << r.white.time_control << r.black.time_control
+                 << r.white.clock_time << r.black.clock_time
+                 << r.white.material_strength << r.black.material_strength
+                 << r.white_to_move << r.turn;
+    }
+}
+
 namespace Game {
 
 AbstractLink::AbstractLink(QObject *parent)
@@ -133,16 +189,36 @@ void FicsLink::processToken(const QByteArray &token)
         (void) m_channel.readAll();
         break;
 
-    case StateReady:
-        m_buffer.append(m_channel.readAll());
-        break;
+    case StateReady: {
+        const Record &r(parseRecord(token));
+        if (not r.valid) {
+            // Try other parsing attempt ...
+            qDebug() << "Not a game record";
+        } else {
+            debugOutput(r);
+        }
+    } break;
     }
+}
+
+void FicsLink::listGames()
+{
+    if (m_state != StateReady) {
+        return;
+    }
+
+    // FIXME: only for debugging!
+    m_channel.write("set seek 0");
+    m_channel.write("\n");
+
+    m_channel.write("games");
+    m_channel.write("\n");
 }
 
 void FicsLink::onReadyRead()
 {
     int next_newline_pos = -1;
-    const bool enable_echo = true;
+    const bool enable_echo = false;
     do {
         processToken(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
     } while (next_newline_pos != -1);
@@ -176,6 +252,7 @@ void FicsLink::processLogin(const QByteArray &line)
         configurePrompt();
         m_state = StateReady;
         emit stateChanged(m_state);
+        listGames();
     }
 }
 

@@ -31,6 +31,30 @@
 namespace Game
 {
 
+//! Represents one entry from a list of games.
+
+struct SideRecord
+{
+    QByteArray name;
+    uint rating;
+    uint time_control; // in secs
+    uint clock_time; // in secs
+    uint material_strength;
+};
+
+struct Record
+{
+    bool valid;
+    uint id;
+    Mode mode;
+    SideRecord white;
+    SideRecord black;
+    bool white_to_move;
+    uint turn;
+};
+
+typedef QMap<uint, Record> GameTable;
+
 class AbstractLink;
 typedef QSharedPointer<AbstractLink> SharedLink;
 
@@ -48,7 +72,7 @@ public:
         StateIdle,
         StateLoginPending,
         StateLoginFailed,
-        StateReady
+        StateReady,
     };
 
     Q_ENUMS(State)
@@ -70,6 +94,9 @@ public:
     //! @param password the password of the account.
     virtual void login(const QString &username,
                        const QString &password) = 0;
+
+    //! List games on remote server.
+    virtual void listGames() = 0;
 };
 
 //! A link for FICS
@@ -99,6 +126,7 @@ public:
     virtual void login(const QString &username,
                        const QString &password);
     virtual void processToken(const QByteArray &token);
+    virtual void listGames();
     //! \reimp_end
 
 private:

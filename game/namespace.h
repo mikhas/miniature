@@ -39,7 +39,6 @@ enum Command
     CommandObserve = 0x40
 };
 
-//Q_ENUMS(Command)
 Q_DECLARE_FLAGS(CommandFlags, Command)
 
 //! Enumeration of rows - called 'ranks' - on a chess board. Range: [1-8].
@@ -76,11 +75,29 @@ enum Side {
     SideRemote
 };
 
+enum Mode {
+    ModeNone = 0x0,
+    ModeBlitz = 0x1,
+    ModeLightening = 0x2,
+    ModeUntimed = 0x4,
+    ModeExamined = 0x8,
+    ModeStandard = 0x10,
+    ModeWild = 0x20,
+    ModeAtomic = 0x40,
+    ModeCrazyHouse = 0x80,
+    ModeBugHouse = 0x100,
+    ModeLosers = 0x200,
+    ModeSuicide = 0x400
+};
+
+Q_DECLARE_FLAGS(ModeFlags, Mode)
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::CommandFlags)
 Q_DECLARE_METATYPE(Game::Rank)
 Q_DECLARE_METATYPE(Game::File)
 Q_DECLARE_METATYPE(Game::Side)
+Q_DECLARE_METATYPE(Game::Mode)
 
 #endif // NAMESPACE_H
