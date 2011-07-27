@@ -104,18 +104,6 @@ namespace {
 
 namespace Game {
 
-AbstractLink::AbstractLink(QObject *parent)
-    : AbstractParser(parent)
-{}
-
-AbstractLink::~AbstractLink()
-{}
-
-AbstractLink::State AbstractLink::state() const
-{
-    return StateIdle;
-}
-
 FicsLink::FicsLink(QObject *parent)
     : AbstractLink(parent)
     , m_channel()
