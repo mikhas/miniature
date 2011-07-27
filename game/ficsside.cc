@@ -24,10 +24,33 @@
 
 namespace {
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
-    const QRegExp match_record("\\s*(\\d+)\\s+(\\d+)\\s+(\\w+)\\s+(\\d+)\\s+(\\w+)"
+    const QRegExp match_record("\\s*(\\d+)\\s+([0-9+]+)\\s+(\\w+)\\s+([0-9+]+)\\s+(\\w+)"
                                "\\s+\\[\\s*(\\w{1,3})\\s*(\\d+)\\s+(\\d+)\\s*\\]"
                                "\\s+(\\d+):(\\d+)\\s+\\-\\s+(\\d+):(\\d+)\\s+"
                                "\\((\\d+)\\-(\\d+)\\)\\s+(\\w):\\s+(\\d+)");
+
+    bool parseRating(Game::SideRecord *sr,
+                     const QString &captured)
+    {
+        if (not sr) {
+            return false;
+        }
+
+        bool converted = false;
+        int rating = captured.toInt(&converted);
+
+        if (not converted) {
+            if (captured == "++++") {
+                sr->rating = 0; // unrated
+            } else {
+                return false;
+            }
+        } else {
+            sr->rating = rating;
+        }
+
+        return true;
+    }
 
     Game::Record parseRecord(const QByteArray &token)
     {
@@ -38,11 +61,9 @@ namespace {
 
         result.id = match_record.cap(1).toInt(&converted);
         result.valid = result.valid && converted;
-        result.white.rating = match_record.cap(2).toInt(&converted);
-        result.valid = result.valid && converted;
+        result.valid = result.valid && parseRating(&result.white, match_record.cap(2));
         result.white.name = match_record.cap(3).toLatin1();
-        result.black.rating = match_record.cap(4).toInt(&converted);
-        result.valid = result.valid && converted;
+        result.valid = result.valid && parseRating(&result.black, match_record.cap(4));
         result.black.name = match_record.cap(5).toLatin1();
         // TODO: parse game mode.
         //result.mode = match_record.cap(6).toInt(&converted);
