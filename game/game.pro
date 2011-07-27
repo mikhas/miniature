@@ -6,6 +6,8 @@ TARGET = $$GAME_TARGET
 QT -= gui
 QT += network
 
+include(commands/commands.pri)
+
 HEADERS += \
     namespace.h \
     game.h \
@@ -21,6 +23,9 @@ HEADERS += \
     abstractparser.h \
     localparser.h \
     ficsside.h \
+    dispatcher.h \
+    abstractcommand.h \
+    abstractlink.h \
 
 SOURCES += \
     game.cc \
@@ -36,3 +41,7 @@ SOURCES += \
     abstractparser.cc \
     localparser.cc \
     ficsside.cc \
+    dispatcher.cc \
+    abstractcommand.cc \
+    abstractlink.cc \
+
