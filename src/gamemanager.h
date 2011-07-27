@@ -26,6 +26,7 @@
 #include <abstracttokenizer.h>
 #include <localparser.h>
 #include <ficsside.h>
+#include <dispatcher.h>
 #include <QtCore>
 
 namespace Miniature {
@@ -54,6 +55,7 @@ private:
     Game::SharedParser m_local_side_parser;
     Game::SharedParser m_gnuchess_parser;
     QSharedPointer<Game::AbstractLink> m_fics_link;
+    Game::SharedDispatcher m_dispatcher;
 
 public:
     enum Parser {

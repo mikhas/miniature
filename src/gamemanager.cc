@@ -23,6 +23,7 @@
 #include <game.h>
 #include <localside.h> // TODO: Have a side factory to prevent this class from depending on those headers
 #include <gnuchess.h> // TODO: see above
+#include <commands/logincommand.h>
 #include <iostream>
 
 using Game::Command;
@@ -44,6 +45,7 @@ GameManager::GameManager(QObject *parent)
     , m_local_side_parser(new Game::LocalParser)
     , m_gnuchess_parser(new Game::GnuChessParser)
     , m_fics_link()
+    , m_dispatcher(new Game::Dispatcher)
 {
     m_parser->setFlags(game_manager_commands);
     m_local_side_parser->setFlags(local_side_commands);
@@ -140,18 +142,14 @@ void GameManager::onCommandFound(Command command,
     Q_UNUSED(data)
 
     switch(command) {
-    case Game::CommandLogin:
-        if (m_fics_link.isNull()) {
-            QList<QByteArray> list = data.split(' ');
-            const QString username(data.isEmpty() ? "guest" : list.at(0));
-            const QString password(list.size() > 1 ? list.at(1) : "");
+    case Game::CommandLogin: {
+        QList<QByteArray> list = data.split(' ');
+        const QString username(data.isEmpty() ? "guest" : list.at(0));
+        const QString password(list.size() > 1 ? list.at(1) : "");
 
-            m_fics_link = QSharedPointer<Game::FicsLink>(new Game::FicsLink);
-            m_fics_link->setEnabled(true);
-            m_fics_link->login(username,
-                               username == "guest" ? "" : password);
-        }
-        break;
+        Game::LoginCommand login(Game::TargetServer, username, password);
+        m_dispatcher->sendCommand(&login);
+    } break;
 
     case Game::CommandJoin:
         startGame(GameModeRemoteFics);
