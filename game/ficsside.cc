@@ -58,6 +58,9 @@ namespace {
         bool converted = false;
 
         result.valid = match_record.exactMatch(token);
+        if (not result.valid) {
+            return result;
+        }
 
         result.id = match_record.cap(1).toInt(&converted);
         result.valid = result.valid && converted;
@@ -227,10 +230,6 @@ void FicsLink::listGames()
     if (m_state != StateReady) {
         return;
     }
-
-    // FIXME: only for debugging!
-    m_channel.write("set seek 0");
-    m_channel.write("\n");
 
     m_channel.write("games");
     m_channel.write("\n");
