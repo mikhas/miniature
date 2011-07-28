@@ -23,7 +23,7 @@
 
 #include <namespace.h>
 #include <game.h>
-#include <abstracttokenizer.h>
+#include <linereader.h>
 #include <localparser.h>
 #include <ficsside.h>
 #include <dispatcher.h>
@@ -50,7 +50,7 @@ public:
 
 private:
     QList<QPointer<Game::Game> > m_games;
-    QScopedPointer<Game::AbstractTokenizer> m_tokenizer;
+    Game::LineReader m_tokenizer;
     Game::SharedParser m_parser;
     Game::SharedParser m_local_side_parser;
     Game::SharedParser m_gnuchess_parser;

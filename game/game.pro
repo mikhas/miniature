@@ -11,7 +11,6 @@ include(commands/commands.pri)
 HEADERS += \
     namespace.h \
     game.h \
-    abstracttokenizer.h \
     linereader.h \
     directinputdevice.h \
     abstractside.h \
@@ -29,7 +28,6 @@ HEADERS += \
 
 SOURCES += \
     game.cc \
-    abstracttokenizer.cc \
     linereader.cc \
     directinputdevice.cc \
     abstractside.cc \

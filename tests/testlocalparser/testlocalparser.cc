@@ -98,7 +98,7 @@ public:
 namespace {
     void setupParser(Game::AbstractParser *parser,
                      CommandCounter *counter,
-                     Game::AbstractTokenizer *tokenizer,
+                     Game::LineReader *tokenizer,
                      Game::CommandFlags flags)
     {
         parser->setFlags(flags);
@@ -163,8 +163,10 @@ private:
         const int TimeOut(10);
         const QVector<int> emptyCounters(3, 0);
 
+        Game::LineReader tokenizer;
         QIODevice *device = new TestInputDevice;
-        Game::LineReader tokenizer(device);
+        tokenizer.init(device);
+        device->open(QIODevice::ReadWrite);
 
         Game::LocalParser p0;
         CommandCounter c0;
@@ -181,9 +183,6 @@ private:
         setupParser(&p2, &c2, &tokenizer,
                     Game::CommandFlags(Game::CommandNone));
 
-        tokenizer.init();
-        device->open(QIODevice::ReadWrite);
-
         device->write(input);
         TestUtils::waitForSignal(&c0, SIGNAL(ready()), TimeOut);
         TestUtils::waitForSignal(&c1, SIGNAL(ready()), TimeOut);
@@ -197,16 +196,16 @@ private:
     Q_SLOT void testChoppedInput()
     {
         const int TimeOut(20);
+
+        Game::LineReader tokenizer;
         QIODevice *device = new TestInputDevice;
-        Game::LineReader tokenizer(device);
+        tokenizer.init(device);
+        device->open(QIODevice::ReadWrite);
 
         Game::LocalParser parser;
         CommandCounter counter;
         setupParser(&parser, &counter, &tokenizer,
                     Game::CommandFlags(Game::CommandMove));
-
-        tokenizer.init();
-        device->open(QIODevice::ReadWrite);
 
         device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
@@ -220,16 +219,16 @@ private:
     Q_SLOT void testInputBeforeReady()
     {
         const int TimeOut(20);
+
+        Game::LineReader tokenizer;
         QIODevice *device = new TestInputDevice;
-        Game::LineReader tokenizer(device);
+        tokenizer.init(device);
+        device->open(QIODevice::ReadWrite);
 
         Game::LocalParser parser;
         CommandCounter counter;
         setupParser(&parser, &counter, &tokenizer,
                     Game::CommandFlags(Game::CommandQuit));
-
-        tokenizer.init();
-        device->open(QIODevice::ReadWrite);
 
         parser.setEnabled(false);
         device->write("quit\n");

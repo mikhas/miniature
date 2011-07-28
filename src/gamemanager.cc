@@ -24,6 +24,7 @@
 #include <localside.h> // TODO: Have a side factory to prevent this class from depending on those headers
 #include <gnuchess.h> // TODO: see above
 #include <commands/logincommand.h>
+#include <directinputdevice.h>
 #include <iostream>
 
 using Game::Command;
@@ -40,7 +41,7 @@ namespace Miniature {
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
-    , m_tokenizer(Game::createLocalInputTokenizer())
+    , m_tokenizer()
     , m_parser(new Game::LocalParser)
     , m_local_side_parser(new Game::LocalParser)
     , m_gnuchess_parser(new Game::GnuChessParser)
@@ -50,10 +51,10 @@ GameManager::GameManager(QObject *parent)
     m_parser->setFlags(game_manager_commands);
     m_local_side_parser->setFlags(local_side_commands);
 
-    connect(m_tokenizer.data(), SIGNAL(tokenFound(QByteArray)),
-            m_parser.data(),    SLOT(processToken(QByteArray)));
+    connect(&m_tokenizer,    SIGNAL(tokenFound(QByteArray)),
+            m_parser.data(), SLOT(processToken(QByteArray)));
 
-    connect(m_tokenizer.data(),         SIGNAL(tokenFound(QByteArray)),
+    connect(&m_tokenizer,               SIGNAL(tokenFound(QByteArray)),
             m_local_side_parser.data(), SLOT(processToken(QByteArray)));
 
     connect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
@@ -61,7 +62,7 @@ GameManager::GameManager(QObject *parent)
 
     m_parser->setEnabled(true);
     m_local_side_parser->setEnabled(true);
-    m_tokenizer->init();
+    m_tokenizer.init(new Game::DirectInputDevice);
     std::cout << "Welcome to Miniature!" << std::endl;
 }
 

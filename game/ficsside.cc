@@ -20,7 +20,7 @@
 
 #include "ficsside.h"
 #include "move.h"
-#include "abstracttokenizer.h"
+#include "linereader.h"
 
 namespace {
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"

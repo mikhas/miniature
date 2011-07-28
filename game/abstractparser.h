@@ -34,7 +34,7 @@ typedef QSharedPointer<AbstractParser> SharedParser;
 //! user interface and translate input into proper commands. Each AbstractSide
 //! backend might require its own parser implementation.
 //!
-//! For streamed input, it can make sense to use an AbstractTokenizer. Simply
+//! For streamed input, it makes sense to use a tokenizer. Simply
 //! connect a tokenizer's tokenFound signal to the processToken slot.
 //! For each instance, the range of accepted commands can be specified through
 //! setFlags. If two instances accept the same command - say, while reading
