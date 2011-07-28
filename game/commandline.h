@@ -22,30 +22,30 @@
 #define LOCALPARSER_H
 
 #include "namespace.h"
-#include "abstractparser.h"
+#include "abstractlink.h"
 
 #include <QtCore>
 
 namespace Game {
 
-class LocalParserPrivate;
+class CommandLinePrivate;
 
 //! Reads input from local input device and translates it into commands.
 //! Used for local sides and local command line interface.
-class LocalParser
-    : public AbstractParser
+class CommandLine
+    : public AbstractLink
 {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(LocalParser)
-    Q_DISABLE_COPY(LocalParser)
+    Q_DECLARE_PRIVATE(CommandLine)
+    Q_DISABLE_COPY(CommandLine)
 
 private:
-    const QScopedPointer<LocalParserPrivate> d_ptr;
+    const QScopedPointer<CommandLinePrivate> d_ptr;
 
 public:
     //! \reimp
-    explicit LocalParser(QObject *parent = 0);
-    virtual ~LocalParser();
+    explicit CommandLine(QObject *parent = 0);
+    virtual ~CommandLine();
     virtual void setFlags(CommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual void processToken(const QByteArray &token);

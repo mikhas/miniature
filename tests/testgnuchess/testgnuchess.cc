@@ -23,7 +23,7 @@
 #include "localside.h"
 #include "gnuchess.h"
 #include "move.h"
-#include "localparser.h"
+#include "commandline.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -53,7 +53,7 @@ private:
         Game::SharedParser parser(new TestUtils::DummyLink);
 
         Game::LocalSide *white = new Game::LocalSide("white", parser);
-        Game::GnuChess  *black = new Game::GnuChess("black", parser);
+        Game::GnuChess  *black = new Game::GnuChess("black");
         QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Move)));
         QSignalSpy blackSpy(black, SIGNAL(turnEnded(Move)));
         Game::Game game(white, black);
@@ -79,7 +79,7 @@ private:
     Q_SLOT void testRunInBackgroundForeground()
     {
         Game::SharedLink parser(new TestUtils::DummyLink);
-        Game::GnuChess subject("GnuChess", parser);
+        Game::GnuChess subject("GnuChess");
         QSignalSpy spy(&subject, SIGNAL(turnEnded(Move)));
 
         subject.init();

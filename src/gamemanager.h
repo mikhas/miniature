@@ -24,7 +24,7 @@
 #include <namespace.h>
 #include <game.h>
 #include <linereader.h>
-#include <localparser.h>
+#include <commandline.h>
 #include <ficsside.h>
 #include <dispatcher.h>
 #include <QtCore>
@@ -50,10 +50,8 @@ public:
 
 private:
     QList<QPointer<Game::Game> > m_games;
-    Game::LineReader m_tokenizer;
-    Game::SharedParser m_parser;
-    Game::SharedParser m_local_side_parser;
-    Game::SharedParser m_gnuchess_parser;
+    QSharedPointer<Game::CommandLine> m_commandline;
+    QSharedPointer<Game::CommandLine> m_local_side_commandline;
     QSharedPointer<Game::AbstractLink> m_fics_link;
     Game::SharedDispatcher m_dispatcher;
 
@@ -70,9 +68,6 @@ public:
     //! Starts game with specified game mode.
     //! @param mode the game mode
     Q_SLOT void startGame(GameMode mode);
-
-    //! Test API, exposes the internally used parser instance.
-    const Game::SharedParser &parser(Parser type) const;
 
 private:        
     Game::Game *createLocalEngineGame();

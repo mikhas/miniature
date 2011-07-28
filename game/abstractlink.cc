@@ -34,4 +34,8 @@ AbstractLink::State AbstractLink::state() const
     return StateIdle;
 }
 
+void AbstractLink::login(const QString &,
+                         const QString &)
+{}
+
 } // namespace Game

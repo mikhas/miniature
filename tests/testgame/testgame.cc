@@ -110,7 +110,7 @@ private:
         QTest::addColumn<AbstractSideWrapper>("side_wrapper");
         QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side", link));
         QTest::newRow("FICS") << AbstractSideWrapper(new Game::FicsSide("local", link));
-        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess", link));
+        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess"));
     }
 
     Q_SLOT void testSideStates()

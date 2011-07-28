@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "localparser.h"
+#include "commandline.h"
 #include "testutils.h"
 #include "linereader.h"
 
@@ -27,7 +27,7 @@
 #include <QtTest>
 
 using Game::Command;
-using Game::LocalParser;
+using Game::CommandLine;
 
 Q_DECLARE_METATYPE(QVector<int>)
 
@@ -96,18 +96,18 @@ public:
 };
 
 namespace {
-    void setupParser(Game::AbstractParser *parser,
-                     CommandCounter *counter,
-                     Game::LineReader *tokenizer,
-                     Game::CommandFlags flags)
+    void setupLink(Game::AbstractLink *link,
+                   CommandCounter *counter,
+                   Game::LineReader *tokenizer,
+                   Game::CommandFlags flags)
     {
-        parser->setFlags(flags);
-        parser->setEnabled(true);
+        link->setFlags(flags);
+        link->setEnabled(true);
 
         QObject::connect(tokenizer, SIGNAL(tokenFound(QByteArray)),
-                         parser,    SLOT(processToken(QByteArray)));
+                         link,    SLOT(processToken(QByteArray)));
 
-        QObject::connect(parser,  SIGNAL(commandFound(Command, QByteArray)),
+        QObject::connect(link,  SIGNAL(commandFound(Command, QByteArray)),
                          counter, SLOT(onCommandFound(Command, QByteArray)));
     }
 }
@@ -168,19 +168,19 @@ private:
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::LocalParser p0;
+        Game::CommandLine l0;
         CommandCounter c0;
-        setupParser(&p0, &c0, &tokenizer,
+        setupLink(&l0, &c0, &tokenizer,
                     Game::CommandFlags(Game::CommandNew | Game::CommandQuit));
 
-        Game::LocalParser p1;
+        Game::CommandLine l1;
         CommandCounter c1;
-        setupParser(&p1, &c1, &tokenizer,
+        setupLink(&l1, &c1, &tokenizer,
                     Game::CommandFlags(Game::CommandMove | Game::CommandQuit));
 
-        Game::LocalParser p2;
+        Game::CommandLine l2;
         CommandCounter c2;
-        setupParser(&p2, &c2, &tokenizer,
+        setupLink(&l2, &c2, &tokenizer,
                     Game::CommandFlags(Game::CommandNone));
 
         device->write(input);
@@ -202,10 +202,10 @@ private:
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::LocalParser parser;
+        Game::CommandLine link;
         CommandCounter counter;
-        setupParser(&parser, &counter, &tokenizer,
-                    Game::CommandFlags(Game::CommandMove));
+        setupLink(&link, &counter, &tokenizer,
+                  Game::CommandFlags(Game::CommandMove));
 
         device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
@@ -225,17 +225,17 @@ private:
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::LocalParser parser;
+        Game::CommandLine link;
         CommandCounter counter;
-        setupParser(&parser, &counter, &tokenizer,
-                    Game::CommandFlags(Game::CommandQuit));
+        setupLink(&link, &counter, &tokenizer,
+                  Game::CommandFlags(Game::CommandQuit));
 
-        parser.setEnabled(false);
+        link.setEnabled(false);
         device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 0);
 
-        parser.setEnabled(true);
+        link.setEnabled(true);
         device->write("quit\n");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
         QCOMPARE(counter.m_counters.at(2), 1);

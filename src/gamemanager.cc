@@ -41,28 +41,27 @@ namespace Miniature {
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
-    , m_tokenizer()
-    , m_parser(new Game::LocalParser)
-    , m_local_side_parser(new Game::LocalParser)
-    , m_gnuchess_parser(new Game::GnuChessParser)
+    , m_commandline(new Game::CommandLine)
+    , m_local_side_commandline(new Game::CommandLine)
     , m_fics_link()
     , m_dispatcher(new Game::Dispatcher)
 {
-    m_parser->setFlags(game_manager_commands);
-    m_local_side_parser->setFlags(local_side_commands);
+    m_commandline->setFlags(game_manager_commands);
+    m_local_side_commandline->setFlags(local_side_commands);
 
-    connect(&m_tokenizer,    SIGNAL(tokenFound(QByteArray)),
-            m_parser.data(), SLOT(processToken(QByteArray)));
+    Game::LineReader tokenizer;
+    connect(&tokenizer,           SIGNAL(tokenFound(QByteArray)),
+            m_commandline.data(), SLOT(processToken(QByteArray)));
 
-    connect(&m_tokenizer,               SIGNAL(tokenFound(QByteArray)),
-            m_local_side_parser.data(), SLOT(processToken(QByteArray)));
+    connect(&tokenizer,                      SIGNAL(tokenFound(QByteArray)),
+            m_local_side_commandline.data(), SLOT(processToken(QByteArray)));
 
-    connect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
-            this,            SLOT(onCommandFound(Command, QByteArray)));
+    connect(m_commandline.data(), SIGNAL(commandFound(Command, QByteArray)),
+            this,                 SLOT(onCommandFound(Command, QByteArray)));
 
-    m_parser->setEnabled(true);
-    m_local_side_parser->setEnabled(true);
-    m_tokenizer.init(new Game::DirectInputDevice);
+    m_commandline->setEnabled(true);
+    m_local_side_commandline->setEnabled(true);
+    tokenizer.init(new Game::DirectInputDevice);
     std::cout << "Welcome to Miniature!" << std::endl;
 }
 
@@ -101,37 +100,17 @@ void GameManager::startGame(GameMode mode)
     m_games.append(QPointer<Game::Game>(game));
 }
 
-const Game::SharedParser &GameManager::parser(Parser type) const
-{
-    switch(type) {
-    case ParserGameManager:
-        return m_parser;
-
-    case ParserLocalSide:
-        return m_local_side_parser;
-
-    case ParserGnuChess:
-        return m_gnuchess_parser;
-    }
-
-    qCritical() << __PRETTY_FUNCTION__
-                << "Querying invalid parser instance!";
-
-    static Game::SharedParser invalid;
-    return invalid;
-}
-
 Game::Game *GameManager::createLocalEngineGame()
 {
-    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_parser);
-    Game::GnuChess *remote = new Game::GnuChess("black", m_gnuchess_parser);
+    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_commandline);
+    Game::GnuChess *remote = new Game::GnuChess("black");
 
     return new Game::Game(local, remote, this);
 }
 
 Game::Game *GameManager::createRemoteFicsGame()
 {
-    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_parser);
+    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_commandline);
     Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link);
 
     return new Game::Game(local, remote, this);

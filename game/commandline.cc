@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "localparser.h"
+#include "commandline.h"
 
 namespace {
     typedef QHash<Game::Command, QByteArray> CommandLookupTable;
@@ -38,13 +38,13 @@ namespace {
 
 namespace Game {
 
-class LocalParserPrivate
+class CommandLinePrivate
 {
 public:
     CommandFlags flags;
     bool enabled;
 
-    explicit LocalParserPrivate()
+    explicit CommandLinePrivate()
         : flags(CommandNone)
         , enabled(false)
     {}
@@ -71,29 +71,29 @@ public:
     }
 };
 
-LocalParser::LocalParser(QObject *parent)
-    : AbstractParser(parent)
-    , d_ptr(new LocalParserPrivate)
+CommandLine::CommandLine(QObject *parent)
+    : AbstractLink(parent)
+    , d_ptr(new CommandLinePrivate)
 {}
 
-LocalParser::~LocalParser()
+CommandLine::~CommandLine()
 {}
 
-void LocalParser::setFlags(CommandFlags flags)
+void CommandLine::setFlags(CommandFlags flags)
 {
-    Q_D(LocalParser);
+    Q_D(CommandLine);
     d->flags = flags;
 }
 
-void LocalParser::setEnabled(bool enable)
+void CommandLine::setEnabled(bool enable)
 {
-    Q_D(LocalParser);
+    Q_D(CommandLine);
     d->enabled = enable;
 }
 
-void LocalParser::processToken(const QByteArray &token)
+void CommandLine::processToken(const QByteArray &token)
 {
-    Q_D(const LocalParser);
+    Q_D(const CommandLine);
     if (not d->enabled) {
         return;
     }

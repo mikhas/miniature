@@ -55,7 +55,7 @@ public:
     //! \reimp_end
 
     //! Returns state of this link.
-    virtual State state() const = 0;
+    virtual State state() const;
 
     //! Emitted whenever state changes.
     Q_SIGNAL void stateChanged(State state);
@@ -64,7 +64,7 @@ public:
     //! @param username the username of the account.
     //! @param password the password of the account.
     virtual void login(const QString &username,
-                       const QString &password) = 0;
+                       const QString &password);
 };
 
 } // namespace Game

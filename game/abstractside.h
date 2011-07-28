@@ -52,6 +52,10 @@ public:
 
     //! C'tor
     //! @param identifier the identifier for this side.
+    explicit AbstractSide(const QString &identifier);
+
+    //! C'tor
+    //! @param identifier the identifier for this side.
     //! @param parser the (shared) parser instance.
     explicit AbstractSide(const QString &identifier,
                           const SharedParser &parser);

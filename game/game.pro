@@ -20,26 +20,26 @@ HEADERS += \
     position.h \
     square.h \
     abstractparser.h \
-    localparser.h \
     ficsside.h \
     dispatcher.h \
     abstractcommand.h \
     abstractlink.h \
+    commandline.h \
 
 SOURCES += \
     game.cc \
     linereader.cc \
     directinputdevice.cc \
     abstractside.cc \
-    localside.cc \
     gnuchess.cc \
     move.cc \
     position.cc \
     square.cc \
     abstractparser.cc \
-    localparser.cc \
     ficsside.cc \
     dispatcher.cc \
     abstractcommand.cc \
     abstractlink.cc \
+    localside.cc \
+    commandline.cc \
 

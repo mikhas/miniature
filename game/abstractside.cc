@@ -22,6 +22,10 @@
 
 namespace Game {
 
+AbstractSide::AbstractSide(const QString &)
+    : QObject()
+{}
+
 AbstractSide::AbstractSide(const QString &,
                            const SharedParser &parser)
     : QObject()
