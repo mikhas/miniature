@@ -23,7 +23,7 @@
 
 #include "move.h"
 #include "abstractside.h"
-#include "abstractparser.h"
+#include "abstractlink.h"
 
 #include <QtCore>
 

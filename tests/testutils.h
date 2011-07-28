@@ -21,7 +21,7 @@
 #ifndef TESTUTILS_H
 #define TESTUTILS_H
 
-#include "abstractparser.h"
+#include "abstractlink.h"
 #include "ficsside.h" // TODO: move parser in separate file
 
 #include <QtCore>

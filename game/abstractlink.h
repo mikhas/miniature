@@ -21,18 +21,29 @@
 #ifndef ABSTRACTLINK_H
 #define ABSTRACTLINK_H
 
-#include "abstractparser.h"
+#include "namespace.h"
 #include <QtCore>
+
 
 namespace Game {
 
 class AbstractLink;
 typedef QSharedPointer<AbstractLink> SharedLink;
+typedef QSharedPointer<AbstractLink> SharedParser;
 
-//! Extends AbstractParser into a bidirectional link. Can be used to transmit
-//! and receive commands from a remote server.
+//! Can retrieve input from command line or graphical user interface and
+//! translate input into proper commands.
+//!
+//! For streamed input, it makes sense to use a tokenizer. Simply
+//! connect a tokenizer's tokenFound signal to the processToken slot.
+//! For each instance, the range of accepted commands can be specified through
+//! setFlags. If two instances accept the same command - say, while reading
+//! from the same tokenizer - then both instances may emit a commandFound,
+//! should the command be found in the common input stream.
+//! To retrieve commands, clients hook up to the commandFound signal.
+//! A graphical user interface can inject commands through processToken.
 class AbstractLink
-    : public AbstractParser
+    : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(AbstractLink)
@@ -49,10 +60,32 @@ public:
     Q_ENUMS(State)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
-    //! \reimp
+    //! C'tor
+    //! @param parent the owner of this instance (optional).
     explicit AbstractLink(QObject *parent = 0);
+
     virtual ~AbstractLink() = 0;
-    //! \reimp_end
+
+    //! Specify commands that should be handled by this instance.
+    //! @param flags the command flags.
+    virtual void setFlags(CommandFlags flags) = 0;
+
+    //! Enables command parsing. Initializes input device backend for tokenizer
+    //! if required.
+    //! @param enable whether to enable command parsing.
+    virtual void setEnabled(bool enable) = 0;
+
+    //! Emitted when a command was found in tokenizer stream.
+    //! @param cmd the found command.
+    //! @param data the data for this command.
+    Q_SIGNAL void commandFound(Command cmd,
+                               const QByteArray &data = QByteArray());
+
+    //! Processes a token. Graphical user interface may want to call this
+    //! method directly.
+    //! @param token the token to be processed. If the token could be
+    //!              translated into a command, commandFound will be emitted.
+    Q_SLOT virtual void processToken(const QByteArray &token) = 0;
 
     //! Returns state of this link.
     virtual State state() const;

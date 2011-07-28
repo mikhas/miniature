@@ -22,7 +22,7 @@
 #define SIDE_H
 
 #include "namespace.h"
-#include "abstractparser.h"
+#include "abstractlink.h"
 
 #include <QtCore>
 

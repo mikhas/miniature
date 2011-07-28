@@ -19,7 +19,6 @@ HEADERS += \
     move.h \
     position.h \
     square.h \
-    abstractparser.h \
     ficsside.h \
     dispatcher.h \
     abstractcommand.h \
@@ -35,7 +34,6 @@ SOURCES += \
     move.cc \
     position.cc \
     square.cc \
-    abstractparser.cc \
     ficsside.cc \
     dispatcher.cc \
     abstractcommand.cc \

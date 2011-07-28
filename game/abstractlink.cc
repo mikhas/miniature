@@ -23,7 +23,7 @@
 namespace Game {
 
 AbstractLink::AbstractLink(QObject *parent)
-    : AbstractParser(parent)
+    : QObject(parent)
 {}
 
 AbstractLink::~AbstractLink()
