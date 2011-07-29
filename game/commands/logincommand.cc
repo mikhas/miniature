@@ -19,7 +19,7 @@
  */
 
 #include "logincommand.h"
-#include "abstractlink.h"
+#include "abstractbackend.h"
 
 namespace Game {
 
@@ -40,7 +40,7 @@ Target LoginCommand::target() const
     return m_target;
 }
 
-bool LoginCommand::exec(AbstractLink *target)
+bool LoginCommand::exec(AbstractBackend *target)
 {
     if (not target) {
         return false;

@@ -22,7 +22,7 @@
 #define LOCALPARSER_H
 
 #include "namespace.h"
-#include "abstractlink.h"
+#include "abstractbackend.h"
 
 #include <QtCore>
 
@@ -33,7 +33,7 @@ class CommandLinePrivate;
 //! Reads input from local input device and translates it into commands.
 //! Used for local sides and local command line interface.
 class CommandLine
-    : public AbstractLink
+    : public AbstractBackend
 {
     Q_OBJECT
     Q_DECLARE_PRIVATE(CommandLine)

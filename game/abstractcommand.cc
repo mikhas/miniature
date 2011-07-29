@@ -33,7 +33,7 @@ bool AbstractCommand::exec(Game *)
     return false;
 }
 
-bool AbstractCommand::exec(AbstractLink *)
+bool AbstractCommand::exec(AbstractBackend *)
 {
     return false;
 }

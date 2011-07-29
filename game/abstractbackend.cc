@@ -18,23 +18,23 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractlink.h"
+#include "abstractbackend.h"
 
 namespace Game {
 
-AbstractLink::AbstractLink(QObject *parent)
+AbstractBackend::AbstractBackend(QObject *parent)
     : QObject(parent)
 {}
 
-AbstractLink::~AbstractLink()
+AbstractBackend::~AbstractBackend()
 {}
 
-AbstractLink::State AbstractLink::state() const
+AbstractBackend::State AbstractBackend::state() const
 {
     return StateIdle;
 }
 
-void AbstractLink::login(const QString &,
+void AbstractBackend::login(const QString &,
                          const QString &)
 {}
 

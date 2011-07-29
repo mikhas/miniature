@@ -96,7 +96,7 @@ public:
 };
 
 namespace {
-    void setupLink(Game::AbstractLink *link,
+    void setupLink(Game::AbstractBackend *link,
                    CommandCounter *counter,
                    Game::LineReader *tokenizer,
                    Game::CommandFlags flags)

@@ -29,7 +29,7 @@
 #include <QtGui>
 #include <QtTest>
 
-using Game::AbstractLink;
+using Game::AbstractBackend;
 using Game::Move;
 Q_DECLARE_METATYPE(Move)
 
@@ -88,7 +88,7 @@ private:
 
     Q_SLOT void testFicsGame()
     {
-        Game::SharedLink link(new TestUtils::DummyLink);
+        Game::SharedBackend link(new TestUtils::DummyLink);
         Game::AbstractSide *local = new Game::LocalSide("local", link);
 
         link->login("guest", "");
@@ -105,7 +105,7 @@ private:
     Q_SLOT void testSideStates_data()
     {
         qRegisterMetaType<AbstractSideWrapper>();
-        Game::SharedLink link(new TestUtils::DummyLink);
+        Game::SharedBackend link(new TestUtils::DummyLink);
 
         QTest::addColumn<AbstractSideWrapper>("side_wrapper");
         QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side", link));

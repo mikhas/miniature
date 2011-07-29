@@ -21,7 +21,7 @@
 #ifndef TESTUTILS_H
 #define TESTUTILS_H
 
-#include "abstractlink.h"
+#include "abstractbackend.h"
 #include "ficsside.h" // TODO: move parser in separate file
 
 #include <QtCore>
@@ -67,25 +67,25 @@ QApplication *createApp(const QString &app_name)
 }
 
 class DummyLink
-    : public Game::AbstractLink
+    : public Game::AbstractBackend
 {
 public:
     explicit DummyLink(QObject *parent = 0)
-        : Game::AbstractLink(parent)
+        : Game::AbstractBackend(parent)
     {}
 
     virtual ~DummyLink()
     {}
 
-    virtual Game::AbstractLink::State state() const
+    virtual Game::AbstractBackend::State state() const
     {
-        return Game::AbstractLink::StateIdle;
+        return Game::AbstractBackend::StateIdle;
     }
 
     virtual void login(const QString &,
                        const QString &)
     {
-        emit stateChanged(Game::AbstractLink::StateLoginFailed);
+        emit stateChanged(Game::AbstractBackend::StateLoginFailed);
     }
 
     virtual void setEnabled(bool)

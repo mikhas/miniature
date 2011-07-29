@@ -23,7 +23,7 @@
 
 #include "namespace.h"
 #include "abstractside.h"
-#include "abstractlink.h"
+#include "abstractbackend.h"
 
 #include <QtCore>
 #include <QtNetwork/QTcpSocket>
@@ -57,7 +57,7 @@ typedef QMap<uint, Record> GameTable;
 
 //! A link for FICS
 class FicsLink
-    : public AbstractLink
+    : public AbstractBackend
 {
     Q_OBJECT
     Q_DISABLE_COPY(FicsLink)
@@ -105,14 +105,14 @@ private:
     const QString m_identifier;
     const QString m_password;
     SideState m_state;
-    SharedLink m_link;
+    SharedBackend m_link;
 
 public:
     //! C'tor
     //! @param identifier the identifier for this side.
     //! @param link the shared FICS link.
     explicit FicsSide(const QString &identifier,
-                      const SharedLink &link);
+                      const SharedBackend &link);
 
     //! \reimp
     virtual ~FicsSide();

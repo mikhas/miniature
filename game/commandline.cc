@@ -72,7 +72,7 @@ public:
 };
 
 CommandLine::CommandLine(QObject *parent)
-    : AbstractLink(parent)
+    : AbstractBackend(parent)
     , d_ptr(new CommandLinePrivate)
 {}
 

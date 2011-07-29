@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ABSTRACTLINK_H
-#define ABSTRACTLINK_H
+#ifndef AbstractBackend_H
+#define AbstractBackend_H
 
 #include "namespace.h"
 #include <QtCore>
@@ -27,9 +27,9 @@
 
 namespace Game {
 
-class AbstractLink;
-typedef QSharedPointer<AbstractLink> SharedLink;
-typedef QSharedPointer<AbstractLink> SharedParser;
+class AbstractBackend;
+typedef QSharedPointer<AbstractBackend> SharedBackend;
+typedef QSharedPointer<AbstractBackend> SharedParser;
 
 //! Can retrieve input from command line or graphical user interface and
 //! translate input into proper commands.
@@ -42,11 +42,11 @@ typedef QSharedPointer<AbstractLink> SharedParser;
 //! should the command be found in the common input stream.
 //! To retrieve commands, clients hook up to the commandFound signal.
 //! A graphical user interface can inject commands through processToken.
-class AbstractLink
+class AbstractBackend
     : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(AbstractLink)
+    Q_DISABLE_COPY(AbstractBackend)
 
 public:
     //! The link's state.
@@ -62,9 +62,9 @@ public:
 
     //! C'tor
     //! @param parent the owner of this instance (optional).
-    explicit AbstractLink(QObject *parent = 0);
+    explicit AbstractBackend(QObject *parent = 0);
 
-    virtual ~AbstractLink() = 0;
+    virtual ~AbstractBackend() = 0;
 
     //! Specify commands that should be handled by this instance.
     //! @param flags the command flags.
@@ -102,4 +102,4 @@ public:
 
 } // namespace Game
 
-#endif // ABSTRACTLINK_H
+#endif // AbstractBackend_H

@@ -52,7 +52,7 @@ private:
     QList<QPointer<Game::Game> > m_games;
     QSharedPointer<Game::CommandLine> m_commandline;
     QSharedPointer<Game::CommandLine> m_local_side_commandline;
-    QSharedPointer<Game::AbstractLink> m_fics_link;
+    QSharedPointer<Game::AbstractBackend> m_fics_link;
     Game::SharedDispatcher m_dispatcher;
 
 public:

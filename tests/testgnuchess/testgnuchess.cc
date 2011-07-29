@@ -78,7 +78,7 @@ private:
 
     Q_SLOT void testRunInBackgroundForeground()
     {
-        Game::SharedLink parser(new TestUtils::DummyLink);
+        Game::SharedBackend parser(new TestUtils::DummyLink);
         Game::GnuChess subject("GnuChess");
         QSignalSpy spy(&subject, SIGNAL(turnEnded(Move)));
 

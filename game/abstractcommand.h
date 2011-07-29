@@ -26,7 +26,7 @@
 namespace Game {
 
 class Game;
-class AbstractLink;
+class AbstractBackend;
 
 // Specify the target for a command. Some commands, such as
 // TargetBackgroundGames, will be executed as a broadcast. It is the
@@ -63,7 +63,7 @@ public:
     // \returns whether the command was consumed. If true, this command will
     //          not call exec on a potentially next target.
     virtual bool exec(Game *target);
-    virtual bool exec(AbstractLink *target);
+    virtual bool exec(AbstractBackend *target);
 
 private:
     AbstractCommand(const AbstractCommand &);

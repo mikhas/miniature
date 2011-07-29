@@ -26,7 +26,7 @@
 
 namespace Game {
 
-class AbstractLink;
+class AbstractBackend;
 
 //! Login to remote server.
 class LoginCommand
@@ -44,7 +44,7 @@ public:
                           const QString &password);
     virtual ~LoginCommand();
     virtual Target target() const;
-    virtual bool exec(AbstractLink *);
+    virtual bool exec(AbstractBackend *);
     //! \reimp_end
 };
 

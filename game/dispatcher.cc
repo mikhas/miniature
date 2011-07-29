@@ -20,7 +20,7 @@
 
 #include "dispatcher.h"
 #include "abstractcommand.h"
-#include "abstractlink.h"
+#include "abstractbackend.h"
 #include "ficsside.h"
 #include "linereader.h"
 #include "directinputdevice.h"
@@ -35,7 +35,7 @@ public:
     SharedParser parser;
     SharedParser local_side_parser;
     SharedParser gnuchess_parser;
-    SharedLink server_link;
+    SharedBackend server_link;
 
     explicit DispatcherPrivate()
         : server_link(new FicsLink)

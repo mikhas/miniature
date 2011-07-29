@@ -105,7 +105,7 @@ namespace {
 namespace Game {
 
 FicsLink::FicsLink(QObject *parent)
-    : AbstractLink(parent)
+    : AbstractBackend(parent)
     , m_channel()
     , m_buffer()
     , m_username()
@@ -158,7 +158,7 @@ void FicsLink::setEnabled(bool enable)
     }
 }
 
-AbstractLink::State FicsLink::state() const
+AbstractBackend::State FicsLink::state() const
 {
     return m_state;
 }
@@ -291,7 +291,7 @@ void FicsLink::configurePrompt()
 }
 
 FicsSide::FicsSide(const QString &identifier,
-                   const SharedLink &link)
+                   const SharedBackend &link)
     : AbstractSide(identifier, link)
     , m_identifier(identifier)
     , m_state(NotReady)

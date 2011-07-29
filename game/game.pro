@@ -22,8 +22,8 @@ HEADERS += \
     ficsside.h \
     dispatcher.h \
     abstractcommand.h \
-    abstractlink.h \
     commandline.h \
+    abstractbackend.h \
 
 SOURCES += \
     game.cc \
@@ -37,7 +37,7 @@ SOURCES += \
     ficsside.cc \
     dispatcher.cc \
     abstractcommand.cc \
-    abstractlink.cc \
     localside.cc \
     commandline.cc \
+    abstractbackend.cc \
 
