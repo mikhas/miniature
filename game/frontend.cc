@@ -18,30 +18,15 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractcommand.h"
 #include "frontend.h"
 
 namespace Game {
 
-AbstractCommand::AbstractCommand(Target)
+UI::UI(QObject *parent)
+    : QObject(parent)
 {}
 
-AbstractCommand::~AbstractCommand()
+UI::~UI()
 {}
-
-bool AbstractCommand::exec(Game *)
-{
-    return false;
-}
-
-bool AbstractCommand::exec(AbstractBackend *)
-{
-    return false;
-}
-
-bool AbstractCommand::exec(Frontend *)
-{
-    return false;
-}
 
 } // namespace Game

@@ -27,16 +27,16 @@ namespace Game {
 
 class Game;
 class AbstractBackend;
+class Frontend;
 
-// Specify the target for a command. Some commands, such as
-// TargetBackgroundGames, will be executed as a broadcast. It is the
-// responsbility of the command's exec override to filter the actual target
-// from a list of offered targets.
+//! Specify the target for a command. Some commands, such as
+//! TargetBackgroundGames, will be executed as a broadcast. It is the
+//! responsbility of the command's exec override to filter the actual target
+//! from a list of offered targets.
 enum Target {
-    TargetUserInterface, // GUI, command line, ...
-    TargetEngine, // Gnuchess, ...
-    TargetServer, // FICS, ...
-    TargetActiveGame,
+    TargetFrontend, // GUI, command line, ...
+    TargetBackend, // Gnuchess, FICS, ...
+    TargetGame, // The currently active game.
     TargetBackgroundGames
 };
 
@@ -50,7 +50,7 @@ public:
     explicit AbstractCommand(Target t);
     virtual ~AbstractCommand() = 0;
 
-    // \returns the target for this command.
+    //! \returns the target for this command.
     virtual Target target() const = 0;
 
     // TODO: Define set of interfaces for command receivers, so that we can
@@ -60,10 +60,11 @@ public:
     // - current game
     // - local, remote, active side (of current game, but also of games running
     //   background).
-    // \returns whether the command was consumed. If true, this command will
-    //          not call exec on a potentially next target.
+    //! \returns whether the command was consumed. If true, this command will
+    //!          not call exec on a potentially next target.
     virtual bool exec(Game *target);
     virtual bool exec(AbstractBackend *target);
+    virtual bool exec(Frontend *target);
 
 private:
     AbstractCommand(const AbstractCommand &);

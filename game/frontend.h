@@ -18,30 +18,25 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractcommand.h"
-#include "frontend.h"
+#ifndef FRONTEND_H
+#define FRONTEND_H
+
+#include <QtCore>
 
 namespace Game {
 
-AbstractCommand::AbstractCommand(Target)
-{}
-
-AbstractCommand::~AbstractCommand()
-{}
-
-bool AbstractCommand::exec(Game *)
+//! Frontend, the root context used for QML
+class Frontend
+    : public QObject
 {
-    return false;
-}
+    Q_OBJECT
+    Q_DISABLE_COPY(Frontend)
 
-bool AbstractCommand::exec(AbstractBackend *)
-{
-    return false;
-}
-
-bool AbstractCommand::exec(Frontend *)
-{
-    return false;
-}
+public:
+    explicit Frontend(QObject *parent = 0);
+    virtual ~Frontend();
+};
 
 } // namespace Game
+
+#endif // FRONTEND_H

@@ -24,6 +24,7 @@ HEADERS += \
     abstractcommand.h \
     commandline.h \
     abstractbackend.h \
+    frontend.h \
 
 SOURCES += \
     game.cc \
@@ -40,4 +41,5 @@ SOURCES += \
     localside.cc \
     commandline.cc \
     abstractbackend.cc \
+    frontend.cc \
 
