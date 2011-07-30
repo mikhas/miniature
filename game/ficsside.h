@@ -24,6 +24,7 @@
 #include "namespace.h"
 #include "abstractside.h"
 #include "abstractbackend.h"
+#include "dispatcher.h"
 
 #include <QtCore>
 #include <QtNetwork/QTcpSocket>
@@ -56,13 +57,14 @@ struct Record
 typedef QMap<uint, Record> GameTable;
 
 //! A link for FICS
-class FicsLink
+class FicsBackend
     : public AbstractBackend
 {
     Q_OBJECT
-    Q_DISABLE_COPY(FicsLink)
+    Q_DISABLE_COPY(FicsBackend)
 
 private:
+    WeakDispatcher m_dispatcher;
     QTcpSocket m_channel;
     QByteArray m_buffer;
     QString m_username;
@@ -74,8 +76,9 @@ private:
 
 public:
     //! \reimp
-    explicit FicsLink(QObject *parent = 0);
-    virtual ~FicsLink();
+    explicit FicsBackend(Dispatcher *dispatcher,
+                         QObject *parent = 0);
+    virtual ~FicsBackend();
     virtual void setFlags(CommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual State state() const;

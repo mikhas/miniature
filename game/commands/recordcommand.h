@@ -18,40 +18,33 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FRONTEND_H
-#define FRONTEND_H
+#ifndef LOGOUTCOMMAND_H
+#define LOGOUTCOMMAND_H
 
-#include "dispatcher.h"
-#include "commandline.h"
-#include "linereader.h"
+#include "abstractcommand.h"
+#include "ficsside.h" // Record defined there. TODO: move into dedicated file, of course.
 
 #include <QtCore>
 
 namespace Game {
 
-//! Frontend, the root context used for QML
-class Frontend
-    : public QObject
+class RecordCommand
+    : public AbstractCommand
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(Frontend)
-
 private:
-    WeakDispatcher m_dispatcher;
-    CommandLine m_command_line;
-    LineReader m_line_reader;
+    Target m_target;
+    Record m_record;
 
 public:
-    explicit Frontend(Dispatcher *dispatcher,
-                      QObject *parent = 0);
-    virtual ~Frontend();
-    virtual void show();
-
-private:
-    Q_SLOT void onCommandFound(Command cmd,
-                               const QByteArray &data);
+    //! \reimp
+    explicit RecordCommand(Target t,
+                           const Record &r);
+    virtual ~RecordCommand();
+    virtual Target target() const;
+    virtual bool exec(Frontend *target);
+    //! \reimp_end
 };
 
 } // namespace Game
 
-#endif // FRONTEND_H
+#endif // LOGOUTCOMMAND_H

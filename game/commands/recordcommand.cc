@@ -18,40 +18,29 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FRONTEND_H
-#define FRONTEND_H
-
-#include "dispatcher.h"
-#include "commandline.h"
-#include "linereader.h"
-
-#include <QtCore>
+#include "recordcommand.h"
 
 namespace Game {
 
-//! Frontend, the root context used for QML
-class Frontend
-    : public QObject
+RecordCommand::RecordCommand(Target t,
+                             const Record &r)
+    : AbstractCommand(t)
+    , m_target(t)
+    , m_record(r)
+{}
+
+RecordCommand::~RecordCommand()
+{}
+
+Target RecordCommand::target() const
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(Frontend)
+    return m_target;
+}
 
-private:
-    WeakDispatcher m_dispatcher;
-    CommandLine m_command_line;
-    LineReader m_line_reader;
-
-public:
-    explicit Frontend(Dispatcher *dispatcher,
-                      QObject *parent = 0);
-    virtual ~Frontend();
-    virtual void show();
-
-private:
-    Q_SLOT void onCommandFound(Command cmd,
-                               const QByteArray &data);
-};
+bool RecordCommand::exec(Frontend *)
+{
+    return true;
+}
 
 } // namespace Game
 
-#endif // FRONTEND_H

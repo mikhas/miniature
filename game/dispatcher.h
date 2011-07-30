@@ -26,7 +26,7 @@
 namespace Game {
 
 class Dispatcher;
-typedef QSharedPointer<Dispatcher> SharedDispatcher;
+typedef QWeakPointer<Dispatcher> WeakDispatcher;
 
 class DispatcherPrivate;
 class AbstractCommand;

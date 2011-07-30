@@ -29,7 +29,7 @@ namespace Game { namespace {
                                     | CommandMove);
 }
 
-Frontend::Frontend(const SharedDispatcher &dispatcher,
+Frontend::Frontend(Dispatcher *dispatcher,
                    QObject *parent)
     : QObject(parent)
     , m_dispatcher(dispatcher)
@@ -61,14 +61,18 @@ void Frontend::show()
 void Frontend::onCommandFound(Command cmd,
                               const QByteArray &data)
 {
+    Dispatcher *dispatcher = m_dispatcher.data();
+
     switch(cmd) {
     case CommandLogin: {
         QList<QByteArray> list = data.split(' ');
         const QString username(data.isEmpty() ? "guest" : list.at(0));
         const QString password(list.size() > 1 ? list.at(1) : "");
 
-        LoginCommand login(TargetBackendFics, username, password);
-        m_dispatcher->sendCommand(&login);
+        if (dispatcher) {
+            LoginCommand login(TargetBackendFics, username, password);
+            dispatcher->sendCommand(&login);
+        }
     } break;
 
     case CommandJoin:
@@ -78,8 +82,10 @@ void Frontend::onCommandFound(Command cmd,
         break;
 
     case CommandQuit: {
-        LogoutCommand logout(TargetBackendFics);
-        m_dispatcher->sendCommand(&logout);
+        if (dispatcher) {
+            LogoutCommand logout(TargetBackendFics);
+            dispatcher->sendCommand(&logout);
+        }
         qApp->quit();
     } break;
 

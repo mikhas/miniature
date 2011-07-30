@@ -21,6 +21,7 @@
 #include "ficsside.h"
 #include "move.h"
 #include "linereader.h"
+#include "commands/recordcommand.h"
 
 namespace {
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
@@ -104,8 +105,10 @@ namespace {
 
 namespace Game {
 
-FicsLink::FicsLink(QObject *parent)
+FicsBackend::FicsBackend(Dispatcher *dispatcher,
+                         QObject *parent)
     : AbstractBackend(parent)
+    , m_dispatcher(dispatcher)
     , m_channel()
     , m_buffer()
     , m_username()
@@ -128,14 +131,14 @@ FicsLink::FicsLink(QObject *parent)
             this,       SLOT(onHostFound()));
 }
 
-FicsLink::~FicsLink()
+FicsBackend::~FicsBackend()
 {}
 
 // Not supported, we always read everything from FICS.
-void FicsLink::setFlags(CommandFlags)
+void FicsBackend::setFlags(CommandFlags)
 {}
 
-void FicsLink::setEnabled(bool enable)
+void FicsBackend::setEnabled(bool enable)
 {
     m_enabled = enable;
 
@@ -147,7 +150,7 @@ void FicsLink::setEnabled(bool enable)
             m_state = StateIdle;
             emit stateChanged(m_state);
         }
-    } else {
+    } else if (not m_channel.isOpen()) {
         m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
         m_channel.waitForConnected();
 
@@ -158,12 +161,12 @@ void FicsLink::setEnabled(bool enable)
     }
 }
 
-AbstractBackend::State FicsLink::state() const
+AbstractBackend::State FicsBackend::state() const
 {
     return m_state;
 }
 
-void FicsLink::login(const QString &username,
+void FicsBackend::login(const QString &username,
                      const QString &password)
 {
     if (m_state != StateReady) {
@@ -185,7 +188,7 @@ void FicsLink::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
-void FicsLink::processToken(const QByteArray &token)
+void FicsBackend::processToken(const QByteArray &token)
 {
     if (not m_enabled || token.isEmpty()) {
         return;
@@ -208,12 +211,16 @@ void FicsLink::processToken(const QByteArray &token)
             qDebug() << "Not a game record";
         } else {
             debugOutput(r);
+            if (Dispatcher *dispatcher = m_dispatcher.data()) {
+                RecordCommand rc(TargetFrontend, r);
+                dispatcher->sendCommand(&rc);
+            }
         }
     } break;
     }
 }
 
-void FicsLink::listGames()
+void FicsBackend::listGames()
 {
     if (m_state != StateReady) {
         return;
@@ -223,7 +230,7 @@ void FicsLink::listGames()
     m_channel.write("\n");
 }
 
-void FicsLink::onReadyRead()
+void FicsBackend::onReadyRead()
 {
     int next_newline_pos = -1;
     const bool enable_echo = false;
@@ -232,7 +239,7 @@ void FicsLink::onReadyRead()
     } while (next_newline_pos != -1);
 }
 
-void FicsLink::processLogin(const QByteArray &line)
+void FicsBackend::processLogin(const QByteArray &line)
 {
     // TODO: write proper tokenizer?
     static const QByteArray confirm_login("Press return to enter the server as");
@@ -264,12 +271,12 @@ void FicsLink::processLogin(const QByteArray &line)
     }
 }
 
-void FicsLink::onHostFound()
+void FicsBackend::onHostFound()
 {
     // TODO: Handle retry attempts here.
 }
 
-void FicsLink::abortLogin()
+void FicsBackend::abortLogin()
 {
     if (m_state != StateLoginPending) {
         return;
@@ -280,7 +287,7 @@ void FicsLink::abortLogin()
     emit stateChanged(m_state);
 }
 
-void FicsLink::configurePrompt()
+void FicsBackend::configurePrompt()
 {
     if (m_state != StateReady) {
         return;

@@ -35,7 +35,7 @@ GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
     , m_dispatcher(new Game::Dispatcher)
-    , m_frontend(m_dispatcher)
+    , m_frontend(m_dispatcher.data())
 {
     m_dispatcher->setFrontend(&m_frontend);
     m_frontend.show();

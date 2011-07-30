@@ -49,7 +49,7 @@ public:
 private:
     // TODO: Wrap list of games in an item model that can be used by Dispatcher, too.
     QList<QPointer<Game::Game> > m_games;
-    Game::SharedDispatcher m_dispatcher;
+    QScopedPointer<Game::Dispatcher> m_dispatcher;
     Game::Frontend m_frontend;
 
 public:

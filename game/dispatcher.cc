@@ -31,18 +31,18 @@ namespace Game {
 class DispatcherPrivate
 {
 public:
-    FicsLink fics;
+    FicsBackend fics;
     QWeakPointer<Frontend> frontend;
 
-    explicit DispatcherPrivate()
-        : fics()
+    explicit DispatcherPrivate(Dispatcher *q)
+        : fics(q)
         , frontend()
     {}
 };
 
 Dispatcher::Dispatcher(QObject *parent)
     : QObject(parent)
-    , d_ptr(new DispatcherPrivate())
+    , d_ptr(new DispatcherPrivate(this))
 {}
 
 Dispatcher::~Dispatcher()
