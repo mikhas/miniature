@@ -20,6 +20,7 @@
 
 #include "frontend.h"
 #include "commands/logincommand.h"
+#include "commands/logoutcommand.h"
 #include "directinputdevice.h"
 
 namespace Game { namespace {
@@ -54,7 +55,7 @@ void Frontend::show()
     m_command_line.setEnabled(true);
 
     QTextStream out(stdout);
-    out << "Welcome to Miniature!";
+    out << "Welcome to Miniature!\n";
 }
 
 void Frontend::onCommandFound(Command cmd,
@@ -76,8 +77,11 @@ void Frontend::onCommandFound(Command cmd,
     case CommandNew:
         break;
 
-    case CommandQuit:
-        break;
+    case CommandQuit: {
+        LogoutCommand logout(TargetBackendFics);
+        m_dispatcher->sendCommand(&logout);
+        qApp->quit();
+    } break;
 
     default:
         break;
