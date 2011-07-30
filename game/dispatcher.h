@@ -30,6 +30,7 @@ typedef QSharedPointer<Dispatcher> SharedDispatcher;
 
 class DispatcherPrivate;
 class AbstractCommand;
+class Frontend;
 
 //! Dispatches commands.
 class Dispatcher
@@ -47,6 +48,7 @@ public:
     virtual ~Dispatcher();
 
     bool sendCommand(AbstractCommand *command);
+    void setFrontend(Frontend *frontend);
 };
 
 } // namespace Game

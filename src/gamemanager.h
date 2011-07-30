@@ -23,10 +23,8 @@
 
 #include <namespace.h>
 #include <game.h>
-#include <linereader.h>
-#include <commandline.h>
-#include <ficsside.h>
 #include <dispatcher.h>
+#include <frontend.h>
 #include <QtCore>
 
 namespace Miniature {
@@ -49,11 +47,10 @@ public:
     };
 
 private:
+    // TODO: Wrap list of games in an item model that can be used by Dispatcher, too.
     QList<QPointer<Game::Game> > m_games;
-    QSharedPointer<Game::CommandLine> m_commandline;
-    QSharedPointer<Game::CommandLine> m_local_side_commandline;
-    QSharedPointer<Game::AbstractBackend> m_fics_link;
     Game::SharedDispatcher m_dispatcher;
+    Game::Frontend m_frontend;
 
 public:
     enum Parser {
@@ -73,11 +70,6 @@ private:
     Game::Game *createLocalEngineGame();
     Game::Game *createRemoteFicsGame();
 
-    //! Handle input from command line interface.
-    //! @command the found command.
-    //! @data the data that belongs to the command.
-    Q_SLOT void onCommandFound(Command command,
-                               const QByteArray &data);
 };
 
 } // namespace Miniature

@@ -29,40 +29,16 @@
 
 using Game::Command;
 
-namespace {
-    const Game::CommandFlags game_manager_commands(Game::CommandNew | Game::CommandQuit
-                                                   | Game::CommandLogin | Game::CommandSeek
-                                                   | Game::CommandJoin | Game::CommandObserve);
-    const Game::CommandFlags local_side_commands(Game::CommandMove);
-}
-
 namespace Miniature {
 
 GameManager::GameManager(QObject *parent)
     : QObject(parent)
     , m_games()
-    , m_commandline(new Game::CommandLine)
-    , m_local_side_commandline(new Game::CommandLine)
-    , m_fics_link()
     , m_dispatcher(new Game::Dispatcher)
+    , m_frontend(m_dispatcher)
 {
-    m_commandline->setFlags(game_manager_commands);
-    m_local_side_commandline->setFlags(local_side_commands);
-
-    Game::LineReader tokenizer;
-    connect(&tokenizer,           SIGNAL(tokenFound(QByteArray)),
-            m_commandline.data(), SLOT(processToken(QByteArray)));
-
-    connect(&tokenizer,                      SIGNAL(tokenFound(QByteArray)),
-            m_local_side_commandline.data(), SLOT(processToken(QByteArray)));
-
-    connect(m_commandline.data(), SIGNAL(commandFound(Command, QByteArray)),
-            this,                 SLOT(onCommandFound(Command, QByteArray)));
-
-    m_commandline->setEnabled(true);
-    m_local_side_commandline->setEnabled(true);
-    tokenizer.init(new Game::DirectInputDevice);
-    std::cout << "Welcome to Miniature!" << std::endl;
+    m_dispatcher->setFrontend(&m_frontend);
+    m_frontend.show();
 }
 
 GameManager::~GameManager()
@@ -102,50 +78,12 @@ void GameManager::startGame(GameMode mode)
 
 Game::Game *GameManager::createLocalEngineGame()
 {
-    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_commandline);
-    Game::GnuChess *remote = new Game::GnuChess("black");
-
-    return new Game::Game(local, remote, this);
+    return new Game::Game(0, 0, this);
 }
 
 Game::Game *GameManager::createRemoteFicsGame()
 {
-    Game::LocalSide *local = new Game::LocalSide("white", m_local_side_commandline);
-    Game::FicsSide *remote = new Game::FicsSide("FICS", m_fics_link);
-
-    return new Game::Game(local, remote, this);
-}
-
-void GameManager::onCommandFound(Command command,
-                                 const QByteArray &data)
-{
-    Q_UNUSED(data)
-
-    switch(command) {
-    case Game::CommandLogin: {
-        QList<QByteArray> list = data.split(' ');
-        const QString username(data.isEmpty() ? "guest" : list.at(0));
-        const QString password(list.size() > 1 ? list.at(1) : "");
-
-        Game::LoginCommand login(Game::TargetServer, username, password);
-        m_dispatcher->sendCommand(&login);
-    } break;
-
-    case Game::CommandJoin:
-        startGame(GameModeRemoteFics);
-        break;
-
-    case Game::CommandNew:
-        startGame(GameModeLocalEngine);
-        break;
-
-    case Game::CommandQuit:
-        qApp->exit();
-        break;
-
-    default:
-        break;
-    }
+    return new Game::Game(0, 0, this);
 }
 
 } // namespace Miniature

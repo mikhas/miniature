@@ -24,21 +24,19 @@
 #include "ficsside.h"
 #include "linereader.h"
 #include "directinputdevice.h"
+#include "frontend.h"
 
 namespace Game {
 
 class DispatcherPrivate
 {
 public:
-    // TODO: If games of list is not shared, then better provide means to query game list, say from GameManager.
-    QList<QPointer<Game> > games; // active game == QList::last()
-    SharedParser parser;
-    SharedParser local_side_parser;
-    SharedParser gnuchess_parser;
-    SharedBackend server_link;
+    FicsLink fics;
+    QWeakPointer<Frontend> frontend;
 
     explicit DispatcherPrivate()
-        : server_link(new FicsLink)
+        : fics()
+        , frontend()
     {}
 };
 
@@ -61,9 +59,9 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     Q_D(Dispatcher);
 
     switch(command->target()) {
-    case TargetServer:
-        d->server_link->setEnabled(true);
-        result = command->exec(d->server_link.data());
+    case TargetBackendFics:
+        d->fics.setEnabled(true);
+        result = command->exec(&d->fics);
         break;
 
     default:
@@ -71,6 +69,12 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     }
 
     return result;
+}
+
+void Dispatcher::setFrontend(Frontend *frontend)
+{
+    Q_D(Dispatcher);
+    d->frontend = QWeakPointer<Frontend>(frontend);
 }
 
 } // namespace Game

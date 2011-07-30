@@ -21,6 +21,10 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
+#include "dispatcher.h"
+#include "commandline.h"
+#include "linereader.h"
+
 #include <QtCore>
 
 namespace Game {
@@ -32,9 +36,20 @@ class Frontend
     Q_OBJECT
     Q_DISABLE_COPY(Frontend)
 
+private:
+    SharedDispatcher m_dispatcher;
+    CommandLine m_command_line;
+    LineReader m_line_reader;
+
 public:
-    explicit Frontend(QObject *parent = 0);
+    explicit Frontend(const SharedDispatcher &dispatcher,
+                      QObject *parent = 0);
     virtual ~Frontend();
+    virtual void show();
+
+private:
+    Q_SLOT void onCommandFound(Command cmd,
+                               const QByteArray &data);
 };
 
 } // namespace Game

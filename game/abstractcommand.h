@@ -35,7 +35,8 @@ class Frontend;
 //! from a list of offered targets.
 enum Target {
     TargetFrontend, // GUI, command line, ...
-    TargetBackend, // Gnuchess, FICS, ...
+    TargetBackendEngine, // Gnuchess
+    TargetBackendFics, // freechess.org
     TargetGame, // The currently active game.
     TargetBackgroundGames
 };

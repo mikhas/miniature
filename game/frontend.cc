@@ -19,14 +19,69 @@
  */
 
 #include "frontend.h"
+#include "commands/logincommand.h"
+#include "directinputdevice.h"
 
-namespace Game {
+namespace Game { namespace {
+    const CommandFlags all_commands(CommandNew | CommandQuit | CommandLogin
+                                    | CommandSeek | CommandJoin | CommandObserve
+                                    | CommandMove);
+}
 
-UI::UI(QObject *parent)
+Frontend::Frontend(const SharedDispatcher &dispatcher,
+                   QObject *parent)
     : QObject(parent)
+    , m_dispatcher(dispatcher)
+    , m_command_line()
+    , m_line_reader()
+{
+    m_command_line.setFlags(all_commands);
+    connect(&m_command_line, SIGNAL(commandFound(Command,QByteArray)),
+            this,            SLOT(onCommandFound(Command,QByteArray)),
+            Qt::UniqueConnection);
+
+    connect(&m_line_reader, SIGNAL(tokenFound(QByteArray)),
+            &m_command_line, SLOT(processToken(QByteArray)),
+            Qt::UniqueConnection);
+}
+
+Frontend::~Frontend()
 {}
 
-UI::~UI()
-{}
+void Frontend::show()
+{
+    m_line_reader.init(new DirectInputDevice);
+    m_command_line.setEnabled(true);
+
+    QTextStream out(stdout);
+    out << "Welcome to Miniature!";
+}
+
+void Frontend::onCommandFound(Command cmd,
+                              const QByteArray &data)
+{
+    switch(cmd) {
+    case CommandLogin: {
+        QList<QByteArray> list = data.split(' ');
+        const QString username(data.isEmpty() ? "guest" : list.at(0));
+        const QString password(list.size() > 1 ? list.at(1) : "");
+
+        LoginCommand login(TargetBackendFics, username, password);
+        m_dispatcher->sendCommand(&login);
+    } break;
+
+    case CommandJoin:
+        break;
+
+    case CommandNew:
+        break;
+
+    case CommandQuit:
+        break;
+
+    default:
+        break;
+    }
+}
 
 } // namespace Game
