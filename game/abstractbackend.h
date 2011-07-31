@@ -27,8 +27,16 @@
 
 namespace Game {
 
-//! Represents one side in a game record.
-struct SideRecord
+//! Base structure for game records or seeks.
+struct RecordSeekBase
+{
+    bool valid;
+    uint id;
+    Mode mode;
+};
+
+//! Represents one player side in a game record.
+struct PlayerRecord
 {
     QByteArray name;
     uint rating;
@@ -39,14 +47,27 @@ struct SideRecord
 
 //! Represents one entry from a list of games.
 struct Record
+    : public RecordSeekBase
 {
-    bool valid;
-    uint id;
-    Mode mode;
-    SideRecord white;
-    SideRecord black;
+    PlayerRecord white;
+    PlayerRecord black;
     bool white_to_move;
     uint turn;
+};
+
+//! Represents an offer for a game.
+struct Seek
+    : public RecordSeekBase
+{
+    QByteArray player_name;
+    uint rating;
+    uint time;
+    uint increment;
+    bool is_rated;
+    bool white_to_start;
+    bool is_auto_started;
+    bool uses_formula;
+    QPair<int, int> rating_range;
 };
 
 class AbstractBackend;

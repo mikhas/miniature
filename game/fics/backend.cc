@@ -23,33 +23,68 @@
 #include "linereader.h"
 
 namespace {
+    // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
+    const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
+                             "\\s+(\\w+)\\s+(\\w+)\\s+(\\[\\w+\\])?\\s*(m|a)?\\s*(f)?"
+                             "\\s*(\\[(\\d+)\\-(\\d+)\\])?\\s*\\(\"play\\s+(\\d+)\" to respond\\)");
+
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
     const QRegExp match_record("\\s*(\\d+)\\s+([0-9+]+)\\s+(\\w+)\\s+([0-9+]+)\\s+(\\w+)"
                                "\\s+\\[\\s*(\\w{1,3})\\s*(\\d+)\\s+(\\d+)\\s*\\]"
                                "\\s+(\\d+):(\\d+)\\s+\\-\\s+(\\d+):(\\d+)\\s+"
                                "\\((\\d+)\\-(\\d+)\\)\\s+(\\w):\\s+(\\d+)");
 
-    bool parseRating(Game::SideRecord *sr,
+    bool parseRating(Game::RecordSeekBase *rsb,
+                     uint *rating,
                      const QString &captured)
     {
-        if (not sr) {
+        if (not rsb || not rating) {
             return false;
         }
 
         bool converted = false;
-        int rating = captured.toInt(&converted);
+        *rating = captured.toInt(&converted);
 
         if (not converted) {
             if (captured == "++++") {
-                sr->rating = 0; // unrated
+                *rating = 0; // unrated
             } else {
                 return false;
             }
-        } else {
-            sr->rating = rating;
         }
 
         return true;
+    }
+
+    Game::Seek parseSeek(const QByteArray &token)
+    {
+        Game::Seek result;
+        bool converted = false;
+
+        result.valid = match_seek.exactMatch(token);
+        if (not result.valid) {
+            return result;
+        }
+
+        result.id = match_seek.cap(13).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.valid = result.valid && parseRating(&result, &result.rating, match_record.cap(2));
+        // TODO: parse game mode.
+        result.player_name = match_seek.cap(1).toLatin1();
+        result.time = match_seek.cap(3).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.increment = match_seek.cap(4).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.is_rated = (match_seek.cap(5) == "rated" || match_record.cap(5) == "r");
+        result.white_to_start = (match_seek.cap(7) == "white" || match_seek.cap(7) == "w");
+        result.is_auto_started = (match_seek.cap(8) != "m");
+        result.uses_formula = (match_seek.cap(9) == "f");
+        result.rating_range.first = match_seek.cap(10).toInt(&converted);
+        result.valid = result.valid && converted;
+        result.rating_range.second = match_seek.cap(11).toInt(&converted);
+        result.valid = result.valid && converted;
+
+        return result;
     }
 
     Game::Record parseRecord(const QByteArray &token)
@@ -64,9 +99,9 @@ namespace {
 
         result.id = match_record.cap(1).toInt(&converted);
         result.valid = result.valid && converted;
-        result.valid = result.valid && parseRating(&result.white, match_record.cap(2));
+        result.valid = result.valid && parseRating(&result, &result.white.rating, match_record.cap(2));
         result.white.name = match_record.cap(3).toLatin1();
-        result.valid = result.valid && parseRating(&result.black, match_record.cap(4));
+        result.valid = result.valid && parseRating(&result, &result.black.rating, match_record.cap(4));
         result.black.name = match_record.cap(5).toLatin1();
         // TODO: parse game mode.
         //result.mode = match_record.cap(6).toInt(&converted);
@@ -90,6 +125,15 @@ namespace {
 
         return result;
     }
+
+    void debugOutput(const Game::Seek s)
+    {
+        qDebug() << s.valid
+                 << s.id << s.mode << s.player_name << s.time << s.increment
+                 << s.is_rated << s.white_to_start << s.is_auto_started
+                 << s.uses_formula << s.rating_range;
+    }
+
 
     void debugOutput(const Game::Record r)
     {
@@ -204,15 +248,24 @@ void Backend::processToken(const QByteArray &token)
         break;
 
     case StateReady: {
-        const Record &r(parseRecord(token));
-        if (not r.valid) {
-            // Try other parsing attempt ...
-            qDebug() << "Not a game record";
-        } else {
-            debugOutput(r);
+        const Seek &s(parseSeek(token));
+        if (s.valid) {
+            debugOutput(s);
             if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                RecordCommand rc(TargetFrontend, r);
-                dispatcher->sendCommand(&rc);
+                //RecordCommand rc(TargetFrontend, r);
+                //dispatcher->sendCommand(&rc);
+            }
+        } else {
+            qDebug() << "Not a seek";
+            const Record &r(parseRecord(token));
+            if (r.valid) {
+                debugOutput(r);
+                if (Dispatcher *dispatcher = m_dispatcher.data()) {
+                    RecordCommand rc(TargetFrontend, r);
+                    dispatcher->sendCommand(&rc);
+                }
+            } else {
+                qDebug() << "Not a game record";
             }
         }
     } break;
