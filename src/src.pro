@@ -15,3 +15,12 @@ SOURCES += \
 LIBS += \
     -L$${GAME_DIR} \
     -l$${GAME_LIB} \
+
+target.path = /usr/games
+desktop.files = ../miniature.desktop
+desktop.path = /usr/share/applications
+
+INSTALLS += \
+    target \
+    desktop \
+

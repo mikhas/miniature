@@ -1,0 +1,87 @@
+Source: miniature
+Section: games
+Priority: optional
+Maintainer: Michael Hasselmann <michael@taschenorakel.de>
+Build-Depends: debhelper (>= 5), libqt4-dev
+Standards-Version: 3.7.2
+
+Package: libminiature-game0
+Architecture: any
+Depends:  ${misc:Depends}, ${shlibs:Depends}
+Description: Core library of Miniature
+ Provides backends (FICS, Gnuchess, etc.) and core logic for Miniature.
+
+Package: libminiature-game-dev
+Section: libdevel
+Architecture: all
+Depends: libminiature-game0 (>= ${source:Version}), libqt4-dev
+Description: Header files for Miniature's core library
+
+Package: libminiature-game-dbg
+Section: devel
+Architecture: any
+Depends: libminiature-game0 (= ${binary:Version})
+Description: Debug symbols for Miniature's core library
+
+Package: miniature
+Section: user/games
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, libminiature-game0
+Description: A chess board to play and learn wherever you go.
+ .
+  * The main use case is playing online against other players at
+    http://freechess.org (FICS)
+  * Now imagine that you can also chat with the other player.
+  * Learning is important: watch games live, review stored games and also
+    process offline the lessons offered at FICS.
+  * Play P2P games against other players next to you or in your Contacts.
+  * And not only regular chess. See also Antichess, Chess960...
+ .
+ Miniature is based on Qt and targets MeeGo as primary platform.
+XB-Maemo-Icon-26:
+ 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
+ 0Zf/B0y6DUPWuArsAAAAAElFTkSuQmCC

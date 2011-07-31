@@ -1,7 +1,7 @@
 include(../config.pri)
 
 TEMPLATE = lib
-VERSION = 0.0.1
+VERSION = 0.2.0
 TARGET = $$GAME_TARGET
 QT -= gui
 QT += network
@@ -42,4 +42,17 @@ SOURCES += \
     commandline.cc \
     abstractbackend.cc \
     frontend.cc \
+
+target.path = /usr/lib
+
+headers.files = $${HEADERS}
+headers.path = /usr/include/miniature
+
+prf.files = ../miniature-game.prf
+prf.path = $$[QT_INSTALL_DATA]/mkspecs/features
+
+INSTALLS += \
+    target \
+    headers \
+    prf \
 
