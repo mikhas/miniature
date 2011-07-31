@@ -29,23 +29,24 @@
 
 namespace Game {
 
+class FrontendPrivate;
+
 //! Frontend, the root context used for QML
 class Frontend
     : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(Frontend)
+    Q_DECLARE_PRIVATE(Frontend)
 
 private:
-    WeakDispatcher m_dispatcher;
-    CommandLine m_command_line;
-    LineReader m_line_reader;
+    const QScopedPointer<FrontendPrivate> d_ptr;
 
 public:
     explicit Frontend(Dispatcher *dispatcher,
                       QObject *parent = 0);
     virtual ~Frontend();
-    virtual void show();
+    virtual void show(const QUrl &ui);
 
 private:
     Q_SLOT void onCommandFound(Command cmd,

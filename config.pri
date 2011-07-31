@@ -8,8 +8,8 @@ GAME_DIR = $${DIR_PREFIX}/game
 SRC_DIR = $${DIR_PREFIX}/src
 TESTS_DIR = $${DIR_PREFIX}/tests
 
-enable-cli{
-    DEFINES += MINIATURE_CLI_ENABLED
+enable-gui {
+    DEFINES += MINIATURE_GUI_ENABLED
 }
 
 INCLUDEPATH += \

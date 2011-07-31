@@ -12,3 +12,4 @@ tests/testgame/testgame
 tests/testgnuchess/testgnuchess
 tests/testlocalparser/testlocalparser
 tests/testficsparser/testficsparser
+src/qrc_frontend.cpp

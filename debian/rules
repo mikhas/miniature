@@ -16,7 +16,7 @@
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	qmake PREFIX=/usr CONFIG+=enable-cli
+	qmake PREFIX=/usr CONFIG+=enable-gui
 
 	touch configure-stamp
 
@@ -35,9 +35,6 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	$(MAKE) clean
 
 	dh_clean 
 

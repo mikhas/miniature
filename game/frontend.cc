@@ -23,36 +23,76 @@
 #include "commands/logoutcommand.h"
 #include "directinputdevice.h"
 
+#ifdef MINIATURE_GUI_ENABLED
+#include <QtDeclarative/QtDeclarative>
+#endif
+
 namespace Game { namespace {
     const CommandFlags all_commands(CommandNew | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
 }
 
+class FrontendPrivate
+{
+public:
+    WeakDispatcher dispatcher;
+    CommandLine command_line;
+    LineReader line_reader;
+#ifdef MINIATURE_GUI_ENABLED
+    QDeclarativeView ui;
+#endif
+
+    explicit FrontendPrivate(Dispatcher *new_dispatcher)
+        : dispatcher(new_dispatcher)
+        , command_line()
+        , line_reader()
+#ifdef MINIATURE_GUI_ENABLED
+        , ui()
+#endif
+    {}
+};
+
 Frontend::Frontend(Dispatcher *dispatcher,
                    QObject *parent)
     : QObject(parent)
-    , m_dispatcher(dispatcher)
-    , m_command_line()
-    , m_line_reader()
+    , d_ptr(new FrontendPrivate(dispatcher))
 {
-    m_command_line.setFlags(all_commands);
-    connect(&m_command_line, SIGNAL(commandFound(Command,QByteArray)),
+    Q_D(Frontend);
+
+    d->command_line.setFlags(all_commands);
+    connect(&d->command_line, SIGNAL(commandFound(Command,QByteArray)),
             this,            SLOT(onCommandFound(Command,QByteArray)),
             Qt::UniqueConnection);
 
-    connect(&m_line_reader, SIGNAL(tokenFound(QByteArray)),
-            &m_command_line, SLOT(processToken(QByteArray)),
+    connect(&d->line_reader, SIGNAL(tokenFound(QByteArray)),
+            &d->command_line, SLOT(processToken(QByteArray)),
             Qt::UniqueConnection);
 }
 
 Frontend::~Frontend()
 {}
 
-void Frontend::show()
+void Frontend::show(const QUrl &ui)
 {
-    m_line_reader.init(new DirectInputDevice);
-    m_command_line.setEnabled(true);
+    Q_D(Frontend);
+
+#ifndef MINIATURE_GUI_ENABLED
+    Q_UNUSED(ui)
+#else
+    if (d->ui.source() != ui) {
+        d->ui.setSource(ui);
+        QFont font;
+        // FIXME: Read font family from a QML property instead.
+        font.setFamily("Nokia Pure Text");
+        qApp->setFont(font);
+    }
+
+    d->ui.showFullScreen();
+#endif
+
+    d->line_reader.init(new DirectInputDevice);
+    d->command_line.setEnabled(true);
 
     QTextStream out(stdout);
     out << "Welcome to Miniature!\n";
@@ -61,7 +101,9 @@ void Frontend::show()
 void Frontend::onCommandFound(Command cmd,
                               const QByteArray &data)
 {
-    Dispatcher *dispatcher = m_dispatcher.data();
+    Q_D(Frontend);
+
+    Dispatcher *dispatcher = d->dispatcher.data();
 
     switch(cmd) {
     case CommandLogin: {

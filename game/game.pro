@@ -6,6 +6,10 @@ TARGET = $$GAME_TARGET
 QT -= gui
 QT += network
 
+enable-gui {
+    QT += declarative
+}
+
 include(commands/commands.pri)
 
 HEADERS += \

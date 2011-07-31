@@ -19,13 +19,7 @@
  */
 
 #include "gamemanager.h"
-
 #include <game.h>
-#include <localside.h> // TODO: Have a side factory to prevent this class from depending on those headers
-#include <gnuchess.h> // TODO: see above
-#include <commands/logincommand.h>
-#include <directinputdevice.h>
-#include <iostream>
 
 using Game::Command;
 
@@ -38,7 +32,7 @@ GameManager::GameManager(QObject *parent)
     , m_frontend(m_dispatcher.data())
 {
     m_dispatcher->setFrontend(&m_frontend);
-    m_frontend.show();
+    m_frontend.show(QUrl("qrc:/main.qml"));
 }
 
 GameManager::~GameManager()

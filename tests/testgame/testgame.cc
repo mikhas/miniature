@@ -138,9 +138,6 @@ private:
 
     Q_SLOT void testCli()
     {
-#ifndef MINIATURE_CLI_ENABLED
-        QSKIP("Miniature CLI support not enabled, skipping test.", SkipAll);
-#else
         QProcess p;
         p.setEnvironment(QStringList(QString("LD_LIBRARY_PATH=%1")
             .arg(MINIATURE_LIB_PATH)));
@@ -151,7 +148,6 @@ private:
         p.write("quit\n");
         p.waitForFinished();
         QCOMPARE(p.state(), QProcess::NotRunning);
-#endif
     }
 };
 
