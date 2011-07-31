@@ -27,6 +27,28 @@
 
 namespace Game {
 
+//! Represents one side in a game record.
+struct SideRecord
+{
+    QByteArray name;
+    uint rating;
+    uint time_control; // in secs
+    uint clock_time; // in secs
+    uint material_strength;
+};
+
+//! Represents one entry from a list of games.
+struct Record
+{
+    bool valid;
+    uint id;
+    Mode mode;
+    SideRecord white;
+    SideRecord black;
+    bool white_to_move;
+    uint turn;
+};
+
 class AbstractBackend;
 typedef QSharedPointer<AbstractBackend> SharedBackend;
 typedef QSharedPointer<AbstractBackend> SharedParser;

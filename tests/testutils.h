@@ -22,7 +22,6 @@
 #define TESTUTILS_H
 
 #include "abstractbackend.h"
-#include "ficsside.h" // TODO: move parser in separate file
 
 #include <QtCore>
 #include <QtGui>
@@ -66,15 +65,15 @@ QApplication *createApp(const QString &app_name)
 
 }
 
-class DummyLink
+class DummyBackend
     : public Game::AbstractBackend
 {
 public:
-    explicit DummyLink(QObject *parent = 0)
+    explicit DummyBackend(QObject *parent = 0)
         : Game::AbstractBackend(parent)
     {}
 
-    virtual ~DummyLink()
+    virtual ~DummyBackend()
     {}
 
     virtual Game::AbstractBackend::State state() const

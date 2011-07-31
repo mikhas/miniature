@@ -22,7 +22,7 @@
 #include "game.h"
 #include "localside.h"
 #include "gnuchess.h"
-#include "ficsside.h"
+#include "fics/side.h"
 #include "move.h"
 
 #include <QtCore>
@@ -61,7 +61,7 @@ private:
         // After each valid move, active side should switch. So we can test a
         // valid move sequence simply by checking the active side against the
         // expected value.
-        Game::SharedParser parser(new TestUtils::DummyLink);
+        Game::SharedParser parser(new TestUtils::DummyBackend);
         Game::AbstractSide *white = new Game::LocalSide("white", parser);
         Game::AbstractSide *black = new Game::LocalSide("white", parser);
         Game::Game subject(white, black);
@@ -88,12 +88,12 @@ private:
 
     Q_SLOT void testFicsGame()
     {
-        Game::SharedBackend link(new TestUtils::DummyLink);
+        Game::SharedBackend link(new TestUtils::DummyBackend);
         Game::AbstractSide *local = new Game::LocalSide("local", link);
 
         link->login("guest", "");
         TestUtils::waitForSignal(link.data(), SIGNAL(stateChanged(State)), 5000);
-        Game::AbstractSide *fics = new Game::FicsSide("FICS", link);
+        Game::AbstractSide *fics = new Game::Fics::Side("FICS", link);
 
         Game::Game subject(local, fics);
         subject.start();
@@ -105,11 +105,11 @@ private:
     Q_SLOT void testSideStates_data()
     {
         qRegisterMetaType<AbstractSideWrapper>();
-        Game::SharedBackend link(new TestUtils::DummyLink);
+        Game::SharedBackend link(new TestUtils::DummyBackend);
 
         QTest::addColumn<AbstractSideWrapper>("side_wrapper");
         QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side", link));
-        QTest::newRow("FICS") << AbstractSideWrapper(new Game::FicsSide("local", link));
+        QTest::newRow("FICS") << AbstractSideWrapper(new Game::Fics::Side("local", link));
         QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess"));
     }
 

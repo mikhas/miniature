@@ -22,7 +22,7 @@
 #define LOGOUTCOMMAND_H
 
 #include "abstractcommand.h"
-#include "ficsside.h" // Record defined there. TODO: move into dedicated file, of course.
+#include "abstractbackend.h"
 
 #include <QtCore>
 

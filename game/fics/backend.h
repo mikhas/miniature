@@ -18,50 +18,24 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FICSSIDE_H
-#define FICSSIDE_H
+#ifndef FICS_BACKEND_H
+#define FICS_BACKEND_H
 
 #include "namespace.h"
-#include "abstractside.h"
 #include "abstractbackend.h"
 #include "dispatcher.h"
 
 #include <QtCore>
 #include <QtNetwork/QTcpSocket>
 
-namespace Game
-{
+namespace Game { namespace Fics {
 
-//! Represents one entry from a list of games.
-
-struct SideRecord
-{
-    QByteArray name;
-    uint rating;
-    uint time_control; // in secs
-    uint clock_time; // in secs
-    uint material_strength;
-};
-
-struct Record
-{
-    bool valid;
-    uint id;
-    Mode mode;
-    SideRecord white;
-    SideRecord black;
-    bool white_to_move;
-    uint turn;
-};
-
-typedef QMap<uint, Record> GameTable;
-
-//! A link for FICS
-class FicsBackend
+//! A backend for FICS
+class Backend
     : public AbstractBackend
 {
     Q_OBJECT
-    Q_DISABLE_COPY(FicsBackend)
+    Q_DISABLE_COPY(Backend)
 
 private:
     WeakDispatcher m_dispatcher;
@@ -76,9 +50,9 @@ private:
 
 public:
     //! \reimp
-    explicit FicsBackend(Dispatcher *dispatcher,
-                         QObject *parent = 0);
-    virtual ~FicsBackend();
+    explicit Backend(Dispatcher *dispatcher,
+                     QObject *parent = 0);
+    virtual ~Backend();
     virtual void setFlags(CommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual State state() const;
@@ -96,40 +70,7 @@ private:
     void configurePrompt();
 };
 
-//! Implement a backend for FICS (freechess.org).
-//! Can be feeded by Game::FicsParser.
-class FicsSide
-    : public AbstractSide
-{
-    Q_OBJECT
-    Q_DISABLE_COPY(FicsSide)
-
-private:
-    const QString m_identifier;
-    const QString m_password;
-    SideState m_state;
-    SharedBackend m_link;
-
-public:
-    //! C'tor
-    //! @param identifier the identifier for this side.
-    //! @param link the shared FICS link.
-    explicit FicsSide(const QString &identifier,
-                      const SharedBackend &link);
-
-    //! \reimp
-    virtual ~FicsSide();
-    virtual void init();
-    virtual SideState state() const;
-    virtual const QString &identifier() const;
-    virtual void runInBackground();
-    virtual void runInForeground();
-    virtual void startTurn(const Move &move);
-    virtual void onCommandFound(Command command,
-                                const QByteArray &data);
-    //! \reimp_end
-};
-
+} // namespace Fics
 } // namespace Game
 
-#endif // FICSSIDE_H
+#endif // FICS_BACKEND_H

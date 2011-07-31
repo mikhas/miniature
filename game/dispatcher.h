@@ -31,7 +31,10 @@ typedef QWeakPointer<Dispatcher> WeakDispatcher;
 class DispatcherPrivate;
 class AbstractCommand;
 class Frontend;
-class FicsBackend;
+
+namespace Fics {
+class Backend;
+}
 
 Dispatcher *createDispatcher(QObject *owner = 0);
 
@@ -52,7 +55,7 @@ public:
 
     bool sendCommand(AbstractCommand *command);
     void setFrontend(Frontend *frontend);
-    void setFicsBackend(FicsBackend *fics);
+    void setFicsBackend(Fics::Backend *fics);
 };
 
 } // namespace Game

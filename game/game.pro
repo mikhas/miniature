@@ -11,6 +11,7 @@ enable-gui {
 }
 
 include(commands/commands.pri)
+include(fics/fics.pri)
 
 HEADERS += \
     namespace.h \
@@ -23,7 +24,6 @@ HEADERS += \
     move.h \
     position.h \
     square.h \
-    ficsside.h \
     dispatcher.h \
     abstractcommand.h \
     commandline.h \
@@ -39,7 +39,6 @@ SOURCES += \
     move.cc \
     position.cc \
     square.cc \
-    ficsside.cc \
     dispatcher.cc \
     abstractcommand.cc \
     localside.cc \

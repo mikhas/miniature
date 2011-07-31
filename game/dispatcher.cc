@@ -20,18 +20,15 @@
 
 #include "dispatcher.h"
 #include "abstractcommand.h"
-#include "abstractbackend.h"
-#include "ficsside.h"
-#include "linereader.h"
-#include "directinputdevice.h"
 #include "frontend.h"
+#include "fics/backend.h"
 
 namespace Game {
 
 Dispatcher *createDispatcher(QObject *owner)
 {
     Dispatcher *dispatcher = new Dispatcher(owner);
-    dispatcher->setFicsBackend(new FicsBackend(dispatcher));
+    dispatcher->setFicsBackend(new Fics::Backend(dispatcher));
 
     return dispatcher;
 }
@@ -39,7 +36,7 @@ Dispatcher *createDispatcher(QObject *owner)
 class DispatcherPrivate
 {
 public:
-    QScopedPointer<FicsBackend> fics;
+    QScopedPointer<Fics::Backend> fics;
     QWeakPointer<Frontend> frontend;
 
     explicit DispatcherPrivate()
@@ -68,7 +65,7 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
 
     switch(command->target()) {
     case TargetBackendFics:
-        if (FicsBackend *fics = d->fics.data()) {
+        if (Fics::Backend *fics = d->fics.data()) {
             fics->setEnabled(true);
             result = command->exec(fics);
         }
@@ -87,7 +84,7 @@ void Dispatcher::setFrontend(Frontend *frontend)
     d->frontend = QWeakPointer<Frontend>(frontend);
 }
 
-void Dispatcher::setFicsBackend(FicsBackend *fics)
+void Dispatcher::setFicsBackend(Fics::Backend *fics)
 {
     Q_D(Dispatcher);
     d->fics.reset(fics);

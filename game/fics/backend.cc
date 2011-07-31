@@ -18,10 +18,9 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ficsside.h"
-#include "move.h"
-#include "linereader.h"
+#include "fics/backend.h"
 #include "commands/recordcommand.h"
+#include "linereader.h"
 
 namespace {
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
@@ -103,10 +102,10 @@ namespace {
     }
 }
 
-namespace Game {
+namespace Game { namespace Fics {
 
-FicsBackend::FicsBackend(Dispatcher *dispatcher,
-                         QObject *parent)
+Backend::Backend(Dispatcher *dispatcher,
+                 QObject *parent)
     : AbstractBackend(parent)
     , m_dispatcher(dispatcher)
     , m_channel()
@@ -131,14 +130,14 @@ FicsBackend::FicsBackend(Dispatcher *dispatcher,
             this,       SLOT(onHostFound()));
 }
 
-FicsBackend::~FicsBackend()
+Backend::~Backend()
 {}
 
 // Not supported, we always read everything from FICS.
-void FicsBackend::setFlags(CommandFlags)
+void Backend::setFlags(CommandFlags)
 {}
 
-void FicsBackend::setEnabled(bool enable)
+void Backend::setEnabled(bool enable)
 {
     m_enabled = enable;
 
@@ -161,13 +160,13 @@ void FicsBackend::setEnabled(bool enable)
     }
 }
 
-AbstractBackend::State FicsBackend::state() const
+AbstractBackend::State Backend::state() const
 {
     return m_state;
 }
 
-void FicsBackend::login(const QString &username,
-                     const QString &password)
+void Backend::login(const QString &username,
+                    const QString &password)
 {
     if (m_state != StateReady) {
         return;
@@ -188,7 +187,7 @@ void FicsBackend::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
-void FicsBackend::processToken(const QByteArray &token)
+void Backend::processToken(const QByteArray &token)
 {
     if (not m_enabled || token.isEmpty()) {
         return;
@@ -220,7 +219,7 @@ void FicsBackend::processToken(const QByteArray &token)
     }
 }
 
-void FicsBackend::listGames()
+void Backend::listGames()
 {
     if (m_state != StateReady) {
         return;
@@ -230,7 +229,7 @@ void FicsBackend::listGames()
     m_channel.write("\n");
 }
 
-void FicsBackend::onReadyRead()
+void Backend::onReadyRead()
 {
     int next_newline_pos = -1;
     const bool enable_echo = false;
@@ -239,7 +238,7 @@ void FicsBackend::onReadyRead()
     } while (next_newline_pos != -1);
 }
 
-void FicsBackend::processLogin(const QByteArray &line)
+void Backend::processLogin(const QByteArray &line)
 {
     // TODO: write proper tokenizer?
     static const QByteArray confirm_login("Press return to enter the server as");
@@ -271,12 +270,12 @@ void FicsBackend::processLogin(const QByteArray &line)
     }
 }
 
-void FicsBackend::onHostFound()
+void Backend::onHostFound()
 {
     // TODO: Handle retry attempts here.
 }
 
-void FicsBackend::abortLogin()
+void Backend::abortLogin()
 {
     if (m_state != StateLoginPending) {
         return;
@@ -287,7 +286,7 @@ void FicsBackend::abortLogin()
     emit stateChanged(m_state);
 }
 
-void FicsBackend::configurePrompt()
+void Backend::configurePrompt()
 {
     if (m_state != StateReady) {
         return;
@@ -297,64 +296,6 @@ void FicsBackend::configurePrompt()
     m_channel.write("\n");
 }
 
-FicsSide::FicsSide(const QString &identifier,
-                   const SharedBackend &link)
-    : AbstractSide(identifier, link)
-    , m_identifier(identifier)
-    , m_state(NotReady)
-    , m_link(link)
-{}
-
-FicsSide::~FicsSide()
-{}
-
-void FicsSide::init()
-{
-    m_state = Ready;
-    emit ready();
-}
-
-AbstractSide::SideState FicsSide::state() const
-{
-    return m_state;
-}
-
-const QString &FicsSide::identifier() const
-{
-    return m_identifier;
-}
-
-void FicsSide::runInBackground()
-{
-    if (m_state == NotReady) {
-        return;
-    }
-
-    m_state = RunInBackground;
-    disconnect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
-               this,          SLOT(onCommandFound(Command, QByteArray)));
-}
-
-void FicsSide::runInForeground()
-{
-    if (m_state == RunInBackground) {
-        m_state = Ready;
-        connect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
-                this,          SLOT(onCommandFound(Command, QByteArray)),
-                Qt::UniqueConnection);
-    }
-}
-
-void FicsSide::startTurn(const Move &move)
-{
-    Q_UNUSED(move)
-}
-
-void FicsSide::onCommandFound(Command command,
-                               const QByteArray &data)
-{
-    Q_UNUSED(command)
-    Q_UNUSED(data)
-}
-
+} // namespace Fics
 } // namespace Game
+
