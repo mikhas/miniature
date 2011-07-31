@@ -38,6 +38,8 @@ Description: A chess board to play and learn wherever you go.
   * And not only regular chess. See also Antichess, Chess960...
  .
  Miniature is based on Qt and targets MeeGo as primary platform.
+XSBC-Maemo-Display-Name: Miniature
+XB-Maemo-Display-Name: Miniature
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgI
  fAhkiAAAAAlwSFlzAAAVFgAAFRYBDHmQBwAAABl0RVh0U29mdHdhcmUAd3d3

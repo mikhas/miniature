@@ -30,7 +30,15 @@ target.depends += \
 desktop.files = ../miniature.desktop
 desktop.path = /usr/share/applications
 
+icon.files = $${TARGET}.png
+icon.path = /usr/share/themes/base/meegotouch/icons/
+
 INSTALLS += \
     target \
     desktop \
+    icon \
 
+# enable booster
+CONFIG += qdeclarative-boostable
+QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
+QMAKE_LFLAGS += -pie -rdynamic

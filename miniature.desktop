@@ -1,10 +1,8 @@
 [Desktop Entry]
 Encoding=UTF-8
-Version=0.2.0
+Version=1.0
+Terminal=false
 Type=Application
 Name=Miniature
 Exec=/usr/games/miniature
 Icon=miniature
-Categories=Game;BoardGame;Qt;
-MimeType=application/x-chess-pgn
-X-Osso-Service=org.maemo.miniature
