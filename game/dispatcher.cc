@@ -28,21 +28,29 @@
 
 namespace Game {
 
+Dispatcher *createDispatcher(QObject *owner)
+{
+    Dispatcher *dispatcher = new Dispatcher(owner);
+    dispatcher->setFicsBackend(new FicsBackend(dispatcher));
+
+    return dispatcher;
+}
+
 class DispatcherPrivate
 {
 public:
-    FicsBackend fics;
+    QScopedPointer<FicsBackend> fics;
     QWeakPointer<Frontend> frontend;
 
-    explicit DispatcherPrivate(Dispatcher *q)
-        : fics(q)
+    explicit DispatcherPrivate()
+        : fics()
         , frontend()
     {}
 };
 
 Dispatcher::Dispatcher(QObject *parent)
     : QObject(parent)
-    , d_ptr(new DispatcherPrivate(this))
+    , d_ptr(new DispatcherPrivate)
 {}
 
 Dispatcher::~Dispatcher()
@@ -60,8 +68,10 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
 
     switch(command->target()) {
     case TargetBackendFics:
-        d->fics.setEnabled(true);
-        result = command->exec(&d->fics);
+        if (FicsBackend *fics = d->fics.data()) {
+            fics->setEnabled(true);
+            result = command->exec(fics);
+        }
         break;
 
     default:
@@ -75,6 +85,12 @@ void Dispatcher::setFrontend(Frontend *frontend)
 {
     Q_D(Dispatcher);
     d->frontend = QWeakPointer<Frontend>(frontend);
+}
+
+void Dispatcher::setFicsBackend(FicsBackend *fics)
+{
+    Q_D(Dispatcher);
+    d->fics.reset(fics);
 }
 
 } // namespace Game
