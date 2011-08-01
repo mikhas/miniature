@@ -34,9 +34,14 @@ build-stamp: configure-stamp
 clean: 
 	dh_testdir
 	dh_testroot
+
 	rm -f build-stamp configure-stamp
 
-	dh_clean 
+	make  $(PARALLEL_MAKEFLAGS) clean || true
+	rm -f lib/*
+	rm -rf .obj
+
+	dh_clean
 
 install: build
 	dh_testdir
