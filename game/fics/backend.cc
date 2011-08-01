@@ -64,12 +64,12 @@ namespace {
 
         result.valid = match_seek.exactMatch(token);
         if (not result.valid) {
-            //return result;
+            return result;
         }
 
         result.id = match_seek.cap(14).toInt(&converted);
         result.valid = result.valid && converted;
-        result.valid = result.valid && parseRating(&result, &result.rating, match_record.cap(2));
+        /*result.valid = result.valid &&*/ parseRating(&result, &result.rating, match_record.cap(2));
         // TODO: parse game mode.
         result.player_name = match_seek.cap(1).toLatin1();
         result.time = match_seek.cap(3).toInt(&converted);
@@ -93,7 +93,7 @@ namespace {
 
         result.valid = match_record.exactMatch(token);
         if (not result.valid) {
-            //return result;
+            return result;
         }
 
         result.id = match_record.cap(1).toInt(&converted);
@@ -129,7 +129,7 @@ namespace {
     {
         qDebug() << s.valid
                  << "id:" << s.id << "mode:" << s.mode << "name:" << s.player_name
-                 << "time:" << s.time << "inc:" << s.increment
+                 << "rating" << s.rating << "time:" << s.time << "inc:" << s.increment
                  << "is_rated:" << s.is_rated << "white_to_start:" << s.white_to_start
                  << "is_auto_started:" << s.is_auto_started
                  << "uses_formula:" << s.uses_formula
@@ -251,6 +251,7 @@ void Backend::processToken(const QByteArray &token)
 
     case StateReady: {
         const Seek &s(parseSeek(token));
+        debugOutput(s);
         if (s.valid) {
             if (Dispatcher *dispatcher = m_dispatcher.data()) {
                 AdvertisementCommand ac(TargetFrontend, s);

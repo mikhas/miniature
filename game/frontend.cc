@@ -33,12 +33,121 @@ namespace Game { namespace {
                                     | CommandMove);
 }
 
+class AdvertisementModel
+    : public QAbstractItemModel
+{
+private:
+    QVector<Seek> m_advertisements;
+
+public:
+    enum Roles {
+        RoleId = Qt::UserRole + 1,
+        RoleMode,
+        RolePlayerName,
+        RoleRating,
+        RoleTime,
+        RoleIncrement,
+        RoleIsRated,
+        RoleWhiteToStart,
+        RoleIsAutoStarted,
+        RoleUsesFormula,
+        RoleRatingLowerLimit,
+        RoleRatingUpperLimit
+    };
+
+    explicit AdvertisementModel(QObject *parent = 0)
+        : QAbstractItemModel(parent)
+    {
+        // QML cannot cope with c-style-variable-names!
+        QHash<int, QByteArray> roles;
+        roles[RoleId] = "id";
+        roles[RoleMode] = "mode";
+        roles[RolePlayerName] = "playerName";
+        roles[RoleRating] = "rating";
+        roles[RoleTime] = "time";
+        roles[RoleIncrement] = "increment";
+        roles[RoleIsRated] = "isRated";
+        roles[RoleWhiteToStart] = "whiteToStart";
+        roles[RoleIsAutoStarted] = "isAutoStarted";
+        roles[RoleUsesFormula] = "usesFormula";
+        roles[RoleRatingLowerLimit] = "ratingLowerLimit";
+        roles[RoleRatingUpperLimit] = "ratingUpperLimit";
+        setRoleNames(roles);
+    }
+
+    virtual ~AdvertisementModel()
+    {}
+
+    virtual void append(const Seek& s)
+    {
+        beginInsertRows(QModelIndex(), m_advertisements.size(), m_advertisements.size());
+        m_advertisements.append(s);
+        endInsertRows();
+
+        // Manage a sliding window of no more than 1024 entries:
+        // TODO: delete ads after x secs?
+        while (m_advertisements.size() > 1024) {
+            beginRemoveRows(QModelIndex(), 0, 0);
+            m_advertisements.pop_front();
+            endRemoveRows();
+        }
+    }
+
+    virtual int columnCount(const QModelIndex &) const
+    {
+        return 1;
+    }
+
+    virtual int rowCount(const QModelIndex &) const
+    {
+        return m_advertisements.size();
+    }
+
+    virtual QModelIndex index(int row, int column, const QModelIndex &) const
+    {
+        return createIndex(row, column);
+    }
+
+    virtual QModelIndex parent(const QModelIndex &) const
+    {
+        return QModelIndex();
+    }
+
+    virtual QVariant data(const QModelIndex &index, int role) const
+    {
+        if (m_advertisements.size() < index.row()) {
+            return QVariant();
+        }
+
+        const Seek &s(m_advertisements.at(index.row()));
+
+        switch(role) {
+        case RoleId: return QVariant(s.id);
+        case RoleMode: return QVariant(s.mode);
+        case RolePlayerName: return QVariant(s.player_name);
+        case RoleRating: return QVariant(s.rating);
+        case RoleTime: return QVariant(s.time);
+        case RoleIncrement: return QVariant(s.increment);
+        case RoleIsRated: return QVariant(s.is_rated);
+        case RoleWhiteToStart: return QVariant(s.white_to_start);
+        case RoleIsAutoStarted: return QVariant(s.is_auto_started);
+        case RoleUsesFormula: return QVariant(s.uses_formula);
+        case RoleRatingLowerLimit: return QVariant(s.rating_range.first);
+        case RoleRatingUpperLimit: return QVariant(s.rating_range.second);
+
+        default:
+            return QVariant();
+        }
+    }
+};
+
 class FrontendPrivate
 {
 public:
     WeakDispatcher dispatcher;
     CommandLine command_line;
     LineReader line_reader;
+    AdvertisementModel advertisements;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
 #endif
@@ -47,6 +156,7 @@ public:
         : dispatcher(new_dispatcher)
         , command_line()
         , line_reader()
+        , advertisements()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -59,6 +169,10 @@ Frontend::Frontend(Dispatcher *dispatcher,
     , d_ptr(new FrontendPrivate(dispatcher))
 {
     Q_D(Frontend);
+
+#ifdef MINIATURE_GUI_ENABLED
+    d->ui.rootContext()->setContextProperty("gameAdvertisements", &d->advertisements);
+#endif
 
     d->command_line.setFlags(all_commands);
     connect(&d->command_line, SIGNAL(commandFound(Command,QByteArray)),
@@ -139,7 +253,10 @@ void Frontend::onCommandFound(Command cmd,
 void Frontend::handleRecord(const Record &)
 {}
 
-void Frontend::handleSeek(const Seek &)
-{}
+void Frontend::handleSeek(const Seek &s)
+{
+    Q_D(Frontend);
+    d->advertisements.append(s);
+}
 
 } // namespace Game
