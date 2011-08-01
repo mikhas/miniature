@@ -59,7 +59,6 @@ public:
     virtual void login(const QString &username,
                        const QString &password);
     virtual void processToken(const QByteArray &token);
-    virtual void listGames();
     //! \reimp_end
 
     virtual void enableTesting();

@@ -272,16 +272,6 @@ void Backend::processToken(const QByteArray &token)
     }
 }
 
-void Backend::listGames()
-{
-    if (m_state != StateReady) {
-        return;
-    }
-
-    m_channel.write("games");
-    m_channel.write("\n");
-}
-
 void Backend::enableTesting()
 {
     m_enabled = true;
@@ -325,7 +315,6 @@ void Backend::processLogin(const QByteArray &line)
         configurePrompt();
         m_state = StateReady;
         emit stateChanged(m_state);
-        listGames();
     }
 }
 
