@@ -172,6 +172,7 @@ Frontend::Frontend(Dispatcher *dispatcher,
 
 #ifdef MINIATURE_GUI_ENABLED
     d->ui.rootContext()->setContextProperty("gameAdvertisements", &d->advertisements);
+    d->ui.rootContext()->setContextProperty("miniature", this);
 #endif
 
     d->command_line.setFlags(all_commands);
@@ -257,6 +258,16 @@ void Frontend::handleSeek(const Seek &s)
 {
     Q_D(Frontend);
     d->advertisements.append(s);
+}
+
+void Frontend::login(const QString &username,
+                     const QString &password)
+{
+    Q_D(Frontend);
+    if (Dispatcher *dispatcher = d->dispatcher.data()) {
+        LoginCommand lc(TargetBackendFics, username, password);
+        dispatcher->sendCommand(&lc);
+    }
 }
 
 } // namespace Game

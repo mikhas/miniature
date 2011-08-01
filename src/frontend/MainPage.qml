@@ -57,6 +57,7 @@ Page {
         anchors.topMargin: 200
         anchors.horizontalCenter: ficsLogin.horizontalCenter
         onClicked: {
+            miniature.login("guest", "") 
             loadScreen("SeekGame.qml")
         }
     }
@@ -86,7 +87,8 @@ Page {
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
         onClicked: {
-            loadScreen("OnlineBoard.qml")
+            miniature.login(idForm.text, idPassword.text) 
+            loadScreen("SeekGame.qml")
     }
 
     // tools: gameTypes - still figuring out navigation

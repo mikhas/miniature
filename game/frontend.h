@@ -52,6 +52,9 @@ public:
     virtual void handleRecord(const Record &r);
     virtual void handleSeek(const Seek &s);
 
+    Q_INVOKABLE void login(const QString &username,
+                           const QString &password);
+
 private:
     Q_SLOT void onCommandFound(Command cmd,
                                const QByteArray &data);
