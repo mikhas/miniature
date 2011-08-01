@@ -1,0 +1,16 @@
+*.swp
+*.pro.user
+.moc
+.obj
+*.o
+*.so
+Makefile
+lib*.so.*
+*.swo
+src/miniature
+tests/testgame/testgame
+tests/testgnuchess/testgnuchess
+tests/testlocalparser/testlocalparser
+tests/testficsparser/testficsparser
+src/qrc_frontend.cpp
+tests/testfics/testfics
