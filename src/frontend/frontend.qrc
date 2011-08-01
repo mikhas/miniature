@@ -4,5 +4,6 @@
     <file>MainPage.qml</file>
     <file>OnlineBoard.qml</file>
     <file>SeekGame.qml</file>
+    <file>chessboard.svg</file>
   </qresource>
 </RCC>

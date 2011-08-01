@@ -152,7 +152,7 @@ Page {
 
     Image {
         id: imageBoard
-        source: "glossy.svg" // FIXME must be glossy.svg but need the file
+        source: "chessboard.svg"
         width: ficsBoard.width
         fillMode: Image.PreserveAspectFit
         anchors.top: opponentZone.bottom

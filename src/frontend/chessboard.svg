@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="480"
+   height="480"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="glossy.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <metadata
+     id="metadata52">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="715"
+     inkscape:window-width="1148"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#000000"
+     id="base"
+     showgrid="false"
+     inkscape:zoom="1.0291667"
+     inkscape:cx="223.50021"
+     inkscape:cy="294.06615"
+     inkscape:window-x="60"
+     inkscape:window-y="26"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3199">
+      <stop
+         id="stop3201"
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0" />
+      <stop
+         id="stop3203"
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3479">
+      <stop
+         id="stop3481"
+         style="stop-color:#e9ddaf;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3487"
+         style="stop-color:#a0882c;stop-opacity:1"
+         offset="0.94999999" />
+      <stop
+         id="stop3483"
+         style="stop-color:#c0a334;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3469">
+      <stop
+         id="stop3471"
+         style="stop-color:#a0892c;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3477"
+         style="stop-color:#504515;stop-opacity:1"
+         offset="0.94999999" />
+      <stop
+         id="stop3473"
+         style="stop-color:#5f5019;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3469"
+       id="linearGradient2437"
+       gradientUnits="userSpaceOnUse"
+       x1="240"
+       y1="0"
+       x2="240"
+       y2="480" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3479"
+       id="linearGradient2440"
+       gradientUnits="userSpaceOnUse"
+       x1="240"
+       y1="0"
+       x2="240"
+       y2="480" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3199"
+       id="linearGradient3296"
+       x1="479.84375"
+       y1="479.03125"
+       x2="0"
+       y2="0"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <path
+     style="fill:url(#linearGradient2440);fill-opacity:1;stroke:none;stroke-linecap:round"
+     id="path3215"
+     d="M 15,0 C 6.69,0 0,6.69 0,15 L 0,60 L 60,60 L 60,0 L 15,0 z M 60,60 L 60,120 L 120,120 L 120,60 L 60,60 z M 120,60 L 180,60 L 180,0 L 120,0 L 120,60 z M 180,60 L 180,120 L 240,120 L 240,60 L 180,60 z M 240,60 L 300,60 L 300,0 L 240,0 L 240,60 z M 300,60 L 300,120 L 360,120 L 360,60 L 300,60 z M 360,60 L 420,60 L 420,0 L 360,0 L 360,60 z M 420,60 L 420,120 L 480,120 L 480,60 L 420,60 z M 420,120 L 360,120 L 360,180 L 420,180 L 420,120 z M 420,180 L 420,240 L 480,240 L 480,180 L 420,180 z M 420,240 L 360,240 L 360,300 L 420,300 L 420,240 z M 420,300 L 420,360 L 480,360 L 480,300 L 420,300 z M 420,360 L 360,360 L 360,420 L 420,420 L 420,360 z M 420,420 L 420,480 L 465,480 C 473.31,480 480,473.31 480,465 L 480,420 L 420,420 z M 360,420 L 300,420 L 300,480 L 360,480 L 360,420 z M 300,420 L 300,360 L 240,360 L 240,420 L 300,420 z M 240,420 L 180,420 L 180,480 L 240,480 L 240,420 z M 180,420 L 180,360 L 120,360 L 120,420 L 180,420 z M 120,420 L 60,420 L 60,480 L 120,480 L 120,420 z M 60,420 L 60,360 L 0,360 L 0,420 L 60,420 z M 60,360 L 120,360 L 120,300 L 60,300 L 60,360 z M 60,300 L 60,240 L 0,240 L 0,300 L 60,300 z M 60,240 L 120,240 L 120,180 L 60,180 L 60,240 z M 60,180 L 60,120 L 0,120 L 0,180 L 60,180 z M 120,180 L 180,180 L 180,120 L 120,120 L 120,180 z M 180,180 L 180,240 L 240,240 L 240,180 L 180,180 z M 240,180 L 300,180 L 300,120 L 240,120 L 240,180 z M 300,180 L 300,240 L 360,240 L 360,180 L 300,180 z M 300,240 L 240,240 L 240,300 L 300,300 L 300,240 z M 300,300 L 300,360 L 360,360 L 360,300 L 300,300 z M 240,300 L 180,300 L 180,360 L 240,360 L 240,300 z M 180,300 L 180,240 L 120,240 L 120,300 L 180,300 z" />
+  <path
+     style="fill:url(#linearGradient2437);fill-opacity:1;stroke:none;stroke-linecap:round"
+     id="path3217"
+     d="M 60,0 L 60,60 L 120,60 L 120,0 L 60,0 z M 120,60 L 120,120 L 180,120 L 180,60 L 120,60 z M 180,60 L 240,60 L 240,0 L 180,0 L 180,60 z M 240,60 L 240,120 L 300,120 L 300,60 L 240,60 z M 300,60 L 360,60 L 360,0 L 300,0 L 300,60 z M 360,60 L 360,120 L 420,120 L 420,60 L 360,60 z M 420,60 L 480,60 L 480,15 C 480,6.69 473.31,0 465,0 L 420,0 L 420,60 z M 420,120 L 420,180 L 480,180 L 480,120 L 420,120 z M 420,180 L 360,180 L 360,240 L 420,240 L 420,180 z M 420,240 L 420,300 L 480,300 L 480,240 L 420,240 z M 420,300 L 360,300 L 360,360 L 420,360 L 420,300 z M 420,360 L 420,420 L 480,420 L 480,360 L 420,360 z M 420,420 L 360,420 L 360,480 L 420,480 L 420,420 z M 360,420 L 360,360 L 300,360 L 300,420 L 360,420 z M 300,420 L 240,420 L 240,480 L 300,480 L 300,420 z M 240,420 L 240,360 L 180,360 L 180,420 L 240,420 z M 180,420 L 120,420 L 120,480 L 180,480 L 180,420 z M 120,420 L 120,360 L 60,360 L 60,420 L 120,420 z M 60,420 L 0,420 L 0,465 C 0,473.31 6.69,480 15,480 L 60,480 L 60,420 z M 60,360 L 60,300 L 0,300 L 0,360 L 60,360 z M 60,300 L 120,300 L 120,240 L 60,240 L 60,300 z M 60,240 L 60,180 L 0,180 L 0,240 L 60,240 z M 60,180 L 120,180 L 120,120 L 60,120 L 60,180 z M 60,120 L 60,60 L 0,60 L 0,120 L 60,120 z M 120,180 L 120,240 L 180,240 L 180,180 L 120,180 z M 180,180 L 240,180 L 240,120 L 180,120 L 180,180 z M 240,180 L 240,240 L 300,240 L 300,180 L 240,180 z M 300,180 L 360,180 L 360,120 L 300,120 L 300,180 z M 300,240 L 300,300 L 360,300 L 360,240 L 300,240 z M 300,300 L 240,300 L 240,360 L 300,360 L 300,300 z M 240,300 L 240,240 L 180,240 L 180,300 L 240,300 z M 180,300 L 120,300 L 120,360 L 180,360 L 180,300 z" />
+  <path
+     style="opacity:0.085;fill:url(#linearGradient3296);fill-opacity:1;stroke:none;stroke-linecap:round;stroke-opacity:1"
+     id="rect3196"
+     d="M 16,0 C 7.136,0 0,7.136 0,16 L 0,464 C 0,470.94252 4.3745367,476.80715 10.53125,479.03125 C 97.309644,160.34092 439.24076,140.16027 479.84375,13.875 C 478.80195,6.0323292 472.13648,0 464,0 L 16,0 z" />
+  <path
+     d="M 16,0 C 7.136,0 0,7.136 0,16 L 0,464 C 0,470.94252 4.3745367,476.80715 10.53125,479.03125 C 97.309644,160.34092 439.24076,140.16027 479.84375,13.875 C 478.80195,6.0323292 472.13648,0 464,0 L 16,0 z"
+     id="path3212"
+     style="opacity:0.015;fill:none;fill-opacity:1;stroke:#ffffff;stroke-linecap:round;stroke-opacity:1" />
+  <path
+     d="M 10.53125,479.03125 C 97.309644,160.34092 439.24076,140.16027 479.84375,13.875"
+     id="path3208"
+     style="opacity:0.025;fill:none;fill-opacity:1;stroke:#ffffff;stroke-linecap:round;stroke-opacity:1;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+     sodipodi:nodetypes="cc" />
+</svg>

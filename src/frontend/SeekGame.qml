@@ -93,13 +93,14 @@ Page {
 
                 Row {
                     anchors.fill: parent
+                    property string seek: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
 
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
 
                         Label {
                             id: opponentTextEntry
-                            text: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
+                            text: seek
                             font.pointSize: 36 // FIXME no idea why this font isn't bigger
                         }
 
@@ -121,44 +122,59 @@ Page {
                     id: mouseArea
                     anchors.fill: listItem
                     onClicked: {
-                        loadScreen("OnlineBoard.qml") // FIXME must open confirm dialog
+                        confirmGame.open();
+                    }
+
+                    // Confirm game dialog
+                    QueryDialog {
+                        id: confirmGame
+                        // icon: "" FIXME anybody volunteers an battling image for this dialog?
+                        titleText: "Ready to play?"
+                        message: seek
+                        acceptButtonText: "Yes"
+                        onAccepted: {
+                            loadScreen("OnlineBoard.qml") // FIXME here would start the real game
+                        }
+                        rejectButtonText: "No"
                     }
                 }
+
             }
         }
-
     }
+
+
 
     // Not sure why this toolbar is not placed automatically in the bottom - getting rid of it and putting the icons alone.
     //ToolBarLayout {
     //    id: boardTools
 
 
-        ToolIcon {
-            id: backIcon
-            iconId: "toolbar-back";
-            anchors.bottom: ficsSeekGame.bottom
-            anchors.left: ficsSeekGame.left
-            onClicked: {
-                loadScreen("MainPage.qml")
+    ToolIcon {
+        id: backIcon
+        iconId: "toolbar-back";
+        anchors.bottom: ficsSeekGame.bottom
+        anchors.left: ficsSeekGame.left
+        onClicked: {
+            loadScreen("MainPage.qml")
         }
-        }
+    }
 
-        // TO BE DECIDED The 2nd icon is used to confirm the move after the piece has been placed.
-        // ToolButton {
-        //    text: "Confirm";
-        //    anchors.verticalCenter: backIcon.verticalCenter
-        //    anchors.horizontalCenter: ficsSeekGame.horizontalCenter
-        //}
+    // TO BE DECIDED The 2nd icon is used to confirm the move after the piece has been placed.
+    // ToolButton {
+    //    text: "Confirm";
+    //    anchors.verticalCenter: backIcon.verticalCenter
+    //    anchors.horizontalCenter: ficsSeekGame.horizontalCenter
+    //}
 
-        // Placeholder icon for settings etc
-        ToolIcon {
-            iconId: "toolbar-view-menu"
-            anchors.bottom: ficsSeekGame.bottom
-            anchors.right: ficsSeekGame.right
-        }
+    // Placeholder icon for settings etc
+    ToolIcon {
+        iconId: "toolbar-view-menu"
+        anchors.bottom: ficsSeekGame.bottom
+        anchors.right: ficsSeekGame.right
+    }
 
-        // }
+    // }
 
 }
 
