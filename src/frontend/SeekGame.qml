@@ -82,154 +82,30 @@ Page {
         anchors.bottom: backIcon.top // FIXME a tool rectangle needs to be defined
         anchors.bottomMargin: 50
 
-        // FIXME this static list needs to be obviously plugged to the backend
-        // Listing many to test "flickability"
-        ListModel {
-                id: seekListModel
-
-                // FIXME the ListElement will also have values for robot y/n and black/white preference, displayed next to Rated
-                ListElement {
-                    opponentRating: "2735"
-                    opponentName: "Judit Polgár"
-                    opponentSeekTime: "10"
-                    opponentSeekIncrement: "0"
-                    opponentSeekRating: "Rated"
-                    // opponentRobot: if yes, an image of a robot will be displayed
-                    // opponentColorPreference: if any, an image of a white/black piece will be diplayed
-                }
-
-                ListElement {
-                    opponentRating: "2622"
-                    opponentName: "Humpy Koneru"
-                    opponentSeekTime: "12"
-                    opponentSeekIncrement: "3"
-                    opponentSeekRating: "Unrated"
-                }
-
-                ListElement {
-                    opponentRating: "2590"
-                    opponentName: "Hou Yifan"
-                    opponentSeekTime: "8"
-                    opponentSeekIncrement: "8"
-                    opponentSeekRating: "Unrated"
-                }
-
-                ListElement {
-                    opponentRating: "2577"
-                    opponentName: "Susan Polgar"
-                    opponentSeekTime: "10"
-                    opponentSeekIncrement: "5"
-                    opponentSeekRating: "Rated"
-                }
-
-               ListElement {
-                    opponentRating: "2574"
-                    opponentName: "Xie Jun"
-                    opponentSeekTime: "10"
-                    opponentSeekIncrement: "5"
-                    opponentSeekRating: "Unrated"
-                }
-
-               ListElement {
-                   opponentRating: "2577"
-                   opponentName: "Susan Polgar"
-                   opponentSeekTime: "10"
-                   opponentSeekIncrement: "5"
-                   opponentSeekRating: "Rated"
-               }
-
-              ListElement {
-                   opponentRating: "2574"
-                   opponentName: "Xie Jun"
-                   opponentSeekTime: "10"
-                   opponentSeekIncrement: "5"
-                   opponentSeekRating: "Unrated"
-               }
-
-              ListElement {
-                  opponentRating: "2577"
-                  opponentName: "Susan Polgar"
-                  opponentSeekTime: "10"
-                  opponentSeekIncrement: "5"
-                  opponentSeekRating: "Rated"
-              }
-
-             ListElement {
-                  opponentRating: "2574"
-                  opponentName: "Xie Jun"
-                  opponentSeekTime: "10"
-                  opponentSeekIncrement: "5"
-                  opponentSeekRating: "Unrated"
-              }
-
-             ListElement {
-                 opponentRating: "2577"
-                 opponentName: "Susan Polgar"
-                 opponentSeekTime: "10"
-                 opponentSeekIncrement: "5"
-                 opponentSeekRating: "Rated"
-             }
-
-            ListElement {
-                 opponentRating: "2574"
-                 opponentName: "Xie Jun"
-                 opponentSeekTime: "10"
-                 opponentSeekIncrement: "5"
-                 opponentSeekRating: "Unrated"
-             }
-
-            ListElement {
-                opponentRating: "2577"
-                opponentName: "Susan Polgar"
-                opponentSeekTime: "10"
-                opponentSeekIncrement: "5"
-                opponentSeekRating: "Rated"
-            }
-
-           ListElement {
-                opponentRating: "2574"
-                opponentName: "Xie Jun"
-                opponentSeekTime: "10"
-                opponentSeekIncrement: "5"
-                opponentSeekRating: "Unrated"
-            }
-        }
-
-
         ListView {
             id: seekList
             anchors.fill: seekListWindow
-            model: seekListModel
+            model: gameAdvertisements
             delegate: Item { // feels weird that a delegate is called like this, jus copied from Qt examples
                 id: listItem
                 height: 88
                 width: parent.width
 
-                // BorderImage {
-                //    id: backgroundItem
-                //    anchors.fill: parent
-                //    anchors.leftMargin: -ficsSeekGame.anchors.leftMargin
-                //    anchors.rightMargin: -ficsSeekGame.anchors.rightMargin
-                //    visible: mouseArea.pressed
-                //    source: "image://theme/meegotouch-list-background-pressed-center"
-                // }
-
                 Row {
                     anchors.fill: parent
 
-                    // FIXME this still looks ugly, going for basic concepts first
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
 
                         Label {
                             id: opponentTextEntry
-                            text: opponentRating + " " + opponentName + " " + opponentSeekTime + " " + opponentSeekIncrement
+                            text: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
                             font.pointSize: 36 // FIXME no idea why this font isn't bigger
                         }
 
                         Label {
                             id: opponentTextSubEntry
-                            text: opponentSeekRating
+                            text: model.rated ? "rated" : "unrated"
                             font.pointSize: 22
                         }
                     }
