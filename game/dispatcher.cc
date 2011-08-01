@@ -71,6 +71,12 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
         }
         break;
 
+    case TargetFrontend:
+        if (Frontend *frontend = d->frontend.data()) {
+            result = command->exec(frontend);
+        }
+        break;
+
     default:
         break;
     }

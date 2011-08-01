@@ -18,29 +18,29 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "recordcommand.h"
+#include "advertisementcommand.h"
 #include "frontend.h"
 
 namespace Game {
 
-RecordCommand::RecordCommand(Target t,
-                             const Record &r)
+AdvertisementCommand::AdvertisementCommand(Target t,
+                                           const Seek &s)
     : AbstractCommand(t)
     , m_target(t)
-    , m_record(r)
+    , m_seek(s)
 {}
 
-RecordCommand::~RecordCommand()
+AdvertisementCommand::~AdvertisementCommand()
 {}
 
-Target RecordCommand::target() const
+Target AdvertisementCommand::target() const
 {
     return m_target;
 }
 
-bool RecordCommand::exec(Frontend *target)
+bool AdvertisementCommand::exec(Frontend *target)
 {
-    target->handleRecord(m_record);
+    target->handleSeek(m_seek);
     return false;
 }
 

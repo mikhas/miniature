@@ -62,6 +62,8 @@ public:
     virtual void listGames();
     //! \reimp_end
 
+    virtual void enableTesting();
+
 private:
     Q_SLOT void onReadyRead();
     void processLogin(const QByteArray &line);

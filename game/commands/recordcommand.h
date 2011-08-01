@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOGOUTCOMMAND_H
-#define LOGOUTCOMMAND_H
+#ifndef RECORDCOMMAND_H
+#define RECORDCOMMAND_H
 
 #include "abstractcommand.h"
 #include "abstractbackend.h"
@@ -47,4 +47,4 @@ public:
 
 } // namespace Game
 
-#endif // LOGOUTCOMMAND_H
+#endif // RECORDCOMMAND_H

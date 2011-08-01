@@ -24,6 +24,7 @@
 #include "dispatcher.h"
 #include "commandline.h"
 #include "linereader.h"
+#include "abstractbackend.h"
 
 #include <QtCore>
 
@@ -47,6 +48,9 @@ public:
                       QObject *parent = 0);
     virtual ~Frontend();
     virtual void show(const QUrl &ui);
+
+    virtual void handleRecord(const Record &r);
+    virtual void handleSeek(const Seek &s);
 
 private:
     Q_SLOT void onCommandFound(Command cmd,

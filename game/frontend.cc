@@ -136,4 +136,10 @@ void Frontend::onCommandFound(Command cmd,
     }
 }
 
+void Frontend::handleRecord(const Record &)
+{}
+
+void Frontend::handleSeek(const Seek &)
+{}
+
 } // namespace Game

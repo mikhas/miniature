@@ -20,12 +20,13 @@
 
 #include "fics/backend.h"
 #include "commands/recordcommand.h"
+#include "commands/advertisementcommand.h"
 #include "linereader.h"
 
 namespace {
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
     const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
-                             "\\s+(\\w+)\\s+(\\w+)\\s+(\\[\\w+\\])?\\s*(m|a)?\\s*(f)?"
+                             "\\s+(\\w+)\\s+(\\w+)\\s+(\\[(\\w+)\\])?\\s*(m|a)?\\s*(f)?"
                              "\\s*(\\[(\\d+)\\-(\\d+)\\])?\\s*\\(\"play\\s+(\\d+)\" to respond\\)");
 
     // Matches: "92 2370 playerABC     2383 playerDEF  [ br  5   5]   2:22 -  3:17 (18-18) W: 42"
@@ -63,10 +64,10 @@ namespace {
 
         result.valid = match_seek.exactMatch(token);
         if (not result.valid) {
-            return result;
+            //return result;
         }
 
-        result.id = match_seek.cap(13).toInt(&converted);
+        result.id = match_seek.cap(14).toInt(&converted);
         result.valid = result.valid && converted;
         result.valid = result.valid && parseRating(&result, &result.rating, match_record.cap(2));
         // TODO: parse game mode.
@@ -76,13 +77,11 @@ namespace {
         result.increment = match_seek.cap(4).toInt(&converted);
         result.valid = result.valid && converted;
         result.is_rated = (match_seek.cap(5) == "rated" || match_record.cap(5) == "r");
-        result.white_to_start = (match_seek.cap(7) == "white" || match_seek.cap(7) == "w");
-        result.is_auto_started = (match_seek.cap(8) != "m");
-        result.uses_formula = (match_seek.cap(9) == "f");
-        result.rating_range.first = match_seek.cap(10).toInt(&converted);
-        result.valid = result.valid && converted;
-        result.rating_range.second = match_seek.cap(11).toInt(&converted);
-        result.valid = result.valid && converted;
+        result.white_to_start = (match_seek.cap(8) == "white" || match_seek.cap(7) == "w");
+        result.is_auto_started = (match_seek.cap(9) != "m");
+        result.uses_formula = (match_seek.cap(10) == "f");
+        result.rating_range.first = match_seek.cap(11).toInt(&converted);
+        result.rating_range.second = match_seek.cap(12).toInt(&converted);
 
         return result;
     }
@@ -94,7 +93,7 @@ namespace {
 
         result.valid = match_record.exactMatch(token);
         if (not result.valid) {
-            return result;
+            //return result;
         }
 
         result.id = match_record.cap(1).toInt(&converted);
@@ -129,9 +128,12 @@ namespace {
     void debugOutput(const Game::Seek s)
     {
         qDebug() << s.valid
-                 << s.id << s.mode << s.player_name << s.time << s.increment
-                 << s.is_rated << s.white_to_start << s.is_auto_started
-                 << s.uses_formula << s.rating_range;
+                 << "id:" << s.id << "mode:" << s.mode << "name:" << s.player_name
+                 << "time:" << s.time << "inc:" << s.increment
+                 << "is_rated:" << s.is_rated << "white_to_start:" << s.white_to_start
+                 << "is_auto_started:" << s.is_auto_started
+                 << "uses_formula:" << s.uses_formula
+                 << "rating range:" << s.rating_range;
     }
 
 
@@ -250,22 +252,19 @@ void Backend::processToken(const QByteArray &token)
     case StateReady: {
         const Seek &s(parseSeek(token));
         if (s.valid) {
-            debugOutput(s);
             if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                //RecordCommand rc(TargetFrontend, r);
-                //dispatcher->sendCommand(&rc);
+                AdvertisementCommand ac(TargetFrontend, s);
+                dispatcher->sendCommand(&ac);
             }
         } else {
-            qDebug() << "Not a seek";
             const Record &r(parseRecord(token));
             if (r.valid) {
-                debugOutput(r);
                 if (Dispatcher *dispatcher = m_dispatcher.data()) {
                     RecordCommand rc(TargetFrontend, r);
                     dispatcher->sendCommand(&rc);
                 }
             } else {
-                qDebug() << "Not a game record";
+                qDebug() << "Unknown token:" << token;
             }
         }
     } break;
@@ -280,6 +279,12 @@ void Backend::listGames()
 
     m_channel.write("games");
     m_channel.write("\n");
+}
+
+void Backend::enableTesting()
+{
+    m_enabled = true;
+    m_state = StateReady;
 }
 
 void Backend::onReadyRead()
