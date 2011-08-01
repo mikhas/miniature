@@ -93,14 +93,13 @@ Page {
 
                 Row {
                     anchors.fill: parent
-                    property string seek: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
 
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
 
                         Label {
                             id: opponentTextEntry
-                            text: seek
+                            text: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
                             font.pointSize: 36 // FIXME no idea why this font isn't bigger
                         }
 
@@ -130,7 +129,7 @@ Page {
                         id: confirmGame
                         // icon: "" FIXME anybody volunteers an battling image for this dialog?
                         titleText: "Ready to play?"
-                        message: seek
+                        message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
                         acceptButtonText: "Yes"
                         onAccepted: {
                             loadScreen("OnlineBoard.qml") // FIXME here would start the real game
