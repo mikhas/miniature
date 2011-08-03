@@ -7,7 +7,7 @@ QT -= gui
 QT += network
 
 enable-gui {
-    QT += declarative
+    QT += gui declarative
 }
 
 include(commands/commands.pri)
