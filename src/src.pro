@@ -31,7 +31,7 @@ LIBS += \
         $${GAME_DIR}/frontend.h \
         $${GAME_DIR}/commands/logincommand.h \
         $${GAME_DIR}/commands/logoutcommand.h \
-        $${GAME_DIR}/commands/advertisementcommand.h \
+        $${GAME_DIR}/commands/advertisement.h \
         $${GAME_DIR}/commands/recordcommand.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
@@ -49,7 +49,7 @@ LIBS += \
         $${GAME_DIR}/frontend.cc \
         $${GAME_DIR}/commands/logincommand.cc \
         $${GAME_DIR}/commands/logoutcommand.cc \
-        $${GAME_DIR}/commands/advertisementcommand.cc \
+        $${GAME_DIR}/commands/advertisement.cc \
         $${GAME_DIR}/commands/recordcommand.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \

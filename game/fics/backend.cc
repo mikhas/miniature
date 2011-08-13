@@ -20,7 +20,7 @@
 
 #include "fics/backend.h"
 #include "commands/recordcommand.h"
-#include "commands/advertisementcommand.h"
+#include "commands/advertisement.h"
 #include "linereader.h"
 
 namespace {
@@ -254,7 +254,7 @@ void Backend::processToken(const QByteArray &token)
         debugOutput(s);
         if (s.valid) {
             if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                AdvertisementCommand ac(TargetFrontend, s);
+                Command::Advertisement ac(TargetFrontend, s);
                 dispatcher->sendCommand(&ac);
             }
         } else {

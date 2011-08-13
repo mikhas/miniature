@@ -18,31 +18,33 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "advertisementcommand.h"
-#include "frontend.h"
+#ifndef ADVERTISEMENTCOMMAND_H
+#define ADVERTISEMENTCOMMAND_H
 
-namespace Game {
+#include "abstractcommand.h"
+#include "abstractbackend.h"
 
-AdvertisementCommand::AdvertisementCommand(Target t,
-                                           const Seek &s)
-    : AbstractCommand(t)
-    , m_target(t)
-    , m_seek(s)
-{}
+#include <QtCore>
 
-AdvertisementCommand::~AdvertisementCommand()
-{}
+namespace Game { namespace Command {
 
-Target AdvertisementCommand::target() const
+class Advertisement
+    : public AbstractCommand
 {
-    return m_target;
-}
+private:
+    Target m_target;
+    Seek m_seek;
 
-bool AdvertisementCommand::exec(Frontend *target)
-{
-    target->handleSeek(m_seek);
-    return false;
-}
+public:
+    //! \reimp
+    explicit Advertisement(Target t,
+                           const Seek &s);
+    virtual ~Advertisement();
+    virtual Target target() const;
+    virtual bool exec(Frontend *target);
+    //! \reimp_end
+};
 
-} // namespace Game
+}} // namespace Command, Game
 
+#endif // ADVERTISEMENTCOMMAND_H
