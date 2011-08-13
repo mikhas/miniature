@@ -18,22 +18,28 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logoutcommand.h"
+#ifndef LOGOUTCOMMAND_H
+#define LOGOUTCOMMAND_H
 
-namespace Game {
+#include "abstractcommand.h"
+#include <QtCore>
 
-LogoutCommand::LogoutCommand(Target t)
-    : AbstractCommand(t)
-    , m_target(t)
-{}
+namespace Game { namespace Command {
 
-LogoutCommand::~LogoutCommand()
-{}
-
-Target LogoutCommand::target() const
+class Logout
+    : public AbstractCommand
 {
-    return m_target;
-}
+private:
+    Target m_target;
 
-} // namespace Game
+public:
+    //! \reimp
+    explicit Logout(Target t);
+    virtual ~Logout();
+    virtual Target target() const;
+    //! \reimp_end
+};
 
+}} // namespace Command, Game
+
+#endif // LOGOUTCOMMAND_H

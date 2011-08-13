@@ -20,7 +20,7 @@
 
 #include "frontend.h"
 #include "commands/login.h"
-#include "commands/logoutcommand.h"
+#include "commands/logout.h"
 #include "directinputdevice.h"
 
 #ifdef MINIATURE_GUI_ENABLED
@@ -240,7 +240,7 @@ void Frontend::onCommandFound(ParserCommand cmd,
 
     case CommandQuit: {
         if (dispatcher) {
-            LogoutCommand logout(TargetBackend);
+            Command::Logout logout(TargetBackend);
             dispatcher->sendCommand(&logout);
         }
         qApp->quit();
