@@ -18,31 +18,33 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "recordcommand.h"
-#include "frontend.h"
+#ifndef RECORDCOMMAND_H
+#define RECORDCOMMAND_H
 
-namespace Game {
+#include "abstractcommand.h"
+#include "abstractbackend.h"
 
-RecordCommand::RecordCommand(Target t,
-                             const Record &r)
-    : AbstractCommand(t)
-    , m_target(t)
-    , m_record(r)
-{}
+#include <QtCore>
 
-RecordCommand::~RecordCommand()
-{}
+namespace Game { namespace Command {
 
-Target RecordCommand::target() const
+class Record
+    : public AbstractCommand
 {
-    return m_target;
-}
+private:
+    Target m_target;
+    ::Game::Record m_record;
 
-bool RecordCommand::exec(Frontend *target)
-{
-    target->handleRecord(m_record);
-    return false;
-}
+public:
+    //! \reimp
+    explicit Record(Target t,
+                    const ::Game::Record &r);
+    virtual ~Record();
+    virtual Target target() const;
+    virtual bool exec(Frontend *target);
+    //! \reimp_end
+};
 
-} // namespace Game
+}} // namespace Command, Game
 
+#endif // RECORDCOMMAND_H

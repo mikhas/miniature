@@ -19,7 +19,7 @@
  */
 
 #include "fics/backend.h"
-#include "commands/recordcommand.h"
+#include "commands/record.h"
 #include "commands/advertisement.h"
 #include "linereader.h"
 
@@ -261,7 +261,7 @@ void Backend::processToken(const QByteArray &token)
             const Record &r(parseRecord(token));
             if (r.valid) {
                 if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                    RecordCommand rc(TargetFrontend, r);
+                    Command::Record rc(TargetFrontend, r);
                     dispatcher->sendCommand(&rc);
                 }
             } else {
