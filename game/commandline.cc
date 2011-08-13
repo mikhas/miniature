@@ -21,7 +21,7 @@
 #include "commandline.h"
 
 namespace {
-    typedef QHash<Game::Command, QByteArray> CommandLookupTable;
+    typedef QHash<Game::ParserCommand, QByteArray> CommandLookupTable;
     CommandLookupTable createCommandLoopupTable()
     {
         CommandLookupTable result;
@@ -41,7 +41,7 @@ namespace Game {
 class CommandLinePrivate
 {
 public:
-    CommandFlags flags;
+    ParserCommandFlags flags;
     bool enabled;
 
     explicit CommandLinePrivate()
@@ -49,14 +49,14 @@ public:
         , enabled(false)
     {}
 
-    bool isCommand(Command cmd,
+    bool isCommand(ParserCommand cmd,
                    const QByteArray &token) const
     {
         const QByteArray &val(cmd_lookup_table.value(cmd));
         return ((flags & cmd) && token == val);
     }
 
-    bool startsWithCommand(Command cmd,
+    bool startsWithCommand(ParserCommand cmd,
                            const QByteArray &token,
                            QByteArray *val) const
     {
@@ -79,7 +79,7 @@ CommandLine::CommandLine(QObject *parent)
 CommandLine::~CommandLine()
 {}
 
-void CommandLine::setFlags(CommandFlags flags)
+void CommandLine::setFlags(ParserCommandFlags flags)
 {
     Q_D(CommandLine);
     d->flags = flags;

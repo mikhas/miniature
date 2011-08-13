@@ -21,7 +21,7 @@
 #include "gamemanager.h"
 #include <game.h>
 
-using Game::Command;
+using Game::ParserCommand;
 
 namespace Miniature {
 

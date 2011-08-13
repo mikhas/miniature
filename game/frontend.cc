@@ -28,7 +28,7 @@
 #endif
 
 namespace Game { namespace {
-    const CommandFlags all_commands(CommandNew | CommandQuit | CommandLogin
+    const ParserCommandFlags all_commands(CommandNew | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
 }
@@ -176,8 +176,8 @@ Frontend::Frontend(Dispatcher *dispatcher,
 #endif
 
     d->command_line.setFlags(all_commands);
-    connect(&d->command_line, SIGNAL(commandFound(Command,QByteArray)),
-            this,            SLOT(onCommandFound(Command,QByteArray)),
+    connect(&d->command_line, SIGNAL(commandFound(ParserCommand,QByteArray)),
+            this,            SLOT(onCommandFound(ParserCommand,QByteArray)),
             Qt::UniqueConnection);
 
     connect(&d->line_reader, SIGNAL(tokenFound(QByteArray)),
@@ -213,7 +213,7 @@ void Frontend::show(const QUrl &ui)
     out << "Welcome to Miniature!\n";
 }
 
-void Frontend::onCommandFound(Command cmd,
+void Frontend::onCommandFound(ParserCommand cmd,
                               const QByteArray &data)
 {
     Q_D(Frontend);
@@ -227,7 +227,7 @@ void Frontend::onCommandFound(Command cmd,
         const QString password(list.size() > 1 ? list.at(1) : "");
 
         if (dispatcher) {
-            LoginCommand login(TargetBackendFics, username, password);
+            LoginCommand login(TargetBackend, username, password);
             dispatcher->sendCommand(&login);
         }
     } break;
@@ -240,7 +240,7 @@ void Frontend::onCommandFound(Command cmd,
 
     case CommandQuit: {
         if (dispatcher) {
-            LogoutCommand logout(TargetBackendFics);
+            LogoutCommand logout(TargetBackend);
             dispatcher->sendCommand(&logout);
         }
         qApp->quit();
@@ -263,7 +263,7 @@ void Frontend::handleSeek(const Seek &s)
 void Frontend::login(const QString &username,
                      const QString &password)
 {
-    LoginCommand lc(TargetBackendFics, username, password);
+    LoginCommand lc(TargetBackend, username, password);
     sendCommand(&lc);
 }
 
@@ -279,11 +279,11 @@ void Frontend::play(int id)
         {}
 
         ~PlayCommand() {}
-        Target target() const {return TargetBackendFics;}
+        Target target() const {return TargetBackend;}
     };
 
     // TODO: Check for active backend (in dispatcher?), as this command does not feel FICS specific.
-    PlayCommand pc(TargetBackendFics, id);
+    PlayCommand pc(TargetBackend, id);
     sendCommand(&pc);
 }
 

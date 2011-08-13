@@ -97,7 +97,7 @@ public:
     //! Handle input from command line interface or GUI
     //! @command the found command.
     //! @data the data that belongs to the command.
-    Q_SLOT virtual void onCommandFound(Command command,
+    Q_SLOT virtual void onCommandFound(ParserCommand command,
                                        const QByteArray &data) = 0;
 };
 

@@ -26,8 +26,8 @@
 namespace Game
 {
 
-//! Available game commands.
-enum Command
+//! Available game commands, used for example by command line parser.
+enum ParserCommand
 {
     CommandNone = 0, //!< Can be used as a default value or for unrecognized commands.
     CommandNew = 0x1,
@@ -39,7 +39,7 @@ enum Command
     CommandObserve = 0x40
 };
 
-Q_DECLARE_FLAGS(CommandFlags, Command)
+Q_DECLARE_FLAGS(ParserCommandFlags, ParserCommand)
 
 //! Enumeration of rows - called 'ranks' - on a chess board. Range: [1-8].
 enum Rank
@@ -94,7 +94,7 @@ Q_DECLARE_FLAGS(ModeFlags, Mode)
 
 } // namespace Game
 
-Q_DECLARE_METATYPE(Game::CommandFlags)
+Q_DECLARE_METATYPE(Game::ParserCommandFlags)
 Q_DECLARE_METATYPE(Game::Rank)
 Q_DECLARE_METATYPE(Game::File)
 Q_DECLARE_METATYPE(Game::Side)

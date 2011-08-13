@@ -93,7 +93,7 @@ public:
     virtual void processToken(const QByteArray &)
     {}
 
-    virtual void setFlags(Game::CommandFlags)
+    virtual void setFlags(Game::ParserCommandFlags)
     {}
 };
 

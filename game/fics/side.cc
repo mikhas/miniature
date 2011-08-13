@@ -57,16 +57,16 @@ void Side::runInBackground()
     }
 
     m_state = RunInBackground;
-    disconnect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
-               this,          SLOT(onCommandFound(Command, QByteArray)));
+    disconnect(m_link.data(), SIGNAL(commandFound(ParserCommand, QByteArray)),
+               this,          SLOT(onCommandFound(ParserCommand, QByteArray)));
 }
 
 void Side::runInForeground()
 {
     if (m_state == RunInBackground) {
         m_state = Ready;
-        connect(m_link.data(), SIGNAL(commandFound(Command, QByteArray)),
-                this,          SLOT(onCommandFound(Command, QByteArray)),
+        connect(m_link.data(), SIGNAL(commandFound(ParserCommand, QByteArray)),
+                this,          SLOT(onCommandFound(ParserCommand, QByteArray)),
                 Qt::UniqueConnection);
     }
 }
@@ -76,7 +76,7 @@ void Side::startTurn(const Move &move)
     Q_UNUSED(move)
 }
 
-void Side::onCommandFound(Command command,
+void Side::onCommandFound(ParserCommand command,
                           const QByteArray &data)
 {
     Q_UNUSED(command)

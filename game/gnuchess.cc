@@ -112,7 +112,7 @@ void GnuChess::startTurn(const Move &move)
     m_proc.waitForBytesWritten();
 }
 
-void GnuChess::onCommandFound(Command,
+void GnuChess::onCommandFound(ParserCommand,
                               const QByteArray &)
 {}
 

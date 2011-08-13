@@ -30,8 +30,8 @@ AbstractSide::AbstractSide(const QString &,
                            const SharedParser &parser)
     : QObject()
 {
-    connect(parser.data(), SIGNAL(commandFound(Command, QByteArray)),
-            this,          SLOT(onCommandFound(Command, QByteArray)),
+    connect(parser.data(), SIGNAL(commandFound(ParserCommand, QByteArray)),
+            this,          SLOT(onCommandFound(ParserCommand, QByteArray)),
             Qt::UniqueConnection);
 }
 
@@ -39,7 +39,7 @@ AbstractSide::~AbstractSide()
 {}
 
 // Empty impl to make MOC happy:
-void AbstractSide::onCommandFound(Command,
+void AbstractSide::onCommandFound(ParserCommand,
                                   const QByteArray &)
 {}
 

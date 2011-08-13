@@ -180,7 +180,7 @@ Backend::~Backend()
 {}
 
 // Not supported, we always read everything from FICS.
-void Backend::setFlags(CommandFlags)
+void Backend::setFlags(ParserCommandFlags)
 {}
 
 void Backend::setEnabled(bool enable)

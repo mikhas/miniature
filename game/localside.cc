@@ -58,16 +58,16 @@ void LocalSide::runInBackground()
     }
 
     m_state = RunInBackground;
-    disconnect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
-               this,            SLOT(onCommandFound(Command, QByteArray)));
+    disconnect(m_parser.data(), SIGNAL(commandFound(ParserCommand, QByteArray)),
+               this,            SLOT(onCommandFound(ParserCommand, QByteArray)));
 }
 
 void LocalSide::runInForeground()
 {
     if (m_state == RunInBackground) {
         m_state = Ready;
-        connect(m_parser.data(), SIGNAL(commandFound(Command, QByteArray)),
-                this,            SLOT(onCommandFound(Command, QByteArray)),
+        connect(m_parser.data(), SIGNAL(commandFound(ParserCommand, QByteArray)),
+                this,            SLOT(onCommandFound(ParserCommand, QByteArray)),
                 Qt::UniqueConnection);
     }
 }
@@ -81,7 +81,7 @@ void LocalSide::startTurn(const Move &move)
     }
 }
 
-void LocalSide::onCommandFound(Command command,
+void LocalSide::onCommandFound(ParserCommand command,
                                const QByteArray &data)
 {
     switch(command) {

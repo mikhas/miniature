@@ -29,7 +29,7 @@
 
 namespace Miniature {
 
-using Game::Command;
+using Game::ParserCommand;
 
 //! Responsible for initiating games. Also maintain a list of active games.
 class GameManager

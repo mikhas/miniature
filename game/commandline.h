@@ -46,7 +46,7 @@ public:
     //! \reimp
     explicit CommandLine(QObject *parent = 0);
     virtual ~CommandLine();
-    virtual void setFlags(CommandFlags flags);
+    virtual void setFlags(ParserCommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual void processToken(const QByteArray &token);
     //! \reimp_end

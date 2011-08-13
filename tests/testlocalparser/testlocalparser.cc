@@ -26,7 +26,7 @@
 #include <QtGui>
 #include <QtTest>
 
-using Game::Command;
+using Game::ParserCommand;
 using Game::CommandLine;
 
 Q_DECLARE_METATYPE(QVector<int>)
@@ -71,7 +71,7 @@ public:
 
     Q_SIGNAL void ready();
 
-    Q_SLOT void onCommandFound(Command cmd,
+    Q_SLOT void onCommandFound(ParserCommand cmd,
                                const QByteArray &)
     {
         switch (cmd) {
@@ -99,7 +99,7 @@ namespace {
     void setupLink(Game::AbstractBackend *link,
                    CommandCounter *counter,
                    Game::LineReader *tokenizer,
-                   Game::CommandFlags flags)
+                   Game::ParserCommandFlags flags)
     {
         link->setFlags(flags);
         link->setEnabled(true);
@@ -107,8 +107,8 @@ namespace {
         QObject::connect(tokenizer, SIGNAL(tokenFound(QByteArray)),
                          link,    SLOT(processToken(QByteArray)));
 
-        QObject::connect(link,  SIGNAL(commandFound(Command, QByteArray)),
-                         counter, SLOT(onCommandFound(Command, QByteArray)));
+        QObject::connect(link,  SIGNAL(commandFound(ParserCommand, QByteArray)),
+                         counter, SLOT(onCommandFound(ParserCommand, QByteArray)));
     }
 }
 
@@ -171,17 +171,17 @@ private:
         Game::CommandLine l0;
         CommandCounter c0;
         setupLink(&l0, &c0, &tokenizer,
-                    Game::CommandFlags(Game::CommandNew | Game::CommandQuit));
+                    Game::ParserCommandFlags(Game::CommandNew | Game::CommandQuit));
 
         Game::CommandLine l1;
         CommandCounter c1;
         setupLink(&l1, &c1, &tokenizer,
-                    Game::CommandFlags(Game::CommandMove | Game::CommandQuit));
+                    Game::ParserCommandFlags(Game::CommandMove | Game::CommandQuit));
 
         Game::CommandLine l2;
         CommandCounter c2;
         setupLink(&l2, &c2, &tokenizer,
-                    Game::CommandFlags(Game::CommandNone));
+                    Game::ParserCommandFlags(Game::CommandNone));
 
         device->write(input);
         TestUtils::waitForSignal(&c0, SIGNAL(ready()), TimeOut);
@@ -205,7 +205,7 @@ private:
         Game::CommandLine link;
         CommandCounter counter;
         setupLink(&link, &counter, &tokenizer,
-                  Game::CommandFlags(Game::CommandMove));
+                  Game::ParserCommandFlags(Game::CommandMove));
 
         device->write("mo");
         TestUtils::waitForSignal(&counter, SIGNAL(ready()), TimeOut);
@@ -228,7 +228,7 @@ private:
         Game::CommandLine link;
         CommandCounter counter;
         setupLink(&link, &counter, &tokenizer,
-                  Game::CommandFlags(Game::CommandQuit));
+                  Game::ParserCommandFlags(Game::CommandQuit));
 
         link.setEnabled(false);
         device->write("quit\n");

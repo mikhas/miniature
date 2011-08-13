@@ -111,7 +111,7 @@ public:
 
     //! Specify commands that should be handled by this instance.
     //! @param flags the command flags.
-    virtual void setFlags(CommandFlags flags) = 0;
+    virtual void setFlags(ParserCommandFlags flags) = 0;
 
     //! Enables command parsing. Initializes input device backend for tokenizer
     //! if required.
@@ -121,7 +121,7 @@ public:
     //! Emitted when a command was found in tokenizer stream.
     //! @param cmd the found command.
     //! @param data the data for this command.
-    Q_SIGNAL void commandFound(Command cmd,
+    Q_SIGNAL void commandFound(ParserCommand cmd,
                                const QByteArray &data = QByteArray());
 
     //! Processes a token. Graphical user interface may want to call this

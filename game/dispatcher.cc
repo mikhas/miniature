@@ -64,7 +64,8 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     Q_D(Dispatcher);
 
     switch(command->target()) {
-    case TargetBackendFics:
+    case TargetBackend:
+        // TODO: Use *active* backend
         if (Fics::Backend *fics = d->fics.data()) {
             fics->setEnabled(true);
             result = command->exec(fics);

@@ -61,7 +61,7 @@ public:
     Q_INVOKABLE void play(int id);
 
 private:
-    Q_SLOT void onCommandFound(Command cmd,
+    Q_SLOT void onCommandFound(ParserCommand cmd,
                                const QByteArray &data);
 
     void sendCommand(AbstractCommand *command);

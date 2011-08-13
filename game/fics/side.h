@@ -59,7 +59,7 @@ public:
     virtual void runInBackground();
     virtual void runInForeground();
     virtual void startTurn(const Move &move);
-    virtual void onCommandFound(Command command,
+    virtual void onCommandFound(ParserCommand command,
                                 const QByteArray &data);
     //! \reimp_end
 };

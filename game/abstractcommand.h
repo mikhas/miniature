@@ -35,8 +35,8 @@ class Frontend;
 //! from a list of offered targets.
 enum Target {
     TargetFrontend, // GUI, command line, ...
-    TargetBackendEngine, // Gnuchess
-    TargetBackendFics, // freechess.org
+    TargetAnalyzer, // Used for move validation, position analysis. Can be a chess engine, such as gnuchess.
+    TargetBackend, // The currently active backend, e.g., freechess.org
     TargetGame, // The currently active game.
     TargetBackgroundGames
 };
@@ -66,10 +66,6 @@ public:
     virtual bool exec(Game *target);
     virtual bool exec(AbstractBackend *target);
     virtual bool exec(Frontend *target);
-
-private:
-    AbstractCommand(const AbstractCommand &);
-    AbstractCommand &operator=(const AbstractCommand &);
 };
 
 } // namespace Game
