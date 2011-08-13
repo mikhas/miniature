@@ -29,7 +29,7 @@ LIBS += \
         $${GAME_DIR}/game.h \
         $${GAME_DIR}/dispatcher.h \
         $${GAME_DIR}/frontend.h \
-        $${GAME_DIR}/commands/logincommand.h \
+        $${GAME_DIR}/commands/login.h \
         $${GAME_DIR}/commands/logoutcommand.h \
         $${GAME_DIR}/commands/advertisement.h \
         $${GAME_DIR}/commands/recordcommand.h \
@@ -47,7 +47,7 @@ LIBS += \
         $${GAME_DIR}/game.cc \
         $${GAME_DIR}/dispatcher.cc \
         $${GAME_DIR}/frontend.cc \
-        $${GAME_DIR}/commands/logincommand.cc \
+        $${GAME_DIR}/commands/login.cc \
         $${GAME_DIR}/commands/logoutcommand.cc \
         $${GAME_DIR}/commands/advertisement.cc \
         $${GAME_DIR}/commands/recordcommand.cc \

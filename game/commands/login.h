@@ -22,14 +22,14 @@
 #define TEMPLATE_H
 
 #include "abstractcommand.h"
+#include "abstractbackend.h"
+
 #include <QtCore>
 
-namespace Game {
-
-class AbstractBackend;
+namespace Game { namespace Command {
 
 //! Login to remote server.
-class LoginCommand
+class Login
     : public AbstractCommand
 {
 private:
@@ -39,15 +39,15 @@ private:
 
 public:
     //! \reimp
-    explicit LoginCommand(Target target,
-                          const QString &username,
-                          const QString &password);
-    virtual ~LoginCommand();
+    explicit Login(Target target,
+                   const QString &username,
+                   const QString &password);
+    virtual ~Login();
     virtual Target target() const;
     virtual bool exec(AbstractBackend *);
     //! \reimp_end
 };
 
-} // namespace Game
+}} // namespace Command, Game
 
 #endif // TEMPLATE_H

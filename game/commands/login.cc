@@ -18,29 +18,29 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logincommand.h"
+#include "login.h"
 #include "abstractbackend.h"
 
-namespace Game {
+namespace Game { namespace Command {
 
-LoginCommand::LoginCommand(Target target,
-                           const QString &username,
-                           const QString &password)
+Login::Login(Target target,
+             const QString &username,
+             const QString &password)
     : AbstractCommand(target)
     , m_target(target)
     , m_username(username)
     , m_password(password)
 {}
 
-LoginCommand::~LoginCommand()
+Login::~Login()
 {}
 
-Target LoginCommand::target() const
+Target Login::target() const
 {
     return m_target;
 }
 
-bool LoginCommand::exec(AbstractBackend *target)
+bool Login::exec(AbstractBackend *target)
 {
     if (not target) {
         return false;
@@ -50,4 +50,4 @@ bool LoginCommand::exec(AbstractBackend *target)
     return true;
 }
 
-} // namespace Game
+}} // namespace Command, Game

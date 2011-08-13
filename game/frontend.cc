@@ -19,7 +19,7 @@
  */
 
 #include "frontend.h"
-#include "commands/logincommand.h"
+#include "commands/login.h"
 #include "commands/logoutcommand.h"
 #include "directinputdevice.h"
 
@@ -227,7 +227,7 @@ void Frontend::onCommandFound(ParserCommand cmd,
         const QString password(list.size() > 1 ? list.at(1) : "");
 
         if (dispatcher) {
-            LoginCommand login(TargetBackend, username, password);
+            Command::Login login(TargetBackend, username, password);
             dispatcher->sendCommand(&login);
         }
     } break;
@@ -263,7 +263,7 @@ void Frontend::handleSeek(const Seek &s)
 void Frontend::login(const QString &username,
                      const QString &password)
 {
-    LoginCommand lc(TargetBackend, username, password);
+    Command::Login lc(TargetBackend, username, password);
     sendCommand(&lc);
 }
 
