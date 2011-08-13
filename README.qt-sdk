@@ -1,0 +1,55 @@
+These were the steps I used to get Miniature set up and running with the Qt SDK.
+
+1. Get the Qt SDK
+* http://www.developer.nokia.com/Devices/MeeGo/
+* http://www.developer.nokia.com/info/sw.nokia.com/id/da8df288-e615-443d-be5c-00c8a72435f8/Qt_SDK.html
+
+2. Install the Qt SDK
+* Select custom installation type,
+* Enable all of the experimental options.
+
+3. Get Miniature sources
+$ git clone git@gitorious.org:miniature/miniature.git
+
+OR (if you have no ssh access to gitorious):
+$ git clone git://gitorious.org/miniature/miniature.git
+
+Make sure there is no debian folder in the clone, otherwise Qt Creator will
+complain later.
+
+The debian folder is a git submodule, but the Qt SDK needs to use its own
+packaging setup. Which means: If you only develop within the Qt SDK, you don't
+need this submodule.
+
+4. Open the Miniature project within Qt Creator
+* Make sure it's the Qt Creator version from the installed Qt SDK (only applies
+  if you had Qt Creator installed previously).
+* Qt Creator will ask whether to add the packaging info, say "no". It will also
+  complain about the tests having no install targets, but that's fine and can be ignored.
+
+5. Set up the N950 as a deploy target
+* Go to "Tools" => "Options" => "Maemo"
+* In the "Maemo Device Configuration" tab, "Add" a new configuration. This
+  starts a wizard. I conveniently named it "N950". Select Harmattan/Hardware
+  Device, the device's host IP address should be 192.168.2.15.
+* Follow the next steps in the wizard to set up SSH access (easiest was to
+  connect the N950 via USB; you get the password from the SDK Connection app on
+  the N950).
+
+6. Configure the build options
+* Go to the "Projects" view.
+* Use "MeeGo 1.2 Harmattan API (Qt SDK) Release" as build configuration
+  (probably needs to be added first; I don't know the differences between the
+  build configurations, but this one worked).
+* Add "CONFIG+=enable-gui CONFIG+=enable-madde-support" to the qmake's build
+  step, in the "Additional arguments" field.
+* Disable shadow builds (avoids issues with out-of-tree builds, patches
+  welcome).
+
+7. Configure the run options
+* Click on the "Run" tab in the Harmattan labelled box at the top. Actually,
+  make sure that you only have this one Harmattan box there, you won't need
+  anything else.
+* It only knows a "Deploy to device: QEMU" option by default, which is of
+  course not what we want. Open the "Details" view and select "N950" (which we
+  created in step 5).
