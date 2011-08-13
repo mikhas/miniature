@@ -161,7 +161,6 @@ Page {
                         }
                     }
 
-
                     // Opponent info
                     Rectangle {
                         id: opponentData
@@ -202,6 +201,7 @@ Page {
                             message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
                             acceptButtonText: "Yes"
                             onAccepted: {
+                                miniature.play(model.id)
                                 loadScreen("OnlineBoard.qml") // FIXME here would start the real game
                             }
                             rejectButtonText: "No"

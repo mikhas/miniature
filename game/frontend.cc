@@ -263,10 +263,35 @@ void Frontend::handleSeek(const Seek &s)
 void Frontend::login(const QString &username,
                      const QString &password)
 {
+    LoginCommand lc(TargetBackendFics, username, password);
+    sendCommand(&lc);
+}
+
+void Frontend::play(int id)
+{
+    // Placeholder ...
+    class PlayCommand
+        : public AbstractCommand
+    {
+    public:
+        PlayCommand(Target t, int)
+            : AbstractCommand(t)
+        {}
+
+        ~PlayCommand() {}
+        Target target() const {return TargetBackendFics;}
+    };
+
+    // TODO: Check for active backend (in dispatcher?), as this command does not feel FICS specific.
+    PlayCommand pc(TargetBackendFics, id);
+    sendCommand(&pc);
+}
+
+void Frontend::sendCommand(AbstractCommand *command)
+{
     Q_D(Frontend);
     if (Dispatcher *dispatcher = d->dispatcher.data()) {
-        LoginCommand lc(TargetBackendFics, username, password);
-        dispatcher->sendCommand(&lc);
+        dispatcher->sendCommand(command);
     }
 }
 

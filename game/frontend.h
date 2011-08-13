@@ -55,9 +55,16 @@ public:
     Q_INVOKABLE void login(const QString &username,
                            const QString &password);
 
+    //! Respond to a game advertisement. Will trigger a match if id is valid
+    //! (and opponent accepts, in case of manual starts).
+    //! @param id the game advertisement id.
+    Q_INVOKABLE void play(int id);
+
 private:
     Q_SLOT void onCommandFound(Command cmd,
                                const QByteArray &data);
+
+    void sendCommand(AbstractCommand *command);
 };
 
 } // namespace Game
