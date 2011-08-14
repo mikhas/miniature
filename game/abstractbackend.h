@@ -146,8 +146,8 @@ public:
 
     //! Play a game.
     //! @param advertisement_id the play request was the response to a previous
-    //!        game advertisement; this is the ad's id.
-    virtual void play(int advertisement_id);
+    //!        game advertisement; this is the ad's id (optional).
+    virtual void play(uint advertisement_id = 0);
 };
 
 } // namespace Game

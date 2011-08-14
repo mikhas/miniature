@@ -53,9 +53,9 @@ public:
     explicit Dispatcher(QObject *parent = 0);
     virtual ~Dispatcher();
 
-    bool sendCommand(AbstractCommand *command);
-    void setFrontend(Frontend *frontend);
-    void setFicsBackend(Fics::Backend *fics);
+    virtual bool sendCommand(AbstractCommand *command);
+    virtual void setFrontend(Frontend *frontend);
+    virtual void setFicsBackend(Fics::Backend *fics);
 };
 
 } // namespace Game

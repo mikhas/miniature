@@ -19,9 +19,7 @@
  */
 
 #include "frontend.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/play.h"
+#include "commands.h"
 #include "directinputdevice.h"
 
 #ifdef MINIATURE_GUI_ENABLED
@@ -155,7 +153,7 @@ public:
 
     explicit FrontendPrivate(Dispatcher *new_dispatcher)
         : dispatcher(new_dispatcher)
-        , command_line()
+        , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
 #ifdef MINIATURE_GUI_ENABLED
@@ -177,10 +175,6 @@ Frontend::Frontend(Dispatcher *dispatcher,
 #endif
 
     d->command_line.setFlags(all_commands);
-    connect(&d->command_line, SIGNAL(commandFound(ParserCommand,QByteArray)),
-            this,            SLOT(onCommandFound(ParserCommand,QByteArray)),
-            Qt::UniqueConnection);
-
     connect(&d->line_reader, SIGNAL(tokenFound(QByteArray)),
             &d->command_line, SLOT(processToken(QByteArray)),
             Qt::UniqueConnection);
@@ -212,44 +206,6 @@ void Frontend::show(const QUrl &ui)
 
     QTextStream out(stdout);
     out << "Welcome to Miniature!\n";
-}
-
-void Frontend::onCommandFound(ParserCommand cmd,
-                              const QByteArray &data)
-{
-    Q_D(Frontend);
-
-    Dispatcher *dispatcher = d->dispatcher.data();
-
-    switch(cmd) {
-    case CommandLogin: {
-        QList<QByteArray> list = data.split(' ');
-        const QString username(data.isEmpty() ? "guest" : list.at(0));
-        const QString password(list.size() > 1 ? list.at(1) : "");
-
-        if (dispatcher) {
-            Command::Login login(TargetBackend, username, password);
-            dispatcher->sendCommand(&login);
-        }
-    } break;
-
-    case CommandJoin:
-        break;
-
-    case CommandNew:
-        break;
-
-    case CommandQuit: {
-        if (dispatcher) {
-            Command::Logout logout(TargetBackend);
-            dispatcher->sendCommand(&logout);
-        }
-        qApp->quit();
-    } break;
-
-    default:
-        break;
-    }
 }
 
 void Frontend::handleRecord(const Record &)

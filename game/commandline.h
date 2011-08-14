@@ -29,6 +29,8 @@
 namespace Game {
 
 class CommandLinePrivate;
+class Dispatcher;
+class AbstractCommand;
 
 //! Reads input from local input device and translates it into commands.
 //! Used for local sides and local command line interface.
@@ -44,12 +46,16 @@ private:
 
 public:
     //! \reimp
-    explicit CommandLine(QObject *parent = 0);
+    explicit CommandLine(Dispatcher *dispatcher,
+                         QObject *parent = 0);
     virtual ~CommandLine();
     virtual void setFlags(ParserCommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual void processToken(const QByteArray &token);
     //! \reimp_end
+
+private:
+    void sendCommand(AbstractCommand *command);
 };
 
 } // namespace Game

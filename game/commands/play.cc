@@ -24,7 +24,7 @@
 namespace Game { namespace Command {
 
 Play::Play(Target t,
-           int id)
+           uint id)
     : AbstractCommand(t)
     , m_target(t)
     , m_advertisement_id(id)

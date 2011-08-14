@@ -19,6 +19,8 @@
  */
 
 #include "commandline.h"
+#include "dispatcher.h"
+#include "commands.h"
 
 namespace {
     typedef QHash<Game::ParserCommand, QByteArray> CommandLookupTable;
@@ -41,11 +43,13 @@ namespace Game {
 class CommandLinePrivate
 {
 public:
+    WeakDispatcher dispatcher;
     ParserCommandFlags flags;
     bool enabled;
 
-    explicit CommandLinePrivate()
-        : flags(CommandNone)
+    explicit CommandLinePrivate(Dispatcher *new_dispatcher)
+        : dispatcher(new_dispatcher)
+        , flags(CommandNone)
         , enabled(false)
     {}
 
@@ -71,9 +75,10 @@ public:
     }
 };
 
-CommandLine::CommandLine(QObject *parent)
+CommandLine::CommandLine(Dispatcher *dispatcher,
+                         QObject *parent)
     : AbstractBackend(parent)
-    , d_ptr(new CommandLinePrivate)
+    , d_ptr(new CommandLinePrivate(dispatcher))
 {}
 
 CommandLine::~CommandLine()
@@ -103,12 +108,34 @@ void CommandLine::processToken(const QByteArray &token)
 
     if (d->startsWithCommand(CommandMove, token, &value)) {
         emit commandFound(CommandMove, d->extractData(value, token));
-    } else if (d->isCommand(CommandNew, token)) {
-        emit commandFound(CommandNew);
+    } else if (d->startsWithCommand(CommandNew, token, &value)) {
+        const QByteArray &data(d->extractData(value, token));
+
+        // We leave it to the specific backend to deal with invalid
+        // advertisement id's, it's optional anyway.
+        Command::Play play(TargetBackend, data.toUInt());
+        sendCommand(&play);
     } else if (d->isCommand(CommandQuit, token)) {
-        emit commandFound(CommandQuit);
+        Command::Logout logout(TargetBackend);
+        sendCommand(&logout);
+        qApp->quit();
     } else if (d->startsWithCommand(CommandLogin, token, &value)) {
-        emit commandFound(CommandLogin, d->extractData(value, token));
+        const QByteArray &data(d->extractData(value, token));
+        const QList<QByteArray> &list(data.split(' '));
+
+        const QString username(data.isEmpty() ? "guest" : list.at(0));
+        const QString password(list.size() > 1 ? list.at(1) : "");
+
+        Command::Login login(TargetBackend, username, password);
+        sendCommand(&login);
+    }
+}
+
+void CommandLine::sendCommand(AbstractCommand *command)
+{
+    Q_D(CommandLine);
+    if (Dispatcher *dispatcher = d->dispatcher.data()) {
+        dispatcher->sendCommand(command);
     }
 }
 

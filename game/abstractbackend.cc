@@ -38,7 +38,7 @@ void AbstractBackend::login(const QString &,
                          const QString &)
 {}
 
-void AbstractBackend::play(int)
+void AbstractBackend::play(uint)
 {}
 
 } // namespace Game

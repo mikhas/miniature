@@ -21,6 +21,8 @@
 #include "commandline.h"
 #include "testutils.h"
 #include "linereader.h"
+#include "dispatcher.h"
+#include "commands.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -56,48 +58,36 @@ public:
     }
 };
 
-class CommandCounter
-    : public QObject
+class CountingDispatcher
+    : public Game::Dispatcher
 {
     Q_OBJECT
 
 public:
     QVector<int> m_counters;
 
-    explicit CommandCounter(QObject *parent = 0)
-        : QObject(parent)
-        , m_counters(3, 0)
+    explicit CountingDispatcher(QObject *parent = 0)
+        : Game::Dispatcher(parent)
+        , m_counters(4, 0)
     {}
 
     Q_SIGNAL void ready();
 
-    Q_SLOT void onCommandFound(ParserCommand cmd,
-                               const QByteArray &)
+    bool sendCommand(Game::AbstractCommand *cmd)
     {
-        switch (cmd) {
-        case Game::CommandMove:
-            ++m_counters[0];
-            break;
-
-        case Game::CommandNew:
+        if (dynamic_cast<Game::Command::Play *>(cmd)) {
             ++m_counters[1];
-            break;
-
-        case Game::CommandQuit:
-            ++m_counters[2];
-            break;
-
-        default:
-            break;
+        } else if (dynamic_cast<Game::Command::Login *>(cmd)) {
+            ++m_counters[3];
         }
 
         emit ready();
+        return true;
     }
 };
 
 namespace {
     void setupLink(Game::AbstractBackend *link,
-                   CommandCounter *counter,
                    Game::LineReader *tokenizer,
                    Game::ParserCommandFlags flags)
     {
@@ -106,9 +96,6 @@ namespace {
 
         QObject::connect(tokenizer, SIGNAL(tokenFound(QByteArray)),
                          link,    SLOT(processToken(QByteArray)));
-
-        QObject::connect(link,  SIGNAL(commandFound(ParserCommand, QByteArray)),
-                         counter, SLOT(onCommandFound(ParserCommand, QByteArray)));
     }
 }
 
@@ -127,7 +114,8 @@ private:
 
     Q_SLOT void testMultiParsing_data()
     {
-        // counters are interpreted as [move, new, quit]
+        // Counters are interpreted as [move, new, quit, login, logout]
+        // Make sure that the compared vectors are of same size!
         qRegisterMetaType<QVector<int> >();
         QTest::addColumn<QByteArray>("input");
         QTest::addColumn<QVector<int> >("countersForFirstParser");
@@ -135,23 +123,23 @@ private:
 
         QTest::newRow("p0 finds 'new'")
                 << QByteArray("new\n")
-                << (QVector<int>() << 0 << 1 << 0) << (QVector<int>(3, 0));
+                << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>(4, 0));
 
         QTest::newRow("p0 finds 'new', but ignores garbage")
                 << QByteArray("garbage\nnew\nmore#124garbage\n")
-                << (QVector<int>() << 0 << 1 << 0) << (QVector<int>(3, 0));
+                << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>(4, 0));
 
         QTest::newRow("p1 finds 'move'")
                 << QByteArray("move\n")
-                << (QVector<int>(3, 0)) << (QVector<int>() << 1 << 0 << 0);
+                << (QVector<int>(4, 0)) << (QVector<int>() << 1 << 0 << 0 << 0);
 
         QTest::newRow("p0, p1 find 1x 'new', 2x 'move'")
                 << QByteArray("new\nmove e4\nmove f4\n")
-                << (QVector<int>() << 0 << 1 << 0) << (QVector<int>() << 2 << 0 << 0);
+                << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>() << 2 << 0 << 0 << 0);
 
         QTest::newRow("p0, p1 both find 'new', 'move', 'quit'")
                 << QByteArray("new\nmove e4\nquit\n")
-                << (QVector<int>() << 0 << 1 << 1) << (QVector<int>() << 1 << 0 << 1);
+                << (QVector<int>() << 0 << 1 << 1 << 0) << (QVector<int>() << 1 << 0 << 1 << 0);
     }
 
     Q_SLOT void testMultiParsing()
@@ -161,27 +149,27 @@ private:
         QFETCH(QVector<int>, countersForSecondParser);
 
         const int TimeOut(10);
-        const QVector<int> emptyCounters(3, 0);
+        const QVector<int> emptyCounters(4, 0);
 
         Game::LineReader tokenizer;
         QIODevice *device = new TestInputDevice;
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::CommandLine l0;
-        CommandCounter c0;
-        setupLink(&l0, &c0, &tokenizer,
-                    Game::ParserCommandFlags(Game::CommandNew | Game::CommandQuit));
+        CountingDispatcher c0;
+        Game::CommandLine l0(&c0);
+        setupLink(&l0, &tokenizer,
+                  Game::ParserCommandFlags(Game::CommandNew | Game::CommandQuit));
 
-        Game::CommandLine l1;
-        CommandCounter c1;
-        setupLink(&l1, &c1, &tokenizer,
-                    Game::ParserCommandFlags(Game::CommandMove | Game::CommandQuit));
+        CountingDispatcher c1;
+        Game::CommandLine l1(&c1);
+        setupLink(&l1, &tokenizer,
+                  Game::ParserCommandFlags(Game::CommandMove | Game::CommandQuit));
 
-        Game::CommandLine l2;
-        CommandCounter c2;
-        setupLink(&l2, &c2, &tokenizer,
-                    Game::ParserCommandFlags(Game::CommandNone));
+        CountingDispatcher c2;
+        Game::CommandLine l2(&c2);
+        setupLink(&l2, &tokenizer,
+                  Game::ParserCommandFlags(Game::CommandNone));
 
         device->write(input);
         TestUtils::waitForSignal(&c0, SIGNAL(ready()), TimeOut);
@@ -202,9 +190,9 @@ private:
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::CommandLine link;
-        CommandCounter counter;
-        setupLink(&link, &counter, &tokenizer,
+        CountingDispatcher counter;
+        Game::CommandLine link(&counter);
+        setupLink(&link, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandMove));
 
         device->write("mo");
@@ -225,9 +213,9 @@ private:
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
-        Game::CommandLine link;
-        CommandCounter counter;
-        setupLink(&link, &counter, &tokenizer,
+        CountingDispatcher counter;
+        Game::CommandLine link(&counter);
+        setupLink(&link, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandQuit));
 
         link.setEnabled(false);

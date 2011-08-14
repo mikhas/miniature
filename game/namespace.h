@@ -26,6 +26,7 @@
 namespace Game
 {
 
+// TODO: move this enum into commandline.h, for anything outside the CommandLine class, use the Dispatcher instead.
 //! Available game commands, used for example by command line parser.
 enum ParserCommand
 {
