@@ -264,15 +264,15 @@ void Frontend::handleSeek(const Seek &s)
 void Frontend::login(const QString &username,
                      const QString &password)
 {
-    Command::Login lc(TargetBackend, username, password);
-    sendCommand(&lc);
+    Command::Login login(TargetBackend, username, password);
+    sendCommand(&login);
 }
 
 void Frontend::play(int id)
 {
     // TODO: Check for active backend (in dispatcher?), as this command does not feel FICS specific.
-    Command::Play pc(TargetBackend, id);
-    sendCommand(&pc);
+    Command::Play play(TargetBackend, id);
+    sendCommand(&play);
 }
 
 void Frontend::sendCommand(AbstractCommand *command)
