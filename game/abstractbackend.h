@@ -97,6 +97,8 @@ public:
         StateIdle,
         StateLoginPending,
         StateLoginFailed,
+        StatePlayPending,
+        StatePlayFailed,
         StateReady,
     };
 
@@ -141,6 +143,11 @@ public:
     //! @param password the password of the account.
     virtual void login(const QString &username,
                        const QString &password);
+
+    //! Play a game.
+    //! @param advertisement_id the play request was the response to a previous
+    //!        game advertisement; this is the ad's id.
+    virtual void play(int advertisement_id);
 };
 
 } // namespace Game

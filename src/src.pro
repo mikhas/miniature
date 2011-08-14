@@ -33,6 +33,7 @@ LIBS += \
         $${GAME_DIR}/commands/logout.h \
         $${GAME_DIR}/commands/advertisement.h \
         $${GAME_DIR}/commands/record.h \
+        $${GAME_DIR}/commands/play.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -51,6 +52,7 @@ LIBS += \
         $${GAME_DIR}/commands/logout.cc \
         $${GAME_DIR}/commands/advertisement.cc \
         $${GAME_DIR}/commands/record.cc \
+        $${GAME_DIR}/commands/play.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \

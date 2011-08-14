@@ -58,6 +58,7 @@ public:
     virtual State state() const;
     virtual void login(const QString &username,
                        const QString &password);
+    virtual void play(int advertisement_id);
     virtual void processToken(const QByteArray &token);
     //! \reimp_end
 
@@ -66,6 +67,7 @@ public:
 private:
     Q_SLOT void onReadyRead();
     void processLogin(const QByteArray &line);
+    void processPlay(const QByteArray &line);
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
     void configurePrompt();

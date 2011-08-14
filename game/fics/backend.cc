@@ -24,6 +24,9 @@
 #include "linereader.h"
 
 namespace {
+    // %1 is a placeholder the game ad id.
+    const QString play_command("play %1\n");
+
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
     const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
                              "\\s+(\\w+)\\s+(\\w+)\\s+(\\[(\\w+)\\])?\\s*(m|a)?\\s*(f)?"
@@ -233,6 +236,18 @@ void Backend::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
+void Backend::play(int advertisement_id)
+{
+    if (m_state != StateReady) {
+        return;
+    }
+
+    m_state = StatePlayPending;
+    emit stateChanged(m_state);
+
+    m_channel.write(play_command.arg(advertisement_id).toLatin1());
+}
+
 void Backend::processToken(const QByteArray &token)
 {
     if (not m_enabled || token.isEmpty()) {
@@ -243,6 +258,11 @@ void Backend::processToken(const QByteArray &token)
     case StateLoginFailed:
     case StateLoginPending:
         processLogin(token);
+        break;
+
+    case StatePlayFailed:
+    case StatePlayPending:
+        processPlay(token);
         break;
 
     case StateIdle:
@@ -314,6 +334,20 @@ void Backend::processLogin(const QByteArray &line)
         m_extra_delimiter.clear();
         configurePrompt();
         m_state = StateReady;
+        emit stateChanged(m_state);
+    }
+}
+
+void Backend::processPlay(const QByteArray &line)
+{
+    static const QByteArray wait_for_accept("Issuing match request since the seek was set to manual.");
+    static const QByteArray offer_accepted("accepts the match offer.");
+
+    if (line.startsWith(wait_for_accept)) {
+        // OK, the seek included a manual game start, need to wait for acceptance of offer from other player.
+        // TODO: allow to cancel
+    } else if (line.endsWith(offer_accepted)) {
+        m_state = StateReady; // Actually, state is "in game", but not sure I want to treat that as a special case.
         emit stateChanged(m_state);
     }
 }

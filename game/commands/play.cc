@@ -18,27 +18,31 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractbackend.h"
+#include "play.h"
+#include "frontend.h"
 
-namespace Game {
+namespace Game { namespace Command {
 
-AbstractBackend::AbstractBackend(QObject *parent)
-    : QObject(parent)
+Play::Play(Target t,
+           int id)
+    : AbstractCommand(t)
+    , m_target(t)
+    , m_advertisement_id(id)
 {}
 
-AbstractBackend::~AbstractBackend()
+Play::~Play()
 {}
 
-AbstractBackend::State AbstractBackend::state() const
+Target Play::target() const
 {
-    return StateIdle;
+    return m_target;
 }
 
-void AbstractBackend::login(const QString &,
-                         const QString &)
-{}
+bool Play::exec(AbstractBackend *target)
+{
+    target->play(m_advertisement_id);
+    return false;
+}
 
-void AbstractBackend::play(int)
-{}
+}} // namespace Command, Game
 
-} // namespace Game

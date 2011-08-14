@@ -21,6 +21,7 @@
 #include "frontend.h"
 #include "commands/login.h"
 #include "commands/logout.h"
+#include "commands/play.h"
 #include "directinputdevice.h"
 
 #ifdef MINIATURE_GUI_ENABLED
@@ -269,21 +270,8 @@ void Frontend::login(const QString &username,
 
 void Frontend::play(int id)
 {
-    // Placeholder ...
-    class PlayCommand
-        : public AbstractCommand
-    {
-    public:
-        PlayCommand(Target t, int)
-            : AbstractCommand(t)
-        {}
-
-        ~PlayCommand() {}
-        Target target() const {return TargetBackend;}
-    };
-
     // TODO: Check for active backend (in dispatcher?), as this command does not feel FICS specific.
-    PlayCommand pc(TargetBackend, id);
+    Command::Play pc(TargetBackend, id);
     sendCommand(&pc);
 }
 

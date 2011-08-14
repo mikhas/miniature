@@ -18,27 +18,33 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PLAYCOMMAND_H
+#define PLAYCOMMAND_H
+
+#include "abstractcommand.h"
 #include "abstractbackend.h"
 
-namespace Game {
+#include <QtCore>
 
-AbstractBackend::AbstractBackend(QObject *parent)
-    : QObject(parent)
-{}
+namespace Game { namespace Command {
 
-AbstractBackend::~AbstractBackend()
-{}
-
-AbstractBackend::State AbstractBackend::state() const
+class Play
+    : public AbstractCommand
 {
-    return StateIdle;
-}
+private:
+    Target m_target;
+    int m_advertisement_id;
 
-void AbstractBackend::login(const QString &,
-                         const QString &)
-{}
+public:
+    //! \reimp
+    explicit Play(Target t,
+                  int id);
+    virtual ~Play();
+    virtual Target target() const;
+    virtual bool exec(AbstractBackend *target);
+    //! \reimp_end
+};
 
-void AbstractBackend::play(int)
-{}
+}} // namespace Command, Game
 
-} // namespace Game
+#endif // PLAYCOMMAND_H
