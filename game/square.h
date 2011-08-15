@@ -25,7 +25,7 @@
 
 namespace Game {
 
-//! Represents  square on the board.
+//! Represents square on the board.
 struct Square
 {
 public:

@@ -24,7 +24,6 @@
 #include "namespace.h"
 #include <QtCore>
 
-
 namespace Game {
 
 //! Base structure for game records or seeks.
@@ -72,7 +71,6 @@ struct Seek
 
 class AbstractBackend;
 typedef QSharedPointer<AbstractBackend> SharedBackend;
-typedef QSharedPointer<AbstractBackend> SharedParser;
 
 //! Can retrieve input from command line or graphical user interface and
 //! translate input into proper commands.
@@ -111,20 +109,10 @@ public:
 
     virtual ~AbstractBackend() = 0;
 
-    //! Specify commands that should be handled by this instance.
-    //! @param flags the command flags.
-    virtual void setFlags(ParserCommandFlags flags) = 0;
-
     //! Enables command parsing. Initializes input device backend for tokenizer
     //! if required.
     //! @param enable whether to enable command parsing.
     virtual void setEnabled(bool enable) = 0;
-
-    //! Emitted when a command was found in tokenizer stream.
-    //! @param cmd the found command.
-    //! @param data the data for this command.
-    Q_SIGNAL void commandFound(ParserCommand cmd,
-                               const QByteArray &data = QByteArray());
 
     //! Processes a token. Graphical user interface may want to call this
     //! method directly.

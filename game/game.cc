@@ -19,7 +19,8 @@
  */
 
 #include "game.h"
-#include "move.h"
+#include "dispatcher.h"
+#include "commands.h"
 
 #include <iostream>
 
@@ -34,19 +35,37 @@ namespace {
 
 namespace Game {
 
+Game *createGame(Dispatcher *dispatcher,
+                 const QString &local_identifier,
+                 const QString &remote_identifier)
+{
+    if (not dispatcher) {
+        return 0;
+    }
+
+    Side *local = new Side(local_identifier);
+    Side *remote = new Side(remote_identifier);
+    Game *game = new Game(dispatcher, local, remote);
+
+    return game;
+}
+
 class GamePrivate
 {
 public:
-    SharedAbstractSide local; //!< Side of the local player.
-    SharedAbstractSide remote; //!< Side of the remote player.
-    SharedAbstractSide active; //!< Points to active side.
+    WeakDispatcher dispatcher;
+    const QScopedPointer<Side> local; //!< Side of the local player.
+    const QScopedPointer<Side> remote; //!< Side of the remote player.
+    Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
 
-    explicit GamePrivate(AbstractSide *new_local,
-                         AbstractSide *new_remote)
-        : local(new_local)
+    explicit GamePrivate(Dispatcher *new_dispatcher,
+                         Side *new_local,
+                         Side *new_remote)
+        : dispatcher(new_dispatcher)
+        , local(new_local)
         , remote(new_remote)
-        , active(local)// FIXME: Set correct active side (could be remote) already during construction!
+        , active(new_local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
     {
         if (local.isNull() || remote.isNull()) {
@@ -60,52 +79,53 @@ public:
     }
 };
 
-Game::Game(AbstractSide *local,
-           AbstractSide *remote,
+Game::Game(Dispatcher *dispatcher,
+           Side *local,
+           Side *remote,
            QObject *parent)
     : QObject(parent)
-    , d_ptr(new GamePrivate(local, remote))
+    , d_ptr(new GamePrivate(dispatcher, local, remote))
 {
     Q_D(Game);
 
-    connectSide(d->local);
-    connectSide(d->remote);
+    connectSide(d->local.data());
+    connectSide(d->remote.data());
 }
 
 Game::~Game()
 {}
 
-void Game::start()
+void Game::play(uint advertisement_id)
 {
     Q_D(Game);
-
-    // A Game instance represents exactly one game. Restarts will need to
-    // create new game instances.
-    if (d->state == Game::Idle) {
-        d->local->init();
-        d->remote->init();
+    if (d->state != Game::Idle) {
+        return;
     }
+
+    d->state = Game::Started;
+    d->active = d->local.data();
+    d->active->startTurn(Position(), MovedPiece());
+    printTurnMessage(d->active->identifier());
+
+    // Notify backend, too:
+    Command::Play play(TargetBackend, advertisement_id);
+    sendCommand(&play);
 }
 
-const SharedAbstractSide &Game::side(Side side) const
+WeakSide Game::localSide() const
 {
     Q_D(const Game);
-    switch(side) {
-    case SideActive:
-        return d->active;
-    case SideLocal:
-        return d->local;
-    case SideRemote:
-        return d->remote;
-    }
-
-    qCritical() << __PRETTY_FUNCTION__
-                << "Should not be reached, invalid side queried!";
-    static SharedAbstractSide invalid;
-    return invalid;
+    return WeakSide(d->local.data());
 }
 
-void Game::onTurnEnded(const Move &move)
+WeakSide Game::remoteSide() const
+{
+    Q_D(const Game);
+    return WeakSide(d->local.data());
+}
+
+void Game::onTurnEnded(const Position &result,
+                       const MovedPiece &moved_piece)
 {
     // TOOD: Validate move, call startTurn again with last valid move, on (still active) side.
     Q_D(Game);
@@ -116,42 +136,32 @@ void Game::onTurnEnded(const Move &move)
         return;
     }
 
-    if (sender() != d->active.data()) {
+    if (sender() != d->active) {
         qWarning() << __PRETTY_FUNCTION__
                    << "Move received from inactive side, ignoring.";
         return;
     }
 
-    d->active = (d->active == d->local ? d->remote
-                                       : d->local);
+    d->active = (d->active == d->local.data() ? d->remote.data()
+                                              : d->local.data());
 
-    d->active->startTurn(move);
+    d->active->startTurn(result, moved_piece);
     printTurnMessage(d->active->identifier());
 }
 
-void Game::connectSide(const SharedAbstractSide &side)
+void Game::connectSide(Side *side)
 {
-    connect(side.data(), SIGNAL(turnEnded(Move)),
-            this,        SLOT(onTurnEnded(Move)),
+    connect(side, SIGNAL(turnEnded(Position,MovedPiece)),
+            this, SLOT(onTurnEnded(Position,MovedPiece)),
             Qt::UniqueConnection);
-
-    connect(side.data(), SIGNAL(ready()),
-            this,        SLOT(onSideReady()));
 }
 
-void Game::onSideReady()
+void Game::sendCommand(AbstractCommand *command)
 {
     Q_D(Game);
-
-    if (d->local->state() == AbstractSide::NotReady
-        || d->remote->state() == AbstractSide::NotReady) {
-        return;
+    if (Dispatcher *dispatcher = d->dispatcher.data()) {
+        dispatcher->sendCommand(command);
     }
-
-    d->state = Game::Started;
-    d->active = d->local;
-    d->active->startTurn(Move());
-    printTurnMessage(d->active->identifier());
 }
 
 } // namespace Game

@@ -24,3 +24,4 @@
 #include "commands/advertisement.h"
 #include "commands/record.h"
 #include "commands/play.h"
+#include "commands/move.h"

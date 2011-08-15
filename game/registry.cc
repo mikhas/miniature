@@ -18,22 +18,46 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "move.h"
+#include "registry.h"
+#include "game.h"
+#include "namespace.h"
+#include "side.h"
+#include "frontend.h"
 
 namespace Game {
 
-Move::Move(const Position &new_result,
-           const Square &new_origin,
-           const Square &new_target,
-           const QString &new_notation)
-    : result(new_result)
-    , origin(new_origin)
-    , target(new_target)
-    , notation(new_notation)
+Registry::Registry(Dispatcher *dispatcher,
+                   QObject *parent)
+    : QObject(parent)
+    , m_dispatcher(dispatcher)
+    , m_games()
 {}
 
-// TODO: Actually construct start position.
-Move::Move()
+Registry::~Registry()
 {}
+
+void Registry::registerGame(Game *game)
+{
+    if (m_games.contains(game)) {
+        return;
+    }
+
+    m_games.append(game);
+
+    if (Dispatcher *dispatcher = m_dispatcher.data()) {
+        dispatcher->setActiveGame(m_games.last());
+    }
+}
+
+void Registry::registerGameWithFrontend(Game *game,
+                                        Frontend *frontend)
+{
+    if (frontend) {
+        frontend->setLocalSide(game->localSide());
+        frontend->setRemoteSide(game->remoteSide());
+    }
+
+    registerGame(game);
+}
 
 } // namespace Game

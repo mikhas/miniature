@@ -53,7 +53,6 @@ public:
     explicit Backend(Dispatcher *dispatcher,
                      QObject *parent = 0);
     virtual ~Backend();
-    virtual void setFlags(ParserCommandFlags flags);
     virtual void setEnabled(bool enable);
     virtual State state() const;
     virtual void login(const QString &username,

@@ -18,35 +18,57 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOVE_H
-#define MOVE_H
+#include "move.h"
+#include "frontend.h"
+#include "game.h"
+#include "frontend.h"
 
-#include "position.h"
-#include "square.h"
+namespace Game { namespace Command {
 
-#include <QtCore>
+Move::Move(Target target,
+           const Position &result,
+           const MovedPiece &moved_piece)
+    : AbstractCommand(target)
+    , m_target(target)
+    , m_result(result)
+    , m_moved_piece(moved_piece)
+{}
 
-namespace Game {
+Move::~Move()
+{}
 
-//! Represents a move, POD struct.
-// TODO: implement equality operator.
-struct Move
+Target Move::target() const
 {
-public:
-    const Position result; //!< The resulting position.
-    const Square origin; //!< The original square of the moved piece.
-    const Square target; //!< The target square of the moved piece.
-    const QString notation; //!< A human-readable notation of the move.
+    return m_target;
+}
 
-    explicit Move(const Position &new_result,
-                  const Square &new_origin,
-                  const Square &new_target,
-                  const QString &new_notation);
+bool Move::exec(Game *)
+{
+    // TBD
+    return false;
+}
 
-    //! Construct move with start position.
-    explicit Move();
-};
+bool Move::exec(AbstractBackend *)
+{
+    // TBD
+    return false;
+}
 
-} // namespace Game
+bool Move::exec(Frontend *)
+{
+    // TBD
+    return false;
+}
 
-#endif // MOVE_H
+Position Move::result() const
+{
+    return m_result;
+}
+
+MovedPiece Move::movedPiece() const
+{
+    return m_moved_piece;
+}
+
+}} // namespace Command, Game
+

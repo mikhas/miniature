@@ -18,45 +18,45 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DISPATCHER_H
-#define DISPATCHER_H
+#ifndef REGISTRY_H
+#define REGISTRY_H
 
+#include "dispatcher.h"
 #include <QtCore>
 
 namespace Game {
 
-class Dispatcher;
-typedef QWeakPointer<Dispatcher> WeakDispatcher;
-
-class DispatcherPrivate;
-class AbstractCommand;
-class Frontend;
-class AbstractBackend;
 class Game;
+class Frontend;
 
-Dispatcher *createDispatcher(QObject *owner = 0);
-
-//! Dispatches commands.
-class Dispatcher
+//! Registry for games.
+class Registry
     : public QObject
-{
-    Q_OBJECT
-    Q_DISABLE_COPY(Dispatcher)
-    Q_DECLARE_PRIVATE(Dispatcher)
-
+{    
 private:
-    const QScopedPointer<DispatcherPrivate> d_ptr;
+    WeakDispatcher m_dispatcher;
+    QList<Game *> m_games;
 
 public:
-    explicit Dispatcher(QObject *parent = 0);
-    virtual ~Dispatcher();
+    //! C'tor
+    //! @param dispatcher the (shared) dispatcher, Registry does not take
+    //!        ownership.
+    //! @param parent the (optional) owner of this instance.
+    explicit Registry(Dispatcher *dispatcher,
+                      QObject *parent = 0);
+    virtual ~Registry();
 
-    virtual bool sendCommand(AbstractCommand *command);
-    virtual void setActiveFrontend(Frontend *frontend);
-    virtual void setActiveBackend(AbstractBackend *backend);
-    virtual void setActiveGame(Game *game);
+    //! Registers a newly created game.
+    //! @param game the game instance to register.
+    void registerGame(Game *game);
+
+    //! Registers a newly created game and hooks up the frontend.
+    //! @param game the game instance to register.
+    //! @param frontend the frontend.
+    void registerGameWithFrontend(Game *game,
+                                  Frontend *frontend);
 };
 
 } // namespace Game
 
-#endif // DISPATCHER_H
+#endif // REGISTRY_H

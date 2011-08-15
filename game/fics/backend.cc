@@ -182,10 +182,6 @@ Backend::Backend(Dispatcher *dispatcher,
 Backend::~Backend()
 {}
 
-// Not supported, we always read everything from FICS.
-void Backend::setFlags(ParserCommandFlags)
-{}
-
 void Backend::setEnabled(bool enable)
 {
     m_enabled = enable;
@@ -238,9 +234,13 @@ void Backend::login(const QString &username,
 
 void Backend::play(int advertisement_id)
 {
+    qDebug() << __PRETTY_FUNCTION__;
+
     if (m_state != StateReady) {
         return;
     }
+
+    qDebug() << "play response to" << advertisement_id;
 
     m_state = StatePlayPending;
     emit stateChanged(m_state);

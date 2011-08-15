@@ -21,14 +21,25 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "abstractside.h"
+#include "side.h"
 #include "namespace.h"
 
 #include <QtCore>
 
 namespace Game {
 
+class Game;
 class GamePrivate;
+class Dispatcher;
+class AbstractCommand;
+
+//! Creates a game
+//! @param dispatcher the dispatcher.
+//! @param local_identifier the identifier for the local side.
+//! @param remote_identifier the identifier for the remote side.
+Game *createGame(Dispatcher *dispatcher,
+                 const QString &local_identifier,
+                 const QString &remote_identifier);
 
 //! A Game instance represents exactly one game. A game goes from Idle =>
 //! Started => Ended and cannot be restarted.
@@ -53,29 +64,33 @@ public:
     //! @param local the local side, Game takes ownership.
     //! @param remote the remote side, Game takes ownership.
     //! @param parent the optional parent that owns this instance.
-    explicit Game(AbstractSide *local,
-                  AbstractSide *remote,
+    explicit Game(Dispatcher *dispatcher,
+                  Side *local,
+                  Side *remote,
                   QObject *parent = 0);
     virtual ~Game();
 
-    //! Starts game.
-    void start();
+    //! Plays a game.
+    //! @param advertisement_id the id of the game advertisement (optional).
+    void play(uint advertisement_id = 0);
 
-    //! Returns specified side.
-    const SharedAbstractSide &side(Side side) const;
+    //! Returns local side.
+    WeakSide localSide() const;
+
+    //! Returns remote side.
+    WeakSide remoteSide() const;
 
 private:
     //! One side ended turn and submitted a move.
     //! @param move the submitted move.
-    Q_SLOT void onTurnEnded(const Move &move);
+    Q_SLOT void onTurnEnded(const Position &result,
+                            const MovedPiece &moved_piece);
 
     //! Connects common parts for each side with controller.
     //! @param side the side to connect.
-    void connectSide(const SharedAbstractSide &side);
+    void connectSide(Side *side);
 
-    //! Used to sync with side backends; start when all backends report
-    //! readiness.
-    Q_SLOT void onSideReady();
+    void sendCommand(AbstractCommand *command);
 };
 
 } // namespace Game

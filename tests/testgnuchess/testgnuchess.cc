@@ -60,7 +60,7 @@ private:
 
         QCOMPARE(game.side(Game::SideActive).data(), white);
 
-        game.start();
+        game.play();
         emit white->turnEnded(Move(Game::Position(), Game::Square(), Game::Square(),
                                    QString("g4")));
         TestUtils::waitForSignal(black, SIGNAL(turnEnded(Move)));

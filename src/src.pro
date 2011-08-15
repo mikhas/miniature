@@ -6,11 +6,9 @@ TARGET=miniature
 QT += gui
 
 HEADERS += \
-    gamemanager.h \
 
 SOURCES += \
     main.cc \
-    gamemanager.cc \
 
 RESOURCES += \
     frontend/frontend.qrc
@@ -27,17 +25,19 @@ LIBS += \
 } else {
     HEADERS += \
         $${GAME_DIR}/game.h \
+        $${GAME_DIR}/side.h \
         $${GAME_DIR}/dispatcher.h \
+        $${GAME_DIR}/registry.h \
         $${GAME_DIR}/frontend.h \
         $${GAME_DIR}/commands/login.h \
         $${GAME_DIR}/commands/logout.h \
         $${GAME_DIR}/commands/advertisement.h \
         $${GAME_DIR}/commands/record.h \
         $${GAME_DIR}/commands/play.h \
+        $${GAME_DIR}/commands/move.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
-        $${GAME_DIR}/move.h \
         $${GAME_DIR}/fics/backend.h \
         $${GAME_DIR}/abstractcommand.h \
         $${GAME_DIR}/abstractbackend.h \
@@ -46,17 +46,19 @@ LIBS += \
 
     SOURCES += \
         $${GAME_DIR}/game.cc \
+        $${GAME_DIR}/side.cc \
         $${GAME_DIR}/dispatcher.cc \
+        $${GAME_DIR}/registry.cc \
         $${GAME_DIR}/frontend.cc \
         $${GAME_DIR}/commands/login.cc \
         $${GAME_DIR}/commands/logout.cc \
         $${GAME_DIR}/commands/advertisement.cc \
         $${GAME_DIR}/commands/record.cc \
         $${GAME_DIR}/commands/play.cc \
+        $${GAME_DIR}/commands/move.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \
-        $${GAME_DIR}/move.cc \
         $${GAME_DIR}/fics/backend.cc \
         $${GAME_DIR}/abstractcommand.cc \
         $${GAME_DIR}/abstractbackend.cc \

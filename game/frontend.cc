@@ -21,13 +21,14 @@
 #include "frontend.h"
 #include "commands.h"
 #include "directinputdevice.h"
+#include "registry.h"
 
 #ifdef MINIATURE_GUI_ENABLED
 #include <QtDeclarative/QtDeclarative>
 #endif
 
 namespace Game { namespace {
-    const ParserCommandFlags all_commands(CommandNew | CommandQuit | CommandLogin
+    const ParserCommandFlags all_commands(CommandPlay | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
 }
@@ -147,6 +148,9 @@ public:
     CommandLine command_line;
     LineReader line_reader;
     AdvertisementModel advertisements;
+    Registry registry;
+    WeakSide local_side;
+    WeakSide remote_side;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
 #endif
@@ -156,6 +160,7 @@ public:
         , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
+        , registry(new_dispatcher)
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -224,11 +229,26 @@ void Frontend::login(const QString &username,
     sendCommand(&login);
 }
 
-void Frontend::play(int id)
+void Frontend::play(uint id,
+                    const QString &local_identifier,
+                    const QString &remote_identifier)
 {
-    // TODO: Check for active backend (in dispatcher?), as this command does not feel FICS specific.
-    Command::Play play(TargetBackend, id);
+    Q_D(Frontend);
+    d->registry.registerGameWithFrontend(createGame(d->dispatcher.data(), local_identifier, remote_identifier), this);
+    Command::Play play(TargetGame, id);
     sendCommand(&play);
+}
+
+void Frontend::setLocalSide(const WeakSide &side)
+{
+    Q_D(Frontend);
+    d->local_side = side;
+}
+
+void Frontend::setRemoteSide(const WeakSide &side)
+{
+    Q_D(Frontend);
+    d->remote_side = side;
 }
 
 void Frontend::sendCommand(AbstractCommand *command)

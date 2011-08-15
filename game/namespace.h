@@ -26,22 +26,6 @@
 namespace Game
 {
 
-// TODO: move this enum into commandline.h, for anything outside the CommandLine class, use the Dispatcher instead.
-//! Available game commands, used for example by command line parser.
-enum ParserCommand
-{
-    CommandNone = 0, //!< Can be used as a default value or for unrecognized commands.
-    CommandNew = 0x1,
-    CommandMove = 0x2,
-    CommandQuit = 0x4,
-    CommandLogin = 0x8,
-    CommandSeek = 0x10,
-    CommandJoin = 0x20,
-    CommandObserve = 0x40
-};
-
-Q_DECLARE_FLAGS(ParserCommandFlags, ParserCommand)
-
 //! Enumeration of rows - called 'ranks' - on a chess board. Range: [1-8].
 enum Rank
 {
@@ -70,12 +54,6 @@ enum File
     FileH
 };
 
-enum Side {
-    SideActive,
-    SideLocal,
-    SideRemote
-};
-
 enum Mode {
     ModeNone = 0x0,
     ModeBlitz = 0x1,
@@ -93,12 +71,18 @@ enum Mode {
 
 Q_DECLARE_FLAGS(ModeFlags, Mode)
 
+enum Promotion {
+    PromotionNone = 0,
+    PromotionKnight,
+    PromotionBishop,
+    PromotionRook,
+    PromotionQueen
+};
+
 } // namespace Game
 
-Q_DECLARE_METATYPE(Game::ParserCommandFlags)
 Q_DECLARE_METATYPE(Game::Rank)
 Q_DECLARE_METATYPE(Game::File)
-Q_DECLARE_METATYPE(Game::Side)
 Q_DECLARE_METATYPE(Game::Mode)
 
 #endif // NAMESPACE_H

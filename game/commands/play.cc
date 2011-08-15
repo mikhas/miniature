@@ -44,5 +44,11 @@ bool Play::exec(AbstractBackend *target)
     return false;
 }
 
+bool Play::exec(Game *target)
+{
+    target->play(m_advertisement_id);
+    return false;
+}
+
 }} // namespace Command, Game
 

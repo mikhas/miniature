@@ -21,6 +21,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "square.h"
 #include <QtCore>
 
 namespace Game {
@@ -31,6 +32,14 @@ struct Position
 public:
     explicit Position();
 };
+
+//! Convenience type that can be used to describe a move.
+typedef QPair<Square, Square> MovedPiece;
+
+//! A human readable notation of a move, based on the resulting position and
+//! the last moved piece.
+QString moveNotation(const Position &result,
+                     const MovedPiece &moved_piece);
 
 } // namespace Game
 

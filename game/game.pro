@@ -18,33 +18,31 @@ HEADERS += \
     game.h \
     linereader.h \
     directinputdevice.h \
-    abstractside.h \
-    localside.h \
     gnuchess.h \
-    move.h \
     position.h \
     square.h \
     dispatcher.h \
+    registry.h \
     abstractcommand.h \
     commandline.h \
     abstractbackend.h \
     frontend.h \
+    side.h
 
 SOURCES += \
     game.cc \
     linereader.cc \
     directinputdevice.cc \
-    abstractside.cc \
     gnuchess.cc \
-    move.cc \
     position.cc \
     square.cc \
     dispatcher.cc \
+    registry.cc \
     abstractcommand.cc \
-    localside.cc \
     commandline.cc \
     abstractbackend.cc \
     frontend.cc \
+    side.cc
 
 target.path = /usr/lib
 
@@ -58,4 +56,3 @@ INSTALLS += \
     target \
     headers \
     prf \
-

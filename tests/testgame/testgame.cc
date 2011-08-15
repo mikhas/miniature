@@ -71,7 +71,7 @@ private:
         emit white->turnEnded(Game::Move());
         QCOMPARE(subject.side(Game::SideActive).data(), white);
 
-        subject.start();
+        subject.play();
 
         // Switch sides after submitting move:
         emit white->turnEnded(Game::Move());
@@ -96,7 +96,7 @@ private:
         Game::AbstractSide *fics = new Game::Fics::Side("FICS", link);
 
         Game::Game subject(local, fics);
-        subject.start();
+        subject.play();
 
         emit local->turnEnded(Game::Move());
         QCOMPARE(subject.side(Game::SideActive).data(), fics);

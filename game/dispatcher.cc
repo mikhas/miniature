@@ -21,14 +21,18 @@
 #include "dispatcher.h"
 #include "abstractcommand.h"
 #include "frontend.h"
+#include "abstractbackend.h"
 #include "fics/backend.h"
+#include "game.h"
 
 namespace Game {
 
 Dispatcher *createDispatcher(QObject *owner)
 {
     Dispatcher *dispatcher = new Dispatcher(owner);
-    dispatcher->setFicsBackend(new Fics::Backend(dispatcher));
+
+    // Use FICS backend, by default:
+    dispatcher->setActiveBackend(new Fics::Backend(dispatcher, owner));
 
     return dispatcher;
 }
@@ -36,12 +40,14 @@ Dispatcher *createDispatcher(QObject *owner)
 class DispatcherPrivate
 {
 public:
-    QScopedPointer<Fics::Backend> fics;
-    QWeakPointer<Frontend> frontend;
+    QWeakPointer<Frontend> active_frontend;
+    QWeakPointer<AbstractBackend> active_backend;
+    QWeakPointer<Game> active_game;
 
     explicit DispatcherPrivate()
-        : fics()
-        , frontend()
+        : active_frontend()
+        , active_backend()
+        , active_game()
     {}
 };
 
@@ -65,16 +71,20 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
 
     switch(command->target()) {
     case TargetBackend:
-        // TODO: Use *active* backend
-        if (Fics::Backend *fics = d->fics.data()) {
-            fics->setEnabled(true);
-            result = command->exec(fics);
+        if (AbstractBackend *backend = d->active_backend.data()) {
+            result = command->exec(backend);
         }
         break;
 
     case TargetFrontend:
-        if (Frontend *frontend = d->frontend.data()) {
+        if (Frontend *frontend = d->active_frontend.data()) {
             result = command->exec(frontend);
+        }
+        break;
+
+    case TargetGame:
+        if (Game *game = d->active_game.data()) {
+            result = command->exec(game);
         }
         break;
 
@@ -85,16 +95,31 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     return result;
 }
 
-void Dispatcher::setFrontend(Frontend *frontend)
+void Dispatcher::setActiveFrontend(Frontend *frontend)
 {
     Q_D(Dispatcher);
-    d->frontend = QWeakPointer<Frontend>(frontend);
+    d->active_frontend = QWeakPointer<Frontend>(frontend);
 }
 
-void Dispatcher::setFicsBackend(Fics::Backend *fics)
+void Dispatcher::setActiveBackend(AbstractBackend *backend)
 {
     Q_D(Dispatcher);
-    d->fics.reset(fics);
+
+    if (AbstractBackend *old = d->active_backend.data()) {
+        old->setEnabled(false);
+    }
+
+    d->active_backend = QWeakPointer<AbstractBackend>(backend);
+
+    if (backend) {
+        backend->setEnabled(true);
+    }
+}
+
+void Dispatcher::setActiveGame(Game *game)
+{
+    Q_D(Dispatcher);
+    d->active_game = QWeakPointer<Game>(game);
 }
 
 } // namespace Game

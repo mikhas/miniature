@@ -201,7 +201,7 @@ Page {
                             message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
                             acceptButtonText: "Yes"
                             onAccepted: {
-                                miniature.play(model.id)
+                                miniature.play(model.id, "Your Name", model.playerName)
                                 loadScreen("OnlineBoard.qml") // FIXME here would start the real game
                             }
                             rejectButtonText: "No"

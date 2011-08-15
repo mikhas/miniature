@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LOCALPARSER_H
-#define LOCALPARSER_H
+#ifndef COMMANDLINE_H
+#define COMMANDLINE_H
 
 #include "namespace.h"
 #include "abstractbackend.h"
@@ -27,6 +27,21 @@
 #include <QtCore>
 
 namespace Game {
+
+//! Available game commands, used for example by command line parser.
+enum ParserCommand
+{
+    CommandNone = 0, //!< Can be used as a default value or for unrecognized commands.
+    CommandPlay = 0x1,
+    CommandMove = 0x2,
+    CommandQuit = 0x4,
+    CommandLogin = 0x8,
+    CommandSeek = 0x10,
+    CommandJoin = 0x20,
+    CommandObserve = 0x40
+};
+
+Q_DECLARE_FLAGS(ParserCommandFlags, ParserCommand)
 
 class CommandLinePrivate;
 class Dispatcher;
@@ -60,4 +75,6 @@ private:
 
 } // namespace Game
 
-#endif // LOCALPARSER_H
+Q_DECLARE_METATYPE(Game::ParserCommandFlags)
+
+#endif // COMMANDLINE_H

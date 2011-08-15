@@ -25,6 +25,7 @@
 #include "commandline.h"
 #include "linereader.h"
 #include "abstractbackend.h"
+#include "side.h"
 
 #include <QtCore>
 
@@ -58,7 +59,17 @@ public:
     //! Respond to a game advertisement. Will trigger a match if id is valid
     //! (and opponent accepts, in case of manual starts).
     //! @param id the game advertisement id.
-    Q_INVOKABLE void play(int id);
+    Q_INVOKABLE void play(uint id,
+                          const QString &local_identifier,
+                          const QString &remote_identifier);
+
+    //! Sets the model representing the local side.
+    //! @param side the local side.
+    void setLocalSide(const WeakSide &side);
+
+    //! Sets the model representing the remote side.
+    //! @param side the remote side.
+    void setRemoteSide(const WeakSide &side);
 
 private:
     void sendCommand(AbstractCommand *command);

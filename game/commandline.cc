@@ -21,13 +21,14 @@
 #include "commandline.h"
 #include "dispatcher.h"
 #include "commands.h"
+#include "registry.h"
 
 namespace {
     typedef QHash<Game::ParserCommand, QByteArray> CommandLookupTable;
     CommandLookupTable createCommandLoopupTable()
     {
         CommandLookupTable result;
-        result.insert(Game::CommandNew, "new");
+        result.insert(Game::CommandPlay, "play");
         result.insert(Game::CommandQuit, "quit");
         result.insert(Game::CommandMove, "move");
         result.insert(Game::CommandLogin, "login");
@@ -44,11 +45,13 @@ class CommandLinePrivate
 {
 public:
     WeakDispatcher dispatcher;
+    Registry registry;
     ParserCommandFlags flags;
     bool enabled;
 
     explicit CommandLinePrivate(Dispatcher *new_dispatcher)
         : dispatcher(new_dispatcher)
+        , registry(new_dispatcher)
         , flags(CommandNone)
         , enabled(false)
     {}
@@ -98,7 +101,7 @@ void CommandLine::setEnabled(bool enable)
 
 void CommandLine::processToken(const QByteArray &token)
 {
-    Q_D(const CommandLine);
+    Q_D(CommandLine);
     if (not d->enabled) {
         return;
     }
@@ -107,13 +110,18 @@ void CommandLine::processToken(const QByteArray &token)
     QByteArray value;
 
     if (d->startsWithCommand(CommandMove, token, &value)) {
-        emit commandFound(CommandMove, d->extractData(value, token));
-    } else if (d->startsWithCommand(CommandNew, token, &value)) {
+        const QByteArray &data(d->extractData(value, token));
+        // FIXME: Convert into move command.
+        qDebug() << __PRETTY_FUNCTION__ << data;
+        Command::Move move(TargetGame, Position(), MovedPiece());
+        sendCommand(&move);
+    } else if (d->startsWithCommand(CommandPlay, token, &value)) {
         const QByteArray &data(d->extractData(value, token));
 
         // We leave it to the specific backend to deal with invalid
         // advertisement id's, it's optional anyway.
-        Command::Play play(TargetBackend, data.toUInt());
+        d->registry.registerGame(createGame(d->dispatcher.data(), "local", "remote"));
+        Command::Play play(TargetGame, data.toUInt());
         sendCommand(&play);
     } else if (d->isCommand(CommandQuit, token)) {
         Command::Logout logout(TargetBackend);

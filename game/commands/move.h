@@ -18,35 +18,49 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYCOMMAND_H
-#define PLAYCOMMAND_H
+#ifndef MOVECOMMAND_H
+#define MOVECOMMAND_H
 
 #include "abstractcommand.h"
 #include "abstractbackend.h"
-#include "game.h"
+#include "position.h"
+#include "square.h"
 
 #include <QtCore>
 
 namespace Game { namespace Command {
 
-//! Command to start a game. Takes an (optional) advertisement id, in case this
-//! is a reponse to a previous game advertisement.
-class Play
+class Game;
+class Frontend;
+
+//! Command to move a piece.
+class Move
     : public AbstractCommand
 {
 private:
-    Target m_target;
-    uint m_advertisement_id;
+    const Target m_target;
+    const Position m_result;
+    const MovedPiece m_moved_piece;
 
 public:
     //! \reimp
-    explicit Play(Target t,
-                  uint id = 0);
-    virtual ~Play();
+    //! C'tor
+    //! @param result the resulting position.
+    //! @param moved_piece the moved piece, consisting of origin and target
+    //!        square.
+    explicit Move(Target target,
+                  const Position &result,
+                  const MovedPiece &moved_piece);
+
+    virtual ~Move();
     virtual Target target() const;
-    virtual bool exec(AbstractBackend *target);
     virtual bool exec(Game *target);
+    virtual bool exec(AbstractBackend *target);
+    virtual bool exec(Frontend *target);
     //! \reimp_end
+
+    Position result() const;
+    MovedPiece movedPiece() const;
 };
 
 }} // namespace Command, Game

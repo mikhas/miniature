@@ -39,14 +39,19 @@ namespace {
 namespace Game {
 
 GnuChess::GnuChess(const QString &identifier)
-    : AbstractSide(identifier)
-    , m_identifier(identifier)
-    , m_state(NotReady)
+    : Side(identifier)
     , m_proc()
 {
     connect(&m_proc, SIGNAL(readyRead()),
             this,    SLOT(onReadyRead()),
             Qt::UniqueConnection);
+
+    m_proc.start(GnuChessCmd, QIODevice::ReadWrite | QIODevice::Unbuffered);
+    m_proc.setReadChannel(QProcess::StandardOutput);
+
+    if (m_proc.state() != QProcess::Running) {
+        m_proc.waitForStarted();
+    }
 }
 
 GnuChess::~GnuChess()
@@ -55,74 +60,30 @@ GnuChess::~GnuChess()
     m_proc.waitForFinished();
 }
 
-void GnuChess::init()
-{
-    if (m_proc.state() != QProcess::NotRunning) {
-        qWarning() << __PRETTY_FUNCTION__
-                   << "Process already running. Did you call init() twice?";
-    }
-
-    m_proc.start(GnuChessCmd, QIODevice::ReadWrite | QIODevice::Unbuffered);
-    m_proc.setReadChannel(QProcess::StandardOutput);
-
-    if (m_proc.state() != QProcess::Running) {
-        m_proc.waitForStarted();
-    }
-
-    m_state = Ready;
-    emit ready();
-}
-
-AbstractSide::SideState GnuChess::state() const
-{
-    return m_state;
-}
-
-
-const QString &GnuChess::identifier() const
-{
-    return m_identifier;
-}
-
 void GnuChess::runInBackground()
 {
-    if (m_state == NotReady) {
-        return;
-    }
-
-    if (kill(m_proc.pid(), "SIGTSTP")) {
-        m_state = RunInBackground;
-    }
+    kill(m_proc.pid(), "SIGTSTP");
 }
 
 void GnuChess::runInForeground()
 {
-    if (m_state != RunInBackground) {
-        return;
-    }
-
-    if (kill(m_proc.pid(), "SIGCONT")) {
-        m_state = Ready;
-    }
+    kill(m_proc.pid(), "SIGCONT");
 }
 
-void GnuChess::startTurn(const Move &move)
+void GnuChess::startTurn(const Position &result,
+                         const MovedPiece &moved_piece)
 {
-    m_proc.write(move.notation.toLatin1().append("\n"));
+    m_proc.write(moveNotation(result, moved_piece).toLatin1());
+    m_proc.write("\n");
     m_proc.waitForBytesWritten();
 }
-
-void GnuChess::onCommandFound(ParserCommand,
-                              const QByteArray &)
-{}
 
 void GnuChess::onReadyRead()
 {
     while (m_proc.canReadLine()) {
         QString result(m_proc.readLine());
         if (result.startsWith(CmdMove)) {
-            emit turnEnded(Move(Position(), Square(), Square(),
-                                QString(result.right(result.size() - CmdMove.size() - 1))));
+            emit turnEnded(Position(), MovedPiece());
         }
     }
 }

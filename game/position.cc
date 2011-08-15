@@ -25,4 +25,14 @@ namespace Game {
 Position::Position()
 {}
 
+QString moveNotation(const Position &result,
+                     const MovedPiece &moved_piece)
+{
+    Q_UNUSED(result)
+    Q_UNUSED(moved_piece)
+
+    // TODO: Copy functionality over from old Miniature codebase.
+    return QString("Qd8-h4++");
+}
+
 } // namespace Game

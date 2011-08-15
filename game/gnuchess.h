@@ -21,8 +21,7 @@
 #ifndef GNUCHESS_H
 #define GNUCHESS_H
 
-#include "move.h"
-#include "abstractside.h"
+#include "side.h"
 #include "abstractbackend.h"
 
 #include <QtCore>
@@ -30,31 +29,26 @@
 namespace Game {
 
 //! Gnuchess backend.
+// TODO: Turn into an AbstractBackend
 class GnuChess
-    : public AbstractSide
+    : public Side
 {
     Q_OBJECT
     Q_DISABLE_COPY(GnuChess)
 
 private:
-    const QString m_identifier;
-    SideState m_state;
     QProcess m_proc;
-    SharedParser m_parser;
 
 public:
     //! \reimp
     explicit GnuChess(const QString &identifier);
     virtual ~GnuChess();
-    virtual void init();
-    virtual SideState state() const;
-    virtual const QString &identifier() const;
+    virtual void startTurn(const Position &result,
+                           const MovedPiece &moved_piece);
+    //! \reimp_end
+
     virtual void runInBackground();
     virtual void runInForeground();
-    virtual void startTurn(const Move &move);
-    virtual void onCommandFound(ParserCommand command,
-                                const QByteArray &data);
-    //! \reimp_end
 
 private:
     Q_SLOT void onReadyRead();

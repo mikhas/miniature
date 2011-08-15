@@ -95,10 +95,10 @@ private:
 
         Game::Fics::Backend *fics = new Game::Fics::Backend(&dispatcher);
         fics->enableTesting();
-        dispatcher.setFicsBackend(fics);
+        dispatcher.setActiveBackend(fics);
 
         Game::DummyFrontend frontend(&dispatcher);
-        dispatcher.setFrontend(&frontend);
+        dispatcher.setActiveFrontend(&frontend);
 
         QCOMPARE(frontend.m_received_records.size(), 0);
         QCOMPARE(frontend.m_received_seeks.size(), 0);
