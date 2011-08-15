@@ -66,17 +66,22 @@ Page {
 
     // List of games available according to filters
     // FIXME there is a weird effect that makes list items sometimes visible at top bottom, out of the item area.
-    Item {
+    Rectangle {
         id: seekListWindow
-        width: parent.width
-        anchors.top: headerBackground.bottom
-        anchors.topMargin: 50
-        anchors.bottom: backIcon.top // FIXME a tool rectangle needs to be defined
-        anchors.bottomMargin: 50
+        color:  "lightgray"
+        anchors {
+            top: headerBackground.bottom
+            bottom: seekToolbar.top
+            left: parent.left
+            leftMargin: 10
+            right: parent.right
+            rightMargin: 10
+        }
 
-        ListView {
+        ListView { // FIXME ideally the list should scroll showing always the last item at the bottom
             id: seekList
-            anchors.fill: seekListWindow
+            anchors.fill: parent
+            clip: true
             model: gameAdvertisements
             delegate: Item {
                 id: listItem
@@ -134,7 +139,16 @@ Page {
         }
     }
 
-
+    Rectangle { // Little effect of shadow in list
+        width: ficsSeekGame.width
+        height: 15
+        z: +2
+        anchors.top: headerBackground.bottom
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "black" }
+            GradientStop { position: 1.0; color: "transparent" }
+        }
+    }
 
 
 
