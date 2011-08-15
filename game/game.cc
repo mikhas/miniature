@@ -124,6 +124,12 @@ WeakSide Game::remoteSide() const
     return WeakSide(d->local.data());
 }
 
+WeakSide Game::activeSide() const
+{
+    Q_D(const Game);
+    return WeakSide(d->active);
+}
+
 void Game::onTurnEnded(const Position &result,
                        const MovedPiece &moved_piece)
 {

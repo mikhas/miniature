@@ -80,6 +80,9 @@ public:
     //! Returns remote side.
     WeakSide remoteSide() const;
 
+    //! Returns active side.
+    WeakSide activeSide() const;
+
 private:
     //! One side ended turn and submitted a move.
     //! @param move the submitted move.

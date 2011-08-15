@@ -76,10 +76,11 @@ public:
     virtual ~DummyBackend()
     {}
 
-    virtual Game::AbstractBackend::State state() const
-    {
-        return Game::AbstractBackend::StateIdle;
-    }
+    virtual void setEnabled(bool)
+    {}
+
+    virtual void processToken(const QByteArray &)
+    {}
 
     virtual void login(const QString &,
                        const QString &)
@@ -87,14 +88,10 @@ public:
         emit stateChanged(Game::AbstractBackend::StateLoginFailed);
     }
 
-    virtual void setEnabled(bool)
-    {}
-
-    virtual void processToken(const QByteArray &)
-    {}
-
-    virtual void setFlags(Game::ParserCommandFlags)
-    {}
+    virtual void play(uint)
+    {
+        emit stateChanged(Game::AbstractBackend::StatePlayFailed);
+    }
 };
 
 } // namespace TestUtils

@@ -20,28 +20,13 @@
 
 #include "testutils.h"
 #include "game.h"
-#include "localside.h"
+#include "side.h"
 #include "gnuchess.h"
-#include "fics/side.h"
-#include "move.h"
+#include "dispatcher.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
-
-using Game::AbstractBackend;
-using Game::Move;
-Q_DECLARE_METATYPE(Move)
-
-// Need to wrap abstract type in something default-constructable:
-struct AbstractSideWrapper
-{
-    Game::AbstractSide *m_side;
-    AbstractSideWrapper(Game::AbstractSide *side = 0)
-        : m_side(side)
-    {}
-};
-Q_DECLARE_METATYPE(AbstractSideWrapper)
 
 class TestGame
     : public QObject
@@ -61,79 +46,29 @@ private:
         // After each valid move, active side should switch. So we can test a
         // valid move sequence simply by checking the active side against the
         // expected value.
-        Game::SharedParser parser(new TestUtils::DummyBackend);
-        Game::AbstractSide *white = new Game::LocalSide("white", parser);
-        Game::AbstractSide *black = new Game::LocalSide("white", parser);
-        Game::Game subject(white, black);
-        QCOMPARE(subject.side(Game::SideActive).data(), white);
+        Game::Dispatcher dispatcher;
+        Game::Side *white = new Game::Side("white");
+        Game::Side *black = new Game::Side("black");
+        Game::Game subject(&dispatcher, white, black);
+        QCOMPARE(subject.activeSide().data(), white);
 
         // Trying to submit move before starting game => ignore:
-        emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.side(Game::SideActive).data(), white);
+        emit white->turnEnded(Game::Position(), Game::MovedPiece());
+        QCOMPARE(subject.activeSide().data(), white);
 
         subject.play();
 
         // Switch sides after submitting move:
-        emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.side(Game::SideActive).data(), black);
+        emit white->turnEnded(Game::Position(), Game::MovedPiece());
+        QCOMPARE(subject.activeSide().data(), black);
 
         // Trying to submit move twice in a row => ignore:
-        emit white->turnEnded(Game::Move());
-        QCOMPARE(subject.side(Game::SideActive).data(), black);
+        emit white->turnEnded(Game::Position(), Game::MovedPiece());
+        QCOMPARE(subject.activeSide().data(), black);
 
         // Switch sides again after submitting move:
-        emit black->turnEnded(Game::Move());
-        QCOMPARE(subject.side(Game::SideActive).data(), white);
-    }
-
-    Q_SLOT void testFicsGame()
-    {
-        Game::SharedBackend link(new TestUtils::DummyBackend);
-        Game::AbstractSide *local = new Game::LocalSide("local", link);
-
-        link->login("guest", "");
-        TestUtils::waitForSignal(link.data(), SIGNAL(stateChanged(State)), 5000);
-        Game::AbstractSide *fics = new Game::Fics::Side("FICS", link);
-
-        Game::Game subject(local, fics);
-        subject.play();
-
-        emit local->turnEnded(Game::Move());
-        QCOMPARE(subject.side(Game::SideActive).data(), fics);
-    }
-
-    Q_SLOT void testSideStates_data()
-    {
-        qRegisterMetaType<AbstractSideWrapper>();
-        Game::SharedBackend link(new TestUtils::DummyBackend);
-
-        QTest::addColumn<AbstractSideWrapper>("side_wrapper");
-        QTest::newRow("local side") << AbstractSideWrapper(new Game::LocalSide("local side", link));
-        QTest::newRow("FICS") << AbstractSideWrapper(new Game::Fics::Side("local", link));
-        QTest::newRow("gnuchess") << AbstractSideWrapper(new Game::GnuChess("gnuchess"));
-    }
-
-    Q_SLOT void testSideStates()
-    {
-        QFETCH(AbstractSideWrapper, side_wrapper);
-        QScopedPointer<Game::AbstractSide> side(side_wrapper.m_side);
-
-        QCOMPARE(side->state(), Game::AbstractSide::NotReady);
-
-        // Cannot run in background before side was initialized:
-        side->runInBackground();
-        QCOMPARE(side->state(), Game::AbstractSide::NotReady);
-
-        side->init();
-        TestUtils::waitForSignal(side.data(), SIGNAL(ready()));
-        QCOMPARE(side->state(), Game::AbstractSide::Ready);
-
-        side->runInBackground();
-        QCOMPARE(side->state(), Game::AbstractSide::RunInBackground);
-
-        side->runInForeground();
-        QCOMPARE(side->state(), Game::AbstractSide::Ready);
-
+        emit black->turnEnded(Game::Position(), Game::MovedPiece());
+        QCOMPARE(subject.activeSide().data(), white);
     }
 
     Q_SLOT void testCli()
