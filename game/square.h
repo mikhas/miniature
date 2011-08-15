@@ -21,6 +21,7 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 
+#include "namespace.h"
 #include <QtCore>
 
 namespace Game {
@@ -29,7 +30,13 @@ namespace Game {
 struct Square
 {
 public:
+    const File file;
+    const Rank rank;
+
     explicit Square();
+
+    explicit Square(File new_file,
+                    Rank new_rank);
 };
 
 } // namespace Miniature

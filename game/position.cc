@@ -20,6 +20,59 @@
 
 #include "position.h"
 
+namespace {
+    QString fromSquare(const Game::Square &square)
+    {
+        QString result;
+
+        switch(square.file) {
+        case Game::FileA:
+            result.append("a"); break;
+        case Game::FileB:
+            result.append("b"); break;
+        case Game::FileC:
+            result.append("c"); break;
+        case Game::FileD:
+            result.append("d"); break;
+        case Game::FileE:
+            result.append("e"); break;
+        case Game::FileF:
+            result.append("f"); break;
+        case Game::FileG:
+            result.append("g"); break;
+        case Game::FileH:
+            result.append("h"); break;
+
+        default:
+            break;
+        }
+
+        switch(square.rank) {
+        case Game::Rank1:
+            result.append("1"); break;
+        case Game::Rank2:
+            result.append("2"); break;
+        case Game::Rank3:
+            result.append("3"); break;
+        case Game::Rank4:
+            result.append("4"); break;
+        case Game::Rank5:
+            result.append("5"); break;
+        case Game::Rank6:
+            result.append("6"); break;
+        case Game::Rank7:
+            result.append("7"); break;
+        case Game::Rank8:
+            result.append("8"); break;
+
+        default:
+            break;
+        }
+
+        return result;
+    }
+}
+
 namespace Game {
 
 Position::Position()
@@ -29,10 +82,9 @@ QString moveNotation(const Position &result,
                      const MovedPiece &moved_piece)
 {
     Q_UNUSED(result)
-    Q_UNUSED(moved_piece)
-
-    // TODO: Copy functionality over from old Miniature codebase.
-    return QString("Qd8-h4++");
+    // TODO: This is gnuchess-style notation, allow for different types?
+    return QString("%1%2").arg(fromSquare(moved_piece.first))
+                          .arg(fromSquare(moved_piece.second));
 }
 
 } // namespace Game

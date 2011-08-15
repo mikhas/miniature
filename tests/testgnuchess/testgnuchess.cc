@@ -20,18 +20,20 @@
 
 #include "testutils.h"
 #include "game.h"
-#include "localside.h"
+#include "side.h"
 #include "gnuchess.h"
-#include "move.h"
 #include "commandline.h"
+#include "dispatcher.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
 
-// Need to import symbol so that slot/signal signature stays same, for moc.
-using Game::Move;
-Q_DECLARE_METATYPE(Move)
+using Game::Position;
+using Game::MovedPiece;
+
+Q_DECLARE_METATYPE(Position)
+Q_DECLARE_METATYPE(MovedPiece)
 
 class TestGnuChess
     : public QObject
@@ -44,57 +46,69 @@ private:
 
     Q_SLOT void initTestCase()
     {
+        qRegisterMetaType<Position>();
+        qRegisterMetaType<MovedPiece>();
         m_app.reset(TestUtils::createApp("testgnuchess"));
     }
 
     Q_SLOT void testShortMatch()
     {
-        qRegisterMetaType<Move>();
-        Game::SharedParser parser(new TestUtils::DummyBackend);
-
-        Game::LocalSide *white = new Game::LocalSide("white", parser);
+        Game::Dispatcher dispatcher;
+        Game::Side *white = new Game::Side("white");
         Game::GnuChess  *black = new Game::GnuChess("black");
-        QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Move)));
-        QSignalSpy blackSpy(black, SIGNAL(turnEnded(Move)));
-        Game::Game game(white, black);
+        QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Position,MovedPiece)));
+        QSignalSpy blackSpy(black, SIGNAL(turnEnded(Position,MovedPiece)));
+        Game::Game game(&dispatcher, white, black);
 
-        QCOMPARE(game.side(Game::SideActive).data(), white);
+        QCOMPARE(game.activeSide().data(), white);
 
         game.play();
-        emit white->turnEnded(Move(Game::Position(), Game::Square(), Game::Square(),
-                                   QString("g4")));
-        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Move)));
-        QCOMPARE(game.side(Game::SideActive).data(), white);
+
+        const Game::MovedPiece g2g4(Game::Square(Game::FileG, Game::Rank2),
+                                    Game::Square(Game::FileG, Game::Rank4));
+        emit white->turnEnded(Game::Position(), g2g4);
+        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
+        QCOMPARE(game.activeSide().data(),white);
         QCOMPARE(whiteSpy.count(), 1);
         QCOMPARE(blackSpy.count(), 1);
 
-        emit white->turnEnded(Move(Game::Position(), Game::Square(), Game::Square(),
-                                   QString("f4")));
-        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Move)));
-        QCOMPARE(game.side(Game::SideActive).data(), white);
+        const Game::MovedPiece f2f4(Game::Square(Game::FileF, Game::Rank2),
+                                    Game::Square(Game::FileF, Game::Rank4));
+        emit white->turnEnded(Game::Position(), f2f4);
+        TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
+        QCOMPARE(game.activeSide().data(), white);
         QCOMPARE(whiteSpy.count(), 2);
         QCOMPARE(blackSpy.count(), 2);
     }
 
     Q_SLOT void testRunInBackgroundForeground()
     {
-        Game::SharedBackend parser(new TestUtils::DummyBackend);
         Game::GnuChess subject("GnuChess");
-        QSignalSpy spy(&subject, SIGNAL(turnEnded(Move)));
+        QSignalSpy spy(&subject, SIGNAL(turnEnded(Position,MovedPiece)));
 
-        subject.init();
-        TestUtils::waitForSignal(&subject, SIGNAL(ready()));
+        const Game::MovedPiece d2d4(Game::Square(Game::FileD, Game::Rank2),
+                                    Game::Square(Game::FileD, Game::Rank4));
+        subject.startTurn(Game::Position(), d2d4);
 
-        subject.startTurn(Move(Game::Position(), Game::Square(), Game::Square(),
-                               QString("g4")));
+        // If running in background, we don't want gnuchess to compute moves:
         subject.runInBackground();
-        QCOMPARE(subject.state(), Game::AbstractSide::RunInBackground);
+        TestUtils::waitForSignal(&subject, SIGNAL(turnEnded(Position,MovedPiece)), 1000);
+        QCOMPARE(spy.count(), 0);
 
         subject.runInForeground();
-        QCOMPARE(subject.state(), Game::AbstractSide::Ready);
-
-        TestUtils::waitForSignal(&subject, SIGNAL(turnEnded(Move)), 5000);
+        TestUtils::waitForSignal(&subject, SIGNAL(turnEnded(Position,MovedPiece)), 1000);
         QCOMPARE(spy.count(), 1);
+    }
+
+    Q_SLOT void testIllegalMove()
+    {
+        Game::GnuChess subject("GnuChess");
+        QSignalSpy spy(&subject, SIGNAL(turnEnded(Position,MovedPiece)));
+
+        // Gnuchess should ignore illegal moves:
+        subject.startTurn(Game::Position(), Game::MovedPiece());
+        TestUtils::waitForSignal(&subject, SIGNAL(turnEnded(Position,MovedPiece)), 1000);
+        QCOMPARE(spy.count(), 0);
     }
 };
 
