@@ -65,76 +65,150 @@ Page {
     }
 
     // List of games available according to filters
-    // FIXME there is a weird effect that makes list items sometimes visible at top bottom, out of the item area.
-    Rectangle {
+   Rectangle {
         id: seekListWindow
         color:  "lightgray"
         anchors {
             top: headerBackground.bottom
             bottom: seekToolbar.top
             left: parent.left
-            leftMargin: 10
+            leftMargin: 15
             right: parent.right
             rightMargin: 10
         }
 
-        ListView { // FIXME ideally the list should scroll showing always the last item at the bottom
+        ListView { // FIXME ideally the list should have always the most recent item visible
             id: seekList
             anchors.fill: parent
             clip: true
+            spacing: 10 // FIXME an empty header of 20 pixels needs to be created to separate 1st item from shadow
             model: gameAdvertisements
-            delegate: Item {
+            delegate:
+
+                Item {
                 id: listItem
-                height: 88
-                width: parent.width
+                height: 80
+                width: parent.width * 0.8 // a "+" for confirming is meant to fill the remaining 0.2
 
-                Row {
+                Rectangle {
+                    id: gameData
+                    color: "olivedrab"
                     anchors.fill: parent
+                    radius: 10
 
-                    Column {
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Label {
-                            id: opponentTextEntry
-                            text: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
-                            font.pointSize: 36 // FIXME no idea why this font isn't bigger
-                        }
-
-                        Label {
-                            id: opponentTextSubEntry
-                            text: model.rated ? "rated" : "unrated"
-                            font.pointSize: 22
-                        }
-                    }
-                }
-
-                Image {
-                    source: "image://theme/icon-m-common-drilldown-arrow" + (theme.inverted ? "-inverse" : "")
-                    anchors.right: parent.right;
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: listItem
-                    onClicked: {
-                        confirmGame.open();
+                    Rectangle {
+                        id: nonselectedEffect
+                        anchors.fill: parent
+                        color: "white"
+                        opacity: 0.4
+                        radius: 10
                     }
 
-                    // Confirm game dialog
-                    QueryDialog {
-                        id: confirmGame
-                        // icon: "" FIXME anybody volunteers an battling image for this dialog?
-                        titleText: "Ready to play?"
-                        message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
-                        acceptButtonText: "Yes"
-                        onAccepted: {
-                            loadScreen("OnlineBoard.qml") // FIXME here would start the real game
+                    Text {
+                        id: typeChess
+                        text: "Standard" // FIXME the right model* variable goes here
+                        font.family: "Nokia Pure Headline"
+                        font.pointSize: 22
+                        color: "black"
+                        anchors {
+                            bottom: parent.bottom
+                            bottomMargin: 40
+                            left: parent.left
+                            leftMargin: 10
                         }
-                        rejectButtonText: "No"
                     }
-                }
 
+                    Text {
+                        id: timeGame
+                        text: model.time
+                        font.family: "Nokia Pure Headline"
+                        font.pointSize: 22
+                        color: "black"
+                        anchors {
+                            right: incrementGame.left
+                        rightMargin: 15
+                        bottom: parent.bottom
+                        bottomMargin: 40
+                        }
+                    }
+
+                    Text {
+                        id: incrementGame
+                        text: model.increment
+                        font.family: "Nokia Pure Headline"
+                        font.pointSize: 22
+                        color: "black"
+                        anchors {
+                            right: ratedGame.left
+                        rightMargin: 22
+                        bottom: parent.bottom
+                        bottomMargin: 40
+                        }
+                    }
+
+
+                    Text {
+                        id: ratedGame
+                        text: model.rated ? "rated" : "unrated"
+                        font.family: "Nokia Pure Headline"
+                        font.pointSize: 22
+                        color: "black"
+                        anchors {
+                            right: parent.right
+                       rightMargin: 10
+                        bottom: parent.bottom
+                        bottomMargin: 40
+                        }
+                    }
+
+
+                    // Opponent info
+                    Rectangle {
+                        id: opponentData
+                        width: parent.width - 10
+                        height: 35 // FIXME how to make it relative to text height?
+                        color: "lightgrey" // FIXME also white or black if the opponent has defined piece color
+                        anchors {
+                            bottom: gameData.bottom
+                        bottomMargin: 5
+                        horizontalCenter: parent.horizontalCenter
+                        }
+
+                        Text {
+                            id: opponentInfo
+                            text: model.rating + " " + model.playerName // FIXME Ugly way while figuring out tables
+                            color: "black" // FIXME or white if opponentData.color == "black"
+                            font.pointSize: 16
+                            font.weight: Font.DemiBold
+                            anchors {
+                                verticalCenter: opponentData.verticalCenter
+                            left: parent.left
+                            leftMargin: 10
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: mouseArea
+                        anchors.fill: parent
+                        onClicked: {
+                            confirmGame.open();
+                        }
+
+                        // Confirm game dialog - TO BE REPLACED by "+" button next to selected item
+                        QueryDialog {
+                            id: confirmGame
+                            titleText: "Ready to play?"
+                            message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
+                            acceptButtonText: "Yes"
+                            onAccepted: {
+                                loadScreen("OnlineBoard.qml") // FIXME here would start the real game
+                            }
+                            rejectButtonText: "No"
+                        }
+                    }
+
+                }
             }
         }
     }
