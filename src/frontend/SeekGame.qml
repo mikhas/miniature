@@ -3,16 +3,16 @@ import com.meego 1.0
 
 Page {
     id: ficsSeekGame
+    orientationLock: PageOrientation.LockPortrait
 
     // Generic app window style
 
-
     Rectangle {
         id: windowBackground
-        // color: "palegoldenrod"
+        color: "lightgray"
         anchors.fill: parent
+        z: -10
     }
-
 
     // The seek/filter options are integrated in the UI already
     Rectangle {
@@ -25,8 +25,6 @@ Page {
         Button {
             id: seekTypeChess
             text: "Standard" // FIXME onPress Suicide, Bughouse, etc
-            font.family: "Nokia Pure Headline"
-            font.pointSize: 28
             width: 150
             anchors.bottom: headerBackground.bottom
             anchors.bottomMargin: 10
@@ -36,9 +34,7 @@ Page {
 
         Button {
             id: seekTime
-            text: "10" // FIXME onPress number picker
-            font.family: "Nokia Pure Headline"
-            font.pointSize: 28
+            text: "-" // FIXME onPress number picker
             width: 50
             anchors.bottom: headerBackground.bottom
             anchors.bottomMargin: 10
@@ -48,9 +44,7 @@ Page {
 
         Button {
             id: seekIncrement
-            text: "05" // FIXME onPress number picker
-            font.family: "Nokia Pure Headline"
-            font.pointSize: 28
+            text: "-" // FIXME onPress number picker
             width: 50
             anchors.bottom: headerBackground.bottom
             anchors.bottomMargin: 10
@@ -61,10 +55,8 @@ Page {
         // FIXME guest users can only play Unrated, button inactive
         Button {
             id: seekRated
-            text: "Rated" // FIXME onPress Unrated / Any
-            font.family: "Nokia Pure Headline"
-            font.pointSize: 28
-            width: 100
+            text: "Unrated" // FIXME onPress Unrated / Any
+            width: 120
             anchors.bottom: headerBackground.bottom
             anchors.bottomMargin: 10
             anchors.right: parent.right
@@ -86,7 +78,7 @@ Page {
             id: seekList
             anchors.fill: seekListWindow
             model: gameAdvertisements
-            delegate: Item { // feels weird that a delegate is called like this, jus copied from Qt examples
+            delegate: Item {
                 id: listItem
                 height: 88
                 width: parent.width
@@ -144,36 +136,24 @@ Page {
 
 
 
-    // Not sure why this toolbar is not placed automatically in the bottom - getting rid of it and putting the icons alone.
-    //ToolBarLayout {
-    //    id: boardTools
 
 
-    ToolIcon {
-        id: backIcon
-        iconId: "toolbar-back";
-        anchors.bottom: ficsSeekGame.bottom
-        anchors.left: ficsSeekGame.left
-        onClicked: {
-            loadScreen("MainPage.qml")
+    // Toolbar at the bottom of the page - probably this needs to be part of a stacked page
+    ToolBar {
+        id: seekToolbar
+        anchors.bottom: parent.bottom
+        tools: ToolBarLayout {
+            ToolIcon {
+                id: backIcon
+                iconId: "toolbar-back";
+                onClicked: {
+                    loadScreen("MainPage.qml") // FIXME a dialog of stopping options to be plugged here
+                }
+            }
+
+            ToolIcon { // FIXME Settings page pending
+                iconId: "toolbar-view-menu"
+            }
         }
     }
-
-    // TO BE DECIDED The 2nd icon is used to confirm the move after the piece has been placed.
-    // ToolButton {
-    //    text: "Confirm";
-    //    anchors.verticalCenter: backIcon.verticalCenter
-    //    anchors.horizontalCenter: ficsSeekGame.horizontalCenter
-    //}
-
-    // Placeholder icon for settings etc
-    ToolIcon {
-        iconId: "toolbar-view-menu"
-        anchors.bottom: ficsSeekGame.bottom
-        anchors.right: ficsSeekGame.right
-    }
-
-    // }
-
 }
-
