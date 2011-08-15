@@ -94,4 +94,11 @@ Page {
     // tools: gameTypes - still figuring out navigation
 
     }
+
+    Button { // Provisional button to access OnlineBoard for testing purposes
+        id: testingButton
+        text:  "Test board"
+        anchors.bottom: parent.bottom
+        onClicked: loadScreen("OnlineBoard.qml")
+    }
 }

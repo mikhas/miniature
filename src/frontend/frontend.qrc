@@ -1,9 +1,23 @@
 <RCC>
-  <qresource prefix="/">
-    <file>main.qml</file>
-    <file>MainPage.qml</file>
-    <file>OnlineBoard.qml</file>
-    <file>SeekGame.qml</file>
-    <file>chessboard.svg</file>
-  </qresource>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainPage.qml</file>
+        <file>OnlineBoard.qml</file>
+        <file>SeekGame.qml</file>
+        <file>chessboard.svg</file>
+        <file>emptysquare.png</file>
+        <file>white/rook.png</file>
+        <file>white/king.png</file>
+        <file>white/knight.png</file>
+        <file>white/pawn.png</file>
+        <file>white/queen.png</file>
+        <file>white/bishop.png</file>
+        <file>black/rook.png</file>
+        <file>black/king.png</file>
+        <file>black/knight.png</file>
+        <file>black/pawn.png</file>
+        <file>black/queen.png</file>
+        <file>black/bishop.png</file>
+        <file>BoardModel.qml</file>
+    </qresource>
 </RCC>

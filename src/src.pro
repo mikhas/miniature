@@ -86,3 +86,24 @@ INSTALLS += \
 CONFIG += qdeclarative-boostable
 QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
 QMAKE_LFLAGS += -pie -rdynamic
+
+OTHER_FILES += \
+    frontend/MainPage.qml \
+    frontend/SeekGame.qml \
+    frontend/chessboard.svg \
+    frontend/main.qml \
+    frontend/emptysquare.png \
+    frontend/BoardModel.qml \
+    frontend/OnlineBoard.qml \
+    frontend/white/bishop.png \
+    frontend/white/queen.png \
+    frontend/white/pawn.png \
+    frontend/white/knight.png \
+    frontend/white/king.png \
+    frontend/white/rook.png \
+    frontend/black/bishop.png \
+    frontend/black/queen.png \
+    frontend/black/pawn.png \
+    frontend/black/knight.png \
+    frontend/black/king.png \
+    frontend/black/rook.png
