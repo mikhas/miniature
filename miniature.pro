@@ -8,7 +8,6 @@ CONFIG += ordered qt
 !enable-madde-support {
     SUBDIRS += \
         game \
-        tests \
 
 }
 
