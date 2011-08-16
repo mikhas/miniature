@@ -75,8 +75,12 @@ public:
 
     bool sendCommand(Game::AbstractCommand *cmd)
     {
-        if (dynamic_cast<Game::Command::Play *>(cmd)) {
+        if (dynamic_cast<Game::Command::Move *>(cmd)) {
+            ++m_counters[0];
+        } else if (dynamic_cast<Game::Command::Play *>(cmd)) {
             ++m_counters[1];
+        } else if (dynamic_cast<Game::Command::Logout *>(cmd)) {
+            ++m_counters[2];
         } else if (dynamic_cast<Game::Command::Login *>(cmd)) {
             ++m_counters[3];
         }
@@ -87,15 +91,15 @@ public:
 };
 
 namespace {
-    void setupLink(Game::AbstractBackend *link,
+    void setupLink(Game::CommandLine *command_line,
                    Game::LineReader *tokenizer,
                    Game::ParserCommandFlags flags)
     {
-        link->setFlags(flags);
-        link->setEnabled(true);
+        command_line->setFlags(flags);
+        command_line->setEnabled(true);
 
-        QObject::connect(tokenizer, SIGNAL(tokenFound(QByteArray)),
-                         link,    SLOT(processToken(QByteArray)));
+        QObject::connect(tokenizer,    SIGNAL(tokenFound(QByteArray)),
+                         command_line, SLOT(processToken(QByteArray)));
     }
 }
 
@@ -114,31 +118,31 @@ private:
 
     Q_SLOT void testMultiParsing_data()
     {
-        // Counters are interpreted as [move, new, quit, login, logout]
+        // Counters are interpreted as [move, play, logout, login]
         // Make sure that the compared vectors are of same size!
         qRegisterMetaType<QVector<int> >();
         QTest::addColumn<QByteArray>("input");
         QTest::addColumn<QVector<int> >("countersForFirstParser");
         QTest::addColumn<QVector<int> >("countersForSecondParser");
 
-        QTest::newRow("p0 finds 'new'")
-                << QByteArray("new\n")
+        QTest::newRow("p0 finds 'play'")
+                << QByteArray("play\n")
                 << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>(4, 0));
 
-        QTest::newRow("p0 finds 'new', but ignores garbage")
-                << QByteArray("garbage\nnew\nmore#124garbage\n")
+        QTest::newRow("p0 finds 'play', but ignores garbage")
+                << QByteArray("garbage\nplay\nmore#124garbage\n")
                 << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>(4, 0));
 
         QTest::newRow("p1 finds 'move'")
                 << QByteArray("move\n")
                 << (QVector<int>(4, 0)) << (QVector<int>() << 1 << 0 << 0 << 0);
 
-        QTest::newRow("p0, p1 find 1x 'new', 2x 'move'")
-                << QByteArray("new\nmove e4\nmove f4\n")
+        QTest::newRow("p0, p1 find 1x 'play', 2x 'move'")
+                << QByteArray("play\nmove e4\nmove f4\n")
                 << (QVector<int>() << 0 << 1 << 0 << 0) << (QVector<int>() << 2 << 0 << 0 << 0);
 
-        QTest::newRow("p0, p1 both find 'new', 'move', 'quit'")
-                << QByteArray("new\nmove e4\nquit\n")
+        QTest::newRow("p0, p1 both find 'play', 'move', 'quit'")
+                << QByteArray("play\nmove e4\nquit\n")
                 << (QVector<int>() << 0 << 1 << 1 << 0) << (QVector<int>() << 1 << 0 << 1 << 0);
     }
 
@@ -159,7 +163,7 @@ private:
         CountingDispatcher c0;
         Game::CommandLine l0(&c0);
         setupLink(&l0, &tokenizer,
-                  Game::ParserCommandFlags(Game::CommandNew | Game::CommandQuit));
+                  Game::ParserCommandFlags(Game::CommandPlay | Game::CommandQuit));
 
         CountingDispatcher c1;
         Game::CommandLine l1(&c1);
@@ -176,7 +180,9 @@ private:
         TestUtils::waitForSignal(&c1, SIGNAL(ready()), TimeOut);
         TestUtils::waitForSignal(&c2, SIGNAL(ready()), TimeOut);
 
+        qDebug() << "counted_c0:" << c0.m_counters << "expected:" << countersForFirstParser;
         QCOMPARE(c0.m_counters, countersForFirstParser);
+        qDebug() << "counted_c1:" << c1.m_counters << "expected:" << countersForSecondParser;
         QCOMPARE(c1.m_counters, countersForSecondParser);
         QCOMPARE(c2.m_counters, emptyCounters);
     }

@@ -20,17 +20,11 @@
 
 #include "testutils.h"
 #include "frontend.h"
-#include "move.h"
 #include "fics/backend.h"
-#include "fics/side.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
-
-// Need to import symbol so that slot/signal signature stays same, for moc.
-using Game::Move;
-Q_DECLARE_METATYPE(Move)
 
 namespace Game
 {
