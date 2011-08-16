@@ -79,10 +79,18 @@ enum Promotion {
     PromotionQueen
 };
 
+enum Color {
+    ColorAuto = 0,
+    ColorWhite,
+    ColorBlack
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)
 Q_DECLARE_METATYPE(Game::File)
 Q_DECLARE_METATYPE(Game::Mode)
+Q_DECLARE_METATYPE(Game::Promotion)
+Q_DECLARE_METATYPE(Game::Color)
 
 #endif // NAMESPACE_H

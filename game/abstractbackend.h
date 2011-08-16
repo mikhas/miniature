@@ -63,7 +63,7 @@ struct Seek
     uint time;
     uint increment;
     bool is_rated;
-    bool white_to_start;
+    Color color;
     bool is_auto_started;
     bool uses_formula;
     QPair<int, int> rating_range;

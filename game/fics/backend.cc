@@ -80,7 +80,14 @@ namespace {
         result.increment = match_seek.cap(4).toInt(&converted);
         result.valid = result.valid && converted;
         result.is_rated = (match_seek.cap(5) == "rated" || match_record.cap(5) == "r");
-        result.white_to_start = (match_seek.cap(8) == "white" || match_seek.cap(7) == "w");
+        result.color = Game::ColorAuto;
+        const QString color(match_seek.cap(8).toLower());
+        if (color == "white" || color == "w") {
+            result.color = Game::ColorWhite;
+        } else if (color == "black" || color == "b") {
+            result.color = Game::ColorBlack;
+        }
+
         result.is_auto_started = (match_seek.cap(9) != "m");
         result.uses_formula = (match_seek.cap(10) == "f");
         result.rating_range.first = match_seek.cap(11).toInt(&converted);
@@ -133,7 +140,7 @@ namespace {
         qDebug() << s.valid
                  << "id:" << s.id << "mode:" << s.mode << "name:" << s.player_name
                  << "rating" << s.rating << "time:" << s.time << "inc:" << s.increment
-                 << "is_rated:" << s.is_rated << "white_to_start:" << s.white_to_start
+                 << "is_rated:" << s.is_rated << "white_to_start:" << s.color
                  << "is_auto_started:" << s.is_auto_started
                  << "uses_formula:" << s.uses_formula
                  << "rating range:" << s.rating_range;

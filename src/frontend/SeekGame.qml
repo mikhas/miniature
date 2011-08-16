@@ -174,7 +174,8 @@ Page {
                         id: opponentData
                         width: parent.width - 10
                         height: 35 // FIXME how to make it relative to text height?
-                        color: "lightgrey" // FIXME also white or black if the opponent has defined piece color
+                        color: model.color == "auto" ? "lightgrey"
+                                                     : model.color
                         anchors {
                             bottom: gameData.bottom
                             bottomMargin: 5
@@ -184,7 +185,8 @@ Page {
                         Text {
                             id: opponentInfo
                             text: model.rating + " " + model.playerName // FIXME Ugly way while figuring out tables
-                            color: "black" // FIXME or white if opponentData.color == "black"
+                            color: model.color == "black" ? "white"
+                                                          : "black"
                             font.pointSize: 16
                             font.weight: Font.DemiBold
                             anchors {

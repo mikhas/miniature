@@ -31,6 +31,17 @@ namespace Game { namespace {
     const ParserCommandFlags all_commands(CommandPlay | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
+
+    QString fromColor(Color color)
+    {
+        switch(color) {
+        case ColorAuto: return "auto";
+        case ColorWhite: return "white";
+        case ColorBlack: return "black";
+        }
+
+        return "";
+    }
 }
 
 class AdvertisementModel
@@ -48,7 +59,7 @@ public:
         RoleTime,
         RoleIncrement,
         RoleIsRated,
-        RoleWhiteToStart,
+        RoleColor,
         RoleIsAutoStarted,
         RoleUsesFormula,
         RoleRatingLowerLimit,
@@ -67,7 +78,7 @@ public:
         roles[RoleTime] = "time";
         roles[RoleIncrement] = "increment";
         roles[RoleIsRated] = "isRated";
-        roles[RoleWhiteToStart] = "whiteToStart";
+        roles[RoleColor] = "color";
         roles[RoleIsAutoStarted] = "isAutoStarted";
         roles[RoleUsesFormula] = "usesFormula";
         roles[RoleRatingLowerLimit] = "ratingLowerLimit";
@@ -129,7 +140,7 @@ public:
         case RoleTime: return QVariant(s.time);
         case RoleIncrement: return QVariant(s.increment);
         case RoleIsRated: return QVariant(s.is_rated);
-        case RoleWhiteToStart: return QVariant(s.white_to_start);
+        case RoleColor: return QVariant(fromColor(s.color));
         case RoleIsAutoStarted: return QVariant(s.is_auto_started);
         case RoleUsesFormula: return QVariant(s.uses_formula);
         case RoleRatingLowerLimit: return QVariant(s.rating_range.first);
