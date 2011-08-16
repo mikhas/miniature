@@ -83,8 +83,15 @@ Page {
             clip: true
             header: seekListHeader // empty header to avoid overlap of 1st item with shadow.
             spacing: 10 // FIXME an empty header of 20 pixels needs to be created to separate 1st item from shadow
+
             model: gameAdvertisements
-            delegate:
+
+             Connections {
+                 target: gameAdvertisements
+                 onRowsInserted: seekList.positionViewAtEnd()
+             }
+
+             delegate:
 
                 Item {
                 id: listItem
