@@ -72,7 +72,7 @@ namespace {
 
         result.id = match_seek.cap(14).toInt(&converted);
         result.valid = result.valid && converted;
-        /*result.valid = result.valid &&*/ parseRating(&result, &result.rating, match_record.cap(2));
+        /*result.valid = result.valid &&*/ parseRating(&result, &result.rating, match_seek.cap(2));
         // TODO: parse game mode.
         result.player_name = match_seek.cap(1).toLatin1();
         result.time = match_seek.cap(3).toInt(&converted);
