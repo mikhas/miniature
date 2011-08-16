@@ -65,7 +65,7 @@ Page {
     }
 
     // List of games available according to filters
-   Rectangle {
+    Rectangle {
         id: seekListWindow
         color:  "lightgray"
         anchors {
@@ -81,6 +81,7 @@ Page {
             id: seekList
             anchors.fill: parent
             clip: true
+            header: seekListHeader // empty header to avoid overlap of 1st item with shadow.
             spacing: 10 // FIXME an empty header of 20 pixels needs to be created to separate 1st item from shadow
             model: gameAdvertisements
             delegate:
@@ -126,9 +127,9 @@ Page {
                         color: "black"
                         anchors {
                             right: incrementGame.left
-                        rightMargin: 15
-                        bottom: parent.bottom
-                        bottomMargin: 40
+                            rightMargin: 15
+                            bottom: parent.bottom
+                            bottomMargin: 40
                         }
                     }
 
@@ -140,9 +141,9 @@ Page {
                         color: "black"
                         anchors {
                             right: ratedGame.left
-                        rightMargin: 22
-                        bottom: parent.bottom
-                        bottomMargin: 40
+                            rightMargin: 22
+                            bottom: parent.bottom
+                            bottomMargin: 40
                         }
                     }
 
@@ -155,9 +156,9 @@ Page {
                         color: "black"
                         anchors {
                             right: parent.right
-                       rightMargin: 10
-                        bottom: parent.bottom
-                        bottomMargin: 40
+                            rightMargin: 10
+                            bottom: parent.bottom
+                            bottomMargin: 40
                         }
                     }
 
@@ -169,8 +170,8 @@ Page {
                         color: "lightgrey" // FIXME also white or black if the opponent has defined piece color
                         anchors {
                             bottom: gameData.bottom
-                        bottomMargin: 5
-                        horizontalCenter: parent.horizontalCenter
+                            bottomMargin: 5
+                            horizontalCenter: parent.horizontalCenter
                         }
 
                         Text {
@@ -181,8 +182,8 @@ Page {
                             font.weight: Font.DemiBold
                             anchors {
                                 verticalCenter: opponentData.verticalCenter
-                            left: parent.left
-                            leftMargin: 10
+                                left: parent.left
+                                leftMargin: 10
                             }
                         }
                     }
@@ -207,9 +208,17 @@ Page {
                             rejectButtonText: "No"
                         }
                     }
-
                 }
             }
+        }
+    }
+
+    Component {
+        id: seekListHeader
+        Rectangle {
+            height: 20
+            width: parent.width
+            color: "transparent"
         }
     }
 
