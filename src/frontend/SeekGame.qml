@@ -71,18 +71,19 @@ Page {
         anchors {
             top: headerBackground.bottom
             bottom: seekToolbar.top
+            bottomMargin: 10
             left: parent.left
             leftMargin: 15
             right: parent.right
             rightMargin: 10
         }
 
-        ListView { // FIXME ideally the list should have always the most recent item visible
+        ListView {
             id: seekList
             anchors.fill: parent
             clip: true
             header: seekListHeader // empty header to avoid overlap of 1st item with shadow.
-            spacing: 10 // FIXME an empty header of 20 pixels needs to be created to separate 1st item from shadow
+            spacing: 10
 
             model: gameAdvertisements
 
@@ -99,7 +100,6 @@ Page {
                 property int previousIndex // Only used for debugging
                 height: 80
                 width: parent.width * 0.8
-                anchors.horizontalCenter: parent.horizontalCenter
 
                 Rectangle {
                     id: gameData
@@ -199,6 +199,26 @@ Page {
                             }
                         }
                     }
+
+                    Rectangle {
+                        id: counter
+                        width: seekList.width * 0.2
+                        height: parent.height
+                        color: "transparent"
+                        anchors {
+                            verticalCenter: gameData.verticalCenter
+                            left: parent.right
+                            // leftMargin: 20
+                        }
+
+                        Text {
+                            text: index + 1
+                            font.bold: true
+                            font.pointSize: 40
+                            color: "whitesmoke"
+                            anchors.centerIn: parent
+                        }
+                    }
                 }
 
                 MouseArea {
@@ -206,8 +226,8 @@ Page {
                     anchors.fill: gameData
                     onClicked: {
                         console.log(listItem.previouslySelected.state + " " + listItem.previousIndex)
-//                        if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
-//                            listItem.previouslySelected.state = ""
+                        //                        if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
+                        //                            listItem.previouslySelected.state = ""
                         if (listItem.state === "highlighted")
                             listItem.state = ""
                         else listItem.state = "highlighted"
