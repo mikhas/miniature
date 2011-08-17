@@ -88,7 +88,10 @@ Page {
             model: gameAdvertisements
 
             Connections {
+                id: sortingStyle
                 target: gameAdvertisements
+                // var flowing = "seekList.positionViewAtEnd()" // FIXME This attempt to keep the highlighted item on view won't work
+                // onRowsInserted: flowing // FIXME This attempt to keep the highlighted item on view won't work
                 onRowsInserted: seekList.positionViewAtEnd()
             }
 
@@ -187,7 +190,7 @@ Page {
 
                         Text {
                             id: opponentInfo
-                            text: model.rating + " " + model.playerName // FIXME Ugly way while figuring out tables
+                            text: model.rating + " " + model.playerName + model.highlighted // FIXME highlighted used for debugging
                             color: model.color == "black" ? "white"
                                                           : "black"
                             font.pointSize: 16
@@ -201,22 +204,35 @@ Page {
                     }
 
                     Rectangle {
-                        id: counter
+                        id: counterBackground
                         width: seekList.width * 0.2
                         height: parent.height
                         color: "transparent"
                         anchors {
                             verticalCenter: gameData.verticalCenter
                             left: parent.right
-                            // leftMargin: 20
                         }
 
                         Text {
+                            id: counter
                             text: index + 1
                             font.bold: true
                             font.pointSize: 40
                             color: "whitesmoke"
+                            visible: true
                             anchors.centerIn: parent
+                        }
+
+                        ToolIcon { // Confirms the game
+                            id: confirmButton
+                            iconId: "toolbar-add"
+                            visible: false
+                            anchors.centerIn: parent
+                            onClicked: {
+                                console.log(model.playerName)
+                                miniature.play(model.id, "Your Name", model.playerName)
+                                loadScreen("OnlineBoard.qml")
+                            }
                         }
                     }
                 }
@@ -226,11 +242,16 @@ Page {
                     anchors.fill: gameData
                     onClicked: {
                         console.log(listItem.previouslySelected.state + " " + listItem.previousIndex)
-                        //                        if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
-                        //                            listItem.previouslySelected.state = ""
+                        // if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
+                        // listItem.previouslySelected.state = ""
+                        // seekList.model.set(listItem.previousIndex, { highlighted: false }) FIXME not working either
                         if (listItem.state === "highlighted")
                             listItem.state = ""
                         else listItem.state = "highlighted"
+
+
+
+
                     }
                 }
                 states: [
@@ -245,11 +266,12 @@ Page {
                             visible: false
                         }
                         PropertyChanges {
-                            target:  listItem
-                            width: parent.width
+                            target: counter
+                            visible: false
                         }
                         StateChangeScript {
                             script: {
+                                // seekList.model.set(index, { highlighted: false }) // FIXME not working
                                 listItem.previouslySelected = listItem
                                 listItem.previousIndex = index // only used for debugging
                             }
@@ -296,15 +318,15 @@ Page {
                 }
             }
 
-            ToolIcon { // Confirms the game
-                id: confirmButton
-                iconId: "toolbar-add"
-                visible: false
-                onClicked: {
-                    miniature.play(model.id, "Your Name", model.playerName)
-                    loadScreen("OnlineBoard.qml") // FIXME here would start the real game
-                }
-            }
+            //            ToolIcon { // Confirms the game
+            //                id: confirmButton
+            //                iconId: "toolbar-add"
+            //                visible: false
+            //                onClicked: {
+            //                    miniature.play(model.id, "Your Name", model.playerName)
+            //                    loadScreen("OnlineBoard.qml") // FIXME here would start the real game
+            //                }
+            //            }
 
 
             ToolIcon { // FIXME Settings page pending
