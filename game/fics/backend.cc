@@ -239,7 +239,7 @@ void Backend::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
-void Backend::play(int advertisement_id)
+void Backend::play(uint advertisement_id)
 {
     qDebug() << __PRETTY_FUNCTION__;
 
