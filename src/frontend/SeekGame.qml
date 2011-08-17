@@ -86,17 +86,20 @@ Page {
 
             model: gameAdvertisements
 
-             Connections {
-                 target: gameAdvertisements
-                 onRowsInserted: seekList.positionViewAtEnd()
-             }
+            Connections {
+                target: gameAdvertisements
+                onRowsInserted: seekList.positionViewAtEnd()
+            }
 
-             delegate:
+            delegate:
 
                 Item {
                 id: listItem
+                property Item previouslySelected: gameData
+                property int previousIndex // Only used for debugging
                 height: 80
-                width: parent.width * 0.8 // a "+" for confirming is meant to fill the remaining 0.2
+                width: parent.width * 0.8
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 Rectangle {
                     id: gameData
@@ -196,28 +199,44 @@ Page {
                             }
                         }
                     }
+                }
 
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        onClicked: {
-                            confirmGame.open();
-                        }
-
-                        // Confirm game dialog - TO BE REPLACED by "+" button next to selected item
-                        QueryDialog {
-                            id: confirmGame
-                            titleText: "Ready to play?"
-                            message: model.rating + " " + model.playerName + " " + model.time + " " + model.increment
-                            acceptButtonText: "Yes"
-                            onAccepted: {
-                                miniature.play(model.id, "Your Name", model.playerName)
-                                loadScreen("OnlineBoard.qml") // FIXME here would start the real game
-                            }
-                            rejectButtonText: "No"
-                        }
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: gameData
+                    onClicked: {
+                        console.log(listItem.previouslySelected.state + " " + listItem.previousIndex)
+//                        if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
+//                            listItem.previouslySelected.state = ""
+                        if (listItem.state === "highlighted")
+                            listItem.state = ""
+                        else listItem.state = "highlighted"
                     }
                 }
+                states: [
+                    State {
+                        name: "highlighted"
+                        PropertyChanges {
+                            target: confirmButton
+                            visible:true
+                        }
+                        PropertyChanges {
+                            target: nonselectedEffect
+                            visible: false
+                        }
+                        PropertyChanges {
+                            target:  listItem
+                            width: parent.width
+                        }
+                        StateChangeScript {
+                            script: {
+                                listItem.previouslySelected = listItem
+                                listItem.previousIndex = index // only used for debugging
+                            }
+                        }
+                    }
+                ]
+
             }
         }
     }
@@ -253,9 +272,20 @@ Page {
                 id: backIcon
                 iconId: "toolbar-back";
                 onClicked: {
-                    loadScreen("MainPage.qml") // FIXME a dialog of stopping options to be plugged here
+                    loadScreen("MainPage.qml")
                 }
             }
+
+            ToolIcon { // Confirms the game
+                id: confirmButton
+                iconId: "toolbar-add"
+                visible: false
+                onClicked: {
+                    miniature.play(model.id, "Your Name", model.playerName)
+                    loadScreen("OnlineBoard.qml") // FIXME here would start the real game
+                }
+            }
+
 
             ToolIcon { // FIXME Settings page pending
                 iconId: "toolbar-view-menu"
