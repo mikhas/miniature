@@ -318,16 +318,24 @@ Page {
                 }
             }
 
-            //            ToolIcon { // Confirms the game
-            //                id: confirmButton
-            //                iconId: "toolbar-add"
-            //                visible: false
-            //                onClicked: {
-            //                    miniature.play(model.id, "Your Name", model.playerName)
-            //                    loadScreen("OnlineBoard.qml") // FIXME here would start the real game
-            //                }
-            //            }
+            ToolButton { // New seek button
+                id: newSeek
+                text: "New"
+                onClicked: {
+                    newSeekDialog.open();
+                }
 
+                QueryDialog { // New seek dialog
+                    id: newSeekDialog
+                    titleText: "New seek"
+                    message: "Standard 10 05 unrated\nUsername as white" // FIXME the right variables go here, the same as in the filter
+                    acceptButtonText: "Yes"
+                    onAccepted: {
+                        // FIXME instructions to send a new seek
+                    }
+                    rejectButtonText: "No"
+                }
+            }
 
             ToolIcon { // FIXME Settings page pending
                 iconId: "toolbar-view-menu"
