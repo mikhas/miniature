@@ -14,7 +14,7 @@ Page {
         z: -10
     }
 
-    // The seek/filter options are integrated in the UI already
+    // Filter & new seek options, all at once.
     Rectangle {
         id: headerBackground
         color: "olivedrab"
@@ -24,47 +24,134 @@ Page {
 
         Button {
             id: seekTypeChess
-            text: "Standard" // FIXME onPress Suicide, Bughouse, etc
+            text: typeDialog.model.get(typeDialog.selectedIndex).name
             width: 150
-            anchors.bottom: headerBackground.bottom
-            anchors.bottomMargin: 10
-            anchors.left: parent.left
-            anchors.leftMargin: 10
+            anchors {
+                bottom: headerBackground.bottom
+                bottomMargin: 10
+                left: parent.left
+                leftMargin: 10
+            }
+            onClicked: {
+                typeDialog.open();
+            }
+
+            SelectionDialog {
+                id: typeDialog
+                titleText: "Chess variant"
+                model:  ListModel {
+                    ListElement { name: "Standard" }
+                    ListElement { name: "Crazyhouse" }
+                    ListElement { name: "Suicide" }
+                }
+                selectedIndex: 0
+                visualParent: dialogWrapper
+            }
         }
 
         Button {
             id: seekTime
-            text: "-" // FIXME onPress number picker
+            text: timeDialog.model.get(timeDialog.selectedIndex).name
             width: 50
-            anchors.bottom: headerBackground.bottom
-            anchors.bottomMargin: 10
-            anchors.right: seekIncrement.left
-            anchors.rightMargin: 15
+            anchors {
+                bottom: headerBackground.bottom
+                bottomMargin: 10
+                right: seekIncrement.left
+                rightMargin: 15
+            }
+            onClicked: {
+                timeDialog.open();
+            }
+
+            SelectionDialog {
+                id: timeDialog
+                titleText: "Time"
+                model:  ListModel { // Is there a convenient number picker component available somewhere?
+                    ListElement { name: "*" } // Any time is good
+                    ListElement { name: "1" }
+                    ListElement { name: "3" }
+                    ListElement { name: "5" }
+                    ListElement { name: "10" }
+                    ListElement { name: "15" }
+                    ListElement { name: "30" }
+                    ListElement { name: "60" }
+                }
+                selectedIndex: 3
+                visualParent: dialogWrapper
+            }
         }
 
         Button {
             id: seekIncrement
-            text: "-" // FIXME onPress number picker
+            text: incrementDialog.model.get(incrementDialog.selectedIndex).name
             width: 50
-            anchors.bottom: headerBackground.bottom
-            anchors.bottomMargin: 10
-            anchors.right: seekRated.left
-            anchors.rightMargin: 20
+            anchors {
+                bottom: headerBackground.bottom
+                bottomMargin: 10
+                right: seekRated.left
+                rightMargin: 20
+            }
+            onClicked: {
+                incrementDialog.open();
+            }
+
+            SelectionDialog {
+                id: incrementDialog
+                titleText: "Increment"
+                model:  ListModel { // Is there a convenient number picker component available somewhere?
+                    ListElement { name: "*" } // Any increment is good
+                    ListElement { name: "0" }
+                    ListElement { name: "1" }
+                    ListElement { name: "3" }
+                    ListElement { name: "6" }
+                    ListElement { name: "12" }
+                    ListElement { name: "30" }
+                }
+                selectedIndex: 5
+                visualParent: dialogWrapper
+            }
         }
 
-        // FIXME guest users can only play Unrated, button inactive
+
         Button {
             id: seekRated
-            text: "Unrated" // FIXME onPress Unrated / Any
+            text: ratedDialog.model.get(ratedDialog.selectedIndex).name
             width: 120
-            anchors.bottom: headerBackground.bottom
-            anchors.bottomMargin: 10
-            anchors.right: parent.right
-            anchors.rightMargin: 10
+            anchors {
+                bottom: headerBackground.bottom
+                bottomMargin: 10
+                right: parent.right
+                rightMargin: 10
+            }
+            onClicked: {
+                ratedDialog.open();
+            }
+
+            SelectionDialog {
+                id: ratedDialog
+                titleText: "Type of match"
+                model:  ListModel { // FIXME guest users can only play Unrated, button inactive
+                    ListElement { name: "Any" } // Any option is good
+                    ListElement { name: "Unrated" }
+                    ListElement { name: "Rated" }
+                }
+                selectedIndex: 1 // Better 2 for registered users
+                visualParent: dialogWrapper
+            }
         }
     }
 
     // List of games available according to filters
+
+    Rectangle { // Used to define the size of the dialogs
+        id: dialogWrapper
+        color:  "transparent"
+        anchors.top: headerBackground.bottom
+        anchors.bottom: seekToolbar.top
+        width: parent.width
+        z: 10
+    }
+
     Rectangle {
         id: seekListWindow
         color:  "lightgray"
@@ -328,12 +415,19 @@ Page {
                 QueryDialog { // New seek dialog
                     id: newSeekDialog
                     titleText: "New seek"
-                    message: "Standard 10 05 unrated\nUsername as white" // FIXME the right variables go here, the same as in the filter
+                    message: (
+                                 typeDialog.model.get(typeDialog.selectedIndex).name + " " +
+                                 timeDialog.model.get(timeDialog.selectedIndex).name + " " +
+                                 incrementDialog.model.get(incrementDialog.selectedIndex).name + " " +
+                                 ratedDialog.model.get(ratedDialog.selectedIndex).name + "\n" +
+                                 "1033 Username" // This still needs the real variables
+                                 )
                     acceptButtonText: "Yes"
                     onAccepted: {
                         // FIXME instructions to send a new seek
                     }
                     rejectButtonText: "No"
+                    visualParent: dialogWrapper
                 }
             }
 
