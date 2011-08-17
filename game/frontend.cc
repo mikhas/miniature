@@ -63,7 +63,8 @@ public:
         RoleIsAutoStarted,
         RoleUsesFormula,
         RoleRatingLowerLimit,
-        RoleRatingUpperLimit
+        RoleRatingUpperLimit,
+        RoleHighlighted
     };
 
     explicit AdvertisementModel(QObject *parent = 0)
@@ -83,6 +84,7 @@ public:
         roles[RoleUsesFormula] = "usesFormula";
         roles[RoleRatingLowerLimit] = "ratingLowerLimit";
         roles[RoleRatingUpperLimit] = "ratingUpperLimit";
+        roles[RoleHighlighted] = "highlighted";
         setRoleNames(roles);
     }
 
@@ -145,6 +147,7 @@ public:
         case RoleUsesFormula: return QVariant(s.uses_formula);
         case RoleRatingLowerLimit: return QVariant(s.rating_range.first);
         case RoleRatingUpperLimit: return QVariant(s.rating_range.second);
+        case RoleHighlighted: return QVariant(s.highlighted);
 
         default:
             return QVariant();

@@ -67,6 +67,7 @@ struct Seek
     bool is_auto_started;
     bool uses_formula;
     QPair<int, int> rating_range;
+    bool highlighted;
 };
 
 class AbstractBackend;

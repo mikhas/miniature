@@ -70,6 +70,7 @@ namespace {
             return result;
         }
 
+        result.highlighted = false;
         result.id = match_seek.cap(14).toInt(&converted);
         result.valid = result.valid && converted;
         /*result.valid = result.valid &&*/ parseRating(&result, &result.rating, match_seek.cap(2));
