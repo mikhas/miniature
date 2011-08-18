@@ -406,7 +406,10 @@ Page {
                         MenuItem {text: "Resign"; onClicked: resignDialog.open() }
                         MenuItem {text: "Propose a draw"; onClicked: proposedrawDialog.open() }
                         MenuItem {text: "Request to adjourn"; onClicked: requestadjournDialog.open() }
-                        MenuItem {text: "Back to MainPage (testing only)"; onClicked: loadScreen("MainPage.qml") }
+                        MenuItem {text: "Testing: accept draw"; onClicked: acceptdrawDialog.open() }
+                        MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
+                        MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
+                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: loadScreen("MainPage.qml") }
                     }
                 }
             }
@@ -463,19 +466,59 @@ Page {
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send a draw request command
+            // mikas: if a user proposes again a draw, he will just see the FICS message in the chat/console.
         }
         rejectButtonText: "No"
     }
 
-    QueryDialog { // Propose draw
+    QueryDialog { // Request adjourn
         id: requestadjournDialog
         titleText: "Request to adjourn?"
         message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send an adjourn request command
+            // mikas: if a user requests to adjournagain, he will just see the FICS message in the chat/console.
         }
         rejectButtonText: "No"
+    }
+
+    QueryDialog { // Accept draw?
+        id: acceptdrawDialog
+        titleText: "Is this a draw?"
+        message:  "$OPPONENT is proposing to end this game with a draw." // FIXME real variable for $OPPONENT
+        acceptButtonText: "Accept"
+        onAccepted: {
+            // FIXME instructions to send an accept draw command
+            // FIXME: if $OPPONENT requests a draw while a request already exists, this dialog shouldn't show up again.
+        }
+        rejectButtonText: "Ignore"
+    }
+
+    QueryDialog { // Accept adjourn?
+        id: acceptadjournDialog
+        titleText: "See you later?"
+        message:  "$OPPONENT is requesting to adjourn this game." // FIXME real variable for $OPPONENT
+        acceptButtonText: "Accept"
+        onAccepted: {
+            // FIXME instructions to send an accept draw command
+            // FIXME: if $OPPONENT requests to adjourn while a request already exists, this dialog shouldn't show up again.
+        }
+        rejectButtonText: "Ignore"
+    }
+
+    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
+        id: gameoverDialog
+        titleText: "You won!" // FIXME or "Sorry...", depending.
+        message:  "$whitePlayer: 1033 >> 1026\n$blackPlayer: 1033 >> 1041\nWhat's next?" // FIXME real variables
+        acceptButtonText: "Challenge $OPPONENT"
+        onAccepted: {
+            // FIXME instructions to send a challenge to OPPONENT with the same parameters as the previous game
+        }
+        rejectButtonText: "Find other players"
+        onRejected: {
+            loadScreen("SeekGame.qml")
+        }
     }
 }
 
