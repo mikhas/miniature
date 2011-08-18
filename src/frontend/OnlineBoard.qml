@@ -409,6 +409,7 @@ Page {
                         MenuItem {text: "Testing: accept draw"; onClicked: acceptdrawDialog.open() }
                         MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
                         MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
+                        MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
                         MenuItem {text: "Convenient: Back to MainPage"; onClicked: loadScreen("MainPage.qml") }
                     }
                 }
@@ -518,6 +519,20 @@ Page {
         rejectButtonText: "Find other players"
         onRejected: {
             loadScreen("SeekGame.qml")
+        }
+    }
+
+    QueryDialog { // Connection lost
+        id: connectionlostDialog
+        titleText: "Lost connection"
+        message:  "You have lost the connection to the server." // FIXME real variables
+        acceptButtonText: "Log in again"
+        onAccepted: {
+            // FIXME with the stored values, can we attempt to re-login and resume a game automatically?
+        }
+        rejectButtonText: "Close app"
+        onRejected: {
+            // FIXME how to close the app?
         }
     }
 }
