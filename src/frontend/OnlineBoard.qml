@@ -392,13 +392,25 @@ Page {
         id: boardToolbar
         anchors.bottom: parent.bottom
         tools: ToolBarLayout {
+
             ToolIcon { // Stops the game, can lead to draw,
                 id: backIcon
                 iconId: "toolbar-back";
                 onClicked: {
-                    loadScreen("MainPage.qml") // FIXME a dialog of stopping options to be plugged here
+                    exitMenu.open()
+                }
+
+                Menu {
+                    id: exitMenu
+                    MenuLayout {
+                        MenuItem {text: "Resign"; onClicked: resignDialog.open() }
+                        MenuItem {text: "Propose a draw"; onClicked: proposedrawDialog.open() }
+                        MenuItem {text: "Request to adjourn"; onClicked: requestadjournDialog.open() }
+                        MenuItem {text: "Back to MainPage (testing only)"; onClicked: loadScreen("MainPage.qml") }
+                    }
                 }
             }
+
 
             ToolIcon { // Confirms the move. Visible only when fromIndex && toIndex are selected.
                 id: confirmButton
@@ -430,6 +442,40 @@ Page {
                 iconId: "toolbar-view-menu"
             }
         }
+    }
+
+    // Dialogs
+
+    QueryDialog { // Confirm resign
+        id: resignDialog
+        titleText: "Resign?"
+        acceptButtonText: "Yes"
+        onAccepted: {
+            // FIXME instructions to send a resign command
+        }
+        rejectButtonText: "No"
+    }
+
+    QueryDialog { // Propose draw
+        id: proposedrawDialog
+        titleText: "Propose a draw?"
+        message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
+        acceptButtonText: "Yes"
+        onAccepted: {
+            // FIXME instructions to send a draw request command
+        }
+        rejectButtonText: "No"
+    }
+
+    QueryDialog { // Propose draw
+        id: requestadjournDialog
+        titleText: "Request to adjourn?"
+        message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
+        acceptButtonText: "Yes"
+        onAccepted: {
+            // FIXME instructions to send an adjourn request command
+        }
+        rejectButtonText: "No"
     }
 }
 
