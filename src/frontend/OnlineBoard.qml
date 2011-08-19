@@ -132,15 +132,33 @@ Page {
             anchors.leftMargin: 10
         }
 
-        Text {
+        Text { // I guess there is a way not to have two timers defined in a single file but here we go for now.
             id: opponentTime
-            text: " " + "06:55:12" + " " // or mm:ss if it's <  1h
+            property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
+            property string time: getTime()
+            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
+
+            function getTime() {
+                var minutes = Math.floor(milliseconds / 1000 / 60)
+                var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
+
+                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
+            }
+            text: time
             color: "white" // or black, opposite of opponentZone
             font.pointSize: 24
             font.weight: Font.Bold
+            font.family: "Courier"
+            font.underline: false
             anchors.verticalCenter: opponentZone.verticalCenter
             anchors.right: opponentZone.right
             anchors.rightMargin: 10
+
+            Timer  {
+                id: opponentTimer
+                interval: 1000; running: false; repeat: true;
+                onTriggered: opponentTime.milliseconds -= 1000
+            }
 
             Rectangle {
                 id: opponentTimeHighlight
@@ -364,24 +382,30 @@ Page {
 
         Text {
             id: userTime
-            text: " " + "07:35:42" + " " // or mm:ss if it's <  1h
+            property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
+            property string time: getTime()
+            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
+
+            function getTime() {
+                var minutes = Math.floor(milliseconds / 1000 / 60)
+                var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
+
+                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
+            }
+            text: time
             color: "black" // or white, opposite of opponentZone
             font.pointSize: 24
             font.weight: Font.Bold
+            font.family: "Courier"
+            font.underline: true
             anchors.verticalCenter: userZone.verticalCenter
             anchors.right: userZone.right
             anchors.rightMargin: 10
 
-            Rectangle {
-                id: userTimeHighlight
-                anchors.fill: parent
-                z: -1
-                color: "transparent"
-                border.color: "black" // same as userTime.text
-                border.width: 1
-                radius: 2
-                smooth: true
-                visible: true
+            Timer  {
+                id: userTimer
+                interval: 1000; running: true; repeat: true;
+                onTriggered: userTime.milliseconds -= 1000
             }
         }
     }
