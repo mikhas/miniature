@@ -149,7 +149,6 @@ Page {
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
-            font.underline: false
             anchors.verticalCenter: opponentZone.verticalCenter
             anchors.right: opponentZone.right
             anchors.rightMargin: 10
@@ -158,18 +157,6 @@ Page {
                 id: opponentTimer
                 interval: 1000; running: false; repeat: true;
                 onTriggered: opponentTime.milliseconds -= 1000
-            }
-
-            Rectangle {
-                id: opponentTimeHighlight
-                anchors.fill: parent
-                z: -1
-                color: "transparent"
-                border.color: "white" // Same as opponentTime.color
-                border.width: 1
-                radius: 2
-                smooth: true
-                visible: false
             }
         }
     }
@@ -397,8 +384,7 @@ Page {
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
-            font.underline: true
-            anchors.verticalCenter: userZone.verticalCenter
+           anchors.verticalCenter: userZone.verticalCenter
             anchors.right: userZone.right
             anchors.rightMargin: 10
 
@@ -460,9 +446,9 @@ Page {
                     if (checkMove.colorPlaying === "white") // turn for the other player
                         checkMove.colorPlaying = "black"
                     else checkMove.colorPlaying = "white"
-                    if (userTimeHighlight.visible === true)
-                    { opponentTimeHighlight.visible = true ; userTimeHighlight.visible = false}
-                    else { opponentTimeHighlight.visible = false ; userTimeHighlight.visible = true}
+                    if (userTimer.running === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
+                    { userTimer.running = false ; opponentTimer.running = true }
+                    else { opponentTimer.running = false ; userTimer.running = true }
                 }
             }
 
