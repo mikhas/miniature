@@ -136,15 +136,13 @@ Page {
             id: opponentTime
             property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
-            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
-
+            property int increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
                 var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-
-                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
+                return (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
             }
-            text: time
+            text: time // FIXME a sync with the server time is expected here
             color: "white" // or black, opposite of opponentZone
             font.pointSize: 24
             font.weight: Font.Bold
@@ -202,6 +200,7 @@ Page {
             property int fromIndex: -1
             property string fromKing // only needed for castling
             property int toIndex
+            property bool firstMove: false // UJsed by the timers to know if a first move has been done.
         }
 
         // Drawing the pieces on the board
@@ -371,26 +370,24 @@ Page {
             id: userTime
             property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
-            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
-
+            property int increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
                 var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-
-                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
+                return (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
             }
-            text: time
+            text: time // FIXME a sync with the server time is expected here
             color: "black" // or white, opposite of opponentZone
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
-           anchors.verticalCenter: userZone.verticalCenter
+            anchors.verticalCenter: userZone.verticalCenter
             anchors.right: userZone.right
             anchors.rightMargin: 10
 
             Timer  {
                 id: userTimer
-                interval: 1000; running: true; repeat: true;
+                interval: 1000; running: false; repeat: true;
                 onTriggered: userTime.milliseconds -= 1000
             }
         }
@@ -446,9 +443,12 @@ Page {
                     if (checkMove.colorPlaying === "white") // turn for the other player
                         checkMove.colorPlaying = "black"
                     else checkMove.colorPlaying = "white"
-                    if (userTimer.running === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
-                    { userTimer.running = false ; opponentTimer.running = true }
-                    else { opponentTimer.running = false ; userTimer.running = true }
+                    // Stop & start timers
+                    if (checkMove.firstMove === false) opponentTimer.running = true // FIXME if the opponent starts, the backend needs to set this variable to true
+                    else if (userTimer.running === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
+                    { userTimer.running = false ; opponentTimer.running = true ; opponentTime.milliseconds += opponentTime.increment }
+                    else { opponentTimer.running = false ; userTimer.running = true ; userTime.milliseconds += userTime.increment }
+                    checkMove.firstMove = true
                 }
             }
 
