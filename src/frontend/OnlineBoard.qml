@@ -136,7 +136,7 @@ Page {
             id: opponentTime
             property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
-            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
+            property int increment
 
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
@@ -202,7 +202,7 @@ Page {
             property int fromIndex: -1
             property string fromKing // only needed for castling
             property int toIndex
-            property bool firstTurn: false // Used by the timer to know when to start
+            property int moveNumber: 0 // Used by the timer to know when to start
         }
 
         // Drawing the pieces on the board
@@ -372,20 +372,19 @@ Page {
             id: userTime
             property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
-            property int increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
+            property int increment
 
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
                 var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
+                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)}
 
-                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
-            }
             text: time
             color: "black" // or white, opposite of opponentZone
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
-           anchors.verticalCenter: userZone.verticalCenter
+            anchors.verticalCenter: userZone.verticalCenter
             anchors.right: userZone.right
             anchors.rightMargin: 10
 
@@ -444,13 +443,15 @@ Page {
                                              squareColor: "transparent"})
                     checkMove.fromIndex = -1 // back to pre-move conditions
                     confirmButton.visible = false
-                    if (checkMove.firstTurn === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
+
+                    checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
+                    if (checkMove.moveNumber === 3) { userTime.increment = 5000 ; opponentTime.increment = 5000 } // FIXME increments must be substituted by variables
+                    if (checkMove.moveNumber > 1)
                     { if (userTimer.running === true)
-                        { userTimer.running = false ; opponentTimer.running = true }
-                        else { opponentTimer.running = false ; userTimer.running = true }}
-                    else { if (checkMove.colorPlaying === "white")
-                            checkMove.firstTurn = true }
-                    console.log(checkMove.colorPlaying + " " + checkMove.firstTurn  + " " + userTimer.running + " " + opponentTimer.running)
+                        { userTime.milliseconds += userTime.increment ; userTimer.running = false ; opponentTimer.running = true }
+                        else { opponentTime.milliseconds += opponentTime.increment ; opponentTimer.running = false ; userTimer.running = true }}
+
+                    console.log(checkMove.colorPlaying + " " + checkMove.moveNumber  + " " + userTimer.running + " " + opponentTimer.running)
                     if (checkMove.colorPlaying === "white") // turn for the other player
                         checkMove.colorPlaying = "black"
                     else checkMove.colorPlaying = "white"
