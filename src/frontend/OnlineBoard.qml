@@ -202,6 +202,7 @@ Page {
             property int fromIndex: -1
             property string fromKing // only needed for castling
             property int toIndex
+            property bool firstTurn: false // Used by the timer to know when to start
         }
 
         // Drawing the pieces on the board
@@ -371,7 +372,7 @@ Page {
             id: userTime
             property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
-            property string increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
+            property int increment: 1000 * 5 // 5 seconds, FIXME needs to be a real variable
 
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
@@ -390,7 +391,7 @@ Page {
 
             Timer  {
                 id: userTimer
-                interval: 1000; running: true; repeat: true;
+                interval: 1000; running: false; repeat: true;
                 onTriggered: userTime.milliseconds -= 1000
             }
         }
@@ -443,12 +444,16 @@ Page {
                                              squareColor: "transparent"})
                     checkMove.fromIndex = -1 // back to pre-move conditions
                     confirmButton.visible = false
+                    if (checkMove.firstTurn === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
+                    { if (userTimer.running === true)
+                        { userTimer.running = false ; opponentTimer.running = true }
+                        else { opponentTimer.running = false ; userTimer.running = true }}
+                    else { if (checkMove.colorPlaying === "white")
+                            checkMove.firstTurn = true }
+                    console.log(checkMove.colorPlaying + " " + checkMove.firstTurn  + " " + userTimer.running + " " + opponentTimer.running)
                     if (checkMove.colorPlaying === "white") // turn for the other player
                         checkMove.colorPlaying = "black"
                     else checkMove.colorPlaying = "white"
-                    if (userTimer.running === true) // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
-                    { userTimer.running = false ; opponentTimer.running = true }
-                    else { opponentTimer.running = false ; userTimer.running = true }
                 }
             }
 
