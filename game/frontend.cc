@@ -274,12 +274,8 @@ void Frontend::login(const QString &username,
     sendCommand(&login);
 }
 
-void Frontend::play(uint id,
-                    const QString &local_identifier,
-                    const QString &remote_identifier)
+void Frontend::play(uint id)
 {
-    Q_D(Frontend);
-    d->registry.registerGameWithFrontend(createGame(d->dispatcher.data(), local_identifier, remote_identifier), this);
     Command::Play play(TargetBackend, id);
     sendCommand(&play);
 }
@@ -297,16 +293,18 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
     }
 }
 
-void Frontend::setLocalSide(const WeakSide &side)
+void Frontend::registerGame(Game *game)
 {
-    Q_D(Frontend);
-    d->local_side = side;
-}
+    if (not game) {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Cannot register invalid game!";
+        return;
+    }
 
-void Frontend::setRemoteSide(const WeakSide &side)
-{
     Q_D(Frontend);
-    d->remote_side = side;
+    d->local_side = game->localSide();
+    d->remote_side = game->remoteSide();
+    d->registry.registerGame(game);
 }
 
 void Frontend::sendCommand(AbstractCommand *command)
