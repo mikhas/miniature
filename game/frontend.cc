@@ -258,6 +258,9 @@ void Frontend::show(const QUrl &ui)
     out << "Welcome to Miniature!\n";
 }
 
+void Frontend::showBoard()
+{}
+
 void Frontend::handleRecord(const Record &)
 {}
 

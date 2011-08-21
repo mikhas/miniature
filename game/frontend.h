@@ -49,6 +49,7 @@ public:
                       QObject *parent = 0);
     virtual ~Frontend();
     virtual void show(const QUrl &ui);
+    virtual void showBoard();
 
     virtual void handleRecord(const Record &r);
     virtual void handleSeek(const Seek &s);

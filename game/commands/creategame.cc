@@ -20,14 +20,21 @@
 
 #include "creategame.h"
 #include "frontend.h"
+#include "game.h"
 
 namespace Game { namespace Command {
 
 CreateGame::CreateGame(Target t,
-                       uint id)
+                       uint id,
+                       const WeakDispatcher &dispatcher,
+                       const QString &local_id,
+                       const QString &remote_id)
     : AbstractCommand(t)
     , m_target(t)
     , m_game_id(id)
+    , m_dispatcher(dispatcher)
+    , m_local_id(local_id)
+    , m_remote_id(remote_id)
 {}
 
 CreateGame::~CreateGame()
@@ -40,7 +47,10 @@ Target CreateGame::target() const
 
 bool CreateGame::exec(Frontend *target)
 {
-    Q_UNUSED(target)
+    Game *game = createGame(m_dispatcher.data(), m_local_id, m_remote_id);
+    target->registerGame(game);
+    target->showBoard();
+
     return false;
 }
 

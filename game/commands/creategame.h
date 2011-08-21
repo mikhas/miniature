@@ -18,12 +18,12 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYCOMMAND_H
-#define PLAYCOMMAND_H
+#ifndef CREATEGAME_H
+#define CREATEGAME_H
 
 #include "abstractcommand.h"
 #include "abstractbackend.h"
-#include "game.h"
+#include "dispatcher.h"
 
 #include <QtCore>
 
@@ -37,11 +37,17 @@ class CreateGame
 private:
     const Target m_target;
     const uint m_game_id;
+    const WeakDispatcher m_dispatcher;
+    const QString m_local_id;
+    const QString m_remote_id;
 
 public:
     //! \reimp
     explicit CreateGame(Target t,
-                        uint id = 0);
+                        uint id,
+                        const WeakDispatcher &dispatcher,
+                        const QString &local_id,
+                        const QString &remote_id);
     virtual ~CreateGame();
     virtual Target target() const;
     virtual bool exec(Frontend *target);
@@ -50,4 +56,4 @@ public:
 
 }} // namespace Command, Game
 
-#endif // PLAYCOMMAND_H
+#endif // CREATECGAME_H
