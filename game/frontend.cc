@@ -280,7 +280,7 @@ void Frontend::play(uint id,
 {
     Q_D(Frontend);
     d->registry.registerGameWithFrontend(createGame(d->dispatcher.data(), local_identifier, remote_identifier), this);
-    Command::Play play(TargetGame, id);
+    Command::Play play(TargetBackend, id);
     sendCommand(&play);
 }
 

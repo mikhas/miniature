@@ -29,22 +29,22 @@
 
 namespace Game { namespace Command {
 
-//! Command to start a game. Takes an (optional) advertisement id, in case this
-//! is a reponse to a previous game advertisement.
-class Play
+//! Command to create a game. Takes a game id which will stay valid for the
+//! duration of the game. In case id is 0, a unique identifier will be created.
+class CreateGame
     : public AbstractCommand
 {
 private:
-    Target m_target;
-    uint m_advertisement_id;
+    const Target m_target;
+    const uint m_game_id;
 
 public:
     //! \reimp
-    explicit Play(Target t,
-                  uint id = 0);
-    virtual ~Play();
+    explicit CreateGame(Target t,
+                        uint id = 0);
+    virtual ~CreateGame();
     virtual Target target() const;
-    virtual bool exec(AbstractBackend *target);
+    virtual bool exec(Frontend *target);
     //! \reimp_end
 };
 

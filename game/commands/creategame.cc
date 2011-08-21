@@ -18,36 +18,31 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYCOMMAND_H
-#define PLAYCOMMAND_H
-
-#include "abstractcommand.h"
-#include "abstractbackend.h"
-#include "game.h"
-
-#include <QtCore>
+#include "creategame.h"
+#include "frontend.h"
 
 namespace Game { namespace Command {
 
-//! Command to start a game. Takes an (optional) advertisement id, in case this
-//! is a reponse to a previous game advertisement.
-class Play
-    : public AbstractCommand
-{
-private:
-    Target m_target;
-    uint m_advertisement_id;
+CreateGame::CreateGame(Target t,
+                       uint id)
+    : AbstractCommand(t)
+    , m_target(t)
+    , m_game_id(id)
+{}
 
-public:
-    //! \reimp
-    explicit Play(Target t,
-                  uint id = 0);
-    virtual ~Play();
-    virtual Target target() const;
-    virtual bool exec(AbstractBackend *target);
-    //! \reimp_end
-};
+CreateGame::~CreateGame()
+{}
+
+Target CreateGame::target() const
+{
+    return m_target;
+}
+
+bool CreateGame::exec(Frontend *target)
+{
+    Q_UNUSED(target)
+    return false;
+}
 
 }} // namespace Command, Game
 
-#endif // PLAYCOMMAND_H

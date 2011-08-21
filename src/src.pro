@@ -35,6 +35,7 @@ LIBS += \
         $${GAME_DIR}/commands/record.h \
         $${GAME_DIR}/commands/play.h \
         $${GAME_DIR}/commands/move.h \
+        $${GAME_DIR}/commands/creategame.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -56,6 +57,7 @@ LIBS += \
         $${GAME_DIR}/commands/record.cc \
         $${GAME_DIR}/commands/play.cc \
         $${GAME_DIR}/commands/move.cc \
+        $${GAME_DIR}/commands/creategame.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \
