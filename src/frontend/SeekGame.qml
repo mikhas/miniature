@@ -316,7 +316,8 @@ Page {
                             anchors.centerIn: parent
                             onClicked: {
                                 console.log(model.playerName)
-                                miniature.play(model.id, "Your Name", model.playerName)
+                                // TODO: Uncomment to active play feature, but right now it is kind of rude to the other FICS players (since we cannot play yet).
+                                //miniature.play(model.id, "Your Name", model.playerName)
                                 loadScreen("OnlineBoard.qml")
                             }
                         }
