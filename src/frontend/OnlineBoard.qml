@@ -22,6 +22,7 @@ Page {
         width: parent.width
         height: 70
         anchors.top: parent.top
+        z: 30
 
         Text {
             id: typeChess
@@ -77,39 +78,118 @@ Page {
     // Chat area
     Rectangle {
         id: chatBkg
+        property bool expanded: false
         color:  "lightgray"
         anchors.top: headerBackground.bottom
         anchors.bottom: opponentZone.top
         anchors.bottomMargin: 5
         anchors.left: parent.left
-        anchors.leftMargin: 10
         anchors.right: parent.right
-        anchors.rightMargin: 10
+        z: 20
 
-        Text {
+        Text { // It would be cool to have different text colors for FICS, user and opponent - inspired in IRC & Eboard's console.
             id: chatLog
             font.pointSize: 16
             anchors.fill: parent
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
             clip: true
+            lineHeight: 1.5
             wrapMode: Text.Wrap
             verticalAlignment: Text.AlignBottom
 
             // FIXME this needs to be the real log from FICS
             property string liveLog:
-                ":FICS - game25 Garry vs Me 10 05 Rated started.\n:Me - Hi from $PLACE! I'm playing with my $DEVICE - sorry if I don't talk too much...\n:Garry - Hi from Baku. No problem, this is my first game here. Please have some mercy with me!"
+                "Creating: Garry (1333) (++++) Me (1333) unrated standard 10 05\n> Hi from $PLACE! I'm playing with my $DEVICE - sorry if I don't talk too much...\nGarry: Hi from Baku. No problem, this is my first game here. Please have some mercy with me!"
             text: chatLog.liveLog
         }
+
+        MouseArea {
+            id: chatArea
+            anchors.fill: parent
+            onClicked: {
+                if ( chatBkg.state === "" ) chatBkg.state = "expanded"
+                else chatBkg.state = ""
+            }
+        }
+
+        states: [
+
+            State {
+                name: "expanded"
+                PropertyChanges {
+                    target: chatField
+                    visible: true
+                }
+                PropertyChanges {
+                    target: chatInputArea
+                    visible: true
+                    opacity: 0.8
+                }
+                PropertyChanges {
+                    target: chatButton
+                    visible: true
+                }
+                PropertyChanges {
+                    target: chatBkg
+                    anchors.bottom: chatInputArea.top
+                    anchors.bottomMargin: 0
+                    color: "black"
+                    opacity: 0.8
+                }
+                PropertyChanges {
+                    target: chatLog
+                    color: "white"
+
+                }
+            }
+        ]
     }
 
     Rectangle { // Little effect of shadow in chat
         width: ficsBoard.width
         height: 15
-        z: +2
+        z: +22
         anchors.top: headerBackground.bottom
         gradient: Gradient {
             GradientStop { position: 0.0; color: "black" }
             GradientStop { position: 1.0; color: "transparent" }
         }
+    }
+
+    Rectangle { // Chat input area, only visible when chat is expanded
+        id: chatInputArea
+        height: 80
+        anchors.bottom: userZone.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: "black"
+        visible: false
+        z: 20
+
+    TextField {
+        id: chatField
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+        anchors.right: chatButton.left
+        anchors.rightMargin: 10
+        visible: false
+        z: 20
+    }
+
+    Button {
+        id: chatButton
+        text: "Chat"
+        width: 100
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 10
+        visible: false
+        z: 20
+    }
     }
 
 
