@@ -1,0 +1,64 @@
+fics% play 11
+
+Creating: GuestKSHN (++++) testonetwo (++++) unrated standard 999 999
+{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}
+
+<12> rnbqkbnr pppppppp -------- -------- -------- -------- PPPPPPPP RNBQKBNR W -1 1 1 1 1 0 414 GuestKSHN testonetwo 1 999 999 39 39 36000 36000 1 none (0:00) none 0 0 0
+fics% g4      
+
+<12> rnbqkbnr pppppppp -------- -------- ------P- -------- PPPPPP-P RNBQKBNR B 6 1 1 1 1 0 414 GuestKSHN testonetwo -1 999 999 39 39 36000 36000 1 P/g2-g4 (0:00) g4 0 0 0
+fics% 
+<12> rnbqkbnr pppp-ppp -------- ----p--- ------P- -------- PPPPPP-P RNBQKBNR W 4 1 1 1 1 0 414 GuestKSHN testonetwo 1 999 999 39 39 36000 36000 2 P/e7-e5 (0:00) e5 0 1 0
+fics% 
+GuestMQJM(U)(53): thanks formerly GuestSXSR  :)
+fics% observe 270
+You are now observing game 270.
+Game 270: Razo (2154) YScorpion (2392) rated bughouse 2 0
+
+<12> r----r-k p-p---pp --p---b- ---n---- ---N-pbB --P--N-- PP--BPPP R---KR-- W -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 40 34 89 85 23 B/f5-g4 (0:01) Bxg4 0 1 0
+<b1> game 270 white [BQ] black [NBB]
+fics% 
+<12> r----r-k p-p---pp --p---b- ---n---- ---N-pbB --PB-N-- PP--BPPP R---KR-- B -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 40 34 88 85 23 B/@@-d3 (0:07) B@d3 0 1 135
+<b1> game 270 white [Q] black [NBB]
+fics% play
+<12> r----r-k p-p---pp --p----- ---n---- ---N-pbB --Pb-N-- PP--BPPP R---KR-- W -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 37 34 88 78 24 B/g6-d3 (0:08) Bxd3 0 1 274
+<b1> game 270 white [Q] black [NBB]
+fics% 
+<b1> game 270 white [PQ] black [NBB] <- WP
+fics% 
+<12> r----r-k p-p---pp --p----- ---n---- ---N-pbB --PB-N-- PP---PPP R---KR-- B -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 38 31 87 78 24 B/e2-d3 (0:01) Bxd3 0 1 103
+<b1> game 270 white [PQ] black [NBB]
+fic   
+<12> ----rr-k p-p---pp --p----- ---n---- ---N-pbB --PB-N-- PP---PPP R---KR-- W -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 38 31 87 78 25 R/a8-e8 (0:00) Rae8+ 0 1 561
+<b1> game 270 white [PQ] black [NBB]
+fics% 
+<b1> game 270 white [PQ] black [PNBB] <- BP
+fics%     
+<12> ----rr-k p-p---pp --p-P--- ---n---- ---N-pbB --PB-N-- PP---PPP R---KR-- B -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 38 32 84 78 25 P/@@-e6 (0:04) P@e6 0 1 528
+<b1> game 270 white [Q] black [PNBB]
+fics% f4
+<12> ----rr-k p-p---pp --p-b--- ---n---- ---N-p-B --PB-N-- PP---PPP R---KR-- W -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 37 32 84 76 26 B/g4-e6 (0:01) Bxe6 0 1 279
+<b1> game 270 white [Q] black [PNBB]
+fics% 
+
+<12> rnbqkbnr pppp-ppp -------- ----p--- -----PP- -------- PPPPP--P RNBQKBNR B 5 1 1 1 1 0 414 GuestKSHN testonetwo -1 999 999 39 39 36000 36000 2 P/f2-f4 (0:38) f4 0 1 0
+fics% 
+<12> ----rr-k p-p---pp --p-b--- ---n---- ---N-p-B --PB-N-- PP---PPP --KR-R-- B -1 0 0 0 0 0 270 Razo YScorpion 0 2 0 37 32 82 76 26 o-o-o (0:02) O-O-O 0 1 98
+<b1> game 270 white [Q] black [PNBB]
+fics% 
+<b1> game 270 white [RQ] black [PNBB] <- WR
+fics% 
+<12> ----rr-k p-p---pp --pbb--- ---n---- ---N-p-B --PB-N-- PP---PPP --KR-R-- W -1 0 0 0 0 0 270 Razo YScorpion 0 2 0 42 32 82 69 27 B/@@-d6 (0:07) B@d6 0 1 296
+<b1> game 270 white [RQ] black [PNB]
+fics% 
+<12> ----rr-k p-p---pB --pbb--- ---n---- ---N-p-B --P--N-- PP---PPP --KR-R-- B -1 0 0 0 0 0 270 Razo YScorpion 0 2 0 42 31 81 69 27 B/d3-h7 (0:01) Bxh7 0 1 99
+<b1> game 270 white [RQ] black [PNB]
+fics% 
+<b1> game 270 white [RRQ] black [PNB] <- WR
+fics% 
+<12> rnb-kbnr pppp-ppp -------- ----p--- -----PPq -------- PPPPP--P RNBQKBNR W -1 1 1 1 1 1 414 GuestKSHN testonetwo 1 999 999 39 39 36000 36000 3 Q/d8-h4 (0:13) Qh4# 0 1 0
+fics% 
+{Game 414 (GuestKSHN vs. testonetwo) GuestKSHN checkmated} 0-1
+
+No ratings adjustment done.
+fics% 
