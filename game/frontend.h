@@ -63,6 +63,11 @@ public:
                           const QString &local_identifier,
                           const QString &remote_identifier);
 
+    //! Toggles whether a game advertisement is highlighted. Only one ad can be
+    //! highlighted at a time.
+    //! @param id the game advertisement id
+    Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
+
     //! Sets the model representing the local side.
     //! @param side the local side.
     void setLocalSide(const WeakSide &side);

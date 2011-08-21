@@ -106,27 +106,34 @@ public:
         }
     }
 
-    virtual int columnCount(const QModelIndex &) const
+    virtual int columnCount(const QModelIndex &index = QModelIndex()) const
     {
+        Q_UNUSED(index)
         return 1;
     }
 
-    virtual int rowCount(const QModelIndex &) const
+    virtual int rowCount(const QModelIndex &index = QModelIndex()) const
     {
+        Q_UNUSED(index)
         return m_advertisements.size();
     }
 
-    virtual QModelIndex index(int row, int column, const QModelIndex &) const
+    virtual QModelIndex index(int row,
+                              int column,
+                              const QModelIndex &index = QModelIndex()) const
     {
+        Q_UNUSED(index)
         return createIndex(row, column);
     }
 
-    virtual QModelIndex parent(const QModelIndex &) const
+    virtual QModelIndex parent(const QModelIndex &index = QModelIndex()) const
     {
+        Q_UNUSED(index)
         return QModelIndex();
     }
 
-    virtual QVariant data(const QModelIndex &index, int role) const
+    virtual QVariant data(const QModelIndex &index,
+                          int role) const
     {
         if (m_advertisements.size() < index.row()) {
             return QVariant();
@@ -152,6 +159,30 @@ public:
         default:
             return QVariant();
         }
+    }
+
+    virtual bool setData(const QModelIndex &index,
+                         const QVariant &value,
+                         int role)
+    {
+        if (m_advertisements.size() < index.row()) {
+            return false;
+        }
+
+        Seek &s(m_advertisements[index.row()]);
+
+
+        switch(role) {
+        case RoleHighlighted: s.highlighted = value.toBool();
+            emit dataChanged(index, index);
+            return true;
+
+        // Other data is "read-only":
+        default:
+            break;
+        }
+
+        return false;
     }
 };
 
@@ -251,6 +282,19 @@ void Frontend::play(uint id,
     d->registry.registerGameWithFrontend(createGame(d->dispatcher.data(), local_identifier, remote_identifier), this);
     Command::Play play(TargetGame, id);
     sendCommand(&play);
+}
+
+void Frontend::toggleGameAdvertisementHighlighting(uint id)
+{
+    Q_D(Frontend);
+
+    for (int index = 0; index < d->advertisements.rowCount(); ++index) {
+        const QModelIndex mi(d->advertisements.index(index, 0));
+        const bool found(d->advertisements.data(mi, AdvertisementModel::RoleId).toUInt() == id);
+        const bool was_highlighted(d->advertisements.data(mi, AdvertisementModel::RoleHighlighted).toBool());
+
+        d->advertisements.setData(mi, found && not was_highlighted, AdvertisementModel::RoleHighlighted);
+    }
 }
 
 void Frontend::setLocalSide(const WeakSide &side)
