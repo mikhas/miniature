@@ -26,12 +26,16 @@
 namespace Game { namespace Command {
 
 Move::Move(Target target,
+           uint game_id,
            const Position &result,
            const MovedPiece &moved_piece)
     : AbstractCommand(target)
     , m_target(target)
+    , m_game_id(game_id)
     , m_result(result)
     , m_moved_piece(moved_piece)
+    , m_white()
+    , m_black()
 {}
 
 Move::~Move()
@@ -60,6 +64,11 @@ bool Move::exec(Frontend *)
     return false;
 }
 
+uint Move::gameId() const
+{
+    return m_game_id;
+}
+
 Position Move::result() const
 {
     return m_result;
@@ -68,6 +77,26 @@ Position Move::result() const
 MovedPiece Move::movedPiece() const
 {
     return m_moved_piece;
+}
+
+void Move::setWhite(const PlayerRecord &player_record)
+{
+    m_white = player_record;
+}
+
+PlayerRecord Move::white() const
+{
+    return m_white;
+}
+
+void Move::setBlack(const PlayerRecord &player_record)
+{
+    m_black = player_record;
+}
+
+PlayerRecord Move::black() const
+{
+    return m_black;
 }
 
 }} // namespace Command, Game

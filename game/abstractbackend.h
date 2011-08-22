@@ -37,11 +37,15 @@ struct RecordSeekBase
 //! Represents one player side in a game record.
 struct PlayerRecord
 {
+    bool valid;
     QByteArray name;
     uint rating;
     uint time_control; // in secs
     uint clock_time; // in secs
+    uint remaining_time; // in secs
     uint material_strength;
+
+    explicit PlayerRecord();
 };
 
 //! Represents one entry from a list of games.

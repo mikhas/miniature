@@ -22,6 +22,10 @@
 
 namespace Game {
 
+PlayerRecord::PlayerRecord()
+    : valid(false)
+{}
+
 AbstractBackend::AbstractBackend(QObject *parent)
     : QObject(parent)
 {}
