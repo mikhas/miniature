@@ -37,7 +37,7 @@ enum Rank
     Rank6,
     Rank7,
     Rank8,
-    RankCount
+    RankCount // Can also be used for invalid rank.
 };
 
 //! Enumeration of columns - called 'files' - on a chess board. Range: [A-H].
@@ -51,7 +51,7 @@ enum File
     FileF,
     FileG,
     FileH,
-    FileCount
+    FileCount // Can also be used for invalid file.
 };
 
 enum Mode {

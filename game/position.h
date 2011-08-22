@@ -60,10 +60,23 @@ struct MovedPiece
 };
 
 //! Represents a game position.
-struct Position
+class Position
 {
+public:
+    enum Castling {
+        CanWhiteCastleShort = 0x1,
+        CanWhiteCastleLong = 0x2,
+        CanBlackCastleShort = 0x4,
+        CanBlackCastleLong = 0x8
+    };
+
+    Q_DECLARE_FLAGS(CastlingFlags, Castling)
+
 private:
     QVector<Piece> m_board;
+    CastlingFlags m_castling_flags;
+    Color m_next_to_move;
+    File m_double_pawn_push;
 
 public:
     explicit Position();
@@ -71,6 +84,15 @@ public:
     Piece pieceAt(const Square &square) const;
     void setPieceAt(const Piece &piece,
                     const Square &square);
+
+    CastlingFlags castlingFlags() const;
+    void setCastlingFlags(const CastlingFlags &flags);
+
+    Color nextToMove() const;
+    void setNextToMove(Color color);
+
+    File doublePawnPush() const;
+    void setDoublePawnPush(File file);
 };
 
 //! A human readable notation of a move, based on the resulting position and

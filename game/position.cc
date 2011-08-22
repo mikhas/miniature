@@ -108,6 +108,10 @@ MovedPiece::MovedPiece(const Square &new_origin,
 
 Position::Position()
     : m_board(RankCount * FileCount)
+    , m_castling_flags(CanWhiteCastleShort | CanWhiteCastleLong
+                       | CanBlackCastleShort | CanBlackCastleLong)
+    , m_next_to_move(ColorAuto)
+    , m_double_pawn_push(FileCount) // mark as invalid;
 {}
 
 Piece Position::pieceAt(const Square &square) const
@@ -130,6 +134,36 @@ void Position::setPieceAt(const Piece &piece,
     }
 
     m_board[index] = piece;
+}
+
+Position::CastlingFlags Position::castlingFlags() const
+{
+    return m_castling_flags;
+}
+
+void Position::setCastlingFlags(const CastlingFlags &flags)
+{
+    m_castling_flags = flags;
+}
+
+Color Position::nextToMove() const
+{
+    return m_next_to_move;
+}
+
+void Position::setNextToMove(Color color)
+{
+    m_next_to_move = color;
+}
+
+File Position::doublePawnPush() const
+{
+    return m_double_pawn_push;
+}
+
+void Position::setDoublePawnPush(File file)
+{
+    m_double_pawn_push = file;
 }
 
 QString moveNotation(const Position &result,
