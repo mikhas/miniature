@@ -10,3 +10,4 @@ SUBDIRS = \
     testgnuchess \
     testfics \
     testlocalparser \
+    testposition \

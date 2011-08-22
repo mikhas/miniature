@@ -29,29 +29,29 @@ namespace Game
 //! Enumeration of rows - called 'ranks' - on a chess board. Range: [1-8].
 enum Rank
 {
-    RankInvalid, //!< Can be used as a default value.
-    Rank1,
+    Rank1 = 0,
     Rank2,
     Rank3,
     Rank4,
     Rank5,
     Rank6,
     Rank7,
-    Rank8
+    Rank8,
+    RankCount
 };
 
 //! Enumeration of columns - called 'files' - on a chess board. Range: [A-H].
 enum File
 {
-    FileInvalid, //!< Can be used as a default value.
-    FileA,
+    FileA = 0,
     FileB,
     FileC,
     FileD,
     FileE,
     FileF,
     FileG,
-    FileH
+    FileH,
+    FileCount
 };
 
 enum Mode {

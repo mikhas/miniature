@@ -26,20 +26,63 @@
 
 namespace Game {
 
-//! Represents a game position.
-struct Position
+//! Represents a piece.
+struct Piece
 {
 public:
-    explicit Position();
+    enum Type {
+        None,
+        Pawn,
+        Knight,
+        Bishop,
+        Rook,
+        Queen,
+        King
+    };
+
+    Type type;
+    Color color;
+
+    explicit Piece();
+    explicit Piece(Type new_type,
+                   Color new_color);
 };
 
 //! Convenience type that can be used to describe a move.
-typedef QPair<Square, Square> MovedPiece;
+struct MovedPiece
+{
+    const Square origin;
+    const Square target;
+
+    explicit MovedPiece();
+    explicit MovedPiece(const Square &new_origin,
+                        const Square &new_target);
+};
+
+//! Represents a game position.
+struct Position
+{
+private:
+    QVector<Piece> m_board;
+
+public:
+    explicit Position();
+
+    Piece pieceAt(const Square &square) const;
+    void setPieceAt(const Piece &piece,
+                    const Square &square);
+};
 
 //! A human readable notation of a move, based on the resulting position and
 //! the last moved piece.
 QString moveNotation(const Position &result,
                      const MovedPiece &moved_piece);
+
+//! Constructs start position.
+Position createStartPosition();
+
+bool operator==(const Piece &a,
+                const Piece &b);
 
 } // namespace Game
 

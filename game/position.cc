@@ -21,7 +21,7 @@
 #include "position.h"
 
 namespace {
-    QString fromSquare(const Game::Square &square)
+    QString toString(const Game::Square &square)
     {
         QString result;
 
@@ -71,20 +71,113 @@ namespace {
 
         return result;
     }
+
+    int toIndex(const Game::Square &square)
+    {
+        if (square.rank == Game::RankCount || square.file == Game::FileCount) {
+            return -1;
+        } else {
+            return (square.file + square.rank * Game::FileCount);
+        }
+    }
 }
 
 namespace Game {
 
-Position::Position()
+Piece::Piece()
+    : type(None)
+    , color(ColorAuto)
 {}
+
+Piece::Piece(Type new_type,
+             Color new_color)
+    : type(new_type)
+    , color(new_color)
+{}
+
+MovedPiece::MovedPiece()
+    : origin(Square(FileCount, RankCount))
+    , target(Square(FileCount, RankCount))
+{}
+
+MovedPiece::MovedPiece(const Square &new_origin,
+                       const Square &new_target)
+    : origin(new_origin)
+    , target(new_target)
+{}
+
+Position::Position()
+    : m_board(RankCount * FileCount)
+{}
+
+Piece Position::pieceAt(const Square &square) const
+{
+    const int index(toIndex(square));
+    if (index == -1) {
+        static Piece invalid;
+        return invalid;
+    }
+
+    return m_board.at(index);
+}
+
+void Position::setPieceAt(const Piece &piece,
+                          const Square &square)
+{
+    const int index(toIndex(square));
+    if (index == -1) {
+        return;
+    }
+
+    m_board[index] = piece;
+}
 
 QString moveNotation(const Position &result,
                      const MovedPiece &moved_piece)
 {
     Q_UNUSED(result)
     // TODO: This is gnuchess-style notation, allow for different types?
-    return QString("%1%2").arg(fromSquare(moved_piece.first))
-                          .arg(fromSquare(moved_piece.second));
+    return QString("%1%2").arg(toString(moved_piece.origin))
+                          .arg(toString(moved_piece.target));
+}
+
+Position createStartPosition()
+{
+    Position p;
+
+    for (int index = 0; index < FileCount; ++index) {
+        p.setPieceAt(Piece(Piece::Pawn, ColorWhite), Square(static_cast<File>(index), Rank2));
+        p.setPieceAt(Piece(Piece::Pawn, ColorBlack), Square(static_cast<File>(index), Rank7));
+    }
+
+    p.setPieceAt(Piece(Piece::Rook, ColorWhite), Square(FileA, Rank1));
+    p.setPieceAt(Piece(Piece::Rook, ColorWhite), Square(FileH, Rank1));
+    p.setPieceAt(Piece(Piece::Rook, ColorBlack), Square(FileA, Rank8));
+    p.setPieceAt(Piece(Piece::Rook, ColorBlack), Square(FileH, Rank8));
+
+    p.setPieceAt(Piece(Piece::Knight, ColorWhite), Square(FileB, Rank1));
+    p.setPieceAt(Piece(Piece::Knight, ColorWhite), Square(FileG, Rank1));
+    p.setPieceAt(Piece(Piece::Knight, ColorBlack), Square(FileB, Rank8));
+    p.setPieceAt(Piece(Piece::Knight, ColorBlack), Square(FileG, Rank8));
+
+    p.setPieceAt(Piece(Piece::Bishop, ColorWhite), Square(FileC, Rank1));
+    p.setPieceAt(Piece(Piece::Bishop, ColorWhite), Square(FileF, Rank1));
+    p.setPieceAt(Piece(Piece::Bishop, ColorBlack), Square(FileC, Rank8));
+    p.setPieceAt(Piece(Piece::Bishop, ColorBlack), Square(FileF, Rank8));
+
+    p.setPieceAt(Piece(Piece::Queen, ColorWhite), Square(FileD, Rank1));
+    p.setPieceAt(Piece(Piece::Queen, ColorBlack), Square(FileD, Rank8));
+
+    p.setPieceAt(Piece(Piece::King, ColorWhite), Square(FileE, Rank1));
+    p.setPieceAt(Piece(Piece::King, ColorBlack), Square(FileE, Rank8));
+
+    return p;
+}
+
+bool operator==(const Piece &a,
+                const Piece &b)
+{
+    return ((a.type == b.type) && (a.color == b.color));
 }
 
 } // namespace Game

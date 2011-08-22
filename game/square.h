@@ -33,8 +33,6 @@ public:
     const File file;
     const Rank rank;
 
-    explicit Square();
-
     explicit Square(File new_file,
                     Rank new_rank);
 };

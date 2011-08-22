@@ -8,9 +8,10 @@ Makefile
 lib*.so.*
 *.swo
 src/miniature
+src/qrc_frontend.cp
 tests/testgame/testgame
 tests/testgnuchess/testgnuchess
 tests/testlocalparser/testlocalparser
 tests/testficsparser/testficsparser
-src/qrc_frontend.cpp
 tests/testfics/testfics
+tests/testposition/testposition

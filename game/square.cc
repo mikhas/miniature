@@ -22,11 +22,6 @@
 
 namespace Game {
 
-Square::Square()
-    : file(FileInvalid)
-    , rank(RankInvalid)
-{}
-
 Square::Square(File new_file,
                Rank new_rank)
     : file(new_file)
