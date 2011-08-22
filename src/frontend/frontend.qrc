@@ -19,6 +19,5 @@
         <file>black/queen.png</file>
         <file>black/bishop.png</file>
         <file>BoardModel.qml</file>
-        <file>FicsBanner.jpg</file>
     </qresource>
 </RCC>

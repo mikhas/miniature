@@ -10,7 +10,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Rectangle {
         id: windowBackground
-        color: "#020167"
+        color: "lightgray"
         anchors.fill: parent
     }
 
@@ -37,48 +37,19 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.leftMargin: 10
     }
 
-Image {
-        id: ficsBanner
-        source: "FicsBanner.jpg"
-        width: parent.width // - 10
-        fillMode: Image.PreserveAspectFit
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: headerBackground.bottom
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Qt.openUrlExternally("http://freechess.org/")
+
+    Button {
+        id: anonymousButton
+        text: "Join as guest"
+        anchors.top: headerBackground.bottom
+        anchors.topMargin: 50
+        anchors.horizontalCenter: parent.horizontalCenter
+        onClicked: {
+            miniature.login("guest", "")
+            loadScreen("SeekGame.qml")
         }
     }
-
-    Rectangle {
-        id: whiteBackground
-        width: parent.width * 0.8
-        color: "white"
-        radius: 20
-        anchors.right: parent.right
-        anchors.top: ficsBanner.bottom
-        anchors.bottom: ficsFooter.top
-
-        Rectangle { // Just a patch to cover the top right rounded corner
-            color: "white"
-            width: 50
-            height: 50
-            anchors.top: parent.top
-            anchors.right: parent.right
-        }
-
-        Button {
-            id: anonymousButton
-            text: "Join as guest"
-            anchors.top: parent.top
-            anchors.topMargin: 50
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: {
-                miniature.login("guest", "")
-                loadScreen("SeekGame.qml")
-            }
-        }
 
         TextField {
             id: idForm
@@ -87,7 +58,6 @@ Image {
             anchors.topMargin: 70
             anchors.left: anonymousButton.left
             anchors.right: anonymousButton.right
-            z: 10
         }
         TextField {
             id: idPassword
@@ -121,34 +91,37 @@ Image {
             onClicked: { Qt.openUrlExternally("http://www.freechess.org/cgi-bin/Register/FICS_register.cgi") }
         }
 
+            Text {
+                id: ficsDescription
+                text: "freechess.org"
+                font.pointSize: 20
+                font.underline: true
+                color: "black"
+                height: 40
+                verticalAlignment: Text.AlignVCenter
+                anchors {
+                    top: registerButton.bottom
+                    topMargin: 20
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: Qt.openUrlExternally("http://freechess.org/") }
+            }
+
+
         Button { // Provisional button to access OnlineBoard for testing purposes
             id: testingButton
             text:  "Testing: OnlineBoard"
             opacity: 0.3
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 10
+            anchors.top: registerButton.bottom
+            anchors.topMargin: 200
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: loadScreen("OnlineBoard.qml")
         }
-    }
 
-    Text {
-        id: ficsFooter
-        text: "info: freechess.org"
-        font.pointSize: 20
-        font.bold: true
-        color: "white"
-        height:  40
-        verticalAlignment: Text.AlignVCenter
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: 10
-            horizontalCenter: whiteBackground.horizontalCenter
-        }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Qt.openUrlExternally("http://freechess.org/") }
-    }
 }
+
 
