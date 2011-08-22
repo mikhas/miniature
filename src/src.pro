@@ -112,4 +112,5 @@ OTHER_FILES += \
     frontend/black/pawn.png \
     frontend/black/knight.png \
     frontend/black/king.png \
-    frontend/black/rook.png
+    frontend/black/rook.png \
+    frontend/FicsBanner.jpg
