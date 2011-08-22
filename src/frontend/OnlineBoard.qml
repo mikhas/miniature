@@ -79,16 +79,17 @@ Page {
     Rectangle {
         id: chatBkg
         property bool expanded: false
-        color:  "lightgray"
+        color: "black"
+        opacity: 0.8
         anchors.top: headerBackground.bottom
         anchors.bottom: opponentZone.top
-        anchors.bottomMargin: 5
         anchors.left: parent.left
         anchors.right: parent.right
         z: 20
 
         Text { // It would be cool to have different text colors for FICS, user and opponent - inspired in IRC & Eboard's console.
             id: chatLog
+            color: "white"
             font.pointSize: 16
             anchors.fill: parent
             anchors.leftMargin: 10
@@ -130,17 +131,22 @@ Page {
                     target: chatButton
                     visible: true
                 }
-                PropertyChanges {
+                AnchorChanges {
                     target: chatBkg
                     anchors.bottom: chatInputArea.top
-                    anchors.bottomMargin: 0
-                    color: "black"
-                    opacity: 0.8
                 }
-                PropertyChanges {
-                    target: chatLog
-                    color: "white"
+            }
+        ]
 
+        transitions: [
+            Transition {
+                ParallelAnimation  {
+                    running: true
+                    PropertyAnimation {
+                        property: "opacity"; from: 0; to: 0.8
+                        easing.type: Easing.OutQuint
+                    }
+                    AnchorAnimation { easing.type: Easing.OutQuint }
                 }
             }
         ]
@@ -167,29 +173,29 @@ Page {
         visible: false
         z: 20
 
-    TextField {
-        id: chatField
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        anchors.left: parent.left
-        anchors.leftMargin: 10
-        anchors.right: chatButton.left
-        anchors.rightMargin: 10
-        visible: false
-        z: 20
-    }
+        TextField {
+            id: chatField
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            anchors.right: chatButton.left
+            anchors.rightMargin: 10
+            visible: false
+            z: 20
+        }
 
-    Button {
-        id: chatButton
-        text: "Chat"
-        width: 100
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 10
-        visible: false
-        z: 20
-    }
+        Button {
+            id: chatButton
+            text: "Chat"
+            width: 100
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            visible: false
+            z: 20
+        }
     }
 
 
