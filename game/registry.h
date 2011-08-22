@@ -49,12 +49,6 @@ public:
     //! Registers a newly created game.
     //! @param game the game instance to register.
     void registerGame(Game *game);
-
-    //! Registers a newly created game and hooks up the frontend.
-    //! @param game the game instance to register.
-    //! @param frontend the frontend.
-    void registerGameWithFrontend(Game *game,
-                                  Frontend *frontend);
 };
 
 } // namespace Game

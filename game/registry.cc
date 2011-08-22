@@ -49,15 +49,4 @@ void Registry::registerGame(Game *game)
     }
 }
 
-void Registry::registerGameWithFrontend(Game *game,
-                                        Frontend *frontend)
-{
-    if (frontend) {
-        frontend->setLocalSide(game->localSide());
-        frontend->setRemoteSide(game->remoteSide());
-    }
-
-    registerGame(game);
-}
-
 } // namespace Game

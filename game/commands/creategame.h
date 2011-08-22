@@ -18,36 +18,42 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PLAYCOMMAND_H
-#define PLAYCOMMAND_H
+#ifndef CREATEGAME_H
+#define CREATEGAME_H
 
 #include "abstractcommand.h"
 #include "abstractbackend.h"
-#include "game.h"
+#include "dispatcher.h"
 
 #include <QtCore>
 
 namespace Game { namespace Command {
 
-//! Command to start a game. Takes an (optional) advertisement id, in case this
-//! is a reponse to a previous game advertisement.
-class Play
+//! Command to create a game. Takes a game id which will stay valid for the
+//! duration of the game. In case id is 0, a unique identifier will be created.
+class CreateGame
     : public AbstractCommand
 {
 private:
-    Target m_target;
-    uint m_advertisement_id;
+    const Target m_target;
+    const uint m_game_id;
+    const WeakDispatcher m_dispatcher;
+    const QString m_local_id;
+    const QString m_remote_id;
 
 public:
     //! \reimp
-    explicit Play(Target t,
-                  uint id = 0);
-    virtual ~Play();
+    explicit CreateGame(Target t,
+                        uint id,
+                        const WeakDispatcher &dispatcher,
+                        const QString &local_id,
+                        const QString &remote_id);
+    virtual ~CreateGame();
     virtual Target target() const;
-    virtual bool exec(AbstractBackend *target);
+    virtual bool exec(Frontend *target);
     //! \reimp_end
 };
 
 }} // namespace Command, Game
 
-#endif // PLAYCOMMAND_H
+#endif // CREATECGAME_H

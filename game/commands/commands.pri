@@ -7,6 +7,7 @@ HEADERS += \
     $${COMMANDS_DIR}/advertisement.h \
     $${COMMANDS_DIR}/play.h \
     $${COMMANDS_DIR}/move.h \
+    $${COMMANDS_DIR}/creategame.h \
 
 SOURCES += \
     $${COMMANDS_DIR}/login.cc \
@@ -15,6 +16,7 @@ SOURCES += \
     $${COMMANDS_DIR}/advertisement.cc \
     $${COMMANDS_DIR}/play.cc \
     $${COMMANDS_DIR}/move.cc \
+    $${COMMANDS_DIR}/creategame.cc \
 
 #INCLUDEPATH += $${COMMANDS_DIR}
 DEPENDPATH += $${COMMANDS_DIR}

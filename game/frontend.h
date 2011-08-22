@@ -49,6 +49,7 @@ public:
                       QObject *parent = 0);
     virtual ~Frontend();
     virtual void show(const QUrl &ui);
+    virtual void showBoard();
 
     virtual void handleRecord(const Record &r);
     virtual void handleSeek(const Seek &s);
@@ -59,17 +60,16 @@ public:
     //! Respond to a game advertisement. Will trigger a match if id is valid
     //! (and opponent accepts, in case of manual starts).
     //! @param id the game advertisement id.
-    Q_INVOKABLE void play(uint id,
-                          const QString &local_identifier,
-                          const QString &remote_identifier);
+    Q_INVOKABLE void play(uint id);
 
-    //! Sets the model representing the local side.
-    //! @param side the local side.
-    void setLocalSide(const WeakSide &side);
+    //! Toggles whether a game advertisement is highlighted. Only one ad can be
+    //! highlighted at a time.
+    //! @param id the game advertisement id
+    Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
 
-    //! Sets the model representing the remote side.
-    //! @param side the remote side.
-    void setRemoteSide(const WeakSide &side);
+    //! Registers a newly created game and hooks up the frontend.
+    //! @param game the game instance to register.
+    virtual void registerGame(Game *game);
 
 private:
     void sendCommand(AbstractCommand *command);

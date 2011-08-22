@@ -182,9 +182,7 @@ Page {
                 onRowsInserted: seekList.positionViewAtEnd()
             }
 
-            delegate:
-
-                Item {
+            delegate: Item {
                 id: listItem
                 property Item previouslySelected: gameData
                 property int previousIndex // Only used for debugging
@@ -203,6 +201,7 @@ Page {
                         color: "white"
                         opacity: 0.4
                         radius: 10
+                        visible:  model.highlighted
                     }
 
                     Text {
@@ -277,7 +276,7 @@ Page {
 
                         Text {
                             id: opponentInfo
-                            text: model.rating + " " + model.playerName + model.highlighted // FIXME highlighted used for debugging
+                            text: model.rating + " " + model.playerName
                             color: model.color == "black" ? "white"
                                                           : "black"
                             font.pointSize: 16
@@ -306,66 +305,31 @@ Page {
                             font.bold: true
                             font.pointSize: 40
                             color: "whitesmoke"
-                            visible: true
                             anchors.centerIn: parent
+                            visible: !model.highlighted
                         }
 
                         ToolIcon { // Confirms the game
                             id: confirmButton
                             iconId: "toolbar-add"
-                            visible: false
+                            visible: model.highlighted
                             anchors.centerIn: parent
                             onClicked: {
                                 console.log(model.playerName)
-                                miniature.play(model.id, "Your Name", model.playerName)
+                                // TODO: Uncomment to active play feature, but right now it is kind of rude to the other FICS players (since we cannot play yet).
+                                //miniature.play(model.id)
                                 loadScreen("OnlineBoard.qml")
                             }
                         }
                     }
-                }
 
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: gameData
-                    onClicked: {
-                        console.log(listItem.previouslySelected.state + " " + listItem.previousIndex)
-                        // if (listItem.previouslySelected.state === "highlighted") FIXME this should bring previous highlighted back to normal
-                        // listItem.previouslySelected.state = ""
-                        // seekList.model.set(listItem.previousIndex, { highlighted: false }) FIXME not working either
-                        if (listItem.state === "highlighted")
-                            listItem.state = ""
-                        else listItem.state = "highlighted"
-
-
-
-
-                    }
-                }
-                states: [
-                    State {
-                        name: "highlighted"
-                        PropertyChanges {
-                            target: confirmButton
-                            visible:true
-                        }
-                        PropertyChanges {
-                            target: nonselectedEffect
-                            visible: false
-                        }
-                        PropertyChanges {
-                            target: counter
-                            visible: false
-                        }
-                        StateChangeScript {
-                            script: {
-                                // seekList.model.set(index, { highlighted: false }) // FIXME not working
-                                listItem.previouslySelected = listItem
-                                listItem.previousIndex = index // only used for debugging
-                            }
+                    MouseArea {
+                        anchors.fill:  parent
+                        onClicked: {
+                            miniature.toggleGameAdvertisementHighlighting(model.id)
                         }
                     }
-                ]
-
+                }
             }
         }
     }

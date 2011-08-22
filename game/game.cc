@@ -35,7 +35,8 @@ namespace {
 
 namespace Game {
 
-Game *createGame(Dispatcher *dispatcher,
+Game *createGame(uint id,
+                 Dispatcher *dispatcher,
                  const QString &local_identifier,
                  const QString &remote_identifier)
 {
@@ -45,7 +46,7 @@ Game *createGame(Dispatcher *dispatcher,
 
     Side *local = new Side(local_identifier);
     Side *remote = new Side(remote_identifier);
-    Game *game = new Game(dispatcher, local, remote);
+    Game *game = new Game(id, dispatcher, local, remote);
 
     return game;
 }
@@ -53,16 +54,19 @@ Game *createGame(Dispatcher *dispatcher,
 class GamePrivate
 {
 public:
+    uint id;
     WeakDispatcher dispatcher;
     const QScopedPointer<Side> local; //!< Side of the local player.
     const QScopedPointer<Side> remote; //!< Side of the remote player.
     Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
 
-    explicit GamePrivate(Dispatcher *new_dispatcher,
+    explicit GamePrivate(uint new_id,
+                         Dispatcher *new_dispatcher,
                          Side *new_local,
                          Side *new_remote)
-        : dispatcher(new_dispatcher)
+        : id(new_id) // FIXME: create UID if 0
+        , dispatcher(new_dispatcher)
         , local(new_local)
         , remote(new_remote)
         , active(new_local)// FIXME: Set correct active side (could be remote) already during construction!
@@ -79,12 +83,13 @@ public:
     }
 };
 
-Game::Game(Dispatcher *dispatcher,
+Game::Game(uint id,
+           Dispatcher *dispatcher,
            Side *local,
            Side *remote,
            QObject *parent)
     : QObject(parent)
-    , d_ptr(new GamePrivate(dispatcher, local, remote))
+    , d_ptr(new GamePrivate(id, dispatcher, local, remote))
 {
     Q_D(Game);
 
@@ -94,6 +99,12 @@ Game::Game(Dispatcher *dispatcher,
 
 Game::~Game()
 {}
+
+uint Game::id() const
+{
+    Q_D(const Game);
+    return d->id;
+}
 
 void Game::play(uint advertisement_id)
 {

@@ -24,6 +24,7 @@ HEADERS += \
     dispatcher.h \
     registry.h \
     abstractcommand.h \
+    commands.h \
     commandline.h \
     abstractbackend.h \
     frontend.h \

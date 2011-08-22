@@ -21,25 +21,47 @@
 #include "testutils.h"
 #include "frontend.h"
 #include "fics/backend.h"
+#include "game.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
 
-namespace Game
-{
+namespace {
+    bool loadIntoCache(const QString &fileName,
+                       QVector<QByteArray> *cache)
+    {
+        QFile f(fileName);
+
+        if(not cache || not f.open(QIODevice::ReadOnly)) {
+            return false;
+        }
+
+        QByteArray line = f.readLine();
+        while (not line.isNull()) {
+            cache->append(line.trimmed());
+            line = f.readLine();
+        }
+
+        return (not cache->isEmpty());
+    }
+}
+
+namespace Game {
 class DummyFrontend
     : public Frontend
 {
 public:
     QVector<Record> m_received_records;
     QVector<Seek> m_received_seeks;
+    uint m_game_id;
 
     explicit DummyFrontend(Dispatcher *dispatcher,
                            QObject *parent = 0)
         : Frontend(dispatcher, parent)
         , m_received_records()
         , m_received_seeks()
+        , m_game_id(0)
     {}
 
     virtual ~DummyFrontend()
@@ -54,6 +76,11 @@ public:
     {
         m_received_seeks.append(s);
     }
+
+    virtual void registerGame(Game *game)
+    {
+        m_game_id = game->id();
+    }
 };
 
 }
@@ -66,21 +93,15 @@ class TestFics
 private:
     QScopedPointer<QApplication> m_app;
     QVector<QByteArray> m_session_log;
+    QVector<QByteArray> m_play_log;
     QTextStream m_out;
 
     Q_SLOT void initTestCase()
     {
         m_app.reset(TestUtils::createApp("testfics"));
 
-        QFile f(MINIATURE_FICS_SESSION_LOG);
-        QVERIFY(f.open(QIODevice::ReadOnly));
-
-        QByteArray line = f.readLine();
-        while (not line.isNull()) {
-            m_session_log.append(line.trimmed());
-            line = f.readLine();
-        }
-        QCOMPARE(m_session_log.size(), 872);
+        QVERIFY(loadIntoCache(MINIATURE_FICS_SESSION_LOG, &m_session_log));
+        QVERIFY(loadIntoCache(MINIATURE_FICS_PLAY_LOG, &m_play_log));
     }
 
     Q_SLOT void testParsing()
@@ -105,6 +126,13 @@ private:
 
         fics->processToken(m_session_log.at(635));
         QCOMPARE(frontend.m_received_seeks.size(), 1);
+
+        // Emable backend to parse create-game token:
+        fics->play(1);
+        QCOMPARE(fics->state(), Game::Fics::Backend::StatePlayPending);
+
+        fics->processToken(m_play_log.at(3));
+        QCOMPARE(frontend.m_game_id, 414u);
     }
 };
 
