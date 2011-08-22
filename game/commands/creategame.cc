@@ -47,7 +47,7 @@ Target CreateGame::target() const
 
 bool CreateGame::exec(Frontend *target)
 {
-    Game *game = createGame(m_dispatcher.data(), m_local_id, m_remote_id);
+    Game *game = createGame(m_game_id, m_dispatcher.data(), m_local_id, m_remote_id);
     target->registerGame(game);
     target->showBoard();
 

@@ -19,13 +19,24 @@
  */
 
 #include "fics/backend.h"
-#include "commands/record.h"
-#include "commands/advertisement.h"
+#include "commands.h"
 #include "linereader.h"
 
 namespace {
+    struct GameInfo {
+        uint id;
+        bool valid;
+        QByteArray local_identifier;
+        QByteArray remote_identifier;
+        Game::Mode mode;
+    };
+
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
+
+    // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
+    const QRegExp match_create_game("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
+                                    "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
 
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
     const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
@@ -137,6 +148,24 @@ namespace {
         return result;
     }
 
+    GameInfo parseCreateGame(const QByteArray &token)
+    {
+        GameInfo result;
+        bool converted = false;
+
+        result.valid = match_create_game.exactMatch(token);
+        if (not result.valid) {
+            return result;
+        }
+
+        result.id = match_create_game.cap(1).toUInt(&converted);
+        result.valid = result.valid && converted;
+        result.local_identifier = match_create_game.cap(2).toLatin1();
+        result.remote_identifier = match_create_game.cap(3).toLatin1();
+
+        return result;
+    }
+
     void debugOutput(const Game::Seek s)
     {
         qDebug() << s.valid
@@ -148,7 +177,6 @@ namespace {
                  << "rating range:" << s.rating_range;
     }
 
-
     void debugOutput(const Game::Record r)
     {
         qDebug() << r.valid
@@ -157,6 +185,12 @@ namespace {
                  << r.white.clock_time << r.black.clock_time
                  << r.white.material_strength << r.black.material_strength
                  << r.white_to_move << r.turn;
+    }
+
+    void debugOutput(const GameInfo gi)
+    {
+        qDebug() << gi.valid
+                 << gi.id << gi.local_identifier << gi.remote_identifier << gi.mode;
     }
 }
 
@@ -243,13 +277,9 @@ void Backend::login(const QString &username,
 
 void Backend::play(uint advertisement_id)
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     if (m_state != StateReady) {
         return;
     }
-
-    qDebug() << "play response to" << advertisement_id;
 
     m_state = StatePlayPending;
     emit stateChanged(m_state);
@@ -270,9 +300,17 @@ void Backend::processToken(const QByteArray &token)
         break;
 
     case StatePlayFailed:
-    case StatePlayPending:
-        processPlay(token);
-        break;
+    case StatePlayPending: {
+        const GameInfo &gi(parseCreateGame(token));
+        debugOutput(gi);
+        if (gi.valid) {
+            Command::CreateGame cg(TargetFrontend, gi.id, m_dispatcher.data(),
+                                   gi.local_identifier, gi.remote_identifier);
+            sendCommand(&cg);
+            m_state = StateReady;
+            emit stateChanged(m_state);
+        }
+    } break;
 
     case StateIdle:
         (void) m_channel.readAll();
@@ -282,17 +320,13 @@ void Backend::processToken(const QByteArray &token)
         const Seek &s(parseSeek(token));
         debugOutput(s);
         if (s.valid) {
-            if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                Command::Advertisement ac(TargetFrontend, s);
-                dispatcher->sendCommand(&ac);
-            }
+            Command::Advertisement ac(TargetFrontend, s);
+            sendCommand(&ac);
         } else {
             const Record &r(parseRecord(token));
             if (r.valid) {
-                if (Dispatcher *dispatcher = m_dispatcher.data()) {
-                    Command::Record rc(TargetFrontend, r);
-                    dispatcher->sendCommand(&rc);
-                }
+                Command::Record rc(TargetFrontend, r);
+                sendCommand(&rc);
             } else {
                 qDebug() << "Unknown token:" << token;
             }
@@ -347,20 +381,6 @@ void Backend::processLogin(const QByteArray &line)
     }
 }
 
-void Backend::processPlay(const QByteArray &line)
-{
-    static const QByteArray wait_for_accept("Issuing match request since the seek was set to manual.");
-    static const QByteArray offer_accepted("accepts the match offer.");
-
-    if (line.startsWith(wait_for_accept)) {
-        // OK, the seek included a manual game start, need to wait for acceptance of offer from other player.
-        // TODO: allow to cancel
-    } else if (line.endsWith(offer_accepted)) {
-        m_state = StateReady; // Actually, state is "in game", but not sure I want to treat that as a special case.
-        emit stateChanged(m_state);
-    }
-}
-
 void Backend::onHostFound()
 {
     // TODO: Handle retry attempts here.
@@ -385,6 +405,13 @@ void Backend::configurePrompt()
 
     m_channel.write("set style 12");
     m_channel.write("\n");
+}
+
+void Backend::sendCommand(AbstractCommand *command)
+{
+    if (Dispatcher *dispatcher = m_dispatcher.data()) {
+        dispatcher->sendCommand(command);
+    }
 }
 
 } // namespace Fics

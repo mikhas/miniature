@@ -34,10 +34,12 @@ class Dispatcher;
 class AbstractCommand;
 
 //! Creates a game
+//! @param id the game id. If 0 then an unique identifier will be created.
 //! @param dispatcher the dispatcher.
 //! @param local_identifier the identifier for the local side.
 //! @param remote_identifier the identifier for the remote side.
-Game *createGame(Dispatcher *dispatcher,
+Game *createGame(uint id,
+                 Dispatcher *dispatcher,
                  const QString &local_identifier,
                  const QString &remote_identifier);
 
@@ -61,14 +63,19 @@ public:
     };
 
     //! C'tor
+    //! @param id the game id. If 0 then an unique identifier will be created.
     //! @param local the local side, Game takes ownership.
     //! @param remote the remote side, Game takes ownership.
     //! @param parent the optional parent that owns this instance.
-    explicit Game(Dispatcher *dispatcher,
+    explicit Game(uint id,
+                  Dispatcher *dispatcher,
                   Side *local,
                   Side *remote,
                   QObject *parent = 0);
     virtual ~Game();
+
+    //! Returns this game's id.
+    uint id() const;
 
     //! Plays a game.
     //! @param advertisement_id the id of the game advertisement (optional).

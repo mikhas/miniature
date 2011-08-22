@@ -25,3 +25,4 @@
 #include "commands/record.h"
 #include "commands/play.h"
 #include "commands/move.h"
+#include "commands/creategame.h"

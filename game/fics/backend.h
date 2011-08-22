@@ -66,10 +66,10 @@ public:
 private:
     Q_SLOT void onReadyRead();
     void processLogin(const QByteArray &line);
-    void processPlay(const QByteArray &line);
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
     void configurePrompt();
+    void sendCommand(AbstractCommand *command);
 };
 
 } // namespace Fics

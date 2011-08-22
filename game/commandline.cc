@@ -120,7 +120,8 @@ void CommandLine::processToken(const QByteArray &token)
 
         // We leave it to the specific backend to deal with invalid
         // advertisement id's, it's optional anyway.
-        d->registry.registerGame(createGame(d->dispatcher.data(), "local", "remote"));
+        // TODO: Impl createGame command for CLI?
+        d->registry.registerGame(createGame(0, d->dispatcher.data(), "local", "remote"));
         Command::Play play(TargetGame, data.toUInt());
         sendCommand(&play);
     } else if (d->isCommand(CommandQuit, token)) {

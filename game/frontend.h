@@ -69,7 +69,7 @@ public:
 
     //! Registers a newly created game and hooks up the frontend.
     //! @param game the game instance to register.
-    void registerGame(Game *game);
+    virtual void registerGame(Game *game);
 
 private:
     void sendCommand(AbstractCommand *command);
