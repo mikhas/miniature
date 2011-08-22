@@ -49,7 +49,7 @@ private:
         Game::Dispatcher dispatcher;
         Game::Side *white = new Game::Side("white");
         Game::Side *black = new Game::Side("black");
-        Game::Game subject(&dispatcher, white, black);
+        Game::Game subject(0, &dispatcher, white, black);
         QCOMPARE(subject.activeSide().data(), white);
 
         // Trying to submit move before starting game => ignore:

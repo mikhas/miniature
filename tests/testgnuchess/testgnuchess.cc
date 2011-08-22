@@ -58,7 +58,7 @@ private:
         Game::GnuChess  *black = new Game::GnuChess("black");
         QSignalSpy whiteSpy(white, SIGNAL(turnEnded(Position,MovedPiece)));
         QSignalSpy blackSpy(black, SIGNAL(turnEnded(Position,MovedPiece)));
-        Game::Game game(&dispatcher, white, black);
+        Game::Game game(0, &dispatcher, white, black);
 
         QCOMPARE(game.activeSide().data(), white);
 
