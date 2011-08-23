@@ -23,6 +23,7 @@
 #include "fics/backend.h"
 #include "game.h"
 #include "position.h"
+#include "registry.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -78,14 +79,15 @@ public:
     {
         m_received_seeks.append(s);
     }
+};
 
-    virtual void registerGame(Game *game)
-    {
-        Frontend::registerGame(game);
-
-        m_game_id = game->id();
-        m_game = QWeakPointer<Game>(game);
-    }
+class DummyRegistry
+    : public Registry
+{
+    explicit DummyRegistry(Dispatcher *dispatcher,
+                           QObject *parent = 0)
+        : Registry(dispatcher, parent)
+    {}
 };
 
 }
@@ -112,13 +114,15 @@ private:
     Q_SLOT void testParsing()
     {
         Game::Dispatcher dispatcher;
+        Game::Registry *registry = new Game::Registry(&dispatcher);
+        dispatcher.resetRegistry(registry);
 
         Game::Fics::Backend *fics = new Game::Fics::Backend(&dispatcher);
         fics->enableTesting();
-        dispatcher.setActiveBackend(fics);
+        dispatcher.setBackend(fics);
 
         Game::DummyFrontend frontend(&dispatcher);
-        dispatcher.setActiveFrontend(&frontend);
+        dispatcher.setFrontend(&frontend);
 
         QCOMPARE(frontend.m_received_records.size(), 0);
         QCOMPARE(frontend.m_received_seeks.size(), 0);
@@ -137,10 +141,11 @@ private:
         QCOMPARE(fics->state(), Game::Fics::Backend::StatePlayPending);
 
         fics->processToken(m_play_log.at(3));
-        QCOMPARE(frontend.m_game_id, 414u);
+        Game::Game *game = registry->game(414u);
+        QVERIFY(game);
 
         fics->processToken(m_play_log.at(8));
-        const Game::Position &pos(frontend.m_game.data()->position());
+        const Game::Position &pos(game->position());
         QCOMPARE(pos.pieceAt(Game::toSquare("g4")),
                  Game::Piece(Game::Piece::Pawn, Game::ColorWhite));
         QCOMPARE(pos.nextToMove(), Game::ColorBlack);

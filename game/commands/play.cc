@@ -38,10 +38,9 @@ Target Play::target() const
     return m_target;
 }
 
-bool Play::exec(AbstractBackend *target)
+void Play::exec(AbstractBackend *target)
 {
     target->play(m_advertisement_id);
-    return false;
 }
 
 }} // namespace Command, Game

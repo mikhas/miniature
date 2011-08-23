@@ -113,7 +113,7 @@ void CommandLine::processToken(const QByteArray &token)
         const QByteArray &data(d->extractData(value, token));
         // FIXME: Convert into move command, use proper game id?
         qDebug() << __PRETTY_FUNCTION__ << data;
-        Command::Move move(TargetGame, 0, Position(), MovedPiece());
+        Command::Move move(TargetRegistry, 0, Position(), MovedPiece());
         sendCommand(&move);
     } else if (d->startsWithCommand(CommandPlay, token, &value)) {
         const QByteArray &data(d->extractData(value, token));
@@ -122,7 +122,7 @@ void CommandLine::processToken(const QByteArray &token)
         // advertisement id's, it's optional anyway.
         // TODO: Impl createGame command for CLI?
         d->registry.registerGame(createGame(0, d->dispatcher.data(), "local", "remote"));
-        Command::Play play(TargetGame, data.toUInt());
+        Command::Play play(TargetRegistry, data.toUInt());
         sendCommand(&play);
     } else if (d->isCommand(CommandQuit, token)) {
         Command::Logout logout(TargetBackend);

@@ -38,10 +38,9 @@ Target Record::target() const
     return m_target;
 }
 
-bool Record::exec(Frontend *target)
+void Record::exec(Frontend *target)
 {
     target->handleRecord(m_record);
-    return false;
 }
 
 }} // namespace Command, Game

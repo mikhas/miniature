@@ -35,12 +35,11 @@ class Registry
 {    
 private:
     WeakDispatcher m_dispatcher;
-    QList<Game *> m_games;
+    QVector<Game *> m_games;
 
 public:
     //! C'tor
-    //! @param dispatcher the (shared) dispatcher, Registry does not take
-    //!        ownership.
+    //! @param dispatcher the command dispatcher.
     //! @param parent the (optional) owner of this instance.
     explicit Registry(Dispatcher *dispatcher,
                       QObject *parent = 0);
@@ -49,6 +48,10 @@ public:
     //! Registers a newly created game.
     //! @param game the game instance to register.
     void registerGame(Game *game);
+
+    //! @returns game with given id, or 0 if not found.
+    //! @param id the game id.
+    Game * game(uint id) const;
 };
 
 } // namespace Game

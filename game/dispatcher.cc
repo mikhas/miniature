@@ -24,6 +24,7 @@
 #include "abstractbackend.h"
 #include "fics/backend.h"
 #include "game.h"
+#include "registry.h"
 
 namespace Game {
 
@@ -32,7 +33,7 @@ Dispatcher *createDispatcher(QObject *owner)
     Dispatcher *dispatcher = new Dispatcher(owner);
 
     // Use FICS backend, by default:
-    dispatcher->setActiveBackend(new Fics::Backend(dispatcher, owner));
+    dispatcher->setBackend(new Fics::Backend(dispatcher, owner));
 
     return dispatcher;
 }
@@ -42,18 +43,18 @@ class DispatcherPrivate
 public:
     QWeakPointer<Frontend> active_frontend;
     QWeakPointer<AbstractBackend> active_backend;
-    QWeakPointer<Game> active_game;
+    QScopedPointer<Registry> registry;
 
-    explicit DispatcherPrivate()
+    explicit DispatcherPrivate(Dispatcher *q)
         : active_frontend()
         , active_backend()
-        , active_game()
+        , registry(new Registry(q))
     {}
 };
 
 Dispatcher::Dispatcher(QObject *parent)
     : QObject(parent)
-    , d_ptr(new DispatcherPrivate)
+    , d_ptr(new DispatcherPrivate(this))
 {}
 
 Dispatcher::~Dispatcher()
@@ -65,43 +66,44 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
         return false;
     }
 
-    bool result = false;
-
     Q_D(Dispatcher);
+    bool result;
 
     switch(command->target()) {
     case TargetBackend:
         if (AbstractBackend *backend = d->active_backend.data()) {
-            result = command->exec(backend);
+            result = true;
+            command->exec(backend);
         }
         break;
 
     case TargetFrontend:
         if (Frontend *frontend = d->active_frontend.data()) {
-            result = command->exec(frontend);
+            result = true;
+            command->exec(frontend);
         }
         break;
 
-    case TargetGame:
-        if (Game *game = d->active_game.data()) {
-            result = command->exec(game);
-        }
+    case TargetRegistry:
+        result = true;
+        command->exec(d->registry.data());
         break;
 
     default:
+        result = false;
         break;
     }
 
     return result;
 }
 
-void Dispatcher::setActiveFrontend(Frontend *frontend)
+void Dispatcher::setFrontend(Frontend *frontend)
 {
     Q_D(Dispatcher);
     d->active_frontend = QWeakPointer<Frontend>(frontend);
 }
 
-void Dispatcher::setActiveBackend(AbstractBackend *backend)
+void Dispatcher::setBackend(AbstractBackend *backend)
 {
     Q_D(Dispatcher);
 
@@ -116,10 +118,10 @@ void Dispatcher::setActiveBackend(AbstractBackend *backend)
     }
 }
 
-void Dispatcher::setActiveGame(Game *game)
+void Dispatcher::resetRegistry(Registry *registry)
 {
     Q_D(Dispatcher);
-    d->active_game = QWeakPointer<Game>(game);
+    d->registry.reset(registry);
 }
 
 } // namespace Game

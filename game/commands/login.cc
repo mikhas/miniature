@@ -40,14 +40,13 @@ Target Login::target() const
     return m_target;
 }
 
-bool Login::exec(AbstractBackend *target)
+void Login::exec(AbstractBackend *target)
 {
     if (not target) {
-        return false;
+        return;
     }
 
     target->login(m_username, m_password);
-    return true;
 }
 
 }} // namespace Command, Game

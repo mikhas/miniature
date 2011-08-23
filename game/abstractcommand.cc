@@ -29,19 +29,13 @@ AbstractCommand::AbstractCommand(Target)
 AbstractCommand::~AbstractCommand()
 {}
 
-bool AbstractCommand::exec(Game *)
-{
-    return false;
-}
+void AbstractCommand::exec(Registry *)
+{}
 
-bool AbstractCommand::exec(AbstractBackend *)
-{
-    return false;
-}
+void AbstractCommand::exec(AbstractBackend *)
+{}
 
-bool AbstractCommand::exec(Frontend *)
-{
-    return false;
-}
+void AbstractCommand::exec(Frontend *)
+{}
 
 } // namespace Game

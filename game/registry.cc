@@ -43,10 +43,19 @@ void Registry::registerGame(Game *game)
     }
 
     m_games.append(game);
-
-    if (Dispatcher *dispatcher = m_dispatcher.data()) {
-        dispatcher->setActiveGame(m_games.last());
-    }
 }
+
+Game * Registry::game(uint id) const
+{
+    foreach(Game *g, m_games) {
+        if (g->id() == id) {
+            return g;
+        }
+    }
+
+    return 0;
+}
+
+
 
 } // namespace Game

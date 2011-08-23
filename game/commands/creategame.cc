@@ -19,7 +19,7 @@
  */
 
 #include "creategame.h"
-#include "frontend.h"
+#include "registry.h"
 #include "game.h"
 
 namespace Game { namespace Command {
@@ -45,13 +45,11 @@ Target CreateGame::target() const
     return m_target;
 }
 
-bool CreateGame::exec(Frontend *target)
+void CreateGame::exec(Registry *target)
 {
+    // TODO: Dont register game on frontend? Target should be game registry, use new command to inform frontend and backend about sides?
     Game *game = createGame(m_game_id, m_dispatcher.data(), m_local_id, m_remote_id);
     target->registerGame(game);
-    target->showBoard();
-
-    return false;
 }
 
 }} // namespace Command, Game

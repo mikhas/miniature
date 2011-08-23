@@ -30,7 +30,7 @@ int main(int argc, char ** argv)
 
     Game::Dispatcher *dispatcher = Game::createDispatcher(&app);
     Game::Frontend frontend(dispatcher);
-    dispatcher->setActiveFrontend(&frontend);
+    dispatcher->setFrontend(&frontend);
     frontend.show(QUrl("qrc:/main.qml"));
 
     return app.exec();

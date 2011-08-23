@@ -41,7 +41,7 @@ public:
                            const Seek &s);
     virtual ~Advertisement();
     virtual Target target() const;
-    virtual bool exec(Frontend *target);
+    virtual void exec(Frontend *target);
     //! \reimp_end
 };
 

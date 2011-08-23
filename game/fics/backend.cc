@@ -407,7 +407,7 @@ void Backend::processToken(const QByteArray &token)
         const GameInfo &gi(parseCreateGame(token));
         debugOutput(gi);
         if (gi.valid) {
-            Command::CreateGame cg(TargetFrontend, gi.id, m_dispatcher.data(),
+            Command::CreateGame cg(TargetRegistry, gi.id, m_dispatcher.data(),
                                    gi.local_identifier, gi.remote_identifier);
             sendCommand(&cg);
             m_state = StateReady;
@@ -422,7 +422,7 @@ void Backend::processToken(const QByteArray &token)
     case StateReady: {
         const GameUpdate &gu(parseGameUpdate(token));
         if (gu.valid) {
-            Command::Move m(TargetGame, gu.id, gu.position, gu.moved_piece);
+            Command::Move m(TargetRegistry, gu.id, gu.position, gu.moved_piece);
             m.setWhite(gu.white);
             m.setBlack(gu.black);
             sendCommand(&m);

@@ -67,10 +67,6 @@ public:
     //! @param id the game advertisement id
     Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
 
-    //! Registers a newly created game and hooks up the frontend.
-    //! @param game the game instance to register.
-    virtual void registerGame(Game *game);
-
 private:
     void sendCommand(AbstractCommand *command);
 };

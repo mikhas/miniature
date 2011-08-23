@@ -23,7 +23,7 @@
 
 #include "abstractcommand.h"
 #include "abstractbackend.h"
-#include "dispatcher.h"
+#include "registry.h"
 
 #include <QtCore>
 
@@ -50,7 +50,7 @@ public:
                         const QString &remote_id);
     virtual ~CreateGame();
     virtual Target target() const;
-    virtual bool exec(Frontend *target);
+    virtual void exec(Registry *target);
     //! \reimp_end
 };
 

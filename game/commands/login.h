@@ -44,7 +44,7 @@ public:
                    const QString &password);
     virtual ~Login();
     virtual Target target() const;
-    virtual bool exec(AbstractBackend *);
+    virtual void exec(AbstractBackend *);
     //! \reimp_end
 };
 

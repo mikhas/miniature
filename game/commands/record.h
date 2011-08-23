@@ -41,7 +41,7 @@ public:
                     const ::Game::Record &r);
     virtual ~Record();
     virtual Target target() const;
-    virtual bool exec(Frontend *target);
+    virtual void exec(Frontend *target);
     //! \reimp_end
 };
 

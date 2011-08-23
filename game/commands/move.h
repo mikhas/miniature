@@ -32,7 +32,7 @@
 namespace Game {
 
 class AbstractBackend;
-class Game;
+class Registry;
 class Frontend;
 
 namespace Command {
@@ -62,9 +62,7 @@ public:
 
     virtual ~Move();
     virtual Target target() const;
-    virtual bool exec(Game *target);
-    virtual bool exec(AbstractBackend *target);
-    virtual bool exec(Frontend *target);
+    virtual void exec(Registry *target);
     //! \reimp_end
 
     uint gameId() const;

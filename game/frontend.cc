@@ -193,7 +193,6 @@ public:
     CommandLine command_line;
     LineReader line_reader;
     AdvertisementModel advertisements;
-    Registry registry;
     WeakSide local_side;
     WeakSide remote_side;
 #ifdef MINIATURE_GUI_ENABLED
@@ -205,7 +204,6 @@ public:
         , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
-        , registry(new_dispatcher)
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -294,20 +292,6 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
 
         d->advertisements.setData(mi, found && not was_highlighted, AdvertisementModel::RoleHighlighted);
     }
-}
-
-void Frontend::registerGame(Game *game)
-{
-    if (not game) {
-        qWarning() << __PRETTY_FUNCTION__
-                   << "Cannot register invalid game!";
-        return;
-    }
-
-    Q_D(Frontend);
-    d->local_side = game->localSide();
-    d->remote_side = game->remoteSide();
-    d->registry.registerGame(game);
 }
 
 void Frontend::sendCommand(AbstractCommand *command)

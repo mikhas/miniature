@@ -20,8 +20,9 @@
 
 #include "move.h"
 #include "frontend.h"
-#include "game.h"
+#include "registry.h"
 #include "frontend.h"
+#include "game.h"
 
 namespace Game { namespace Command {
 
@@ -46,23 +47,12 @@ Target Move::target() const
     return m_target;
 }
 
-bool Move::exec(Game *game)
+void Move::exec(Registry *target)
 {
     // TBD
-    game->setPosition(m_result);
-    return false;
-}
-
-bool Move::exec(AbstractBackend *)
-{
-    // TBD
-    return false;
-}
-
-bool Move::exec(Frontend *)
-{
-    // TBD
-    return false;
+    if (Game *g = target->game(m_game_id)) {
+        g->setPosition(m_result);
+    }
 }
 
 uint Move::gameId() const

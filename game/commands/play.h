@@ -44,7 +44,7 @@ public:
                   uint id = 0);
     virtual ~Play();
     virtual Target target() const;
-    virtual bool exec(AbstractBackend *target);
+    virtual void exec(AbstractBackend *target);
     //! \reimp_end
 };
 

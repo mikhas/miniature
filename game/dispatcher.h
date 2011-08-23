@@ -32,7 +32,7 @@ class DispatcherPrivate;
 class AbstractCommand;
 class Frontend;
 class AbstractBackend;
-class Game;
+class Registry;
 
 Dispatcher *createDispatcher(QObject *owner = 0);
 
@@ -52,9 +52,12 @@ public:
     virtual ~Dispatcher();
 
     virtual bool sendCommand(AbstractCommand *command);
-    virtual void setActiveFrontend(Frontend *frontend);
-    virtual void setActiveBackend(AbstractBackend *backend);
-    virtual void setActiveGame(Game *game);
+    virtual void setFrontend(Frontend *frontend);
+    virtual void setBackend(AbstractBackend *backend);
+
+    //! Optional. Can be used to replace original registry.
+    //! @param registry the new registry instance, Dispatcher claims ownership.
+    virtual void resetRegistry(Registry *registry);
 };
 
 } // namespace Game

@@ -25,7 +25,7 @@
 
 namespace Game {
 
-class Game;
+class Registry;
 class AbstractBackend;
 class Frontend;
 
@@ -35,10 +35,8 @@ class Frontend;
 //! from a list of offered targets.
 enum Target {
     TargetFrontend, // GUI, command line, ...
-    TargetAnalyzer, // Used for move validation, position analysis. Can be a chess engine, such as gnuchess.
     TargetBackend, // The currently active backend, e.g., freechess.org
-    TargetGame, // The currently active game.
-    TargetBackgroundGames
+    TargetRegistry // The game registry. Knows about all (active) games.
 };
 
 //! Defines the interface for commands that can be send to/received from the
@@ -54,18 +52,14 @@ public:
     //! \returns the target for this command.
     virtual Target target() const = 0;
 
-    // TODO: Define set of interfaces for command receivers, so that we can
-    // have a set of exec overloads? Would allow to handle same command
-    // differently depending on receiver. Such receivers could be:
-    // - backends such as UI, local chess engine, remote server, PBeM
-    // - current game
-    // - local, remote, active side (of current game, but also of games running
-    //   background).
-    //! \returns whether the command was consumed. If true, this command will
-    //!          not call exec on a potentially next target.
-    virtual bool exec(Game *target);
-    virtual bool exec(AbstractBackend *target);
-    virtual bool exec(Frontend *target);
+    //! Execute command on registry.
+    virtual void exec(Registry *target);
+
+    //! Execute command on backend.
+    virtual void exec(AbstractBackend *target);
+
+    //! Execute command on frontend.
+    virtual void exec(Frontend *target);
 };
 
 } // namespace Game

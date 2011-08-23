@@ -38,10 +38,9 @@ Target Advertisement::target() const
     return m_target;
 }
 
-bool Advertisement::exec(Frontend *target)
+void Advertisement::exec(Frontend *target)
 {
     target->handleSeek(m_seek);
-    return false;
 }
 
 }} // namespace Command, Game
