@@ -99,6 +99,7 @@ OTHER_FILES += \
     frontend/chessboard.svg \
     frontend/main.qml \
     frontend/emptysquare.png \
+    frontend/miniatureBIG.png \
     frontend/BoardModel.qml \
     frontend/OnlineBoard.qml \
     frontend/white/bishop.png \

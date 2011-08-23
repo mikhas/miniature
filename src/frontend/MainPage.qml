@@ -14,6 +14,14 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.fill: parent
     }
 
+    Image {
+        source: "miniatureBIG.png"
+        x: -110
+        y: 100
+        height: 900
+        fillMode: Image.PreserveAspectCrop
+    }
+
 
     // How to define a proper header with platform style?
 
@@ -96,12 +104,12 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
                 text: "freechess.org"
                 font.pointSize: 20
                 font.underline: true
-                color: "black"
+                color: "white"
                 height: 40
                 verticalAlignment: Text.AlignVCenter
                 anchors {
                     top: registerButton.bottom
-                    topMargin: 20
+                    topMargin: 200
                     horizontalCenter: parent.horizontalCenter
                 }
 
@@ -111,15 +119,15 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             }
 
 
-        Button { // Provisional button to access OnlineBoard for testing purposes
-            id: testingButton
-            text:  "Testing: OnlineBoard"
-            opacity: 0.3
-            anchors.top: registerButton.bottom
-            anchors.topMargin: 200
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: loadScreen("OnlineBoard.qml")
-        }
+//        Button { // Provisional button to access OnlineBoard for testing purposes
+//            id: testingButton
+//            text:  "Testing: OnlineBoard"
+//            opacity: 0.3
+//            anchors.top: registerButton.bottom
+//            anchors.topMargin: 100
+//            anchors.horizontalCenter: parent.horizontalCenter
+//            onClicked: loadScreen("OnlineBoard.qml")
+//        }
 
 
 }
