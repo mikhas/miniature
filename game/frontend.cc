@@ -35,7 +35,7 @@ namespace Game { namespace {
     QString fromColor(Color color)
     {
         switch(color) {
-        case ColorAuto: return "auto";
+        case ColorNone: return "auto";
         case ColorWhite: return "white";
         case ColorBlack: return "black";
         }

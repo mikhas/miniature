@@ -86,7 +86,7 @@ namespace Game {
 
 Piece::Piece()
     : m_type(None)
-    , m_color(ColorAuto)
+    , m_color(ColorNone)
     , m_square(FileCount, RankCount)
 {}
 
@@ -118,21 +118,36 @@ void Piece::setSquare(const Square &square)
 }
 
 MovedPiece::MovedPiece()
-    : origin(Square(FileCount, RankCount))
-    , target(Square(FileCount, RankCount))
+    : m_piece()
+    , m_origin(Square(FileCount, RankCount))
 {}
 
-MovedPiece::MovedPiece(const Square &new_origin,
-                       const Square &new_target)
-    : origin(new_origin)
-    , target(new_target)
+MovedPiece::MovedPiece(const Piece &piece,
+                       const Square &origin)
+    : m_piece(piece)
+    , m_origin(origin)
 {}
+
+Piece MovedPiece::piece() const
+{
+    return m_piece;
+}
+
+Square MovedPiece::origin() const
+{
+    return m_origin;
+}
+
+Square MovedPiece::target() const
+{
+    return m_piece.square();
+}
 
 Position::Position()
-    : m_pieces(RankCount * FileCount)
+    : m_pieces()
     , m_castling_flags(CanWhiteCastleShort | CanWhiteCastleLong
                        | CanBlackCastleShort | CanBlackCastleLong)
-    , m_next_to_move(ColorAuto)
+    , m_next_to_move(ColorNone)
     , m_double_pawn_push(FileCount) // mark as invalid;
 {}
 
@@ -143,6 +158,14 @@ QVector<Piece> Position::pieces() const
 
 void Position::addPiece(const Piece &piece)
 {
+    if (piece.type() == Piece::None
+        || piece.square().file == FileCount
+        || piece.square().rank == RankCount) {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Refusing to add invalid piece to position.";
+        return;
+    }
+
     m_pieces.append(piece);
 }
 
@@ -192,8 +215,8 @@ QString moveNotation(const Position &result,
 {
     Q_UNUSED(result)
     // TODO: This is gnuchess-style notation, allow for different types?
-    return QString("%1%2").arg(toString(moved_piece.origin))
-                          .arg(toString(moved_piece.target));
+    return QString("%1%2").arg(toString(moved_piece.origin()))
+                          .arg(toString(moved_piece.target()));
 }
 
 Position createStartPosition()
@@ -250,6 +273,32 @@ bool operator==(const Piece &a,
                 const Piece &b)
 {
     return ((a.type() == b.type()) && (a.color() == b.color()));
+}
+
+Piece toPiece(char ch)
+{
+    Piece::Type t;
+    Color c;
+
+    switch (ch) {
+    case 'P': t = Piece::Pawn; c = ColorWhite; break;
+    case 'R': t = Piece::Rook; c = ColorWhite; break;
+    case 'N': t = Piece::Knight; c = ColorWhite; break;
+    case 'B': t = Piece::Bishop; c = ColorWhite; break;
+    case 'Q': t = Piece::Queen; c = ColorWhite; break;
+    case 'K': t = Piece::King; c = ColorWhite; break;
+
+    case 'p': t = Piece::Pawn; c = ColorBlack; break;
+    case 'r': t = Piece::Rook; c = ColorBlack; break;
+    case 'n': t = Piece::Knight; c = ColorBlack; break;
+    case 'b': t = Piece::Bishop; c = ColorBlack; break;
+    case 'q': t = Piece::Queen; c = ColorBlack; break;
+    case 'k': t = Piece::King; c = ColorBlack; break;
+
+    default: t = Piece::None; c = ColorNone; break;
+    }
+
+    return Piece(t, c);
 }
 
 } // namespace Game

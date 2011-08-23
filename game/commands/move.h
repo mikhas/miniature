@@ -22,16 +22,20 @@
 #define MOVECOMMAND_H
 
 #include "abstractcommand.h"
-#include "abstractbackend.h"
+#include "abstractbackend.h" // FIXME: PlayerRecord
+
 #include "position.h"
 #include "square.h"
 
 #include <QtCore>
 
-namespace Game { namespace Command {
+namespace Game {
 
+class AbstractBackend;
 class Game;
 class Frontend;
+
+namespace Command {
 
 //! Command to move a piece.
 class Move

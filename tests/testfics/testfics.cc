@@ -81,6 +81,8 @@ public:
 
     virtual void registerGame(Game *game)
     {
+        Frontend::registerGame(game);
+
         m_game_id = game->id();
         m_game = QWeakPointer<Game>(game);
     }
@@ -138,9 +140,10 @@ private:
         QCOMPARE(frontend.m_game_id, 414u);
 
         fics->processToken(m_play_log.at(8));
-        const Game::Position &p(frontend.m_game.data()->position());
-        QCOMPARE(p.pieceAt(Game::Square(Game::FileG, Game::Rank4)),
+        const Game::Position &pos(frontend.m_game.data()->position());
+        QCOMPARE(pos.pieceAt(Game::toSquare("g4")),
                  Game::Piece(Game::Piece::Pawn, Game::ColorWhite));
+        QCOMPARE(pos.nextToMove(), Game::ColorBlack);
     }
 };
 

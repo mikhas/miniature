@@ -21,6 +21,7 @@
 #include "fics/backend.h"
 #include "commands.h"
 #include "linereader.h"
+#include "position.h"
 
 namespace {
     struct GameInfo {
@@ -31,8 +32,31 @@ namespace {
         Game::Mode mode;
     };
 
+    struct GameUpdate
+            : public Game::RecordSeekBase
+    {
+        // Extracted from http://www.freechess.org/Help/HelpFiles/style12.html
+        enum Role {
+            IsolatedPosition = -3,
+            ObservingExaminedGame = -2,
+            Examiner = 2,
+            OpponentToMove = -1,
+            PlayerToMove = 1,
+            ObservingGame = 0
+        };
+
+        Game::PlayerRecord white;
+        Game::PlayerRecord black;
+        Role role;
+        Game::Position position;
+        Game::MovedPiece moved_piece;
+    };
+
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
+
+    // Matches: "P/g2-g4"
+    const QRegExp match_move("(\\w)/(\\w\\d)-(\\w\\d)");
 
     // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
     const QRegExp match_create_game("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
@@ -93,7 +117,7 @@ namespace {
         result.increment = match_seek.cap(4).toInt(&converted);
         result.valid = result.valid && converted;
         result.is_rated = (match_seek.cap(5) == "rated" || match_record.cap(5) == "r");
-        result.color = Game::ColorAuto;
+        result.color = Game::ColorNone;
         const QString color(match_seek.cap(8).toLower());
         if (color == "white" || color == "w") {
             result.color = Game::ColorWhite;
@@ -127,15 +151,12 @@ namespace {
         result.black.name = match_record.cap(5).toLatin1();
         // TODO: parse game mode.
         //result.mode = match_record.cap(6).toInt(&converted);
-        result.white.time_control = match_record.cap(7).toInt(&converted) * 60;
+        // TODO: Parse remaining_time
+        result.time = match_record.cap(7).toInt(&converted) * 60;
         result.valid = result.valid && converted;
-        result.black.time_control = match_record.cap(8).toInt(&converted) * 60;
+        result.increment = match_record.cap(9).toInt(&converted) * 60
+                            + match_record.cap(10).toInt(&converted);
         result.valid = result.valid && converted;
-        result.white.clock_time = match_record.cap(9).toInt(&converted) * 60
-                                + match_record.cap(10).toInt(&converted);
-        result.valid = result.valid && converted;
-        result.black.clock_time = match_record.cap(11).toInt(&converted) * 60
-                                + match_record.cap(12).toInt(&converted);
         result.valid = result.valid && converted;
         result.white.material_strength = match_record.cap(13).toInt(&converted);
         result.valid = result.valid && converted;
@@ -158,10 +179,92 @@ namespace {
             return result;
         }
 
+        // FIXME: Is it really local/remote, or white/black?
         result.id = match_create_game.cap(1).toUInt(&converted);
         result.valid = result.valid && converted;
         result.local_identifier = match_create_game.cap(2).toLatin1();
         result.remote_identifier = match_create_game.cap(3).toLatin1();
+
+        return result;
+    }
+
+    GameUpdate parseGameUpdate(const QByteArray &token)
+    {
+        // Need to parse
+        // <12> rnbqkbnr pppppppp -------- -------- ------P- -------- PPPPPP-P RNBQKBNR B 6 1 1 1 1 0 414 GuestKSHN testonetwo -1 999 999 39 39 36000 36000 1 P/g2-g4 (0:00) g4 0 0 0
+        // 0    1        2        3        4        5        6        7        8        9             16  17        18         19 20  21  22 23 24    25      27      28     29
+
+        GameUpdate result;
+        bool converted = false;
+
+        const QList<QByteArray> &cols(token.split(' '));
+        result.valid = (cols.size() == 33 && cols.at(0) == "<12>");
+
+        if (not result.valid) {
+            return result;
+        }
+
+        result.mode = Game::ModeNone; // n/a
+        result.white.rating = 0; // n/a
+        result.black.rating = 0; // n/a
+
+        result.id = cols.at(16).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.time = cols.at(20).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.increment = cols.at(21).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.white.name = cols.at(17);
+        result.black.name = cols.at(18);
+
+        result.role = static_cast<GameUpdate::Role>(cols.at(19).toInt(&converted));
+        result.valid = result.valid && converted;
+
+        result.valid = result.valid && match_move.exactMatch(cols.at(27));
+        Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0)));
+        p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
+        result.moved_piece = Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1()));
+
+        int dpp_file = cols.at(19).toInt(&converted);
+        result.valid = result.valid && converted;
+
+        Game::Position &pos = result.position;
+        pos.setDoublePawnPush(dpp_file == -1 ? Game::FileCount : static_cast<Game::File>(dpp_file));
+        pos.setNextToMove(cols.at(9) == "W" ? Game::ColorWhite : Game::ColorBlack);
+
+        Game::Position::CastlingFlags flags;
+
+        if (cols.at(10).toInt() == 1) {
+            flags |= Game::Position::CanWhiteCastleShort;
+        }
+
+        if (cols.at(11).toInt() == 1) {
+            flags |= Game::Position::CanWhiteCastleLong;
+        }
+
+        if (cols.at(12).toInt() == 1) {
+            flags |= Game::Position::CanBlackCastleShort;
+        }
+
+        if (cols.at(13).toInt() == 1) {
+            flags |= Game::Position::CanBlackCastleLong;
+        }
+
+        pos.setCastlingFlags(flags);
+
+        for (uint j = 0; j < Game::RankCount; ++j) {
+            const QByteArray &row(cols.at(1 + j));
+            for (uint i = 0; i < static_cast<uint>(row.size()); ++i) {
+                Game::Piece p(Game::toPiece(row.at(i)));
+                if (p.type() != Game::Piece::None) {
+                    p.setSquare(Game::toSquare(i, j));
+                    pos.addPiece(p);
+                }
+            }
+        }
 
         return result;
     }
@@ -181,9 +284,8 @@ namespace {
     {
         qDebug() << r.valid
                  << r.id << r.white.rating << r.white.name << r.black.rating << r.black.name
-                 << r.white.time_control << r.black.time_control
-                 << r.white.clock_time << r.black.clock_time
                  << r.white.material_strength << r.black.material_strength
+                 << r.time << r.increment
                  << r.white_to_move << r.turn;
     }
 
@@ -299,6 +401,7 @@ void Backend::processToken(const QByteArray &token)
         processLogin(token);
         break;
 
+    // TODO: This currently makes us ignore all other input, not good ...
     case StatePlayFailed:
     case StatePlayPending: {
         const GameInfo &gi(parseCreateGame(token));
@@ -317,18 +420,26 @@ void Backend::processToken(const QByteArray &token)
         break;
 
     case StateReady: {
-        const Seek &s(parseSeek(token));
-        debugOutput(s);
-        if (s.valid) {
-            Command::Advertisement ac(TargetFrontend, s);
-            sendCommand(&ac);
+        const GameUpdate &gu(parseGameUpdate(token));
+        if (gu.valid) {
+            Command::Move m(TargetGame, gu.id, gu.position, gu.moved_piece);
+            m.setWhite(gu.white);
+            m.setBlack(gu.black);
+            sendCommand(&m);
         } else {
-            const Record &r(parseRecord(token));
-            if (r.valid) {
-                Command::Record rc(TargetFrontend, r);
-                sendCommand(&rc);
+            const Seek &s(parseSeek(token));
+            debugOutput(s);
+            if (s.valid) {
+                Command::Advertisement ac(TargetFrontend, s);
+                sendCommand(&ac);
             } else {
-                qDebug() << "Unknown token:" << token;
+                const Record &r(parseRecord(token));
+                if (r.valid) {
+                    Command::Record rc(TargetFrontend, r);
+                    sendCommand(&rc);
+                } else {
+                    qDebug() << "Unknown token:" << token;
+                }
             }
         }
     } break;

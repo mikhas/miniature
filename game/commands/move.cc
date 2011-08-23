@@ -46,9 +46,10 @@ Target Move::target() const
     return m_target;
 }
 
-bool Move::exec(Game *)
+bool Move::exec(Game *game)
 {
     // TBD
+    game->setPosition(m_result);
     return false;
 }
 

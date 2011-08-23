@@ -34,4 +34,59 @@ bool operator==(const Square &a,
     return (a.file == b.file && a.rank == b.rank);
 }
 
+Square toSquare(uint file,
+                uint rank)
+{
+    File f = FileCount;
+    Rank r = RankCount;
+
+    if (file < FileCount) {
+        f = static_cast<File>(file);
+    }
+
+    if (rank < RankCount) {
+        r = static_cast<Rank>(rank);
+    }
+
+    return Square(f, r);
+}
+
+Square toSquare(const QByteArray &data)
+{
+    if (data.size() != 2) {
+        return Square(FileCount, RankCount);
+    }
+
+    File f = FileCount;
+    Rank r = RankCount;
+
+    switch(data.toLower().at(0)) {
+    case 'a': f = FileA; break;
+    case 'b': f = FileB; break;
+    case 'c': f = FileC; break;
+    case 'd': f = FileD; break;
+    case 'e': f = FileE; break;
+    case 'f': f = FileF; break;
+    case 'g': f = FileG; break;
+    case 'h': f = FileH; break;
+
+    default: f = FileCount; break;
+    }
+
+    switch(data.toLower().at(1)) {
+    case '1': r = Rank1; break;
+    case '2': r = Rank2; break;
+    case '3': r = Rank3; break;
+    case '4': r = Rank4; break;
+    case '5': r = Rank5; break;
+    case '6': r = Rank6; break;
+    case '7': r = Rank7; break;
+    case '8': r = Rank8; break;
+
+    default: r = RankCount; break;
+    }
+
+    return Square(f, r);
+}
+
 } // namespace Game

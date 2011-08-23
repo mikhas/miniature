@@ -29,14 +29,14 @@ namespace Game
 //! Enumeration of rows - called 'ranks' - on a chess board. Range: [1-8].
 enum Rank
 {
-    Rank1 = 0,
-    Rank2,
-    Rank3,
-    Rank4,
-    Rank5,
-    Rank6,
+    Rank8 = 0, // Allows to treat (0, 0) as (FileA, Rank8) => top-left corner
     Rank7,
-    Rank8,
+    Rank6,
+    Rank5,
+    Rank4,
+    Rank3,
+    Rank2,
+    Rank1,
     RankCount // Can also be used for invalid rank.
 };
 
@@ -80,7 +80,7 @@ enum Promotion {
 };
 
 enum Color {
-    ColorAuto = 0,
+    ColorNone = 0,
     ColorWhite,
     ColorBlack
 };

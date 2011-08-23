@@ -24,6 +24,7 @@
 #include "gnuchess.h"
 #include "commandline.h"
 #include "dispatcher.h"
+#include "position.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -64,16 +65,17 @@ private:
 
         game.play();
 
-        const Game::MovedPiece g2g4(Game::Square(Game::FileG, Game::Rank2),
-                                    Game::Square(Game::FileG, Game::Rank4));
+        Game::Piece p(Game::Piece::Pawn, Game::ColorWhite);
+        p.setSquare(Game::toSquare("g4"));
+        const Game::MovedPiece g2g4(p, Game::toSquare("g2"));
         emit white->turnEnded(Game::Position(), g2g4);
         TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
         QCOMPARE(game.activeSide().data(),white);
         QCOMPARE(whiteSpy.count(), 1);
         QCOMPARE(blackSpy.count(), 1);
 
-        const Game::MovedPiece f2f4(Game::Square(Game::FileF, Game::Rank2),
-                                    Game::Square(Game::FileF, Game::Rank4));
+        p.setSquare(Game::toSquare("f4"));
+        const Game::MovedPiece f2f4(p, Game::toSquare("f2"));
         emit white->turnEnded(Game::Position(), f2f4);
         TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
         QCOMPARE(game.activeSide().data(), white);
@@ -86,8 +88,9 @@ private:
         Game::GnuChess subject("GnuChess");
         QSignalSpy spy(&subject, SIGNAL(turnEnded(Position,MovedPiece)));
 
-        const Game::MovedPiece d2d4(Game::Square(Game::FileD, Game::Rank2),
-                                    Game::Square(Game::FileD, Game::Rank4));
+        Game::Piece p(Game::Piece::Pawn, Game::ColorWhite);
+        p.setSquare(Game::toSquare("d4"));
+        const Game::MovedPiece d2d4(p, Game::toSquare("d2"));
         subject.startTurn(Game::Position(), d2d4);
 
         // If running in background, we don't want gnuchess to compute moves:

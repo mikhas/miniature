@@ -40,6 +40,11 @@ public:
 bool operator==(const Square &a,
                 const Square &b);
 
+Square toSquare(uint file,
+                uint rank);
+
+Square toSquare(const QByteArray &data);
+
 } // namespace Miniature
 
 #endif // SQUARE_H

@@ -32,6 +32,8 @@ struct RecordSeekBase
     bool valid;
     uint id;
     Mode mode;
+    uint time; // in secs
+    uint increment; // in secs
 };
 
 //! Represents one player side in a game record.
@@ -40,8 +42,6 @@ struct PlayerRecord
     bool valid;
     QByteArray name;
     uint rating;
-    uint time_control; // in secs
-    uint clock_time; // in secs
     uint remaining_time; // in secs
     uint material_strength;
 
@@ -64,8 +64,6 @@ struct Seek
 {
     QByteArray player_name;
     uint rating;
-    uint time;
-    uint increment;
     bool is_rated;
     Color color;
     bool is_auto_started;

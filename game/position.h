@@ -58,14 +58,20 @@ public:
 };
 
 //! Convenience type that can be used to describe a move.
-struct MovedPiece
+class MovedPiece
 {
-    const Square origin;
-    const Square target;
+private:
+    Piece m_piece;
+    Square m_origin;
 
+public:
     explicit MovedPiece();
-    explicit MovedPiece(const Square &new_origin,
-                        const Square &new_target);
+    explicit MovedPiece(const Piece &piece,
+                        const Square &origin);
+
+    Piece piece() const;
+    Square origin() const;
+    Square target() const;
 };
 
 //! Represents a game position.
@@ -114,6 +120,9 @@ Position createStartPosition();
 
 bool operator==(const Piece &a,
                 const Piece &b);
+
+Piece toPiece(char ch);
+
 
 } // namespace Game
 
