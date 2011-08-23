@@ -28,4 +28,10 @@ Square::Square(File new_file,
     , rank(new_rank)
 {}
 
+bool operator==(const Square &a,
+                const Square &b)
+{
+    return (a.file == b.file && a.rank == b.rank);
+}
+
 } // namespace Game

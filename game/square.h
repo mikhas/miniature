@@ -30,12 +30,15 @@ namespace Game {
 struct Square
 {
 public:
-    const File file;
-    const Rank rank;
+    File file;
+    Rank rank;
 
     explicit Square(File new_file,
                     Rank new_rank);
 };
+
+bool operator==(const Square &a,
+                const Square &b);
 
 } // namespace Miniature
 

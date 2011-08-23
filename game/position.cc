@@ -85,15 +85,37 @@ namespace {
 namespace Game {
 
 Piece::Piece()
-    : type(None)
-    , color(ColorAuto)
+    : m_type(None)
+    , m_color(ColorAuto)
+    , m_square(FileCount, RankCount)
 {}
 
-Piece::Piece(Type new_type,
-             Color new_color)
-    : type(new_type)
-    , color(new_color)
+Piece::Piece(Type type,
+             Color color)
+    : m_type(type)
+    , m_color(color)
+    , m_square(FileCount, RankCount)
 {}
+
+Piece::Type Piece::type() const
+{
+    return m_type;
+}
+
+Color Piece::color() const
+{
+    return m_color;
+}
+
+Square Piece::square() const
+{
+    return m_square;
+}
+
+void Piece::setSquare(const Square &square)
+{
+    m_square = square;
+}
 
 MovedPiece::MovedPiece()
     : origin(Square(FileCount, RankCount))
@@ -107,33 +129,32 @@ MovedPiece::MovedPiece(const Square &new_origin,
 {}
 
 Position::Position()
-    : m_board(RankCount * FileCount)
+    : m_pieces(RankCount * FileCount)
     , m_castling_flags(CanWhiteCastleShort | CanWhiteCastleLong
                        | CanBlackCastleShort | CanBlackCastleLong)
     , m_next_to_move(ColorAuto)
     , m_double_pawn_push(FileCount) // mark as invalid;
 {}
 
-Piece Position::pieceAt(const Square &square) const
+QVector<Piece> Position::pieces() const
 {
-    const int index(toIndex(square));
-    if (index == -1) {
-        static Piece invalid;
-        return invalid;
-    }
-
-    return m_board.at(index);
+    return m_pieces;
 }
 
-void Position::setPieceAt(const Piece &piece,
-                          const Square &square)
+void Position::addPiece(const Piece &piece)
 {
-    const int index(toIndex(square));
-    if (index == -1) {
-        return;
+    m_pieces.append(piece);
+}
+
+Piece Position::pieceAt(const Square &square) const
+{
+    foreach(const Piece &piece, m_pieces) {
+        if (piece.square() == square) {
+            return piece;
+        }
     }
 
-    m_board[index] = piece;
+    return Piece();
 }
 
 Position::CastlingFlags Position::castlingFlags() const
@@ -179,31 +200,48 @@ Position createStartPosition()
 {
     Position p;
 
+    Piece wp(Piece::Pawn, ColorWhite);
+    Piece wr(Piece::Rook, ColorWhite);
+    Piece wn(Piece::Knight, ColorWhite);
+    Piece wb(Piece::Bishop, ColorWhite);
+    Piece wq(Piece::Queen, ColorWhite);
+    Piece wk(Piece::King, ColorWhite);
+
+    Piece bp(Piece::Pawn, ColorBlack);
+    Piece br(Piece::Rook, ColorBlack);
+    Piece bn(Piece::Knight, ColorBlack);
+    Piece bb(Piece::Bishop, ColorBlack);
+    Piece bq(Piece::Queen, ColorBlack);
+    Piece bk(Piece::King, ColorBlack);
+
     for (int index = 0; index < FileCount; ++index) {
-        p.setPieceAt(Piece(Piece::Pawn, ColorWhite), Square(static_cast<File>(index), Rank2));
-        p.setPieceAt(Piece(Piece::Pawn, ColorBlack), Square(static_cast<File>(index), Rank7));
+        wp.setSquare(Square(static_cast<File>(index), Rank2));
+        p.addPiece(wp);
+
+        bp.setSquare(Square(static_cast<File>(index), Rank7));
+        p.addPiece(bp);
     }
 
-    p.setPieceAt(Piece(Piece::Rook, ColorWhite), Square(FileA, Rank1));
-    p.setPieceAt(Piece(Piece::Rook, ColorWhite), Square(FileH, Rank1));
-    p.setPieceAt(Piece(Piece::Rook, ColorBlack), Square(FileA, Rank8));
-    p.setPieceAt(Piece(Piece::Rook, ColorBlack), Square(FileH, Rank8));
+    wr.setSquare(Square(FileA, Rank1)); p.addPiece(wr);
+    wr.setSquare(Square(FileH, Rank1)); p.addPiece(wr);
+    br.setSquare(Square(FileA, Rank8)); p.addPiece(br);
+    br.setSquare(Square(FileH, Rank8)); p.addPiece(br);
 
-    p.setPieceAt(Piece(Piece::Knight, ColorWhite), Square(FileB, Rank1));
-    p.setPieceAt(Piece(Piece::Knight, ColorWhite), Square(FileG, Rank1));
-    p.setPieceAt(Piece(Piece::Knight, ColorBlack), Square(FileB, Rank8));
-    p.setPieceAt(Piece(Piece::Knight, ColorBlack), Square(FileG, Rank8));
+    wn.setSquare(Square(FileB, Rank1)); p.addPiece(wn);
+    wn.setSquare(Square(FileG, Rank1)); p.addPiece(wn);
+    bn.setSquare(Square(FileB, Rank8)); p.addPiece(bn);
+    bn.setSquare(Square(FileG, Rank8)); p.addPiece(bn);
 
-    p.setPieceAt(Piece(Piece::Bishop, ColorWhite), Square(FileC, Rank1));
-    p.setPieceAt(Piece(Piece::Bishop, ColorWhite), Square(FileF, Rank1));
-    p.setPieceAt(Piece(Piece::Bishop, ColorBlack), Square(FileC, Rank8));
-    p.setPieceAt(Piece(Piece::Bishop, ColorBlack), Square(FileF, Rank8));
+    wb.setSquare(Square(FileC, Rank1)); p.addPiece(wb);
+    wb.setSquare(Square(FileF, Rank1)); p.addPiece(wb);
+    bb.setSquare(Square(FileC, Rank8)); p.addPiece(bb);
+    bb.setSquare(Square(FileF, Rank8)); p.addPiece(bb);
 
-    p.setPieceAt(Piece(Piece::Queen, ColorWhite), Square(FileD, Rank1));
-    p.setPieceAt(Piece(Piece::Queen, ColorBlack), Square(FileD, Rank8));
+    wq.setSquare(Square(FileD, Rank1)); p.addPiece(wq);
+    bq.setSquare(Square(FileD, Rank8)); p.addPiece(bq);
 
-    p.setPieceAt(Piece(Piece::King, ColorWhite), Square(FileE, Rank1));
-    p.setPieceAt(Piece(Piece::King, ColorBlack), Square(FileE, Rank8));
+    wk.setSquare(Square(FileE, Rank1)); p.addPiece(wk);
+    bk.setSquare(Square(FileE, Rank8)); p.addPiece(bk);
 
     return p;
 }
@@ -211,7 +249,7 @@ Position createStartPosition()
 bool operator==(const Piece &a,
                 const Piece &b)
 {
-    return ((a.type == b.type) && (a.color == b.color));
+    return ((a.type() == b.type()) && (a.color() == b.color()));
 }
 
 } // namespace Game

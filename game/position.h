@@ -27,7 +27,7 @@
 namespace Game {
 
 //! Represents a piece.
-struct Piece
+class Piece
 {
 public:
     enum Type {
@@ -40,12 +40,21 @@ public:
         King
     };
 
-    Type type;
-    Color color;
+private:
+    Type m_type;
+    Color m_color;
+    Square m_square;
 
+public:
     explicit Piece();
-    explicit Piece(Type new_type,
-                   Color new_color);
+    explicit Piece(Type type,
+                   Color color);
+
+    Type type() const;
+    Color color() const;
+
+    Square square() const;
+    void setSquare(const Square &square);
 };
 
 //! Convenience type that can be used to describe a move.
@@ -73,7 +82,7 @@ public:
     Q_DECLARE_FLAGS(CastlingFlags, Castling)
 
 private:
-    QVector<Piece> m_board;
+    QVector<Piece> m_pieces;
     CastlingFlags m_castling_flags;
     Color m_next_to_move;
     File m_double_pawn_push;
@@ -81,9 +90,9 @@ private:
 public:
     explicit Position();
 
+    QVector<Piece> pieces() const;
+    void addPiece(const Piece &piece);
     Piece pieceAt(const Square &square) const;
-    void setPieceAt(const Piece &piece,
-                    const Square &square);
 
     CastlingFlags castlingFlags() const;
     void setCastlingFlags(const CastlingFlags &flags);
