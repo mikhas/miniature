@@ -80,7 +80,7 @@ target.depends += \
 desktop.files = ../miniature.desktop
 desktop.path = /usr/share/applications
 
-icon.files = $${TARGET}.png
+icon.files = $${TARGET}-n9.png
 icon.path = /usr/share/themes/base/meegotouch/icons/
 
 INSTALLS += \

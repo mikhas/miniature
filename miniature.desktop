@@ -5,4 +5,4 @@ Terminal=false
 Type=Application
 Name=Miniature
 Exec=/usr/games/miniature
-Icon=miniature
+Icon=miniature-n9
