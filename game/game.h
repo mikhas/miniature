@@ -81,6 +81,13 @@ public:
     //! @param advertisement_id the id of the game advertisement (optional).
     void play(uint advertisement_id = 0);
 
+    //! Sets position.
+    //! @param position the position.
+    void setPosition(const Position &position);
+
+    //! Returns position.
+    Position position() const;
+
     //! Returns local side.
     WeakSide localSide() const;
 

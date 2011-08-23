@@ -56,6 +56,7 @@ class GamePrivate
 public:
     uint id;
     WeakDispatcher dispatcher;
+    Position position;
     const QScopedPointer<Side> local; //!< Side of the local player.
     const QScopedPointer<Side> remote; //!< Side of the remote player.
     Side *active; //!< Points to active side.
@@ -67,6 +68,7 @@ public:
                          Side *new_remote)
         : id(new_id) // FIXME: create UID if 0
         , dispatcher(new_dispatcher)
+        , position()
         , local(new_local)
         , remote(new_remote)
         , active(new_local)// FIXME: Set correct active side (could be remote) already during construction!
@@ -121,6 +123,18 @@ void Game::play(uint advertisement_id)
     // Notify backend, too:
     Command::Play play(TargetBackend, advertisement_id);
     sendCommand(&play);
+}
+
+void Game::setPosition(const Position &position)
+{
+    Q_D(Game);
+    d->position = position;
+}
+
+Position Game::position() const
+{
+    Q_D(const Game);
+    return d->position;
 }
 
 WeakSide Game::localSide() const

@@ -22,6 +22,7 @@
 #include "frontend.h"
 #include "fics/backend.h"
 #include "game.h"
+#include "position.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -55,6 +56,7 @@ public:
     QVector<Record> m_received_records;
     QVector<Seek> m_received_seeks;
     uint m_game_id;
+    QWeakPointer<Game> m_game;
 
     explicit DummyFrontend(Dispatcher *dispatcher,
                            QObject *parent = 0)
@@ -80,6 +82,7 @@ public:
     virtual void registerGame(Game *game)
     {
         m_game_id = game->id();
+        m_game = QWeakPointer<Game>(game);
     }
 };
 
@@ -133,6 +136,11 @@ private:
 
         fics->processToken(m_play_log.at(3));
         QCOMPARE(frontend.m_game_id, 414u);
+
+        fics->processToken(m_play_log.at(8));
+        const Game::Position &p(frontend.m_game.data()->position());
+        QCOMPARE(p.pieceAt(Game::Square(Game::FileG, Game::Rank4)),
+                 Game::Piece(Game::Piece::Pawn, Game::ColorWhite));
     }
 };
 
