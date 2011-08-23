@@ -1,5 +1,5 @@
 import QtQuick 1.1
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 Page { // FIXME how to make the height fixed so the virtual keyboard doesn't push it up?
     id: ficsLogin
