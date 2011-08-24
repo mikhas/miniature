@@ -5,4 +5,4 @@ Terminal=false
 Type=Application
 Name=Miniature
 Exec=/usr/games/miniature
-Icon=miniature-n9
+Icon=/usr/share/themes/base/meegotouch/icons/miniature-n9.png
