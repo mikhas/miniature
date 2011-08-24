@@ -43,8 +43,7 @@ public:
     //! \reimp
     explicit GnuChess(const QString &identifier);
     virtual ~GnuChess();
-    virtual void startTurn(const Position &result,
-                           const MovedPiece &moved_piece);
+    virtual void startTurn(const Position &result);
     //! \reimp_end
 
     virtual void runInBackground();

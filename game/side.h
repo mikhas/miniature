@@ -61,17 +61,13 @@ public:
     //! and the submitted move is invalid, then startMove will be called again
     //! (as if the turn had just started). Otherwise incorrectly sent moves
     //! will be silently discarded.
-    //! @param result the resulting position, after applying moved_piece.
-    //! @param moved_piece the last moved piece, leading to result.
-    Q_SIGNAL void turnEnded(const Position &result,
-                            const MovedPiece &moved_piece);
+    //! @param result the resulting position.
+    Q_SIGNAL void turnEnded(const Position &result);
 
     //! Starts new turn for this side. If move is the same as last move, then
     //! the last submitted move was invalid.
-    //! @param result the resulting position, after applying moved_piece.
-    //! @param moved_piece the last moved piece, leading to result.
-    virtual void startTurn(const Position &result,
-                           const MovedPiece &moved_piece);
+    //! @param result the new position.
+    virtual void startTurn(const Position &position);
 
     //! Moves a piece, usually based on position from startTurn.
     //! @returns whether move was valid.

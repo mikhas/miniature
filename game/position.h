@@ -89,6 +89,7 @@ public:
 
 private:
     QVector<Piece> m_pieces;
+    MovedPiece m_moved_piece;
     CastlingFlags m_castling_flags;
     Color m_next_to_move;
     File m_double_pawn_push;
@@ -99,6 +100,9 @@ public:
     QVector<Piece> pieces() const;
     void addPiece(const Piece &piece);
     Piece pieceAt(const Square &square) const;
+
+    MovedPiece movedPiece() const;
+    void setMovedPiece(const MovedPiece &moved_piece);
 
     CastlingFlags castlingFlags() const;
     void setCastlingFlags(const CastlingFlags &flags);
@@ -111,9 +115,8 @@ public:
 };
 
 //! A human readable notation of a move, based on the resulting position and
-//! the last moved piece.
-QString moveNotation(const Position &result,
-                     const MovedPiece &moved_piece);
+//! its last moved piece.
+QString moveNotation(const Position &result);
 
 //! Constructs start position.
 Position createStartPosition();

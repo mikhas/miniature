@@ -117,7 +117,7 @@ void Game::play(uint advertisement_id)
 
     d->state = Game::Started;
     d->active = d->local.data();
-    d->active->startTurn(Position(), MovedPiece());
+    d->active->startTurn(Position());
     printTurnMessage(d->active->identifier());
 
     // Notify backend, too:
@@ -155,8 +155,7 @@ Side * Game::activeSide() const
     return d->active;
 }
 
-void Game::onTurnEnded(const Position &result,
-                       const MovedPiece &moved_piece)
+void Game::onTurnEnded(const Position &result)
 {
     // TOOD: Validate move, call startTurn again with last valid move, on (still active) side.
     Q_D(Game);
@@ -176,14 +175,14 @@ void Game::onTurnEnded(const Position &result,
     d->active = (d->active == d->local.data() ? d->remote.data()
                                               : d->local.data());
 
-    d->active->startTurn(result, moved_piece);
+    d->active->startTurn(result);
     printTurnMessage(d->active->identifier());
 }
 
 void Game::connectSide(Side *side)
 {
-    connect(side, SIGNAL(turnEnded(Position,MovedPiece)),
-            this, SLOT(onTurnEnded(Position,MovedPiece)),
+    connect(side, SIGNAL(turnEnded(Position)),
+            this, SLOT(onTurnEnded(Position)),
             Qt::UniqueConnection);
 }
 

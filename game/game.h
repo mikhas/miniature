@@ -22,6 +22,7 @@
 #define GAME_H
 
 #include "side.h"
+#include "position.h"
 #include "namespace.h"
 
 #include <QtCore>
@@ -49,11 +50,14 @@ class Game
     : public QObject
 {
     Q_OBJECT
+    Q_DECLARE_PRIVATE(Game)
+    Q_DISABLE_COPY(Game)
+    Q_PROPERTY(Position position READ position
+                                 WRITE setPosition
+                                 NOTIFY positionChanged)
 
 private:
     const QScopedPointer<GamePrivate> d_ptr;
-    Q_DECLARE_PRIVATE(Game)
-    Q_DISABLE_COPY(Game)
 
 public:
     enum GameState {
@@ -89,6 +93,10 @@ public:
     //! Returns position.
     Position position() const;
 
+    //! Emitted whenever position changes.
+    //! @param position the new position.
+    Q_SIGNAL void positionChanged(const Position &position);
+
     //! Returns local side.
     Side * localSide() const;
 
@@ -100,9 +108,8 @@ public:
 
 private:
     //! One side ended turn and submitted a move.
-    //! @param move the submitted move.
-    Q_SLOT void onTurnEnded(const Position &result,
-                            const MovedPiece &moved_piece);
+    //! @param position the resulting position.
+    Q_SLOT void onTurnEnded(const Position &result);
 
     //! Connects common parts for each side with controller.
     //! @param side the side to connect.

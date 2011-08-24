@@ -70,10 +70,9 @@ void GnuChess::runInForeground()
     kill(m_proc.pid(), "SIGCONT");
 }
 
-void GnuChess::startTurn(const Position &result,
-                         const MovedPiece &moved_piece)
+void GnuChess::startTurn(const Position &result)
 {
-    m_proc.write(moveNotation(result, moved_piece).toLatin1());
+    m_proc.write(moveNotation(result).toLatin1());
     m_proc.write("\n");
     m_proc.waitForBytesWritten();
 }
@@ -83,7 +82,7 @@ void GnuChess::onReadyRead()
     while (m_proc.canReadLine()) {
         QString result(m_proc.readLine());
         if (result.startsWith(CmdMove)) {
-            emit turnEnded(Position(), MovedPiece());
+            emit turnEnded(Position());
         }
     }
 }

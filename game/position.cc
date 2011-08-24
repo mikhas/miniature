@@ -180,6 +180,16 @@ Piece Position::pieceAt(const Square &square) const
     return Piece();
 }
 
+MovedPiece Position::movedPiece() const
+{
+    return m_moved_piece;
+}
+
+void Position::setMovedPiece(const MovedPiece &moved_piece)
+{
+    m_moved_piece = moved_piece;
+}
+
 Position::CastlingFlags Position::castlingFlags() const
 {
     return m_castling_flags;
@@ -210,13 +220,11 @@ void Position::setDoublePawnPush(File file)
     m_double_pawn_push = file;
 }
 
-QString moveNotation(const Position &result,
-                     const MovedPiece &moved_piece)
+QString moveNotation(const Position &result)
 {
-    Q_UNUSED(result)
     // TODO: This is gnuchess-style notation, allow for different types?
-    return QString("%1%2").arg(toString(moved_piece.origin()))
-                          .arg(toString(moved_piece.target()));
+    return QString("%1%2").arg(toString(result.movedPiece().origin()))
+                          .arg(toString(result.movedPiece().target()));
 }
 
 Position createStartPosition()

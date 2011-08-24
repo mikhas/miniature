@@ -53,11 +53,9 @@ QString Side::identifier() const
     return d->identifier;
 }
 
-void Side::startTurn(const Position &result,
-                     const MovedPiece &moved_piece)
+void Side::startTurn(const Position &position)
 {
-    Q_UNUSED(result)
-    Q_UNUSED(moved_piece)
+    Q_UNUSED(position)
 }
 
 bool Side::move(const MovedPiece &moved_piece,
