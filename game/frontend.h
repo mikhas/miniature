@@ -26,6 +26,7 @@
 #include "linereader.h"
 #include "abstractbackend.h"
 #include "game.h"
+#include "position.h"
 
 #include <QtCore>
 
@@ -73,6 +74,7 @@ public:
 
 private:
     void sendCommand(AbstractCommand *command);
+    Q_SLOT void onPositionChanged(const Position &position);
 };
 
 } // namespace Game

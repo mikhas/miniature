@@ -297,7 +297,12 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
 void Frontend::setActiveGame(Game *game)
 {
     Q_D(Frontend);
+
     d->game = WeakGame(game);
+    disconnect(0, SLOT(onPositionChanged(Position)));
+    connect(game, SIGNAL(positionChanged(Position)),
+            this, SLOT(onPositionChanged(Position)),
+            Qt::UniqueConnection);
 }
 
 void Frontend::sendCommand(AbstractCommand *command)
@@ -306,6 +311,12 @@ void Frontend::sendCommand(AbstractCommand *command)
     if (Dispatcher *dispatcher = d->dispatcher.data()) {
         dispatcher->sendCommand(command);
     }
+}
+
+void Frontend::onPositionChanged(const Position &position)
+{
+    Q_UNUSED(position)
+    // TBD
 }
 
 } // namespace Game
