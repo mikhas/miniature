@@ -61,7 +61,7 @@ private:
         QSignalSpy blackSpy(black, SIGNAL(turnEnded(Position,MovedPiece)));
         Game::Game game(0, &dispatcher, white, black);
 
-        QCOMPARE(game.activeSide().data(), white);
+        QCOMPARE(game.activeSide(), white);
 
         game.play();
 
@@ -70,7 +70,7 @@ private:
         const Game::MovedPiece g2g4(p, Game::toSquare("g2"));
         emit white->turnEnded(Game::Position(), g2g4);
         TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
-        QCOMPARE(game.activeSide().data(),white);
+        QCOMPARE(game.activeSide(),white);
         QCOMPARE(whiteSpy.count(), 1);
         QCOMPARE(blackSpy.count(), 1);
 
@@ -78,7 +78,7 @@ private:
         const Game::MovedPiece f2f4(p, Game::toSquare("f2"));
         emit white->turnEnded(Game::Position(), f2f4);
         TestUtils::waitForSignal(black, SIGNAL(turnEnded(Position,MovedPiece)));
-        QCOMPARE(game.activeSide().data(), white);
+        QCOMPARE(game.activeSide(), white);
         QCOMPARE(whiteSpy.count(), 2);
         QCOMPARE(blackSpy.count(), 2);
     }

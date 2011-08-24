@@ -137,22 +137,22 @@ Position Game::position() const
     return d->position;
 }
 
-WeakSide Game::localSide() const
+Side * Game::localSide() const
 {
     Q_D(const Game);
-    return WeakSide(d->local.data());
+    return d->local.data();
 }
 
-WeakSide Game::remoteSide() const
+Side * Game::remoteSide() const
 {
     Q_D(const Game);
-    return WeakSide(d->local.data());
+    return d->local.data();
 }
 
-WeakSide Game::activeSide() const
+Side * Game::activeSide() const
 {
     Q_D(const Game);
-    return WeakSide(d->active);
+    return d->active;
 }
 
 void Game::onTurnEnded(const Position &result,

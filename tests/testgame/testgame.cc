@@ -50,25 +50,25 @@ private:
         Game::Side *white = new Game::Side("white");
         Game::Side *black = new Game::Side("black");
         Game::Game subject(0, &dispatcher, white, black);
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.activeSide(), white);
 
         // Trying to submit move before starting game => ignore:
         emit white->turnEnded(Game::Position(), Game::MovedPiece());
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.activeSide(), white);
 
         subject.play();
 
         // Switch sides after submitting move:
         emit white->turnEnded(Game::Position(), Game::MovedPiece());
-        QCOMPARE(subject.activeSide().data(), black);
+        QCOMPARE(subject.activeSide(), black);
 
         // Trying to submit move twice in a row => ignore:
         emit white->turnEnded(Game::Position(), Game::MovedPiece());
-        QCOMPARE(subject.activeSide().data(), black);
+        QCOMPARE(subject.activeSide(), black);
 
         // Switch sides again after submitting move:
         emit black->turnEnded(Game::Position(), Game::MovedPiece());
-        QCOMPARE(subject.activeSide().data(), white);
+        QCOMPARE(subject.activeSide(), white);
     }
 
     Q_SLOT void testCli()

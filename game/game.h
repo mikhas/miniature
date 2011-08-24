@@ -81,6 +81,7 @@ public:
     //! @param advertisement_id the id of the game advertisement (optional).
     void play(uint advertisement_id = 0);
 
+    // TODO: provide an applyMove method that does validation etc.
     //! Sets position.
     //! @param position the position.
     void setPosition(const Position &position);
@@ -89,13 +90,13 @@ public:
     Position position() const;
 
     //! Returns local side.
-    WeakSide localSide() const;
+    Side * localSide() const;
 
     //! Returns remote side.
-    WeakSide remoteSide() const;
+    Side * remoteSide() const;
 
     //! Returns active side.
-    WeakSide activeSide() const;
+    Side * activeSide() const;
 
 private:
     //! One side ended turn and submitted a move.
