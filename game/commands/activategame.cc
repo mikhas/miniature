@@ -20,6 +20,7 @@
 
 #include "activategame.h"
 #include "registry.h"
+#include "frontend/frontend.h"
 
 namespace Game { namespace Command {
 
@@ -38,7 +39,7 @@ Target ActivateGame::target() const
     return m_target;
 }
 
-void ActivateGame::exec(Frontend *target)
+void ActivateGame::exec(Frontend::Frontend *target)
 {
     target->setActiveGame(m_game.data());
 }

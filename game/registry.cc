@@ -22,7 +22,7 @@
 #include "game.h"
 #include "namespace.h"
 #include "side.h"
-#include "frontend.h"
+#include "frontend/frontend.h"
 #include "commands.h"
 
 namespace Game {

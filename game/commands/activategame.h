@@ -24,11 +24,14 @@
 #include "abstractcommand.h"
 #include "abstractbackend.h"
 #include "game.h"
-#include "frontend.h"
 
 #include <QtCore>
 
-namespace Game { namespace Command {
+namespace Game { namespace Frontend {
+    class Frontend;
+}
+
+namespace Command {
 
 //! Command to activate the given game.
 class ActivateGame
@@ -44,7 +47,7 @@ public:
                           Game *game);
     virtual ~ActivateGame();
     virtual Target target() const;
-    virtual void exec(Frontend *target);
+    virtual void exec(Frontend::Frontend *target);
     //! \reimp_end
 };
 

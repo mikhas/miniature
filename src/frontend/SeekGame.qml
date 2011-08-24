@@ -172,11 +172,11 @@ Page {
             header: seekListHeader // empty header to avoid overlap of 1st item with shadow.
             spacing: 10
 
-            model: gameAdvertisements
+            model: advertisements
 
             Connections {
                 id: sortingStyle
-                target: gameAdvertisements
+                target: advertisements
                 // var flowing = "seekList.positionViewAtEnd()" // FIXME This attempt to keep the highlighted item on view won't work
                 // onRowsInserted: flowing // FIXME This attempt to keep the highlighted item on view won't work
                 onRowsInserted: seekList.positionViewAtEnd()
@@ -315,10 +315,8 @@ Page {
                             visible: model.highlighted
                             anchors.centerIn: parent
                             onClicked: {
-                                console.log(model.playerName)
-                                // TODO: Uncomment to active play feature, but right now it is kind of rude to the other FICS players (since we cannot play yet).
-                                //miniature.play(model.id)
                                 loadScreen("OnlineBoard.qml")
+                                miniature.play(model.id)
                             }
                         }
                     }

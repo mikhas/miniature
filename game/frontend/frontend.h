@@ -30,7 +30,9 @@
 
 #include <QtCore>
 
-namespace Game {
+namespace Game { namespace Frontend {
+
+QString fromColor(Color color);
 
 class FrontendPrivate;
 
@@ -77,6 +79,6 @@ private:
     Q_SLOT void onPositionChanged(const Position &position);
 };
 
-} // namespace Game
+}} // namespace Game, Frontend
 
 #endif // FRONTEND_H

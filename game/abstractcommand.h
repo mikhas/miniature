@@ -27,7 +27,10 @@ namespace Game {
 
 class Registry;
 class AbstractBackend;
-class Frontend;
+
+namespace Frontend {
+    class Frontend;
+}
 
 //! Specify the target for a command. Some commands, such as
 //! TargetBackgroundGames, will be executed as a broadcast. It is the
@@ -59,7 +62,7 @@ public:
     virtual void exec(AbstractBackend *target);
 
     //! Execute command on frontend.
-    virtual void exec(Frontend *target);
+    virtual void exec(Frontend::Frontend *target);
 };
 
 } // namespace Game

@@ -18,24 +18,19 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractcommand.h"
+#include "run.h"
+#include "dispatcher.h"
 #include "frontend/frontend.h"
 
 namespace Game {
 
-AbstractCommand::AbstractCommand(Target)
-{}
-
-AbstractCommand::~AbstractCommand()
-{}
-
-void AbstractCommand::exec(Registry *)
-{}
-
-void AbstractCommand::exec(AbstractBackend *)
-{}
-
-void AbstractCommand::exec(Frontend::Frontend *)
-{}
+void run(const QUrl &url,
+         QObject *parent)
+{
+    Dispatcher *dispatcher = createDispatcher(parent);
+    Frontend::Frontend *frontend = new Frontend::Frontend(dispatcher, parent);
+    dispatcher->setFrontend(frontend);
+    frontend->show(url);
+}
 
 } // namespace Game

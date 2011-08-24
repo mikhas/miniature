@@ -20,7 +20,7 @@
 
 #include "dispatcher.h"
 #include "abstractcommand.h"
-#include "frontend.h"
+#include "frontend/frontend.h"
 #include "abstractbackend.h"
 #include "fics/backend.h"
 #include "game.h"
@@ -41,7 +41,7 @@ Dispatcher *createDispatcher(QObject *owner)
 class DispatcherPrivate
 {
 public:
-    QWeakPointer<Frontend> active_frontend;
+    QWeakPointer<Frontend::Frontend> active_frontend;
     QWeakPointer<AbstractBackend> active_backend;
     QScopedPointer<Registry> registry;
 
@@ -67,7 +67,7 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     }
 
     Q_D(Dispatcher);
-    bool result;
+    bool result = false;
 
     switch(command->target()) {
     case TargetBackend:
@@ -78,7 +78,7 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
         break;
 
     case TargetFrontend:
-        if (Frontend *frontend = d->active_frontend.data()) {
+        if (Frontend::Frontend *frontend = d->active_frontend.data()) {
             result = true;
             command->exec(frontend);
         }
@@ -90,17 +90,16 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
         break;
 
     default:
-        result = false;
         break;
     }
 
     return result;
 }
 
-void Dispatcher::setFrontend(Frontend *frontend)
+void Dispatcher::setFrontend(Frontend::Frontend *frontend)
 {
     Q_D(Dispatcher);
-    d->active_frontend = QWeakPointer<Frontend>(frontend);
+    d->active_frontend = QWeakPointer<Frontend::Frontend>(frontend);
 }
 
 void Dispatcher::setBackend(AbstractBackend *backend)

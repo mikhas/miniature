@@ -188,6 +188,11 @@ MovedPiece Position::movedPiece() const
 void Position::setMovedPiece(const MovedPiece &moved_piece)
 {
     m_moved_piece = moved_piece;
+    setPiece(m_moved_piece.piece());
+
+    Piece none(Piece::None, ColorNone);
+    none.setSquare(moved_piece.origin());
+    setPiece(none);
 }
 
 Position::CastlingFlags Position::castlingFlags() const
@@ -218,6 +223,20 @@ File Position::doublePawnPush() const
 void Position::setDoublePawnPush(File file)
 {
     m_double_pawn_push = file;
+}
+
+void Position::setPiece(const Piece &piece)
+{
+    for (int i = 0; i < m_pieces.count(); ++i) {
+        const Piece &p(m_pieces.at(i));
+        if (p.square() == piece.square()) {
+            m_pieces.replace(i, piece);
+            return;
+        }
+    }
+
+    // Since we weren't able to replace a piece, this piece must be new:
+    addPiece(piece);
 }
 
 QString moveNotation(const Position &result)
@@ -277,11 +296,32 @@ Position createStartPosition()
     return p;
 }
 
+bool operator==(const Position &a,
+                const Position &b)
+{
+    // Suffices, for now:
+    return (a.pieces() == b.pieces());
+}
+
+bool operator!=(const Position &a,
+                const Position &b)
+{
+    return not (a == b);
+}
+
+
 bool operator==(const Piece &a,
                 const Piece &b)
 {
     return ((a.type() == b.type()) && (a.color() == b.color()));
 }
+
+bool operator!=(const Piece &a,
+                const Piece &b)
+{
+    return not (a == b);
+}
+
 
 Piece toPiece(char ch)
 {

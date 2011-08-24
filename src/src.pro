@@ -24,11 +24,11 @@ LIBS += \
 
 } else {
     HEADERS += \
+        $${GAME_DIR}/run.h \
         $${GAME_DIR}/game.h \
         $${GAME_DIR}/side.h \
         $${GAME_DIR}/dispatcher.h \
         $${GAME_DIR}/registry.h \
-        $${GAME_DIR}/frontend.h \
         $${GAME_DIR}/commands/login.h \
         $${GAME_DIR}/commands/logout.h \
         $${GAME_DIR}/commands/advertisement.h \
@@ -37,6 +37,9 @@ LIBS += \
         $${GAME_DIR}/commands/move.h \
         $${GAME_DIR}/commands/creategame.h \
         $${GAME_DIR}/commands/activategame.h \
+        $${GAME_DIR}/frontend/frontend.h \
+        $${GAME_DIR}/frontend/chessboard.h \
+        $${GAME_DIR}/frontend/chessboardelement.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -47,11 +50,11 @@ LIBS += \
         $${GAME_DIR}/square.h \
 
     SOURCES += \
+        $${GAME_DIR}/run.cc \
         $${GAME_DIR}/game.cc \
         $${GAME_DIR}/side.cc \
         $${GAME_DIR}/dispatcher.cc \
         $${GAME_DIR}/registry.cc \
-        $${GAME_DIR}/frontend.cc \
         $${GAME_DIR}/commands/login.cc \
         $${GAME_DIR}/commands/logout.cc \
         $${GAME_DIR}/commands/advertisement.cc \
@@ -60,6 +63,9 @@ LIBS += \
         $${GAME_DIR}/commands/move.cc \
         $${GAME_DIR}/commands/creategame.cc \
         $${GAME_DIR}/commands/activategame.cc \
+        $${GAME_DIR}/frontend/frontend.cc \
+        $${GAME_DIR}/frontend/chessboard.cc \
+        $${GAME_DIR}/frontend/chessboardelement.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \
@@ -102,7 +108,6 @@ OTHER_FILES += \
     frontend/main.qml \
     frontend/emptysquare.png \
     frontend/miniatureBIG.png \
-    frontend/BoardModel.qml \
     frontend/OnlineBoard.qml \
     frontend/white/bishop.png \
     frontend/white/queen.png \

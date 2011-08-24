@@ -19,7 +19,7 @@
  */
 
 #include "advertisement.h"
-#include "frontend.h"
+#include "frontend/frontend.h"
 
 namespace Game { namespace Command {
 
@@ -38,7 +38,7 @@ Target Advertisement::target() const
     return m_target;
 }
 
-void Advertisement::exec(Frontend *target)
+void Advertisement::exec(Frontend::Frontend *target)
 {
     target->handleSeek(m_seek);
 }

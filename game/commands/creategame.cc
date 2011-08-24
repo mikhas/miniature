@@ -49,6 +49,7 @@ void CreateGame::exec(Registry *target)
 {
     // TODO: Dont register game on frontend? Target should be game registry, use new command to inform frontend and backend about sides?
     Game *game = createGame(m_game_id, m_dispatcher.data(), m_local_id, m_remote_id);
+    game->setPosition(createStartPosition());
     target->registerGame(game);
 }
 

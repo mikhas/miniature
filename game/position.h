@@ -112,6 +112,9 @@ public:
 
     File doublePawnPush() const;
     void setDoublePawnPush(File file);
+
+private:
+    void setPiece(const Piece &piece);
 };
 
 //! A human readable notation of a move, based on the resulting position and
@@ -121,7 +124,16 @@ QString moveNotation(const Position &result);
 //! Constructs start position.
 Position createStartPosition();
 
+bool operator==(const Position &a,
+                const Position &b);
+
+bool operator!=(const Position &a,
+                const Position &b);
+
 bool operator==(const Piece &a,
+                const Piece &b);
+
+bool operator!=(const Piece &a,
                 const Piece &b);
 
 Piece toPiece(char ch);

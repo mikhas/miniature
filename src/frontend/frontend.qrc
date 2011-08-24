@@ -18,7 +18,6 @@
         <file>black/pawn.png</file>
         <file>black/queen.png</file>
         <file>black/bishop.png</file>
-        <file>BoardModel.qml</file>
         <file>miniatureBIG.png</file>
     </qresource>
 </RCC>

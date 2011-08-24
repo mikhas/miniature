@@ -27,7 +27,6 @@
 namespace Game {
 
 class Game;
-class Frontend;
 
 //! Registry for games.
 class Registry

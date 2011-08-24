@@ -19,7 +19,7 @@
  */
 
 #include "record.h"
-#include "frontend.h"
+#include "frontend/frontend.h"
 
 namespace Game { namespace Command {
 
@@ -38,7 +38,7 @@ Target Record::target() const
     return m_target;
 }
 
-void Record::exec(Frontend *target)
+void Record::exec(Frontend::Frontend *target)
 {
     target->handleRecord(m_record);
 }

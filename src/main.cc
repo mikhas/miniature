@@ -18,8 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dispatcher.h"
-#include "frontend.h"
+#include "run.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -27,11 +26,6 @@
 int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
-
-    Game::Dispatcher *dispatcher = Game::createDispatcher(&app);
-    Game::Frontend frontend(dispatcher);
-    dispatcher->setFrontend(&frontend);
-    frontend.show(QUrl("qrc:/main.qml"));
-
+    Game::run(QUrl("qrc:/main.qml"), &app);
     return app.exec();
 }

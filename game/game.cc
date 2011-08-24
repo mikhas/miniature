@@ -128,7 +128,10 @@ void Game::play(uint advertisement_id)
 void Game::setPosition(const Position &position)
 {
     Q_D(Game);
-    d->position = position;
+    if (d->position != position) {
+        d->position = position;
+        emit positionChanged(d->position);
+    }
 }
 
 Position Game::position() const

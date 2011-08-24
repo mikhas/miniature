@@ -19,7 +19,6 @@
  */
 
 #include "play.h"
-#include "frontend.h"
 
 namespace Game { namespace Command {
 

@@ -379,6 +379,8 @@ void Backend::login(const QString &username,
 
 void Backend::play(uint advertisement_id)
 {
+    Q_UNUSED(advertisement_id)
+
     if (m_state != StateReady) {
         return;
     }
@@ -386,7 +388,13 @@ void Backend::play(uint advertisement_id)
     m_state = StatePlayPending;
     emit stateChanged(m_state);
 
-    m_channel.write(play_command.arg(advertisement_id).toLatin1());
+    // TODO: Uncomment to active play feature, but right now it is kind of rude to the other FICS players (since we cannot play yet).
+    //m_channel.write(play_command.arg(advertisement_id).toLatin1());
+
+    // For testing; send a create-game command back immediately:
+    Command::CreateGame cg(TargetRegistry, 999u, m_dispatcher.data(),
+                           "test123", "test456");
+    sendCommand(&cg);
 }
 
 void Backend::processToken(const QByteArray &token)

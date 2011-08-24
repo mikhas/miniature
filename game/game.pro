@@ -11,10 +11,12 @@ enable-gui {
 }
 
 include(commands/commands.pri)
+include(frontend/frontend.pri)
 include(fics/fics.pri)
 
 HEADERS += \
     namespace.h \
+    run.h \
     game.h \
     linereader.h \
     directinputdevice.h \
@@ -27,10 +29,10 @@ HEADERS += \
     commands.h \
     commandline.h \
     abstractbackend.h \
-    frontend.h \
     side.h
 
 SOURCES += \
+    run.cc \
     game.cc \
     linereader.cc \
     directinputdevice.cc \
@@ -42,7 +44,6 @@ SOURCES += \
     abstractcommand.cc \
     commandline.cc \
     abstractbackend.cc \
-    frontend.cc \
     side.cc
 
 target.path = /usr/lib

@@ -19,9 +19,7 @@
  */
 
 #include "move.h"
-#include "frontend.h"
 #include "registry.h"
-#include "frontend.h"
 #include "game.h"
 
 namespace Game { namespace Command {

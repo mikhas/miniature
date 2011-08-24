@@ -26,7 +26,11 @@
 
 #include <QtCore>
 
-namespace Game { namespace Command {
+namespace Game { namespace Frontend {
+    class Frontend;
+}
+
+namespace Command {
 
 class Advertisement
     : public AbstractCommand
@@ -41,7 +45,7 @@ public:
                            const Seek &s);
     virtual ~Advertisement();
     virtual Target target() const;
-    virtual void exec(Frontend *target);
+    virtual void exec(Frontend::Frontend *target);
     //! \reimp_end
 };
 

@@ -43,6 +43,8 @@ bool operator==(const Square &a,
 Square toSquare(uint file,
                 uint rank);
 
+Square toSquare(int index);
+
 Square toSquare(const QByteArray &data);
 
 } // namespace Miniature

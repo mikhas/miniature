@@ -51,6 +51,12 @@ Square toSquare(uint file,
     return Square(f, r);
 }
 
+Square toSquare(int index)
+{
+    return toSquare(static_cast<uint>(index % FileCount),
+                    static_cast<uint>(index / qMax<int>(RankCount, 1)));
+}
+
 Square toSquare(const QByteArray &data)
 {
     if (data.size() != 2) {

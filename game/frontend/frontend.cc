@@ -22,29 +22,31 @@
 #include "commands.h"
 #include "directinputdevice.h"
 #include "registry.h"
+#include "frontend/chessboard.h"
+#include "frontend/chessboardelement.h"
 
 #ifdef MINIATURE_GUI_ENABLED
 #include <QtDeclarative/QtDeclarative>
 #endif
 
-namespace Game { namespace {
+namespace Game { namespace Frontend { namespace {
     const ParserCommandFlags all_commands(CommandPlay | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
-
-    QString fromColor(Color color)
-    {
-        switch(color) {
-        case ColorNone: return "auto";
-        case ColorWhite: return "white";
-        case ColorBlack: return "black";
-        }
-
-        return "";
-    }
 }
 
-class AdvertisementModel
+QString fromColor(Color color)
+{
+    switch(color) {
+    case ColorNone: return "auto";
+    case ColorWhite: return "white";
+    case ColorBlack: return "black";
+    }
+
+    return "";
+}
+
+class Advertisements
     : public QAbstractItemModel
 {
 private:
@@ -67,7 +69,7 @@ public:
         RoleHighlighted
     };
 
-    explicit AdvertisementModel(QObject *parent = 0)
+    explicit Advertisements(QObject *parent = 0)
         : QAbstractItemModel(parent)
     {
         // QML cannot cope with c-style-variable-names!
@@ -88,7 +90,7 @@ public:
         setRoleNames(roles);
     }
 
-    virtual ~AdvertisementModel()
+    virtual ~Advertisements()
     {}
 
     virtual void append(const Seek& s)
@@ -192,7 +194,8 @@ public:
     WeakDispatcher dispatcher;
     CommandLine command_line;
     LineReader line_reader;
-    AdvertisementModel advertisements;
+    Advertisements advertisements;
+    ChessBoard chess_board;
     WeakGame game;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
@@ -203,6 +206,7 @@ public:
         , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
+        , chess_board()
         , game()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
@@ -218,7 +222,9 @@ Frontend::Frontend(Dispatcher *dispatcher,
     Q_D(Frontend);
 
 #ifdef MINIATURE_GUI_ENABLED
-    d->ui.rootContext()->setContextProperty("gameAdvertisements", &d->advertisements);
+    qmlRegisterType<ChessBoardElement>("org.maemo.miniature", 1, 0, "ChessBoardElement");
+    d->ui.rootContext()->setContextProperty("advertisements", &d->advertisements);
+    d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
     d->ui.rootContext()->setContextProperty("miniature", this);
 #endif
 
@@ -287,10 +293,10 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
 
     for (int index = 0; index < d->advertisements.rowCount(); ++index) {
         const QModelIndex mi(d->advertisements.index(index, 0));
-        const bool found(d->advertisements.data(mi, AdvertisementModel::RoleId).toUInt() == id);
-        const bool was_highlighted(d->advertisements.data(mi, AdvertisementModel::RoleHighlighted).toBool());
+        const bool found(d->advertisements.data(mi, Advertisements::RoleId).toUInt() == id);
+        const bool was_highlighted(d->advertisements.data(mi, Advertisements::RoleHighlighted).toBool());
 
-        d->advertisements.setData(mi, found && not was_highlighted, AdvertisementModel::RoleHighlighted);
+        d->advertisements.setData(mi, found && not was_highlighted, Advertisements::RoleHighlighted);
     }
 }
 
@@ -299,10 +305,18 @@ void Frontend::setActiveGame(Game *game)
     Q_D(Frontend);
 
     d->game = WeakGame(game);
-    disconnect(0, SLOT(onPositionChanged(Position)));
+
+    if (not game) {
+        return;
+    }
+
+    disconnect(this, SLOT(onPositionChanged(Position)));
     connect(game, SIGNAL(positionChanged(Position)),
             this, SLOT(onPositionChanged(Position)),
             Qt::UniqueConnection);
+
+    // Update current position manually:
+    onPositionChanged(game->position());
 }
 
 void Frontend::sendCommand(AbstractCommand *command)
@@ -315,8 +329,8 @@ void Frontend::sendCommand(AbstractCommand *command)
 
 void Frontend::onPositionChanged(const Position &position)
 {
-    Q_UNUSED(position)
-    // TBD
+    Q_D(Frontend);
+    d->chess_board.setPosition(position);
 }
 
-} // namespace Game
+}} // namespace Game, Frontend

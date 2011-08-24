@@ -1,5 +1,6 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import org.maemo.miniature 1.0
 
 // Pending: proper parenting between groups of items
 
@@ -279,6 +280,9 @@ Page {
         cellWidth: 60 // FIXME better not hardcoded
         cellHeight: 60 // FIXME better not hardcoded
         interactive: false
+        model: chessBoard
+        delegate: chessboardGridDelegate
+
 
         // Creating variables to detect valid piece moves and clean unused squares
         Item {
@@ -307,7 +311,7 @@ Page {
                 }
 
                 Image {
-                    source: piece
+                    source: pieceImage
                     width: 60 // FIXME better not hardcoded
                     height: 60 // FIXME better not hardcoded
                 }
@@ -326,7 +330,7 @@ Page {
                         if (checkMove.fromIndex === -1) {
 
                             // The tap is on an empty square or on a figure of wrong color
-                            if (piece == "emptysquare.png" || pieceColor !== checkMove.colorPlaying)
+                            if (pieceImage == "emptysquare.png" || pieceColor !== checkMove.colorPlaying)
                                 squareDelegate.state = "wrongTap"
 
                             // The tap is on a figure of right color
@@ -348,7 +352,7 @@ Page {
                             if (pieceColor === checkMove.colorPlaying) {
 
                                 // The tap is a castling // FIXME must check with mikhas what he wants to check here
-                                if ((checkMove.fromKing === "whiteKing") && (checkMove.fromIndex === 60) && (piece === "white/rook.png") && (index === 63 || 56))
+                                if ((checkMove.fromKing === "whiteKing") && (checkMove.fromIndex === 60) && (pieceImage === "white/rook.png") && (index === 63 || 56))
                                     squareDelegate.state = "pieceMoving"
 
                                 // No castling & the validator doesn't approve the piece selection - FIXME to be plugged
@@ -378,8 +382,8 @@ Page {
                         name: "cleaningSquares"
                         StateChangeScript {
                             script: {
-                                if (chessboardGrid.model.get(checkMove.toIndex).squareColor !== "transparent")
-                                    chessboardGrid.model.set(checkMove.toIndex, {squareColor: "transparent"})
+                                if (chessboardGrid.model.get(checkMove.toIndex, "squareColor") !== "transparent")
+                                    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
                             }
                         }
                     },
@@ -389,14 +393,14 @@ Page {
                         extend: 'cleaningSquares'
                         StateChangeScript {
                             script: {
-                                checkMove.fromKing = figure // Needed only to detect castling
-                                if (chessboardGrid.model.get(checkMove.fromIndex).squareColor !== "transparent")
-                                    chessboardGrid.model.set(checkMove.fromIndex, {squareColor: "transparent"})
+                                checkMove.fromKing = piece // Needed only to detect castling
+                                if (chessboardGrid.model.get(checkMove.fromIndex, "squareColor") !== "transparent")
+                                    chessboardGrid.model.set(checkMove.fromIndex, "transparent", "squareColor")
                             }
                         }
                         StateChangeScript {
                             script: {
-                                chessboardGrid.model.set(index, {squareColor: "blue"})
+                                chessboardGrid.model.set(index, "blue", "squareColor")
                                 checkMove.fromIndex = index
                             }
                         }
@@ -416,7 +420,7 @@ Page {
                         extend: 'cleaningSquares'
                         StateChangeScript {
                             script: {
-                                chessboardGrid.model.set(index, {squareColor: "green"})
+                                chessboardGrid.model.set(index, "green", "squareColor")
                                 checkMove.toIndex = index
                             }
                         }
@@ -428,9 +432,6 @@ Page {
                 ]
             }
         }
-
-        model: BoardModel {}
-        delegate: chessboardGridDelegate
     }
 
 
@@ -517,16 +518,22 @@ Page {
                 iconId: "toolbar-add"
                 visible: false
                 onClicked: {
-                    chessboardGrid.model.set(checkMove.toIndex, { // moving the piece, removing blue from square
-                                             figure: chessboardGrid.model.get(checkMove.fromIndex).figure,
-                                             piece: chessboardGrid.model.get(checkMove.fromIndex).piece,
-                                             pieceColor: chessboardGrid.model.get(checkMove.fromIndex).pieceColor,
-                                             squareColor: "transparent"})
-                    chessboardGrid.model.set(checkMove.fromIndex, { // clearing the square of origin
-                                             figure: "emptySquare",
-                                             piece: "emptysquare.png",
-                                             pieceColor: "empty",
-                                             squareColor: "transparent"})
+                    chessboardGrid.model.set(checkMove.toIndex,
+                                             chessboardGrid.model.get(checkMove.fromIndex, "piece"),
+                                             "piece")
+                    chessboardGrid.model.set(checkMove.toIndex,
+                                             chessboardGrid.model.get(checkMove.fromIndex, "pieceImage"),
+                                             "pieceImage")
+                    chessboardGrid.model.set(checkMove.toIndex,
+                                             chessboardGrid.model.get(checkMove.fromIndex, "pieceColor"),
+                                             "pieceColor")
+
+                    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
+                    chessboardGrid.model.set(checkgMove.fromIndex, "emptySquare", "piece");
+                    chessboardGrid.model.set(checkgMove.fromIndex, "emptySquare.png", "pieceImage");
+                    chessboardGrid.model.set(checkgMove.fromIndex, "empty", "pieceColor");
+                    chessboardGrid.model.set(checkgMove.fromIndex, "transparent", "squareColor");
+
                     checkMove.fromIndex = -1 // back to pre-move conditions
                     confirmButton.visible = false
 

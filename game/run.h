@@ -18,24 +18,17 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractcommand.h"
-#include "frontend/frontend.h"
+#ifndef RUN_H
+#define RUN_H
+
+#include <QtCore>
 
 namespace Game {
 
-AbstractCommand::AbstractCommand(Target)
-{}
-
-AbstractCommand::~AbstractCommand()
-{}
-
-void AbstractCommand::exec(Registry *)
-{}
-
-void AbstractCommand::exec(AbstractBackend *)
-{}
-
-void AbstractCommand::exec(Frontend::Frontend *)
-{}
+//! Sets up and runs frontend. Mostly done to hide dependencies.
+void run(const QUrl &url,
+         QObject *parent = 0);
 
 } // namespace Game
+
+#endif // RUN_H

@@ -33,7 +33,6 @@ namespace Game {
 
 class AbstractBackend;
 class Registry;
-class Frontend;
 
 namespace Command {
 
