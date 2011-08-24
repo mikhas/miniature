@@ -53,3 +53,6 @@ need this submodule.
 * It only knows a "Deploy to device: QEMU" option by default, which is of
   course not what we want. Open the "Details" view and select "N950" (which we
   created in step 5).
+
+If you installed Miniature from other sources than the Qt SDK, then it is
+recommended to uninstall that Miniature version first.
