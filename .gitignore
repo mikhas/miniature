@@ -15,3 +15,5 @@ tests/testlocalparser/testlocalparser
 tests/testficsparser/testficsparser
 tests/testfics/testfics
 tests/testposition/testposition
+src/qrc_frontend.cpp
+qtc_packaging/
