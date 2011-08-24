@@ -34,6 +34,8 @@ class GamePrivate;
 class Dispatcher;
 class AbstractCommand;
 
+typedef QWeakPointer<Game> WeakGame;
+
 //! Creates a game
 //! @param id the game id. If 0 then an unique identifier will be created.
 //! @param dispatcher the dispatcher.

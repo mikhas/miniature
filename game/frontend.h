@@ -25,7 +25,7 @@
 #include "commandline.h"
 #include "linereader.h"
 #include "abstractbackend.h"
-#include "side.h"
+#include "game.h"
 
 #include <QtCore>
 
@@ -66,6 +66,10 @@ public:
     //! highlighted at a time.
     //! @param id the game advertisement id
     Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
+
+    //! Sets the active game.
+    //! @param game the game.
+    void setActiveGame(Game *game);
 
 private:
     void sendCommand(AbstractCommand *command);

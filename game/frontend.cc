@@ -193,8 +193,7 @@ public:
     CommandLine command_line;
     LineReader line_reader;
     AdvertisementModel advertisements;
-    WeakSide local_side;
-    WeakSide remote_side;
+    WeakGame game;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
 #endif
@@ -204,6 +203,7 @@ public:
         , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
+        , game()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -292,6 +292,12 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
 
         d->advertisements.setData(mi, found && not was_highlighted, AdvertisementModel::RoleHighlighted);
     }
+}
+
+void Frontend::setActiveGame(Game *game)
+{
+    Q_D(Frontend);
+    d->game = WeakGame(game);
 }
 
 void Frontend::sendCommand(AbstractCommand *command)

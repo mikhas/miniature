@@ -18,51 +18,30 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "activategame.h"
 #include "registry.h"
-#include "game.h"
-#include "namespace.h"
-#include "side.h"
-#include "frontend.h"
-#include "commands.h"
 
-namespace Game {
+namespace Game { namespace Command {
 
-Registry::Registry(Dispatcher *dispatcher,
-                   QObject *parent)
-    : QObject(parent)
-    , m_dispatcher(dispatcher)
-    , m_games()
+ActivateGame::ActivateGame(Target t,
+                           Game *game)
+    : AbstractCommand(t)
+    , m_target(t)
+    , m_game(game)
 {}
 
-Registry::~Registry()
+ActivateGame::~ActivateGame()
 {}
 
-void Registry::registerGame(Game *game)
+Target ActivateGame::target() const
 {
-    if (m_games.contains(game)) {
-        return;
-    }
-
-    m_games.append(game);
-
-    // TODO: Who gets to decide about game activation?
-    Command::ActivateGame ag(TargetFrontend, game);
-    if (Dispatcher *dispatcher = m_dispatcher.data()) {
-        dispatcher->sendCommand(&ag);
-    }
+    return m_target;
 }
 
-Game * Registry::game(uint id) const
+void ActivateGame::exec(Frontend *target)
 {
-    foreach(Game *g, m_games) {
-        if (g->id() == id) {
-            return g;
-        }
-    }
-
-    return 0;
+    target->setActiveGame(m_game.data());
 }
 
+}} // namespace Command, Game
 
-
-} // namespace Game

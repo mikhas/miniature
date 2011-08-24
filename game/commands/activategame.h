@@ -18,51 +18,36 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "registry.h"
+#ifndef ACTIVATEGAME_H
+#define ACTIVATEGAME_H
+
+#include "abstractcommand.h"
+#include "abstractbackend.h"
 #include "game.h"
-#include "namespace.h"
-#include "side.h"
 #include "frontend.h"
-#include "commands.h"
 
-namespace Game {
+#include <QtCore>
 
-Registry::Registry(Dispatcher *dispatcher,
-                   QObject *parent)
-    : QObject(parent)
-    , m_dispatcher(dispatcher)
-    , m_games()
-{}
+namespace Game { namespace Command {
 
-Registry::~Registry()
-{}
-
-void Registry::registerGame(Game *game)
+//! Command to activate the given game.
+class ActivateGame
+    : public AbstractCommand
 {
-    if (m_games.contains(game)) {
-        return;
-    }
+private:
+    const Target m_target;
+    WeakGame m_game;
 
-    m_games.append(game);
+public:
+    //! \reimp
+    explicit ActivateGame(Target t,
+                          Game *game);
+    virtual ~ActivateGame();
+    virtual Target target() const;
+    virtual void exec(Frontend *target);
+    //! \reimp_end
+};
 
-    // TODO: Who gets to decide about game activation?
-    Command::ActivateGame ag(TargetFrontend, game);
-    if (Dispatcher *dispatcher = m_dispatcher.data()) {
-        dispatcher->sendCommand(&ag);
-    }
-}
+}} // namespace Command, Game
 
-Game * Registry::game(uint id) const
-{
-    foreach(Game *g, m_games) {
-        if (g->id() == id) {
-            return g;
-        }
-    }
-
-    return 0;
-}
-
-
-
-} // namespace Game
+#endif // CREATECGAME_H
