@@ -347,6 +347,7 @@ Page {
 
                         // This is tap with a piece already selected
                         else {
+                            checkMove.toIndex = index
 
                             // The tap is on another piece of the same color
                             if (pieceColor === checkMove.colorPlaying) {
@@ -382,8 +383,8 @@ Page {
                         name: "cleaningSquares"
                         StateChangeScript {
                             script: {
-                                if (chessboardGrid.model.get(checkMove.toIndex, "squareColor") !== "transparent")
-                                    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
+                                //if (chessboardGrid.model.get(checkMove.toIndex, "squareColor") !== "transparent")
+                                //    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
                             }
                         }
                     },
@@ -394,13 +395,13 @@ Page {
                         StateChangeScript {
                             script: {
                                 checkMove.fromKing = piece // Needed only to detect castling
-                                if (chessboardGrid.model.get(checkMove.fromIndex, "squareColor") !== "transparent")
-                                    chessboardGrid.model.set(checkMove.fromIndex, "transparent", "squareColor")
+                                //if (chessboardGrid.model.get(checkMove.fromIndex, "squareColor") !== "transparent")
+                                //    chessboardGrid.model.set(checkMove.fromIndex, "transparent", "squareColor")
                             }
                         }
                         StateChangeScript {
                             script: {
-                                chessboardGrid.model.set(index, "blue", "squareColor")
+                                //chessboardGrid.model.set(index, "blue", "squareColor")
                                 checkMove.fromIndex = index
                             }
                         }
@@ -417,11 +418,9 @@ Page {
 
                     State {
                         name: "pieceMoving"
-                        extend: 'cleaningSquares'
                         StateChangeScript {
                             script: {
-                                chessboardGrid.model.set(index, "green", "squareColor")
-                                checkMove.toIndex = index
+                                miniature.move(checkMove.fromIndex, checkMove.toIndex);
                             }
                         }
                         PropertyChanges {
@@ -518,21 +517,7 @@ Page {
                 iconId: "toolbar-add"
                 visible: false
                 onClicked: {
-                    chessboardGrid.model.set(checkMove.toIndex,
-                                             chessboardGrid.model.get(checkMove.fromIndex, "piece"),
-                                             "piece")
-                    chessboardGrid.model.set(checkMove.toIndex,
-                                             chessboardGrid.model.get(checkMove.fromIndex, "pieceImage"),
-                                             "pieceImage")
-                    chessboardGrid.model.set(checkMove.toIndex,
-                                             chessboardGrid.model.get(checkMove.fromIndex, "pieceColor"),
-                                             "pieceColor")
-
-                    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
-                    chessboardGrid.model.set(checkgMove.fromIndex, "emptySquare", "piece");
-                    chessboardGrid.model.set(checkgMove.fromIndex, "emptySquare.png", "pieceImage");
-                    chessboardGrid.model.set(checkgMove.fromIndex, "empty", "pieceColor");
-                    chessboardGrid.model.set(checkgMove.fromIndex, "transparent", "squareColor");
+                    miniature.confirmMove()
 
                     checkMove.fromIndex = -1 // back to pre-move conditions
                     confirmButton.visible = false

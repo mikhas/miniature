@@ -49,7 +49,6 @@ namespace {
         Game::PlayerRecord black;
         Role role;
         Game::Position position;
-        Game::MovedPiece moved_piece;
     };
 
     // %1 is a placeholder the game ad id.
@@ -226,12 +225,13 @@ namespace {
         result.valid = result.valid && match_move.exactMatch(cols.at(27));
         Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0)));
         p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
-        result.moved_piece = Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1()));
 
         int dpp_file = cols.at(19).toInt(&converted);
         result.valid = result.valid && converted;
 
         Game::Position &pos = result.position;
+        pos.setMovedPiece(Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1())));
+
         pos.setDoublePawnPush(dpp_file == -1 ? Game::FileCount : static_cast<Game::File>(dpp_file));
         pos.setNextToMove(cols.at(9) == "W" ? Game::ColorWhite : Game::ColorBlack);
 
@@ -430,7 +430,7 @@ void Backend::processToken(const QByteArray &token)
     case StateReady: {
         const GameUpdate &gu(parseGameUpdate(token));
         if (gu.valid) {
-            Command::Move m(TargetRegistry, gu.id, gu.position, gu.moved_piece);
+            Command::Move m(TargetRegistry, gu.id, gu.position);
             m.setWhite(gu.white);
             m.setBlack(gu.black);
             sendCommand(&m);

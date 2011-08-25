@@ -70,6 +70,17 @@ public:
     //! @param id the game advertisement id
     Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
 
+    //! Performs a move. Will be sent once confirmed.
+    //! @param origin the original square of the moved piece.
+    //! @param target the target square of the moved piece.
+    //! @param promotion the promotion to use (optional, defaults to queen).
+    Q_INVOKABLE void move(int origin,
+                          int target,
+                          const QString &promotion = QString("queen"));
+
+    //! Confirms current move.
+    Q_INVOKABLE void confirmMove();
+
     //! Sets the active game.
     //! @param game the game.
     void setActiveGame(Game *game);

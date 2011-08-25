@@ -51,13 +51,11 @@ private:
 public:
     //! \reimp
     //! C'tor
+    //! @param game_id the game id.
     //! @param result the resulting position.
-    //! @param moved_piece the moved piece, consisting of origin and target
-    //!        square.
     explicit Move(Target target,
                   uint game_id,
-                  const Position &result,
-                  const MovedPiece &moved_piece);
+                  const Position &result);
 
     virtual ~Move();
     virtual Target target() const;
@@ -66,7 +64,6 @@ public:
 
     uint gameId() const;
     Position result() const;
-    MovedPiece movedPiece() const;
 
     PlayerRecord white() const;
     void setWhite(const PlayerRecord &player_record);

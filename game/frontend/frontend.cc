@@ -300,6 +300,36 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
     }
 }
 
+
+void Frontend::move(int origin,
+                    int target,
+                    const QString &promotion)
+{
+    Q_UNUSED(promotion)
+    Q_D(Frontend);
+
+    const Square o(toSquare(origin));
+    const Square t(toSquare(target));
+
+    Position pos(d->chess_board.position());
+    Piece p(pos.pieceAt(o));
+    p.setSquare(t);
+
+    // TODO: Send through validator, detect castling etc ... info needs to be set on Position.
+    // Easier: send move to chess engine and just get new position ;-)
+    pos.setMovedPiece(MovedPiece(p, o));
+    d->chess_board.setPosition(pos);
+}
+
+void Frontend::confirmMove()
+{
+    Q_D(Frontend);
+
+    const uint id(d->game.isNull() ? 999u : d->game.data()->id());
+    Command::Move m(TargetRegistry, id, d->chess_board.position());
+    sendCommand(&m);
+}
+
 void Frontend::setActiveGame(Game *game)
 {
     Q_D(Frontend);

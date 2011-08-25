@@ -22,6 +22,23 @@
 #include "frontend.h"
 
 namespace Game { namespace Frontend { namespace {
+    typedef QHash<Piece::Type, QString> PieceMap;
+    PieceMap pieceMap()
+    {
+        PieceMap map;
+
+        map.insert(Piece::Pawn, "Pawn");
+        map.insert(Piece::Rook, "Rook");
+        map.insert(Piece::Knight, "Knight");
+        map.insert(Piece::Bishop, "Bishop");
+        map.insert(Piece::Queen, "Queen");
+        map.insert(Piece::King, "King");
+        map.insert(Piece::None, "emptySquare");
+
+        return map;
+    }
+
+    const PieceMap piece_map(pieceMap());
 
     int indexFromSquare(const Square &square)
     {
@@ -30,22 +47,18 @@ namespace Game { namespace Frontend { namespace {
 
     QString fromPiece(const Piece &piece)
     {
-        QString type;
+        return QString("%1%2").arg(fromColor(piece.color()))
+                              .arg(piece_map.value(piece.type()));
+    }
 
-        switch (piece.type()) {
-        case Piece::Pawn: type = "Pawn"; break;
-        case Piece::Rook: type = "Rook"; break;
-        case Piece::Knight: type = "Knight"; break;
-        case Piece::Bishop: type = "Bishop"; break;
-        case Piece::Queen: type = "Queen"; break;
-        case Piece::King: type = "Knight"; break;
-
-        default:
-            return "emptySquare";
+    Piece toPiece(const QString &str)
+    {
+        static const QRegExp match("(black|white)(\\w)");
+        if (not match.exactMatch(str)) {
+            return Piece();
         }
 
-        return QString("%1%2").arg(fromColor(piece.color()))
-                .arg(type);
+        return Piece(piece_map.key(match.cap(2)), (match.cap(1) == "white" ? ColorWhite : ColorBlack));
     }
 
     QString imageFromPiece(const Piece &piece)
@@ -58,7 +71,7 @@ namespace Game { namespace Frontend { namespace {
         case Piece::Knight: type = "knight"; break;
         case Piece::Bishop: type = "bishop"; break;
         case Piece::Queen: type = "queen"; break;
-        case Piece::King: type = "knight"; break;
+        case Piece::King: type = "king"; break;
 
         default:
             return "emptysquare.png";
@@ -83,11 +96,6 @@ ChessBoard::ChessBoard(QObject *parent)
     setRoleNames(roles);
 }
 
-void ChessBoard::set(int,
-                     const QString &,
-                     const QString &)
-{}
-
 QVariant ChessBoard::get(int index,
                          const QString &role) const
 {
@@ -98,6 +106,11 @@ QVariant ChessBoard::get(int index,
 void ChessBoard::triggerDataChanged()
 {
     emit dataChanged(index(0, 0), index(63, 0));
+}
+
+Position ChessBoard::position() const
+{
+    return m_position;
 }
 
 void ChessBoard::setPosition(const Position &position)

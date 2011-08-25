@@ -57,14 +57,12 @@ public:
 
     explicit ChessBoard(QObject *parent = 0);
 
-    Q_INVOKABLE void set(int index,
-                         const QString &data,
-                         const QString &role);
-
     Q_INVOKABLE QVariant get(int index,
                              const QString &role) const;
 
     void triggerDataChanged();
+
+    Position position() const;
     void setPosition(const Position &position);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;

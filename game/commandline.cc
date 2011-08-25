@@ -113,7 +113,7 @@ void CommandLine::processToken(const QByteArray &token)
         const QByteArray &data(d->extractData(value, token));
         // FIXME: Convert into move command, use proper game id?
         qDebug() << __PRETTY_FUNCTION__ << data;
-        Command::Move move(TargetRegistry, 0, Position(), MovedPiece());
+        Command::Move move(TargetRegistry, 0, Position());
         sendCommand(&move);
     } else if (d->startsWithCommand(CommandPlay, token, &value)) {
         const QByteArray &data(d->extractData(value, token));
