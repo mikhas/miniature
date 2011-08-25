@@ -305,7 +305,7 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
 void Frontend::selectPiece(int target)
 {
     Q_D(Frontend);
-    d->chess_board.selectPiece(toSquare(target));
+    d->chess_board.selectPiece(toSquare(d->chess_board.adjustedIndex(target)));
 }
 
 void Frontend::movePiece(int origin,
@@ -317,14 +317,14 @@ void Frontend::movePiece(int origin,
         return;
     }
 
-    const Square o(toSquare(origin));
-    const Square t(toSquare(target));
+    Q_D(Frontend);
+
+    const Square o(toSquare(d->chess_board.adjustedIndex(origin)));
+    const Square t(toSquare(d->chess_board.adjustedIndex(target)));
 
     if (not o.valid() || not t.valid()) {
         return;
     }
-
-    Q_D(Frontend);
 
     // Undo last move and invalidate:
     const bool was_valid(d->valid_move);
@@ -406,6 +406,8 @@ void Frontend::setActiveGame(Game *game)
             Qt::UniqueConnection);
 
     // Update current position manually:
+    d->chess_board.setOrientation(game->localSideColor() == LocalSideIsWhite ? ChessBoard::WhiteAtBottom
+                                                                             : ChessBoard::WhiteAtTop);
     onPositionChanged(game->position());
 }
 

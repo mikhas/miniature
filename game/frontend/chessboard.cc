@@ -40,9 +40,11 @@ namespace Game { namespace Frontend { namespace {
 
     const PieceMap piece_map(pieceMap());
 
-    int indexFromSquare(const Square &square)
+    int indexFromSquare(const Square &square,
+                        ChessBoard::Orientation o)
     {
-        return square.rank * 8 + square.file;
+        const int index(square.rank * 8 + square.file);
+        return (o == ChessBoard::WhiteAtBottom ? index : qAbs<int>(index - 63));
     }
 
     QString fromPiece(const Piece &piece)
@@ -87,6 +89,7 @@ ChessBoard::ChessBoard(QObject *parent)
     , m_position()
     , m_undo_position()
     , m_square_color(64, SquareColorTransparent)
+    , m_orienation(WhiteAtBottom)
 {
     // QML cannot cope with c-style-variable-names!
     QHash<int, QByteArray> roles;
@@ -132,14 +135,19 @@ void ChessBoard::setPosition(const Position &position)
         const MovedPiece &m(m_position.movedPiece());
         const Piece &p(m.piece());
 
-        const QModelIndex &origin(index(indexFromSquare(m.origin()), 0));
-        const QModelIndex &target(index(indexFromSquare(p.square()), 0));
+        const QModelIndex &origin(index(indexFromSquare(m.origin(), m_orienation), 0));
+        const QModelIndex &target(index(indexFromSquare(p.square(), m_orienation), 0));
 
         emit dataChanged(origin, origin);
         emit dataChanged(target, target);
 
         // TODO: Handle en-passant
     }
+}
+
+void ChessBoard::setOrientation(Orientation orientation)
+{
+    m_orienation = orientation;
 }
 
 int ChessBoard::rowCount(const QModelIndex &parent) const
@@ -151,7 +159,8 @@ int ChessBoard::rowCount(const QModelIndex &parent) const
 QVariant ChessBoard::data(const QModelIndex &index,
                           int role) const
 {
-    const Piece &p(m_position.pieceAt(toSquare(index.row())));
+    int row(adjustedIndex(index.row()));
+    const Piece &p(m_position.pieceAt(toSquare(row)));
     const bool valid_selection(p.type() != Piece::None
                                && p == m_selected_piece);
     const bool wrong_color(m_selected_piece.type() != Piece::None
@@ -163,7 +172,7 @@ QVariant ChessBoard::data(const QModelIndex &index,
     case RolePieceColor: return fromColor(p.color());
     case RoleSquareColor: return (valid_selection ? "green"
                                                   : wrong_color ? "red"
-                                                                : fromSquareColor(m_square_color.at(index.row())));
+                                                                : fromSquareColor(m_square_color.at(row)));
     }
 
     return QVariant();
@@ -191,6 +200,12 @@ void ChessBoard::commitMove(Undo undo)
 
     m_position.setNextToMove(m_position.nextToMove() == ColorWhite ? ColorBlack
                                                                    : ColorWhite);
+}
+
+int ChessBoard::adjustedIndex(int index) const
+{
+    return (m_orienation == WhiteAtBottom ? index
+                                          : qAbs<int>(index - 63));
 }
 
 QString ChessBoard::fromSquareColor(SquareColor sq) const

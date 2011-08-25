@@ -36,6 +36,12 @@ class ChessBoard
     Q_OBJECT
     Q_DISABLE_COPY(ChessBoard)
 
+public:
+    enum Orientation {
+        WhiteAtBottom,
+        WhiteAtTop
+    };
+
 private:
     enum SquareColor {
         SquareColorTransparent,
@@ -48,6 +54,7 @@ private:
     Position m_undo_position;
     QVector<SquareColor> m_square_color;
     Piece m_selected_piece;
+    Orientation m_orienation;
 
 public:
     enum Roles {
@@ -72,6 +79,8 @@ public:
     Position position() const;
     void setPosition(const Position &position);
 
+    void setOrientation(Orientation orientation);
+
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index,
                   int role) const;
@@ -80,6 +89,7 @@ public:
     void undo();
 
     void commitMove(Undo undo = NoUndo);
+    int adjustedIndex(int index) const;
 
 private:
     QString fromSquareColor(SquareColor sq) const;
