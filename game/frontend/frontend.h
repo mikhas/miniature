@@ -44,6 +44,9 @@ class Frontend
     Q_DISABLE_COPY(Frontend)
     Q_DECLARE_PRIVATE(Frontend)
 
+    Q_PROPERTY(bool validMove READ validMove
+                              NOTIFY validMoveChanged)
+
 private:
     const QScopedPointer<FrontendPrivate> d_ptr;
 
@@ -70,16 +73,28 @@ public:
     //! @param id the game advertisement id
     Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
 
+    //! Selects a piece. Silently fails if piece was of wrong color or square is empty.
+    //! @param target the target square of the selected piece [0-63].
+    Q_INVOKABLE void selectPiece(int target);
+
     //! Performs a move. Will be sent once confirmed.
-    //! @param origin the original square of the moved piece.
-    //! @param target the target square of the moved piece.
+    //! @param origin the original square of the moved piece [0-63].
+    //! @param target the target square of the moved piece [0-63].
     //! @param promotion the promotion to use (optional, defaults to queen).
-    Q_INVOKABLE void move(int origin,
-                          int target,
-                          const QString &promotion = QString("queen"));
+    Q_INVOKABLE void movePiece(int origin,
+                               int target,
+                               const QString &promotion = QString("queen"));
+
+    //! Undoes last move.
+    Q_INVOKABLE void undoMove();
+
+    //! Returns whether last move was valid.
+    Q_INVOKABLE bool validMove() const;
+    Q_SIGNAL void validMoveChanged(bool valid);
 
     //! Confirms current move.
     Q_INVOKABLE void confirmMove();
+
 
     //! Sets the active game.
     //! @param game the game.

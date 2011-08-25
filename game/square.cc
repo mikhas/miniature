@@ -28,6 +28,11 @@ Square::Square(File new_file,
     , rank(new_rank)
 {}
 
+bool Square::valid() const
+{
+    return (file != FileCount && rank != RankCount);
+}
+
 bool operator==(const Square &a,
                 const Square &b)
 {

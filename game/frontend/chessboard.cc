@@ -85,6 +85,7 @@ namespace Game { namespace Frontend { namespace {
 ChessBoard::ChessBoard(QObject *parent)
     : QAbstractListModel(parent)
     , m_position()
+    , m_undo_position()
     , m_square_color(64, SquareColorTransparent)
 {
     // QML cannot cope with c-style-variable-names!
@@ -119,7 +120,10 @@ void ChessBoard::setPosition(const Position &position)
                                     && position.pieces().count() > 0);
     const bool was_castling(not was_initial_position
                             && m_position.castlingFlags() != position.castlingFlags());
+
+    m_undo_position = m_position;
     m_position = position;
+    m_selected_piece = Piece();
 
     // Requires full board update:
     if (was_initial_position || was_castling) {
@@ -148,15 +152,35 @@ QVariant ChessBoard::data(const QModelIndex &index,
                           int role) const
 {
     const Piece &p(m_position.pieceAt(toSquare(index.row())));
+    const bool valid_selection(p.type() != Piece::None
+                               && p == m_selected_piece);
+    const bool wrong_color(m_selected_piece.type() != Piece::None
+                           && m_selected_piece.color() != m_position.nextToMove());
 
     switch(role) {
     case RolePiece: return fromPiece(p);
     case RolePieceImage: return imageFromPiece(p);
     case RolePieceColor: return fromColor(p.color());
-    case RoleSquareColor: return fromSquareColor(m_square_color.at(index.row()));
+    case RoleSquareColor: return (valid_selection ? "green"
+                                                  : wrong_color ? "red"
+                                                                : fromSquareColor(m_square_color.at(index.row())));
     }
 
     return QVariant();
+}
+
+void ChessBoard::selectPiece(const Square &target)
+{
+    m_selected_piece = m_position.pieceAt(target);
+}
+
+void ChessBoard::undo()
+{
+    if (m_undo_position.pieces().count() > 0
+        && m_position != m_undo_position) {
+        m_position = m_undo_position;
+        triggerDataChanged();
+    }
 }
 
 QString ChessBoard::fromSquareColor(SquareColor sq) const

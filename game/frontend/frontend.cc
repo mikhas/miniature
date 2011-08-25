@@ -196,6 +196,7 @@ public:
     LineReader line_reader;
     Advertisements advertisements;
     ChessBoard chess_board;
+    bool valid_move;
     WeakGame game;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
@@ -207,6 +208,7 @@ public:
         , line_reader()
         , advertisements()
         , chess_board()
+        , valid_move(false)
         , game()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
@@ -300,34 +302,92 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
     }
 }
 
+void Frontend::selectPiece(int target)
+{
+    Q_D(Frontend);
+    d->chess_board.selectPiece(toSquare(target));
+}
 
-void Frontend::move(int origin,
-                    int target,
-                    const QString &promotion)
+void Frontend::movePiece(int origin,
+                         int target,
+                         const QString &promotion)
 {
     Q_UNUSED(promotion)
-    Q_D(Frontend);
+    if (origin == target) {
+        return;
+    }
 
     const Square o(toSquare(origin));
     const Square t(toSquare(target));
 
+    if (not o.valid() || not t.valid()) {
+        return;
+    }
+
+    Q_D(Frontend);
+
+    // Undo last move and invalidate:
+    const bool was_valid(d->valid_move);
+    d->chess_board.undo();
+    d->valid_move = false;
+
+    // Find piece in current position:
     Position pos(d->chess_board.position());
-    Piece p(pos.pieceAt(o));
-    p.setSquare(t);
+    Piece p0(pos.pieceAt(o));
+    const Piece &p1(pos.pieceAt(t));
+
+    // Select piece:
+    d->chess_board.selectPiece(o);
+    p0.setSquare(t);
 
     // TODO: Send through validator, detect castling etc ... info needs to be set on Position.
     // Easier: send move to chess engine and just get new position ;-)
-    pos.setMovedPiece(MovedPiece(p, o));
-    d->chess_board.setPosition(pos);
+
+    d->valid_move = (p0.valid()
+                     && p0.color() == pos.nextToMove()
+                     && p0.color() != p1.color());
+
+    if (was_valid != d->valid_move) {
+        emit validMoveChanged(d->valid_move);
+    }
+
+    if (d->valid_move) {
+        pos.setNextToMove(p0.color() == ColorWhite ? ColorBlack : ColorWhite);
+        pos.setMovedPiece(MovedPiece(p0, o));
+        d->chess_board.setPosition(pos);
+    }
+}
+
+void Frontend::undoMove()
+{
+    Q_D(Frontend);
+    d->chess_board.undo();
+
+    d->valid_move = false;
+    emit validMoveChanged(false);
+}
+
+bool Frontend::validMove() const
+{
+    Q_D(const Frontend);
+    return d->valid_move;
 }
 
 void Frontend::confirmMove()
 {
     Q_D(Frontend);
+    if (not d->valid_move) {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Invalid move confirmed. Ignored.";
+        return;
+    }
 
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
     Command::Move m(TargetRegistry, id, d->chess_board.position());
     sendCommand(&m);
+
+    d->valid_move = false;
+    emit validMoveChanged(false);
 }
 
 void Frontend::setActiveGame(Game *game)

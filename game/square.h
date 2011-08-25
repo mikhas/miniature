@@ -35,6 +35,8 @@ public:
 
     explicit Square(File new_file,
                     Rank new_rank);
+
+    bool valid() const;
 };
 
 bool operator==(const Square &a,

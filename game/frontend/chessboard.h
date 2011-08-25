@@ -45,7 +45,9 @@ private:
     };
 
     Position m_position;
+    Position m_undo_position;
     QVector<SquareColor> m_square_color;
+    Piece m_selected_piece;
 
 public:
     enum Roles {
@@ -68,6 +70,9 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index,
                   int role) const;
+
+    void selectPiece(const Square &target);
+    void undo();
 
 private:
     QString fromSquareColor(SquareColor sq) const;

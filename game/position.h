@@ -50,6 +50,8 @@ public:
     explicit Piece(Type type,
                    Color color);
 
+    bool valid() const;
+
     Type type() const;
     Color color() const;
 

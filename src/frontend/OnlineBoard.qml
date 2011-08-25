@@ -287,11 +287,7 @@ Page {
         // Creating variables to detect valid piece moves and clean unused squares
         Item {
             id: checkMove
-            property string colorPlaying: "white" // Teaching the program who starts the Chess game.
-            property bool isValid: true // Poorman's Validator, always judges 'true'. The real one needs to plug here.
-            property int fromIndex: -1
-            property string fromKing // only needed for castling
-            property int toIndex
+            property int lastIndex: -1
             property int moveNumber: 0 // Used by the timer to know when to start
         }
 
@@ -319,116 +315,14 @@ Page {
                 MouseArea {
                     id: squareMouseArea
                     anchors.fill: parent
-                    onClicked:
-                    { // console.log(squareDelegate.state); Used to debug board effects
-
-                        // Cleaning previous state of the squareDelegate tapped
-                        if (squareDelegate.state !== "")
-                            squareDelegate.state = ""
-
-                        // This is a tap with no piece already selected
-                        if (checkMove.fromIndex === -1) {
-
-                            // The tap is on an empty square or on a figure of wrong color
-                            if (pieceImage == "emptysquare.png" || pieceColor !== checkMove.colorPlaying)
-                                squareDelegate.state = "wrongTap"
-
-                            // The tap is on a figure of right color
-                            else {
-
-                                // The validator doesn't approve the piece selection - FIXME to be plugged
-                                if (checkMove.isValid === false)
-                                    squareDelegate.state = "wrongTap"
-
-                                // The validator approves the piece selection - FIXME to be plugged
-                                else squareDelegate.state = "pieceSelected"
-                            }
+                    onClicked: {
+                        if (checkMove.lastIndex != -1) {
+                            miniature.movePiece(checkMove.lastIndex, index)
                         }
 
-                        // This is tap with a piece already selected
-                        else {
-                            checkMove.toIndex = index
-
-                            // The tap is on another piece of the same color
-                            if (pieceColor === checkMove.colorPlaying) {
-
-                                // The tap is a castling // FIXME must check with mikhas what he wants to check here
-                                if ((checkMove.fromKing === "whiteKing") && (checkMove.fromIndex === 60) && (pieceImage === "white/rook.png") && (index === 63 || 56))
-                                    squareDelegate.state = "pieceMoving"
-
-                                // No castling & the validator doesn't approve the piece selection - FIXME to be plugged
-                                else if (checkMove.isValid === false)
-                                    squareDelegate.state = "wrongTap"
-
-                                // No castling & the validator approves the piece selection - FIXME to be plugged
-                                else squareDelegate.state = "pieceSelected"
-                            }
-
-                            // The tap is on an empty square or a piece of another color
-                            else
-
-                                // The validator doesn't approve the piece selection - FIXME to be plugged
-                                if (checkMove.isValid === false)
-                                    squareDelegate.state = "wrongTap"
-
-                            // The validator approves the piece selection - FIXME to be plugged
-                                else squareDelegate.state = "pieceMoving"
-                        }
+                        checkMove.lastIndex = index
                     }
                 }
-
-                states: [
-
-                    State {
-                        name: "cleaningSquares"
-                        StateChangeScript {
-                            script: {
-                                //if (chessboardGrid.model.get(checkMove.toIndex, "squareColor") !== "transparent")
-                                //    chessboardGrid.model.set(checkMove.toIndex, "transparent", "squareColor")
-                            }
-                        }
-                    },
-
-                    State {
-                        name: "pieceSelected"
-                        extend: 'cleaningSquares'
-                        StateChangeScript {
-                            script: {
-                                checkMove.fromKing = piece // Needed only to detect castling
-                                //if (chessboardGrid.model.get(checkMove.fromIndex, "squareColor") !== "transparent")
-                                //    chessboardGrid.model.set(checkMove.fromIndex, "transparent", "squareColor")
-                            }
-                        }
-                        StateChangeScript {
-                            script: {
-                                //chessboardGrid.model.set(index, "blue", "squareColor")
-                                checkMove.fromIndex = index
-                            }
-                        }
-                    },
-
-                    State {
-                        name: "wrongTap"
-                        extend: 'cleaningSquares'
-                        PropertyChanges {
-                            target: wrongTapAnimation
-                            running: true
-                        }
-                    },
-
-                    State {
-                        name: "pieceMoving"
-                        StateChangeScript {
-                            script: {
-                                miniature.move(checkMove.fromIndex, checkMove.toIndex);
-                            }
-                        }
-                        PropertyChanges {
-                            target: confirmButton
-                            visible: true
-                        }
-                    }
-                ]
             }
         }
     }
@@ -451,7 +345,6 @@ Page {
             anchors.verticalCenter: userZone.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-
         }
 
         Text {
@@ -512,16 +405,16 @@ Page {
             }
 
 
-            ToolIcon { // Confirms the move. Visible only when fromIndex && toIndex are selected.
+            ToolIcon { // Confirms the move. Visible only when lastIndex && toIndex are selected.
                 id: confirmButton
                 iconId: "toolbar-add"
-                visible: false
+                visible: miniature.validMove
                 anchors.horizontalCenter: parent.horizontalCenter
+
                 onClicked: {
                     miniature.confirmMove()
 
-                    checkMove.fromIndex = -1 // back to pre-move conditions
-                    confirmButton.visible = false
+                    checkMove.lastIndex = -1 // back to pre-move conditions
 
                     checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
                     if (checkMove.moveNumber === 3) { userTime.increment = 5000 ; opponentTime.increment = 5000 } // FIXME increments must be substituted by variables

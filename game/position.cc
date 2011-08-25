@@ -97,6 +97,11 @@ Piece::Piece(Type type,
     , m_square(FileCount, RankCount)
 {}
 
+bool Piece::valid() const
+{
+    return (m_type != Piece::None);
+}
+
 Piece::Type Piece::type() const
 {
     return m_type;
@@ -249,6 +254,7 @@ QString moveNotation(const Position &result)
 Position createStartPosition()
 {
     Position p;
+    p.setNextToMove(ColorWhite);
 
     Piece wp(Piece::Pawn, ColorWhite);
     Piece wr(Piece::Rook, ColorWhite);
