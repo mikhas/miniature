@@ -104,10 +104,12 @@ void ChessBoard::setPosition(const Position &position)
 {
     const bool was_initial_position(m_position.pieces().count() == 0
                                     && position.pieces().count() > 0);
+    const bool was_castling(not was_initial_position
+                            && m_position.castlingFlags() != position.castlingFlags());
     m_position = position;
 
     // Requires full board update:
-    if (was_initial_position) {
+    if (was_initial_position || was_castling) {
         emit dataChanged(index(0, 0), index(63, 0));
     } else {
         const MovedPiece &m(m_position.movedPiece());
@@ -119,7 +121,7 @@ void ChessBoard::setPosition(const Position &position)
         emit dataChanged(origin, origin);
         emit dataChanged(target, target);
 
-        // TODO: Handle double pawn push, castling ... perhaps just update whole board then?
+        // TODO: Handle en-passant
     }
 }
 
