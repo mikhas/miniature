@@ -95,6 +95,13 @@ public:
     //! Returns position.
     Position position() const;
 
+    //! Sets the color for the local side.
+    //! @param color the color.
+    void setLocalSideColor(LocalSideColor color);
+
+    //! Returns the color for the local side.
+    LocalSideColor localSideColor() const;
+
     //! Emitted whenever position changes.
     //! @param position the new position.
     Q_SIGNAL void positionChanged(const Position &position);

@@ -85,6 +85,11 @@ enum Color {
     ColorBlack
 };
 
+enum LocalSideColor {
+    LocalSideIsWhite,
+    LocalSideIsBlack
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)
@@ -92,5 +97,6 @@ Q_DECLARE_METATYPE(Game::File)
 Q_DECLARE_METATYPE(Game::Mode)
 Q_DECLARE_METATYPE(Game::Promotion)
 Q_DECLARE_METATYPE(Game::Color)
+Q_DECLARE_METATYPE(Game::LocalSideColor)
 
 #endif // NAMESPACE_H

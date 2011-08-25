@@ -61,6 +61,7 @@ public:
     const QScopedPointer<Side> remote; //!< Side of the remote player.
     Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
+    LocalSideColor local_color; //!< Color of local side.
 
     explicit GamePrivate(uint new_id,
                          Dispatcher *new_dispatcher,
@@ -73,6 +74,7 @@ public:
         , remote(new_remote)
         , active(new_local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
+        , local_color(LocalSideIsWhite)
     {
         if (local.isNull() || remote.isNull()) {
             qCritical() << __PRETTY_FUNCTION__
@@ -138,6 +140,18 @@ Position Game::position() const
 {
     Q_D(const Game);
     return d->position;
+}
+
+void Game::setLocalSideColor(LocalSideColor color)
+{
+    Q_D(Game);
+    d->local_color = color;
+}
+
+LocalSideColor Game::localSideColor() const
+{
+    Q_D(const Game);
+    return d->local_color;
 }
 
 Side * Game::localSide() const

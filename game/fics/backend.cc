@@ -27,8 +27,8 @@ namespace {
     struct GameInfo {
         uint id;
         bool valid;
-        QByteArray local_identifier;
-        QByteArray remote_identifier;
+        QByteArray white;
+        QByteArray black;
         Game::Mode mode;
     };
 
@@ -181,8 +181,8 @@ namespace {
         // FIXME: Is it really local/remote, or white/black?
         result.id = match_create_game.cap(1).toUInt(&converted);
         result.valid = result.valid && converted;
-        result.local_identifier = match_create_game.cap(2).toLatin1();
-        result.remote_identifier = match_create_game.cap(3).toLatin1();
+        result.white = match_create_game.cap(2).toLatin1();
+        result.black = match_create_game.cap(3).toLatin1();
 
         return result;
     }
@@ -292,7 +292,7 @@ namespace {
     void debugOutput(const GameInfo gi)
     {
         qDebug() << gi.valid
-                 << gi.id << gi.local_identifier << gi.remote_identifier << gi.mode;
+                 << gi.id << gi.white << gi.black << gi.mode;
     }
 }
 
@@ -393,7 +393,7 @@ void Backend::play(uint advertisement_id)
 
     // For testing; send a create-game command back immediately:
     Command::CreateGame cg(TargetRegistry, 999u, m_dispatcher.data(),
-                           "test123", "test456");
+                           "test123", "test456", LocalSideIsBlack);
     sendCommand(&cg);
 }
 
@@ -422,8 +422,12 @@ void Backend::processToken(const QByteArray &token)
         const GameInfo &gi(parseCreateGame(token));
         debugOutput(gi);
         if (gi.valid) {
+            const QByteArray &local_side(gi.white == m_username ? gi.white : gi.black);
+            const QByteArray &remote_side(gi.white == local_side ? gi.black : gi.white);
+
             Command::CreateGame cg(TargetRegistry, gi.id, m_dispatcher.data(),
-                                   gi.local_identifier, gi.remote_identifier);
+                                   local_side, remote_side, (local_side == gi.white ? LocalSideIsWhite
+                                                                                    : LocalSideIsBlack));
             sendCommand(&cg);
             m_state = StateReady;
             emit stateChanged(m_state);

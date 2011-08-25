@@ -28,13 +28,15 @@ CreateGame::CreateGame(Target t,
                        uint id,
                        const WeakDispatcher &dispatcher,
                        const QString &local_id,
-                       const QString &remote_id)
+                       const QString &remote_id,
+                       LocalSideColor color)
     : AbstractCommand(t)
     , m_target(t)
     , m_game_id(id)
     , m_dispatcher(dispatcher)
     , m_local_id(local_id)
     , m_remote_id(remote_id)
+    , m_color(color)
 {}
 
 CreateGame::~CreateGame()
@@ -50,6 +52,7 @@ void CreateGame::exec(Registry *target)
     // TODO: Dont register game on frontend? Target should be game registry, use new command to inform frontend and backend about sides?
     Game *game = createGame(m_game_id, m_dispatcher.data(), m_local_id, m_remote_id);
     game->setPosition(createStartPosition());
+    game->setLocalSideColor(m_color);
     target->registerGame(game);
 }
 

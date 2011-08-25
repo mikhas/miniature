@@ -40,6 +40,7 @@ private:
     const WeakDispatcher m_dispatcher;
     const QString m_local_id;
     const QString m_remote_id;
+    LocalSideColor m_color;
 
 public:
     //! \reimp
@@ -47,7 +48,8 @@ public:
                         uint id,
                         const WeakDispatcher &dispatcher,
                         const QString &local_id,
-                        const QString &remote_id);
+                        const QString &remote_id,
+                        LocalSideColor color);
     virtual ~CreateGame();
     virtual Target target() const;
     virtual void exec(Registry *target);
