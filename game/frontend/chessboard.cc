@@ -183,6 +183,16 @@ void ChessBoard::undo()
     }
 }
 
+void ChessBoard::commitMove(Undo undo)
+{
+    if (undo == NoUndo) {
+        m_undo_position = Position();
+    }
+
+    m_position.setNextToMove(m_position.nextToMove() == ColorWhite ? ColorBlack
+                                                                   : ColorWhite);
+}
+
 QString ChessBoard::fromSquareColor(SquareColor sq) const
 {
     switch(sq) {

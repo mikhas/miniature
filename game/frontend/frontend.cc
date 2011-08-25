@@ -352,7 +352,6 @@ void Frontend::movePiece(int origin,
     }
 
     if (d->valid_move) {
-        pos.setNextToMove(p0.color() == ColorWhite ? ColorBlack : ColorWhite);
         pos.setMovedPiece(MovedPiece(p0, o));
         d->chess_board.setPosition(pos);
     }
@@ -382,6 +381,7 @@ void Frontend::confirmMove()
         return;
     }
 
+    d->chess_board.commitMove();
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
     Command::Move m(TargetRegistry, id, d->chess_board.position());
     sendCommand(&m);

@@ -57,6 +57,11 @@ public:
         RoleSquareColor
     };
 
+    enum Undo {
+        NoUndo,
+        SaveUndo
+    };
+
     explicit ChessBoard(QObject *parent = 0);
 
     Q_INVOKABLE QVariant get(int index,
@@ -73,6 +78,8 @@ public:
 
     void selectPiece(const Square &target);
     void undo();
+
+    void commitMove(Undo undo = NoUndo);
 
 private:
     QString fromSquareColor(SquareColor sq) const;
