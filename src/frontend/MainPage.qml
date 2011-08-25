@@ -115,15 +115,15 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             onClicked: Qt.openUrlExternally("http://freechess.org/") }
     }
 
-    Button { // Provisional button to access OnlineBoard for testing purposes
-        id: testingButton
-        text:  "Testing: OnlineBoard"
-        opacity: 0.3
-        anchors.top: registerButton.bottom
-        anchors.topMargin: 100
-        anchors.horizontalCenter: parent.horizontalCenter
-        onClicked: loadScreen("OnlineBoard.qml")
-    }
+//    Button { // Provisional button to access OnlineBoard for testing purposes
+//        id: testingButton
+//        text:  "Testing: OnlineBoard"
+//        opacity: 0.3
+//        anchors.top: registerButton.bottom
+//        anchors.topMargin: 100
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        onClicked: loadScreen("OnlineBoard.qml")
+//    }
 
 
 }

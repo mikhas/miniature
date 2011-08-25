@@ -516,6 +516,7 @@ Page {
                 id: confirmButton
                 iconId: "toolbar-add"
                 visible: false
+                anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     miniature.confirmMove()
 
@@ -536,9 +537,9 @@ Page {
                 }
             }
 
-            ToolIcon { // FIXME Settings page pending
-                iconId: "toolbar-view-menu"
-            }
+//            ToolIcon { // FIXME Settings page pending
+//                iconId: "toolbar-view-menu"
+//            }
         }
     }
 

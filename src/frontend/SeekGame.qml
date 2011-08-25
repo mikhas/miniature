@@ -369,6 +369,7 @@ Page {
 
             ToolButton { // New seek button
                 id: newSeek
+                anchors.horizontalCenter: parent.horizontalCenter
                 text: "New"
                 onClicked: {
                     newSeekDialog.open();
@@ -393,9 +394,9 @@ Page {
                 }
             }
 
-            ToolIcon { // FIXME Settings page pending
-                iconId: "toolbar-view-menu"
-            }
+//            ToolIcon { // FIXME Settings page pending
+//                iconId: "toolbar-view-menu"
+//            }
         }
     }
 }
