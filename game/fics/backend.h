@@ -58,6 +58,7 @@ public:
     virtual void login(const QString &username,
                        const QString &password);
     virtual void play(uint advertisement_id);
+    virtual void movePiece(const MovedPiece &moved_piece);
     virtual void processToken(const QByteArray &token);
     //! \reimp_end
 

@@ -22,6 +22,8 @@
 #define AbstractBackend_H
 
 #include "namespace.h"
+#include "position.h"
+
 #include <QtCore>
 
 namespace Game {
@@ -93,6 +95,8 @@ class AbstractBackend
     Q_DISABLE_COPY(AbstractBackend)
 
 public:
+    // FIXME: Use flags instead of states!
+    // Allows a backend to say "I expect this, this and that message, but not that one.".
     //! The link's state.
     enum State {
         StateIdle,
@@ -139,6 +143,10 @@ public:
     //! @param advertisement_id the play request was the response to a previous
     //!        game advertisement; this is the ad's id (optional).
     virtual void play(uint advertisement_id = 0);
+
+    //! Move piece.
+    //! @param moved_piece the moved piece.
+    virtual void movePiece(const MovedPiece &moved_piece);
 };
 
 } // namespace Game

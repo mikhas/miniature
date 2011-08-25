@@ -29,10 +29,11 @@
 
 #include <QtCore>
 
-namespace Game {
+namespace Game { namespace Frontend {
+class Frontend;
+}
 
 class AbstractBackend;
-class Registry;
 
 namespace Command {
 
@@ -59,7 +60,8 @@ public:
 
     virtual ~Move();
     virtual Target target() const;
-    virtual void exec(Registry *target);
+    virtual void exec(AbstractBackend *target);
+    virtual void exec(Frontend::Frontend *target);
     //! \reimp_end
 
     uint gameId() const;

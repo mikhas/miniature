@@ -19,7 +19,7 @@
  */
 
 #include "move.h"
-#include "registry.h"
+#include "frontend/frontend.h"
 #include "game.h"
 
 namespace Game { namespace Command {
@@ -43,10 +43,22 @@ Target Move::target() const
     return m_target;
 }
 
-void Move::exec(Registry *target)
+void Move::exec(AbstractBackend *target)
 {
-    // TBD
-    if (Game *g = target->game(m_game_id)) {
+    if (not target) {
+        return;
+    }
+
+    target->movePiece(m_result.movedPiece());
+}
+
+void Move::exec(Frontend::Frontend *target)
+{
+    if (not target) {
+            return;
+    }
+
+    if (Game *g = target->activeGame()) {
         g->setPosition(m_result);
     }
 }

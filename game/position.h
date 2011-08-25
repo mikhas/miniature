@@ -121,7 +121,7 @@ private:
 
 //! A human readable notation of a move, based on the resulting position and
 //! its last moved piece.
-QString moveNotation(const Position &result);
+QString moveNotation(const MovedPiece &moved_piece);
 
 //! Constructs start position.
 Position createStartPosition();

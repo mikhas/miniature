@@ -100,6 +100,9 @@ public:
     //! @param game the game.
     void setActiveGame(Game *game);
 
+    //! Returns agive game, can be 0.
+    Game * activeGame() const;
+
 private:
     void sendCommand(AbstractCommand *command);
     Q_SLOT void onPositionChanged(const Position &position);

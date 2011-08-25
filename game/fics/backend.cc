@@ -397,6 +397,13 @@ void Backend::play(uint advertisement_id)
     sendCommand(&cg);
 }
 
+void Backend::movePiece(const MovedPiece &moved_piece)
+{
+    // TODO: Process invalid moves.
+    m_channel.write(moveNotation(moved_piece).toLatin1());
+    m_channel.write("\n");
+}
+
 void Backend::processToken(const QByteArray &token)
 {
     if (not m_enabled || token.isEmpty()) {
@@ -430,7 +437,7 @@ void Backend::processToken(const QByteArray &token)
     case StateReady: {
         const GameUpdate &gu(parseGameUpdate(token));
         if (gu.valid) {
-            Command::Move m(TargetRegistry, gu.id, gu.position);
+            Command::Move m(TargetFrontend, gu.id, gu.position);
             m.setWhite(gu.white);
             m.setBlack(gu.black);
             sendCommand(&m);

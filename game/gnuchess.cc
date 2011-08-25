@@ -72,7 +72,7 @@ void GnuChess::runInForeground()
 
 void GnuChess::startTurn(const Position &result)
 {
-    m_proc.write(moveNotation(result).toLatin1());
+    m_proc.write(moveNotation(result.movedPiece()).toLatin1());
     m_proc.write("\n");
     m_proc.waitForBytesWritten();
 }

@@ -244,11 +244,11 @@ void Position::setPiece(const Piece &piece)
     addPiece(piece);
 }
 
-QString moveNotation(const Position &result)
+QString moveNotation(const MovedPiece &moved_piece)
 {
     // TODO: This is gnuchess-style notation, allow for different types?
-    return QString("%1%2").arg(toString(result.movedPiece().origin()))
-                          .arg(toString(result.movedPiece().target()));
+    return QString("%1%2").arg(toString(moved_piece.origin()))
+                          .arg(toString(moved_piece.target()));
 }
 
 Position createStartPosition()

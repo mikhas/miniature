@@ -383,7 +383,7 @@ void Frontend::confirmMove()
 
     d->chess_board.commitMove();
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
-    Command::Move m(TargetRegistry, id, d->chess_board.position());
+    Command::Move m(TargetBackend, id, d->chess_board.position());
     sendCommand(&m);
 
     d->valid_move = false;
@@ -407,6 +407,12 @@ void Frontend::setActiveGame(Game *game)
 
     // Update current position manually:
     onPositionChanged(game->position());
+}
+
+Game * Frontend::activeGame() const
+{
+    Q_D(const Frontend);
+    return d->game.data();
 }
 
 void Frontend::sendCommand(AbstractCommand *command)

@@ -45,4 +45,7 @@ void AbstractBackend::login(const QString &,
 void AbstractBackend::play(uint)
 {}
 
+void AbstractBackend::movePiece(const MovedPiece &)
+{}
+
 } // namespace Game
