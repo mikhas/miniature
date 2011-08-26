@@ -1,5 +1,6 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import org.maemo.miniature 1.0
 
 Page { // FIXME how to make the height fixed so the virtual keyboard doesn't push it up?
     id: ficsLogin
@@ -117,18 +118,18 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button { // Toggle between testing mode and real mode - to be commented in releases
         id: testingButton
-        text:  "TESTING MODE ON"
+        text:  checked ? "TESTING MODE ON"
+                       : "TESTING MODE OFF"
         checkable: true
-        checked: true
+        checked: miniature.gameMode == Miniature.TestFicsMode
         opacity: 0.8
         anchors.top: registerButton.bottom
         anchors.topMargin: 100
         anchors.horizontalCenter: parent.horizontalCenter
-        onClicked:
-            if (testingButton.checked == false) {
-                testingButton.text = "TESTING MODE OFF"
-            }
-            else testingButton.text = "TESTING MODE ON"
+        onClicked: {
+            miniature.setGameMode(testingButton.checked ? Miniature.TestFicsMode
+                                                        : Miniature.FicsMode)
+        }
     }
 }
 

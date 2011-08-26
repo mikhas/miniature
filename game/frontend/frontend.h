@@ -43,6 +43,11 @@ class Frontend
     Q_OBJECT
     Q_DISABLE_COPY(Frontend)
     Q_DECLARE_PRIVATE(Frontend)
+    Q_ENUMS(GameMode)
+
+    Q_PROPERTY(GameMode gameMode READ gameMode
+                                 WRITE setGameMode
+                                 NOTIFY gameModeChanged)
 
     Q_PROPERTY(bool validMove READ validMove
                               NOTIFY validMoveChanged)
@@ -51,6 +56,11 @@ private:
     const QScopedPointer<FrontendPrivate> d_ptr;
 
 public:
+    enum GameMode {
+        TestFicsMode,
+        FicsMode
+    };
+
     explicit Frontend(Dispatcher *dispatcher,
                       QObject *parent = 0);
     virtual ~Frontend();
@@ -59,6 +69,11 @@ public:
 
     virtual void handleRecord(const Record &r);
     virtual void handleSeek(const Seek &s);
+
+    //! Sets game mode.
+    Q_INVOKABLE void setGameMode(GameMode mode);
+    Q_INVOKABLE GameMode gameMode() const;
+    Q_SIGNAL void gameModeChanged(GameMode mode);
 
     Q_INVOKABLE void login(const QString &username,
                            const QString &password);

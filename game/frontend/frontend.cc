@@ -210,6 +210,7 @@ public:
     Advertisements advertisements;
     ChessBoard chess_board;
     bool valid_move;
+    Frontend::GameMode mode;
     WeakGame game;
     SideElement local_side;
     SideElement remote_side;
@@ -224,6 +225,7 @@ public:
         , advertisements()
         , chess_board()
         , valid_move(false)
+        , mode(Frontend::TestFicsMode)
         , game()
         , local_side()
         , remote_side()
@@ -241,7 +243,10 @@ Frontend::Frontend(Dispatcher *dispatcher,
     Q_D(Frontend);
 
 #ifdef MINIATURE_GUI_ENABLED
+    qmlRegisterUncreatableType<Frontend>("org.maemo.miniature", 1, 0, "Miniature",
+                                         "Enables access to Miniature enums.");
     qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
+
     d->ui.rootContext()->setContextProperty("advertisements", &d->advertisements);
     d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
     d->ui.rootContext()->setContextProperty("miniature", this);
@@ -295,6 +300,23 @@ void Frontend::handleSeek(const Seek &s)
     d->advertisements.append(s);
 }
 
+void Frontend::setGameMode(GameMode mode)
+{
+    Q_D(Frontend);
+    if (d->mode != mode) {
+        qDebug() << __PRETTY_FUNCTION__
+                 << "mode:" << mode;
+        d->mode = mode;
+        emit gameModeChanged(d->mode);
+    }
+}
+
+Frontend::GameMode Frontend::gameMode() const
+{
+    Q_D(const Frontend);
+    return d->mode;
+}
+
 void Frontend::login(const QString &username,
                      const QString &password)
 {
@@ -304,8 +326,20 @@ void Frontend::login(const QString &username,
 
 void Frontend::play(uint id)
 {
-    Command::Play play(TargetBackend, id);
-    sendCommand(&play);
+    Q_D(Frontend);
+    switch(d->mode) {
+    default:
+    case FicsMode: {
+        Command::Play play(TargetBackend, id);
+        sendCommand(&play);
+    } break;
+
+    case TestFicsMode: {
+        Command::CreateGame cg(TargetRegistry, 999u, d->dispatcher.data(),
+                               "test123", "test456", LocalSideIsBlack);
+        sendCommand(&cg);
+    } break;
+    }
 }
 
 void Frontend::toggleGameAdvertisementHighlighting(uint id)
@@ -366,7 +400,7 @@ void Frontend::movePiece(int origin,
     d->valid_move = (p0.valid()
                      && p0.color() == pos.nextToMove()
                      && p0.color() != p1.color()
-                     && pos.nextToMove() == c);
+                     && (d->mode == TestFicsMode ? true : (pos.nextToMove() == c)));
 
     if (was_valid != d->valid_move) {
         emit validMoveChanged(d->valid_move);
@@ -404,8 +438,11 @@ void Frontend::confirmMove()
 
     d->chess_board.commitMove();
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
-    Command::Move m(TargetBackend, id, d->chess_board.position());
-    sendCommand(&m);
+
+    if (d->mode != TestFicsMode) {
+        Command::Move m(TargetBackend, id, d->chess_board.position());
+        sendCommand(&m);
+    }
 
     d->valid_move = false;
     emit validMoveChanged(false);
