@@ -54,6 +54,9 @@ namespace {
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
 
+    // Matches: 'Press return to enter the server as "GuestZCQM":'
+    const QRegExp match_confirm_login("Press return to enter the server as \"(\\w*)\"");
+
     // Matches: "P/g2-g4"
     const QRegExp match_move("(\\w)/(\\w\\d)-(\\w\\d)");
 
@@ -475,11 +478,10 @@ void Backend::onReadyRead()
 void Backend::processLogin(const QByteArray &line)
 {
     // TODO: write proper tokenizer?
-    static const QByteArray confirm_login("Press return to enter the server as");
     static const QByteArray enter_password("password");
     static const QByteArray fics_prompt("fics");
 
-    if (line.startsWith(confirm_login)) {
+    if (match_confirm_login.exactMatch(line)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();
         // Confirm login:
@@ -487,8 +489,7 @@ void Backend::processLogin(const QByteArray &line)
         configurePrompt();
 
         if (m_username == "guest") {
-            m_username = line.mid(confirm_login.length() + 2,
-                                  line.length() - confirm_login.length() - 3);
+            m_username = match_confirm_login.cap(1);
         }
     } else if (line.startsWith(enter_password)) {
         m_login_abort_timer.stop();
