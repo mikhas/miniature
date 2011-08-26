@@ -7,7 +7,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     // Generic app window style
 
-   Rectangle {
+    Rectangle {
         id: windowBackground
         color: "lightgray"
         anchors.fill: parent
@@ -115,17 +115,21 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             onClicked: Qt.openUrlExternally("http://freechess.org/") }
     }
 
-//    Button { // Provisional button to access OnlineBoard for testing purposes
-//        id: testingButton
-//        text:  "Testing: OnlineBoard"
-//        opacity: 0.3
-//        anchors.top: registerButton.bottom
-//        anchors.topMargin: 100
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        onClicked: loadScreen("OnlineBoard.qml")
-//    }
-
-
+    Button { // Toggle between testing mode and real mode - to be commented in releases
+        id: testingButton
+        text:  "TESTING MODE ON"
+        checkable: true
+        checked: true
+        opacity: 0.8
+        anchors.top: registerButton.bottom
+        anchors.topMargin: 100
+        anchors.horizontalCenter: parent.horizontalCenter
+        onClicked:
+            if (testingButton.checked == false) {
+                testingButton.text = "TESTING MODE OFF"
+            }
+            else testingButton.text = "TESTING MODE ON"
+    }
 }
 
 
