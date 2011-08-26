@@ -117,19 +117,20 @@ Position ChessBoard::position() const
     return m_position;
 }
 
-void ChessBoard::setPosition(const Position &position)
+void ChessBoard::setPosition(const Position &position,
+                             Undo undo)
 {
     const bool was_initial_position(m_position.pieces().count() == 0
                                     && position.pieces().count() > 0);
     const bool was_castling(not was_initial_position
                             && m_position.castlingFlags() != position.castlingFlags());
 
-    m_undo_position = m_position;
+    m_undo_position = (undo == SaveUndo ? m_position : Position());
     m_position = position;
     m_selected_piece = Piece();
 
     // Requires full board update:
-    if (was_initial_position || was_castling) {
+    if (true || was_initial_position || was_castling) {
         emit dataChanged(index(0, 0), index(63, 0));
     } else {
         const MovedPiece &m(m_position.movedPiece());

@@ -138,7 +138,8 @@ bool operator==(const Piece &a,
 bool operator!=(const Piece &a,
                 const Piece &b);
 
-Piece toPiece(char ch);
+Piece toPiece(char ch,
+              Color override = ColorNone);
 
 
 } // namespace Game

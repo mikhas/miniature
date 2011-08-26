@@ -77,7 +77,8 @@ public:
     void triggerDataChanged();
 
     Position position() const;
-    void setPosition(const Position &position);
+    void setPosition(const Position &position,
+                     Undo undo = SaveUndo);
 
     void setOrientation(Orientation orientation);
 

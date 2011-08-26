@@ -319,7 +319,9 @@ bool operator!=(const Position &a,
 bool operator==(const Piece &a,
                 const Piece &b)
 {
-    return ((a.type() == b.type()) && (a.color() == b.color()));
+    return ((a.type() == b.type())
+            && (a.color() == b.color())
+            && (a.square() == b.square()));
 }
 
 bool operator!=(const Piece &a,
@@ -329,7 +331,8 @@ bool operator!=(const Piece &a,
 }
 
 
-Piece toPiece(char ch)
+Piece toPiece(char ch,
+              Color override)
 {
     Piece::Type t;
     Color c;
@@ -352,7 +355,7 @@ Piece toPiece(char ch)
     default: t = Piece::None; c = ColorNone; break;
     }
 
-    return Piece(t, c);
+    return Piece(t, (override != ColorNone ? override : c));
 }
 
 } // namespace Game

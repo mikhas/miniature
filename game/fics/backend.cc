@@ -223,17 +223,20 @@ namespace {
         result.valid = result.valid && converted;
 
         result.valid = result.valid && match_move.exactMatch(cols.at(27));
-        Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0)));
-        p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
 
         int dpp_file = cols.at(19).toInt(&converted);
         result.valid = result.valid && converted;
 
         Game::Position &pos = result.position;
-        pos.setMovedPiece(Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1())));
-
         pos.setDoublePawnPush(dpp_file == -1 ? Game::FileCount : static_cast<Game::File>(dpp_file));
         pos.setNextToMove(cols.at(9) == "W" ? Game::ColorWhite : Game::ColorBlack);
+
+        // The move notation is always capital and does not encode the color of the piece ...
+        Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0),
+                                    pos.nextToMove() == Game::ColorWhite ? Game::ColorBlack
+                                                                         : Game::ColorWhite));
+        p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
+        pos.setMovedPiece(Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1())));
 
         Game::Position::CastlingFlags flags;
 
@@ -385,10 +388,10 @@ void Backend::play(uint advertisement_id)
         return;
     }
 
-    m_state = StatePlayPending;
-    emit stateChanged(m_state);
 
     // TODO: Uncomment to active play feature, but right now it is kind of rude to the other FICS players (since we cannot play yet).
+    //m_state = StatePlayPending;
+    //emit stateChanged(m_state);
     //m_channel.write(play_command.arg(advertisement_id).toLatin1());
 
     // For testing; send a create-game command back immediately:
@@ -490,10 +493,11 @@ void Backend::processLogin(const QByteArray &line)
         m_login_abort_timer.start();
         // Confirm login:
         m_channel.write("\n");
+        configurePrompt();
 
         if (m_username == "guest") {
             m_username = line.mid(confirm_login.length() + 2,
-                                  line.length() - confirm_login.length() - 4);
+                                  line.length() - confirm_login.length() - 3);
         }
     } else if (line.startsWith(enter_password)) {
         m_login_abort_timer.stop();
@@ -503,7 +507,6 @@ void Backend::processLogin(const QByteArray &line)
     } else if (line.startsWith(fics_prompt)) {
         m_login_abort_timer.stop();
         m_extra_delimiter.clear();
-        configurePrompt();
         m_state = StateReady;
         emit stateChanged(m_state);
     }
@@ -527,10 +530,6 @@ void Backend::abortLogin()
 
 void Backend::configurePrompt()
 {
-    if (m_state != StateReady) {
-        return;
-    }
-
     m_channel.write("set style 12");
     m_channel.write("\n");
 }

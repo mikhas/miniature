@@ -361,10 +361,12 @@ void Frontend::movePiece(int origin,
 
     // TODO: Send through validator, detect castling etc ... info needs to be set on Position.
     // Easier: send move to chess engine and just get new position ;-)
-
+    const Color c(d->game.data()->localSideColor() == LocalSideIsWhite ? ColorWhite
+                                                                       : ColorBlack);
     d->valid_move = (p0.valid()
                      && p0.color() == pos.nextToMove()
-                     && p0.color() != p1.color());
+                     && p0.color() != p1.color()
+                     && pos.nextToMove() == c);
 
     if (was_valid != d->valid_move) {
         emit validMoveChanged(d->valid_move);
@@ -412,7 +414,6 @@ void Frontend::confirmMove()
 void Frontend::setActiveGame(Game *game)
 {
     Q_D(Frontend);
-
     d->game = WeakGame(game);
 
     if (not game) {
@@ -452,7 +453,7 @@ void Frontend::sendCommand(AbstractCommand *command)
 void Frontend::onPositionChanged(const Position &position)
 {
     Q_D(Frontend);
-    d->chess_board.setPosition(position);
+    d->chess_board.setPosition(position, ChessBoard::NoUndo);
 }
 
 }} // namespace Game, Frontend

@@ -49,6 +49,8 @@ void Move::exec(AbstractBackend *target)
         return;
     }
 
+    qDebug() << __PRETTY_FUNCTION__
+             << moveNotation(m_result.movedPiece());
     target->movePiece(m_result.movedPiece());
 }
 
@@ -59,6 +61,8 @@ void Move::exec(Frontend::Frontend *target)
     }
 
     if (Game *g = target->activeGame()) {
+        qDebug() << __PRETTY_FUNCTION__
+                 << moveNotation(m_result.movedPiece());
         g->setPosition(m_result);
     }
 }
