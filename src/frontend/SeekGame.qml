@@ -174,6 +174,15 @@ Page {
 
             model: advertisements
 
+            property string highType
+            property int highTime
+            property int highIncrement
+            property string highRating: "unrated"
+            property string highOpponent
+            property int highOpponentRating
+            property string highOpponentColor
+
+
             Connections {
                 id: sortingStyle
                 target: advertisements
@@ -306,18 +315,6 @@ Page {
                             font.pointSize: 40
                             color: "whitesmoke"
                             anchors.centerIn: parent
-                            visible: !model.highlighted
-                        }
-
-                        ToolIcon { // Confirms the game
-                            id: confirmButton
-                            iconId: "toolbar-add"
-                            visible: model.highlighted
-                            anchors.centerIn: parent
-                            onClicked: {
-                                loadScreen("OnlineBoard.qml")
-                                miniature.play(model.id)
-                            }
                         }
                     }
 
@@ -325,6 +322,17 @@ Page {
                         anchors.fill:  parent
                         onClicked: {
                             miniature.toggleGameAdvertisementHighlighting(model.id)
+                            highgameArea.visible = true
+                            seekListWindow.anchors.bottom = highgameArea.top
+                            seekList.highType = "Standard" // FIXME the right model* variable goes here
+                            seekList.highTime = model.time
+                            seekList.highIncrement = model.increment
+                            seekList.highOpponent = model.playerName
+                            seekList.highOpponentRating = model.rating
+                            seekList.highOpponentColor = model.color
+                            if (model.rated == "rated")
+                                seekList.highRating = model.rated
+
                         }
                     }
                 }
@@ -351,6 +359,144 @@ Page {
             GradientStop { position: 1.0; color: "transparent" }
         }
     }
+
+    // Highlighted item. It's basically a copy of a ListView item.
+
+    Rectangle {
+        id: highgameArea
+        height: 100
+        width:  parent.width
+        color: "royalblue"
+        anchors.bottom: seekToolbar.top
+         visible: false
+
+        Rectangle {
+            id: highgameData
+            color: "olivedrab"
+            width: parent.width * 0.8
+            height: 80
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 10
+            anchors.left: parent.left
+            anchors.leftMargin: 15
+            radius: 10
+
+            Text {
+                id: hightypeChess
+                text: seekList.highType
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                    left: parent.left
+                    leftMargin: 10
+                }
+            }
+
+            Text {
+                id: hightimeGame
+                text: seekList.highTime
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: highincrementGame.left
+                    rightMargin: 15
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+            Text {
+                id: highincrementGame
+                text: seekList.highIncrement
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: highratedGame.left
+                    rightMargin: 22
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+
+            Text {
+                id: highratedGame
+                text: seekList.highRating
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: parent.right
+                    rightMargin: 10
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+            // Opponent info
+            Rectangle {
+                id: highopponentData
+                width: parent.width - 10
+                height: 35 // FIXME how to make it relative to text height?
+                color: seekList.highOpponentColor == "auto" ? "lightgrey"
+                                                            : seekList.highOpponentColor
+                anchors {
+                    bottom: highgameData.bottom
+                    bottomMargin: 5
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    id: highopponentInfo
+                    text: seekList.highOpponentRating + " " + seekList.highOpponent
+                    color: seekList.highOpponentColor == "black" ? "white"
+                                                                 : "black"
+                    font.pointSize: 16
+                    font.weight: Font.DemiBold
+                    anchors {
+                        verticalCenter: highopponentData.verticalCenter
+                        left: parent.left
+                        leftMargin: 10
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill:  parent
+                onClicked: {
+                    loadScreen("OnlineBoard.qml")
+                    miniature.play(model.id)
+                }
+            }
+        }
+
+        Rectangle {
+            id: highcounterBackground
+            width: parent.width * 0.2
+            height: 100
+            color: "transparent"
+            anchors {
+                verticalCenter: highgameData.verticalCenter
+                right: parent.right
+            }
+
+            ToolIcon { // Confirms the game
+                id: highconfirmButton
+                iconId: "toolbar-add"
+                anchors.centerIn: parent
+                onClicked: {
+                    loadScreen("OnlineBoard.qml")
+                    miniature.play(model.id)
+                }
+            }
+        }
+    }
+
 
 
 
@@ -394,9 +540,9 @@ Page {
                 }
             }
 
-//            ToolIcon { // FIXME Settings page pending
-//                iconId: "toolbar-view-menu"
-//            }
+            //            ToolIcon { // FIXME Settings page pending
+            //                iconId: "toolbar-view-menu"
+            //            }
         }
     }
 }
