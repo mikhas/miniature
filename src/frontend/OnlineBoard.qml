@@ -96,7 +96,7 @@ Page {
             anchors.leftMargin: 10
             anchors.rightMargin: 10
             clip: true
-            lineHeight: 1.5
+//            lineHeight: 1.5 // // commenting out for MeeGo CE in N900 compatibility
             wrapMode: Text.Wrap
             verticalAlignment: Text.AlignBottom
 
@@ -142,7 +142,6 @@ Page {
         transitions: [
             Transition {
                 ParallelAnimation  {
-                    running: true
                     PropertyAnimation {
                         property: "opacity"; from: 0; to: 0.8
                         easing.type: Easing.OutQuint
@@ -255,7 +254,7 @@ Page {
         source: "chessboard.svg"
         anchors.bottom: userZone.top
         width: parent.width
-        fillMode: Image.PreserveAspectFit
+//        fillMode: Image.PreserveAspectFit // commenting out for MeeGo CE in N900 compatibility
 
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
