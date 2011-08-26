@@ -456,8 +456,6 @@ void Backend::processToken(const QByteArray &token)
                 if (r.valid) {
                     Command::Record rc(TargetFrontend, r);
                     sendCommand(&rc);
-                } else {
-                    qDebug() << "Unknown token:" << token;
                 }
             }
         }

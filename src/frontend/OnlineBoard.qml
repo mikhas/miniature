@@ -204,13 +204,13 @@ Page {
         id: opponentZone
         width: parent.width
         height: 40 // FIXME how to make it relative to text height?
-        color: "black" // or white, whatever color is playing
+        color: remoteSide.color
         anchors.bottom: imageBoard.top
 
         Text {
             id: opponentInfo
-            text: "1333" + " " + "Opponent Name" // FIXME Ugly way while figuring out tables
-            color: "white" // or black, opposite of opponentZone
+            text: remoteSide.id
+            color: parent.color == "white" ? "black" : "white" // Doesn't seem to invert colors correctly?
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: opponentZone.verticalCenter
@@ -332,13 +332,13 @@ Page {
         id: userZone
         width: parent.width
         height: 40 // FIXME how to make it relative to text height?
-        color: "white" // or black, whatever color is playing
+        color: localSide.color
         anchors.bottom:  boardToolbar.top
 
         Text {
             id: userInfo
-            text: "1333" + " " + "User Name" // FIXME Ugly way while figuring out tables
-            color: "black" // or white, opposite of opponentZone
+            text: localSide.id
+            color: parent.color == "white" ? "black" : "white" // Doesn't seem to invert colors correctly?
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter

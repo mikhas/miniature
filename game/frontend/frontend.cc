@@ -24,6 +24,7 @@
 #include "registry.h"
 #include "frontend/chessboard.h"
 #include "frontend/chessboardelement.h"
+#include "frontend/sideelement.h"
 
 #ifdef MINIATURE_GUI_ENABLED
 #include <QtDeclarative/QtDeclarative>
@@ -33,6 +34,18 @@ namespace Game { namespace Frontend { namespace {
     const ParserCommandFlags all_commands(CommandPlay | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
+
+    void configureSideElement(SideElement *elem,
+                              Side *side,
+                              const QColor &color)
+    {
+        if (not elem || not side) {
+            return;
+        }
+
+        elem->setId(side->identifier());
+        elem->setColor(color);
+    }
 }
 
 QString fromColor(Color color)
@@ -198,6 +211,8 @@ public:
     ChessBoard chess_board;
     bool valid_move;
     WeakGame game;
+    SideElement local_side;
+    SideElement remote_side;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
 #endif
@@ -210,6 +225,8 @@ public:
         , chess_board()
         , valid_move(false)
         , game()
+        , local_side()
+        , remote_side()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -224,10 +241,12 @@ Frontend::Frontend(Dispatcher *dispatcher,
     Q_D(Frontend);
 
 #ifdef MINIATURE_GUI_ENABLED
-    qmlRegisterType<ChessBoardElement>("org.maemo.miniature", 1, 0, "ChessBoardElement");
+    qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
     d->ui.rootContext()->setContextProperty("advertisements", &d->advertisements);
     d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
     d->ui.rootContext()->setContextProperty("miniature", this);
+    d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
+    d->ui.rootContext()->setContextProperty("remoteSide", &d->remote_side);
 #endif
 
     d->command_line.setFlags(all_commands);
@@ -409,6 +428,11 @@ void Frontend::setActiveGame(Game *game)
     d->chess_board.setOrientation(game->localSideColor() == LocalSideIsWhite ? ChessBoard::WhiteAtBottom
                                                                              : ChessBoard::WhiteAtTop);
     onPositionChanged(game->position());
+
+    configureSideElement(&d->local_side, game->localSide(),
+                         game->localSideColor() == LocalSideIsWhite ? Qt::white : Qt::black);
+    configureSideElement(&d->remote_side, game->remoteSide(),
+                         game->localSideColor() == LocalSideIsBlack ? Qt::white : Qt::black);
 }
 
 Game * Frontend::activeGame() const

@@ -40,6 +40,7 @@ LIBS += \
         $${GAME_DIR}/frontend/frontend.h \
         $${GAME_DIR}/frontend/chessboard.h \
         $${GAME_DIR}/frontend/chessboardelement.h \
+        $${GAME_DIR}/frontend/sideelement.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -66,6 +67,7 @@ LIBS += \
         $${GAME_DIR}/frontend/frontend.cc \
         $${GAME_DIR}/frontend/chessboard.cc \
         $${GAME_DIR}/frontend/chessboardelement.cc \
+        $${GAME_DIR}/frontend/sideelement.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \

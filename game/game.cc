@@ -163,7 +163,7 @@ Side * Game::localSide() const
 Side * Game::remoteSide() const
 {
     Q_D(const Game);
-    return d->local.data();
+    return d->remote.data();
 }
 
 Side * Game::activeSide() const
