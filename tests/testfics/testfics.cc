@@ -19,7 +19,7 @@
  */
 
 #include "testutils.h"
-#include "frontend/frontend.h"
+#include "frontend/miniature.h"
 #include "fics/backend.h"
 #include "game.h"
 #include "position.h"
@@ -51,7 +51,7 @@ namespace {
 
 namespace Game {
 class DummyFrontend
-    : public Frontend::Frontend
+    : public Frontend::Miniature
 {
 public:
     QVector<Record> m_received_records;
@@ -61,7 +61,7 @@ public:
 
     explicit DummyFrontend(Dispatcher *dispatcher,
                            QObject *parent = 0)
-        : Frontend::Frontend(dispatcher, parent)
+        : Miniature::Miniature(dispatcher, parent)
         , m_received_records()
         , m_received_seeks()
         , m_game_id(0)

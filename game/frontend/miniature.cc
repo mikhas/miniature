@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "frontend.h"
+#include "miniature.h"
 #include "commands.h"
 #include "directinputdevice.h"
 #include "registry.h"
@@ -201,7 +201,7 @@ public:
     }
 };
 
-class FrontendPrivate
+class MiniaturePrivate
 {
 public:
     WeakDispatcher dispatcher;
@@ -210,7 +210,7 @@ public:
     Advertisements advertisements;
     ChessBoard chess_board;
     bool valid_move;
-    Frontend::GameMode mode;
+    Miniature::GameMode mode;
     WeakGame game;
     SideElement local_side;
     SideElement remote_side;
@@ -218,14 +218,14 @@ public:
     QDeclarativeView ui;
 #endif
 
-    explicit FrontendPrivate(Dispatcher *new_dispatcher)
+    explicit MiniaturePrivate(Dispatcher *new_dispatcher)
         : dispatcher(new_dispatcher)
         , command_line(new_dispatcher)
         , line_reader()
         , advertisements()
         , chess_board()
         , valid_move(false)
-        , mode(Frontend::TestFicsMode)
+        , mode(Miniature::TestFicsMode)
         , game()
         , local_side()
         , remote_side()
@@ -235,15 +235,15 @@ public:
     {}
 };
 
-Frontend::Frontend(Dispatcher *dispatcher,
+Miniature::Miniature(Dispatcher *dispatcher,
                    QObject *parent)
     : QObject(parent)
-    , d_ptr(new FrontendPrivate(dispatcher))
+    , d_ptr(new MiniaturePrivate(dispatcher))
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
 
 #ifdef MINIATURE_GUI_ENABLED
-    qmlRegisterUncreatableType<Frontend>("org.maemo.miniature", 1, 0, "Miniature",
+    qmlRegisterUncreatableType<Miniature>("org.maemo.miniature", 1, 0, "Miniature",
                                          "Enables access to Miniature enums.");
     qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
 
@@ -260,12 +260,12 @@ Frontend::Frontend(Dispatcher *dispatcher,
             Qt::UniqueConnection);
 }
 
-Frontend::~Frontend()
+Miniature::~Miniature()
 {}
 
-void Frontend::show(const QUrl &ui)
+void Miniature::show(const QUrl &ui)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
 
 #ifndef MINIATURE_GUI_ENABLED
     Q_UNUSED(ui)
@@ -288,21 +288,21 @@ void Frontend::show(const QUrl &ui)
     out << "Welcome to Miniature!\n";
 }
 
-void Frontend::showBoard()
+void Miniature::showBoard()
 {}
 
-void Frontend::handleRecord(const Record &)
+void Miniature::handleRecord(const Record &)
 {}
 
-void Frontend::handleSeek(const Seek &s)
+void Miniature::handleSeek(const Seek &s)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     d->advertisements.append(s);
 }
 
-void Frontend::setGameMode(GameMode mode)
+void Miniature::setGameMode(GameMode mode)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     if (d->mode != mode) {
         qDebug() << __PRETTY_FUNCTION__
                  << "mode:" << mode;
@@ -311,22 +311,22 @@ void Frontend::setGameMode(GameMode mode)
     }
 }
 
-Frontend::GameMode Frontend::gameMode() const
+Miniature::GameMode Miniature::gameMode() const
 {
-    Q_D(const Frontend);
+    Q_D(const Miniature);
     return d->mode;
 }
 
-void Frontend::login(const QString &username,
+void Miniature::login(const QString &username,
                      const QString &password)
 {
     Command::Login login(TargetBackend, username, password);
     sendCommand(&login);
 }
 
-void Frontend::play(uint id)
+void Miniature::play(uint id)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     switch(d->mode) {
     default:
     case FicsMode: {
@@ -342,9 +342,9 @@ void Frontend::play(uint id)
     }
 }
 
-void Frontend::toggleGameAdvertisementHighlighting(uint id)
+void Miniature::toggleGameAdvertisementHighlighting(uint id)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
 
     for (int index = 0; index < d->advertisements.rowCount(); ++index) {
         const QModelIndex mi(d->advertisements.index(index, 0));
@@ -355,13 +355,13 @@ void Frontend::toggleGameAdvertisementHighlighting(uint id)
     }
 }
 
-void Frontend::selectPiece(int target)
+void Miniature::selectPiece(int target)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     d->chess_board.selectPiece(toSquare(d->chess_board.adjustedIndex(target)));
 }
 
-void Frontend::movePiece(int origin,
+void Miniature::movePiece(int origin,
                          int target,
                          const QString &promotion)
 {
@@ -370,7 +370,7 @@ void Frontend::movePiece(int origin,
         return;
     }
 
-    Q_D(Frontend);
+    Q_D(Miniature);
 
     const Square o(toSquare(d->chess_board.adjustedIndex(origin)));
     const Square t(toSquare(d->chess_board.adjustedIndex(target)));
@@ -412,24 +412,24 @@ void Frontend::movePiece(int origin,
     }
 }
 
-void Frontend::undoMove()
+void Miniature::undoMove()
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     d->chess_board.undo();
 
     d->valid_move = false;
     emit validMoveChanged(false);
 }
 
-bool Frontend::validMove() const
+bool Miniature::validMove() const
 {
-    Q_D(const Frontend);
+    Q_D(const Miniature);
     return d->valid_move;
 }
 
-void Frontend::confirmMove()
+void Miniature::confirmMove()
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     if (not d->valid_move) {
         qWarning() << __PRETTY_FUNCTION__
                    << "Invalid move confirmed. Ignored.";
@@ -448,9 +448,9 @@ void Frontend::confirmMove()
     emit validMoveChanged(false);
 }
 
-void Frontend::setActiveGame(Game *game)
+void Miniature::setActiveGame(Game *game)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     d->game = WeakGame(game);
 
     if (not game) {
@@ -473,23 +473,23 @@ void Frontend::setActiveGame(Game *game)
                          game->localSideColor() == LocalSideIsBlack ? Qt::white : Qt::black);
 }
 
-Game * Frontend::activeGame() const
+Game * Miniature::activeGame() const
 {
-    Q_D(const Frontend);
+    Q_D(const Miniature);
     return d->game.data();
 }
 
-void Frontend::sendCommand(AbstractCommand *command)
+void Miniature::sendCommand(AbstractCommand *command)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     if (Dispatcher *dispatcher = d->dispatcher.data()) {
         dispatcher->sendCommand(command);
     }
 }
 
-void Frontend::onPositionChanged(const Position &position)
+void Miniature::onPositionChanged(const Position &position)
 {
-    Q_D(Frontend);
+    Q_D(Miniature);
     d->chess_board.setPosition(position, ChessBoard::NoUndo);
 }
 

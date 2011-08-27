@@ -30,7 +30,7 @@
 #include <QtCore>
 
 namespace Game { namespace Frontend {
-class Frontend;
+class Miniature;
 }
 
 class AbstractBackend;
@@ -61,7 +61,7 @@ public:
     virtual ~Move();
     virtual Target target() const;
     virtual void exec(AbstractBackend *target);
-    virtual void exec(Frontend::Frontend *target);
+    virtual void exec(Frontend::Miniature *target);
     //! \reimp_end
 
     uint gameId() const;

@@ -34,15 +34,17 @@ namespace Game { namespace Frontend {
 
 QString fromColor(Color color);
 
-class FrontendPrivate;
+class MiniaturePrivate;
 
-//! Frontend, the root context used for QML
-class Frontend
+//! This class communicates with the engine, handles the active game state
+//! (together with the engine) and exports objects and properties to the
+//! graphical frontend, our QML UI.
+class Miniature
     : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(Frontend)
-    Q_DECLARE_PRIVATE(Frontend)
+    Q_DISABLE_COPY(Miniature)
+    Q_DECLARE_PRIVATE(Miniature)
     Q_ENUMS(GameMode)
 
     Q_PROPERTY(GameMode gameMode READ gameMode
@@ -53,7 +55,7 @@ class Frontend
                               NOTIFY validMoveChanged)
 
 private:
-    const QScopedPointer<FrontendPrivate> d_ptr;
+    const QScopedPointer<MiniaturePrivate> d_ptr;
 
 public:
     enum GameMode {
@@ -61,9 +63,9 @@ public:
         FicsMode
     };
 
-    explicit Frontend(Dispatcher *dispatcher,
+    explicit Miniature(Dispatcher *dispatcher,
                       QObject *parent = 0);
-    virtual ~Frontend();
+    virtual ~Miniature();
     virtual void show(const QUrl &ui);
     virtual void showBoard();
 

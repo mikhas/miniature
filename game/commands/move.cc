@@ -19,7 +19,7 @@
  */
 
 #include "move.h"
-#include "frontend/frontend.h"
+#include "frontend/miniature.h"
 #include "game.h"
 
 namespace Game { namespace Command {
@@ -54,7 +54,7 @@ void Move::exec(AbstractBackend *target)
     target->movePiece(m_result.movedPiece());
 }
 
-void Move::exec(Frontend::Frontend *target)
+void Move::exec(Frontend::Miniature *target)
 {
     if (not target) {
             return;

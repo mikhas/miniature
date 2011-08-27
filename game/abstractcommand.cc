@@ -19,7 +19,7 @@
  */
 
 #include "abstractcommand.h"
-#include "frontend/frontend.h"
+#include "frontend/miniature.h"
 
 namespace Game {
 
@@ -35,7 +35,7 @@ void AbstractCommand::exec(Registry *)
 void AbstractCommand::exec(AbstractBackend *)
 {}
 
-void AbstractCommand::exec(Frontend::Frontend *)
+void AbstractCommand::exec(Frontend::Miniature *)
 {}
 
 } // namespace Game

@@ -37,7 +37,7 @@ LIBS += \
         $${GAME_DIR}/commands/move.h \
         $${GAME_DIR}/commands/creategame.h \
         $${GAME_DIR}/commands/activategame.h \
-        $${GAME_DIR}/frontend/frontend.h \
+        $${GAME_DIR}/frontend/miniature.h \
         $${GAME_DIR}/frontend/chessboard.h \
         $${GAME_DIR}/frontend/chessboardelement.h \
         $${GAME_DIR}/frontend/sideelement.h \
@@ -64,7 +64,7 @@ LIBS += \
         $${GAME_DIR}/commands/move.cc \
         $${GAME_DIR}/commands/creategame.cc \
         $${GAME_DIR}/commands/activategame.cc \
-        $${GAME_DIR}/frontend/frontend.cc \
+        $${GAME_DIR}/frontend/miniature.cc \
         $${GAME_DIR}/frontend/chessboard.cc \
         $${GAME_DIR}/frontend/chessboardelement.cc \
         $${GAME_DIR}/frontend/sideelement.cc \

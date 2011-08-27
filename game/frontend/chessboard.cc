@@ -19,7 +19,7 @@
  */
 
 #include "chessboard.h"
-#include "frontend.h"
+#include "miniature.h"
 
 namespace Game { namespace Frontend { namespace {
     typedef QHash<Piece::Type, QString> PieceMap;

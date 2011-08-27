@@ -29,7 +29,7 @@ class Registry;
 class AbstractBackend;
 
 namespace Frontend {
-    class Frontend;
+    class Miniature;
 }
 
 //! Specify the target for a command. Some commands, such as
@@ -62,7 +62,7 @@ public:
     virtual void exec(AbstractBackend *target);
 
     //! Execute command on frontend.
-    virtual void exec(Frontend::Frontend *target);
+    virtual void exec(Frontend::Miniature *target);
 };
 
 } // namespace Game

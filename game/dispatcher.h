@@ -34,7 +34,7 @@ class AbstractBackend;
 class Registry;
 
 namespace Frontend {
-    class Frontend;
+    class Miniature;
 }
 
 Dispatcher *createDispatcher(QObject *owner = 0);
@@ -55,7 +55,7 @@ public:
     virtual ~Dispatcher();
 
     virtual bool sendCommand(AbstractCommand *command);
-    virtual void setFrontend(Frontend::Frontend *frontend);
+    virtual void setFrontend(Frontend::Miniature *frontend);
     virtual void setBackend(AbstractBackend *backend);
 
     //! Optional. Can be used to replace original registry.

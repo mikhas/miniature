@@ -20,7 +20,7 @@
 
 #include "run.h"
 #include "dispatcher.h"
-#include "frontend/frontend.h"
+#include "frontend/miniature.h"
 
 namespace Game {
 
@@ -28,7 +28,7 @@ void run(const QUrl &url,
          QObject *parent)
 {
     Dispatcher *dispatcher = createDispatcher(parent);
-    Frontend::Frontend *frontend = new Frontend::Frontend(dispatcher, parent);
+    Frontend::Miniature *frontend = new Frontend::Miniature(dispatcher, parent);
     dispatcher->setFrontend(frontend);
     frontend->show(url);
 }
