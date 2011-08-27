@@ -174,6 +174,7 @@ Page {
 
             model: advertisements
 
+            property int highId: -1
             property string highType
             property int highTime
             property int highIncrement
@@ -324,6 +325,7 @@ Page {
                             miniature.toggleGameAdvertisementHighlighting(model.id)
                             highgameArea.visible = true
                             seekListWindow.anchors.bottom = highgameArea.top
+                            seekList.highId = model.id
                             seekList.highType = "Standard" // FIXME the right model* variable goes here
                             seekList.highTime = model.time
                             seekList.highIncrement = model.increment
@@ -470,7 +472,7 @@ Page {
                 anchors.fill:  parent
                 onClicked: {
                     loadScreen("OnlineBoard.qml")
-                    miniature.play(model.id)
+                    miniature.play(seekList.highId)
                 }
             }
         }
@@ -491,7 +493,7 @@ Page {
                 anchors.centerIn: parent
                 onClicked: {
                     loadScreen("OnlineBoard.qml")
-                    miniature.play(model.id)
+                    miniature.play(seekList.highId)
                 }
             }
         }
