@@ -4,5 +4,5 @@ Version=1.0
 Terminal=false
 Type=Application
 Name=Miniature
-Exec=/usr/games/miniature
+Exec=invoker --single-instance --type=d /usr/games/miniature
 Icon=/usr/share/themes/base/meegotouch/icons/miniature-n9.png
