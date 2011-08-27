@@ -314,10 +314,8 @@ Page {
                     id: squareMouseArea
                     anchors.fill: parent
                     onClicked: {
-                        if (checkMove.lastIndex != -1) {
-                            if (!miniature.selectSquare(index)) {
-                                // FIXME: flash square red.
-                            }
+                        if (!miniature.selectSquare(index)) {
+                            wrongTapAnimation.restart()
                         }
                     }
                 }
