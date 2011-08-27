@@ -22,7 +22,7 @@
 #define PLAYCOMMAND_H
 
 #include "abstractcommand.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 #include "game.h"
 
 #include <QtCore>
@@ -44,7 +44,7 @@ public:
                   uint id = 0);
     virtual ~Play();
     virtual Target target() const;
-    virtual void exec(AbstractBackend *target);
+    virtual void exec(AbstractEngine *target);
     //! \reimp_end
 };
 

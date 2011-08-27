@@ -44,9 +44,9 @@ LIBS += \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
-        $${GAME_DIR}/fics/backend.h \
+        $${GAME_DIR}/fics/engine.h \
         $${GAME_DIR}/abstractcommand.h \
-        $${GAME_DIR}/abstractbackend.h \
+        $${GAME_DIR}/abstractengine.h \
         $${GAME_DIR}/position.h \
         $${GAME_DIR}/square.h \
 
@@ -71,9 +71,9 @@ LIBS += \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \
-        $${GAME_DIR}/fics/backend.cc \
+        $${GAME_DIR}/fics/engine.cc \
         $${GAME_DIR}/abstractcommand.cc \
-        $${GAME_DIR}/abstractbackend.cc \
+        $${GAME_DIR}/abstractengine.cc \
         $${GAME_DIR}/position.cc \
         $${GAME_DIR}/square.cc \
 

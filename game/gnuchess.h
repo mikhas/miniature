@@ -22,7 +22,7 @@
 #define GNUCHESS_H
 
 #include "side.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 #include <QtCore>
 

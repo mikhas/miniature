@@ -22,7 +22,7 @@
 #define ACTIVATEGAME_H
 
 #include "abstractcommand.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 #include "game.h"
 
 #include <QtCore>

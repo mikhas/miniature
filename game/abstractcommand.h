@@ -26,7 +26,7 @@
 namespace Game {
 
 class Registry;
-class AbstractBackend;
+class AbstractEngine;
 
 namespace Frontend {
     class Miniature;
@@ -38,7 +38,7 @@ namespace Frontend {
 //! from a list of offered targets.
 enum Target {
     TargetFrontend, // GUI, command line, ...
-    TargetBackend, // The currently active backend, e.g., freechess.org
+    TargetEngine, // The currently active engine, e.g., freechess.org
     TargetRegistry // The game registry. Knows about all (active) games.
 };
 
@@ -59,7 +59,7 @@ public:
     virtual void exec(Registry *target);
 
     //! Execute command on backend.
-    virtual void exec(AbstractBackend *target);
+    virtual void exec(AbstractEngine *target);
 
     //! Execute command on frontend.
     virtual void exec(Frontend::Miniature *target);

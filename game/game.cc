@@ -123,7 +123,7 @@ void Game::play(uint advertisement_id)
     printTurnMessage(d->active->identifier());
 
     // Notify backend, too:
-    Command::Play play(TargetBackend, advertisement_id);
+    Command::Play play(TargetEngine, advertisement_id);
     sendCommand(&play);
 }
 

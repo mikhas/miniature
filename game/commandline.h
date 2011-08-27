@@ -22,7 +22,7 @@
 #define COMMANDLINE_H
 
 #include "namespace.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 #include <QtCore>
 
@@ -50,7 +50,7 @@ class AbstractCommand;
 //! Reads input from local input device and translates it into commands.
 //! Used for local sides and local command line interface.
 class CommandLine
-    : public AbstractBackend
+    : public AbstractEngine
 {
     Q_OBJECT
     Q_DECLARE_PRIVATE(CommandLine)

@@ -22,7 +22,7 @@
 #define MOVECOMMAND_H
 
 #include "abstractcommand.h"
-#include "abstractbackend.h" // FIXME: PlayerRecord
+#include "abstractengine.h"// FIXME: PlayerRecord
 
 #include "position.h"
 #include "square.h"
@@ -33,7 +33,7 @@ namespace Game { namespace Frontend {
 class Miniature;
 }
 
-class AbstractBackend;
+class AbstractEngine;
 
 namespace Command {
 
@@ -60,7 +60,7 @@ public:
 
     virtual ~Move();
     virtual Target target() const;
-    virtual void exec(AbstractBackend *target);
+    virtual void exec(AbstractEngine *target);
     virtual void exec(Frontend::Miniature *target);
     //! \reimp_end
 

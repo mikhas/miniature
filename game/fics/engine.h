@@ -22,7 +22,7 @@
 #define FICS_BACKEND_H
 
 #include "namespace.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 #include "dispatcher.h"
 
 #include <QtCore>
@@ -30,12 +30,12 @@
 
 namespace Game { namespace Fics {
 
-//! A backend for FICS
-class Backend
-    : public AbstractBackend
+//! The FICS engine. Responsible for receiving and transmitting commands to FICS.
+class Engine
+    : public AbstractEngine
 {
     Q_OBJECT
-    Q_DISABLE_COPY(Backend)
+    Q_DISABLE_COPY(Engine)
 
 private:
     WeakDispatcher m_dispatcher;
@@ -50,9 +50,9 @@ private:
 
 public:
     //! \reimp
-    explicit Backend(Dispatcher *dispatcher,
-                     QObject *parent = 0);
-    virtual ~Backend();
+    explicit Engine(Dispatcher *dispatcher,
+                    QObject *parent = 0);
+    virtual ~Engine();
     virtual void setEnabled(bool enable);
     virtual State state() const;
     virtual void login(const QString &username,

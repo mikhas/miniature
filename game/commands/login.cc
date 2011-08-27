@@ -19,7 +19,7 @@
  */
 
 #include "login.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 namespace Game { namespace Command {
 
@@ -40,7 +40,7 @@ Target Login::target() const
     return m_target;
 }
 
-void Login::exec(AbstractBackend *target)
+void Login::exec(AbstractEngine *target)
 {
     if (not target) {
         return;

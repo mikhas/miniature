@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 namespace Game {
 
@@ -26,26 +26,26 @@ PlayerRecord::PlayerRecord()
     : valid(false)
 {}
 
-AbstractBackend::AbstractBackend(QObject *parent)
+AbstractEngine::AbstractEngine(QObject *parent)
     : QObject(parent)
 {}
 
-AbstractBackend::~AbstractBackend()
+AbstractEngine::~AbstractEngine()
 {}
 
-AbstractBackend::State AbstractBackend::state() const
+AbstractEngine::State AbstractEngine::state() const
 {
     return StateIdle;
 }
 
-void AbstractBackend::login(const QString &,
+void AbstractEngine::login(const QString &,
                          const QString &)
 {}
 
-void AbstractBackend::play(uint)
+void AbstractEngine::play(uint)
 {}
 
-void AbstractBackend::movePiece(const MovedPiece &)
+void AbstractEngine::movePiece(const MovedPiece &)
 {}
 
 } // namespace Game

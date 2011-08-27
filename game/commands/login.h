@@ -22,7 +22,7 @@
 #define TEMPLATE_H
 
 #include "abstractcommand.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 #include <QtCore>
 
@@ -44,7 +44,7 @@ public:
                    const QString &password);
     virtual ~Login();
     virtual Target target() const;
-    virtual void exec(AbstractBackend *);
+    virtual void exec(AbstractEngine *);
     //! \reimp_end
 };
 

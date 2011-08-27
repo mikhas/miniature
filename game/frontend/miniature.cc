@@ -320,7 +320,7 @@ Miniature::GameMode Miniature::gameMode() const
 void Miniature::login(const QString &username,
                      const QString &password)
 {
-    Command::Login login(TargetBackend, username, password);
+    Command::Login login(TargetEngine, username, password);
     sendCommand(&login);
 }
 
@@ -330,7 +330,7 @@ void Miniature::play(uint id)
     switch(d->mode) {
     default:
     case FicsMode: {
-        Command::Play play(TargetBackend, id);
+        Command::Play play(TargetEngine, id);
         sendCommand(&play);
     } break;
 
@@ -440,7 +440,7 @@ void Miniature::confirmMove()
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
 
     if (d->mode != TestFicsMode) {
-        Command::Move m(TargetBackend, id, d->chess_board.position());
+        Command::Move m(TargetEngine, id, d->chess_board.position());
         sendCommand(&m);
     }
 

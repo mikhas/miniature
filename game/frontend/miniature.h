@@ -24,7 +24,7 @@
 #include "dispatcher.h"
 #include "commandline.h"
 #include "linereader.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 #include "game.h"
 #include "position.h"
 

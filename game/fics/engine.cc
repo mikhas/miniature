@@ -18,7 +18,7 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "fics/backend.h"
+#include "fics/engine.h"
 #include "commands.h"
 #include "linereader.h"
 #include "position.h"
@@ -304,9 +304,9 @@ namespace {
 
 namespace Game { namespace Fics {
 
-Backend::Backend(Dispatcher *dispatcher,
-                 QObject *parent)
-    : AbstractBackend(parent)
+Engine::Engine(Dispatcher *dispatcher,
+               QObject *parent)
+    : AbstractEngine(parent)
     , m_dispatcher(dispatcher)
     , m_channel()
     , m_buffer()
@@ -330,10 +330,10 @@ Backend::Backend(Dispatcher *dispatcher,
             this,       SLOT(onHostFound()));
 }
 
-Backend::~Backend()
+Engine::~Engine()
 {}
 
-void Backend::setEnabled(bool enable)
+void Engine::setEnabled(bool enable)
 {
     m_enabled = enable;
 
@@ -356,12 +356,12 @@ void Backend::setEnabled(bool enable)
     }
 }
 
-AbstractBackend::State Backend::state() const
+AbstractEngine::State Engine::state() const
 {
     return m_state;
 }
 
-void Backend::login(const QString &username,
+void Engine::login(const QString &username,
                     const QString &password)
 {
     if (m_state != StateReady) {
@@ -383,7 +383,7 @@ void Backend::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
-void Backend::play(uint advertisement_id)
+void Engine::play(uint advertisement_id)
 {
     if (m_state != StateReady) {
         return;
@@ -394,14 +394,14 @@ void Backend::play(uint advertisement_id)
     m_channel.write(play_command.arg(advertisement_id).toLatin1());
 }
 
-void Backend::movePiece(const MovedPiece &moved_piece)
+void Engine::movePiece(const MovedPiece &moved_piece)
 {
     // TODO: Process invalid moves.
     m_channel.write(moveNotation(moved_piece).toLatin1());
     m_channel.write("\n");
 }
 
-void Backend::processToken(const QByteArray &token)
+void Engine::processToken(const QByteArray &token)
 {
     if (not m_enabled || token.isEmpty()) {
         return;
@@ -460,13 +460,13 @@ void Backend::processToken(const QByteArray &token)
     }
 }
 
-void Backend::enableTesting()
+void Engine::enableTesting()
 {
     m_enabled = true;
     m_state = StateReady;
 }
 
-void Backend::onReadyRead()
+void Engine::onReadyRead()
 {
     int next_newline_pos = -1;
     const bool enable_echo = false;
@@ -475,7 +475,7 @@ void Backend::onReadyRead()
     } while (next_newline_pos != -1);
 }
 
-void Backend::processLogin(const QByteArray &line)
+void Engine::processLogin(const QByteArray &line)
 {
     // TODO: write proper tokenizer?
     static const QByteArray enter_password("password");
@@ -504,12 +504,12 @@ void Backend::processLogin(const QByteArray &line)
     }
 }
 
-void Backend::onHostFound()
+void Engine::onHostFound()
 {
     // TODO: Handle retry attempts here.
 }
 
-void Backend::abortLogin()
+void Engine::abortLogin()
 {
     if (m_state != StateLoginPending) {
         return;
@@ -520,13 +520,13 @@ void Backend::abortLogin()
     emit stateChanged(m_state);
 }
 
-void Backend::configurePrompt()
+void Engine::configurePrompt()
 {
     m_channel.write("set style 12");
     m_channel.write("\n");
 }
 
-void Backend::sendCommand(AbstractCommand *command)
+void Engine::sendCommand(AbstractCommand *command)
 {
     if (Dispatcher *dispatcher = m_dispatcher.data()) {
         dispatcher->sendCommand(command);

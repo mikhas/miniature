@@ -22,7 +22,7 @@
 #define SIDE_H
 
 #include "namespace.h"
-#include "abstractbackend.h"
+#include "abstractengine.h"
 #include "position.h"
 #include "square.h"
 

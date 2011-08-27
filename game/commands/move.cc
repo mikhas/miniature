@@ -43,7 +43,7 @@ Target Move::target() const
     return m_target;
 }
 
-void Move::exec(AbstractBackend *target)
+void Move::exec(AbstractEngine *target)
 {
     if (not target) {
         return;

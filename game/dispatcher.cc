@@ -21,8 +21,8 @@
 #include "dispatcher.h"
 #include "abstractcommand.h"
 #include "frontend/miniature.h"
-#include "abstractbackend.h"
-#include "fics/backend.h"
+#include "abstractengine.h"
+#include "fics/engine.h"
 #include "game.h"
 #include "registry.h"
 
@@ -33,7 +33,7 @@ Dispatcher *createDispatcher(QObject *owner)
     Dispatcher *dispatcher = new Dispatcher(owner);
 
     // Use FICS backend, by default:
-    dispatcher->setBackend(new Fics::Backend(dispatcher, owner));
+    dispatcher->setBackend(new Fics::Engine(dispatcher, owner));
 
     return dispatcher;
 }
@@ -42,7 +42,7 @@ class DispatcherPrivate
 {
 public:
     QWeakPointer<Frontend::Miniature> active_frontend;
-    QWeakPointer<AbstractBackend> active_backend;
+    QWeakPointer<AbstractEngine> active_backend;
     QScopedPointer<Registry> registry;
 
     explicit DispatcherPrivate(Dispatcher *q)
@@ -70,8 +70,8 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     bool result = false;
 
     switch(command->target()) {
-    case TargetBackend:
-        if (AbstractBackend *backend = d->active_backend.data()) {
+    case TargetEngine:
+        if (AbstractEngine *backend = d->active_backend.data()) {
             result = true;
             command->exec(backend);
         }
@@ -102,15 +102,15 @@ void Dispatcher::setFrontend(Frontend::Miniature *frontend)
     d->active_frontend = QWeakPointer<Frontend::Miniature>(frontend);
 }
 
-void Dispatcher::setBackend(AbstractBackend *backend)
+void Dispatcher::setBackend(AbstractEngine *backend)
 {
     Q_D(Dispatcher);
 
-    if (AbstractBackend *old = d->active_backend.data()) {
+    if (AbstractEngine *old = d->active_backend.data()) {
         old->setEnabled(false);
     }
 
-    d->active_backend = QWeakPointer<AbstractBackend>(backend);
+    d->active_backend = QWeakPointer<AbstractEngine>(backend);
 
     if (backend) {
         backend->setEnabled(true);

@@ -80,7 +80,7 @@ public:
 
 CommandLine::CommandLine(Dispatcher *dispatcher,
                          QObject *parent)
-    : AbstractBackend(parent)
+    : AbstractEngine(parent)
     , d_ptr(new CommandLinePrivate(dispatcher))
 {}
 
@@ -125,7 +125,7 @@ void CommandLine::processToken(const QByteArray &token)
         Command::Play play(TargetRegistry, data.toUInt());
         sendCommand(&play);
     } else if (d->isCommand(CommandQuit, token)) {
-        Command::Logout logout(TargetBackend);
+        Command::Logout logout(TargetEngine);
         sendCommand(&logout);
         qApp->quit();
     } else if (d->startsWithCommand(CommandLogin, token, &value)) {
@@ -135,7 +135,7 @@ void CommandLine::processToken(const QByteArray &token)
         const QString username(data.isEmpty() ? "guest" : list.at(0));
         const QString password(list.size() > 1 ? list.at(1) : "");
 
-        Command::Login login(TargetBackend, username, password);
+        Command::Login login(TargetEngine, username, password);
         sendCommand(&login);
     }
 }

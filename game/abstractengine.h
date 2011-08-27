@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AbstractBackend_H
-#define AbstractBackend_H
+#ifndef ABSTRACTENGINE_H
+#define ABSTRACTENGINE_H
 
 #include "namespace.h"
 #include "position.h"
@@ -74,8 +74,8 @@ struct Seek
     bool highlighted;
 };
 
-class AbstractBackend;
-typedef QSharedPointer<AbstractBackend> SharedBackend;
+class AbstractEngine;
+typedef QSharedPointer<AbstractEngine> SharedEngine;
 
 //! Can retrieve input from command line or graphical user interface and
 //! translate input into proper commands.
@@ -88,11 +88,11 @@ typedef QSharedPointer<AbstractBackend> SharedBackend;
 //! should the command be found in the common input stream.
 //! To retrieve commands, clients hook up to the commandFound signal.
 //! A graphical user interface can inject commands through processToken.
-class AbstractBackend
+class AbstractEngine
     : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(AbstractBackend)
+    Q_DISABLE_COPY(AbstractEngine)
 
 public:
     // FIXME: Use flags instead of states!
@@ -112,9 +112,9 @@ public:
 
     //! C'tor
     //! @param parent the owner of this instance (optional).
-    explicit AbstractBackend(QObject *parent = 0);
+    explicit AbstractEngine(QObject *parent = 0);
 
-    virtual ~AbstractBackend() = 0;
+    virtual ~AbstractEngine() = 0;
 
     //! Enables command parsing. Initializes input device backend for tokenizer
     //! if required.
@@ -151,4 +151,4 @@ public:
 
 } // namespace Game
 
-#endif // AbstractBackend_H
+#endif // ABSTRACTENGINE_H

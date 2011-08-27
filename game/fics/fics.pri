@@ -1,10 +1,10 @@
 FICS_DIR = ./fics
 
 HEADERS += \
-    $${FICS_DIR}/backend.h \
+    $${FICS_DIR}/engine.h \
 
 SOURCES += \
-    $${FICS_DIR}/backend.cc \
+    $${FICS_DIR}/engine.cc \
 
 #INCLUDEPATH += $${FICS_DIR}
 DEPENDPATH += $${FICS_DIR}

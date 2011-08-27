@@ -21,7 +21,7 @@
 #ifndef TESTUTILS_H
 #define TESTUTILS_H
 
-#include "abstractbackend.h"
+#include "abstractengine.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -65,15 +65,15 @@ QApplication *createApp(const QString &app_name)
 
 }
 
-class DummyBackend
-    : public Game::AbstractBackend
+class DummyEngine
+    : public Game::AbstractEngine
 {
 public:
-    explicit DummyBackend(QObject *parent = 0)
-        : Game::AbstractBackend(parent)
+    explicit DummyEngine(QObject *parent = 0)
+        : Game::AbstractEngine(parent)
     {}
 
-    virtual ~DummyBackend()
+    virtual ~DummyEngine()
     {}
 
     virtual void setEnabled(bool)
@@ -85,12 +85,12 @@ public:
     virtual void login(const QString &,
                        const QString &)
     {
-        emit stateChanged(Game::AbstractBackend::StateLoginFailed);
+        emit stateChanged(Game::AbstractEngine::StateLoginFailed);
     }
 
     virtual void play(uint)
     {
-        emit stateChanged(Game::AbstractBackend::StatePlayFailed);
+        emit stateChanged(Game::AbstractEngine::StatePlayFailed);
     }
 };
 

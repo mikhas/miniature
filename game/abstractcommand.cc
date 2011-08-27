@@ -32,7 +32,7 @@ AbstractCommand::~AbstractCommand()
 void AbstractCommand::exec(Registry *)
 {}
 
-void AbstractCommand::exec(AbstractBackend *)
+void AbstractCommand::exec(AbstractEngine *)
 {}
 
 void AbstractCommand::exec(Frontend::Miniature *)

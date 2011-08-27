@@ -37,7 +37,7 @@ Target Play::target() const
     return m_target;
 }
 
-void Play::exec(AbstractBackend *target)
+void Play::exec(AbstractEngine *target)
 {
     target->play(m_advertisement_id);
 }

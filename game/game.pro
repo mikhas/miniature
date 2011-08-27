@@ -3,8 +3,8 @@ include(../config.pri)
 TEMPLATE = lib
 VERSION = 0.2.0
 TARGET = $$GAME_TARGET
-QT -= gui
-QT += network
+# gui is needed for QColor ...
+QT += network gui
 
 enable-gui {
     QT += gui declarative
@@ -28,7 +28,7 @@ HEADERS += \
     abstractcommand.h \
     commands.h \
     commandline.h \
-    abstractbackend.h \
+    abstractengine.h \
     side.h
 
 SOURCES += \
@@ -43,7 +43,7 @@ SOURCES += \
     registry.cc \
     abstractcommand.cc \
     commandline.cc \
-    abstractbackend.cc \
+    abstractengine.cc \
     side.cc
 
 target.path = /usr/lib

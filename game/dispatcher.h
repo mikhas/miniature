@@ -30,7 +30,7 @@ typedef QWeakPointer<Dispatcher> WeakDispatcher;
 
 class DispatcherPrivate;
 class AbstractCommand;
-class AbstractBackend;
+class AbstractEngine;
 class Registry;
 
 namespace Frontend {
@@ -56,7 +56,7 @@ public:
 
     virtual bool sendCommand(AbstractCommand *command);
     virtual void setFrontend(Frontend::Miniature *frontend);
-    virtual void setBackend(AbstractBackend *backend);
+    virtual void setBackend(AbstractEngine *backend);
 
     //! Optional. Can be used to replace original registry.
     //! @param registry the new registry instance, Dispatcher claims ownership.

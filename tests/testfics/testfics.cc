@@ -20,7 +20,7 @@
 
 #include "testutils.h"
 #include "frontend/miniature.h"
-#include "fics/backend.h"
+#include "fics/engine.h"
 #include "game.h"
 #include "position.h"
 #include "registry.h"
@@ -117,7 +117,7 @@ private:
         Game::Registry *registry = new Game::Registry(&dispatcher);
         dispatcher.resetRegistry(registry);
 
-        Game::Fics::Backend *fics = new Game::Fics::Backend(&dispatcher);
+        Game::Fics::Engine *fics = new Game::Fics::Engine(&dispatcher);
         fics->enableTesting();
         dispatcher.setBackend(fics);
 
@@ -138,7 +138,7 @@ private:
 
         // Emable backend to parse create-game token:
         fics->play(1);
-        QCOMPARE(fics->state(), Game::Fics::Backend::StatePlayPending);
+        QCOMPARE(fics->state(), Game::Fics::Engine::StatePlayPending);
 
         fics->processToken(m_play_log.at(3));
         Game::Game *game = registry->game(414u);
