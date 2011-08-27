@@ -181,8 +181,10 @@ bool ChessBoard::selectSquare(int index)
             m_selected_piece = p;
             m_marked_move.origin = adjusted;
             m_marked_move.target = -1;
-        } else {
+        } else if (m_selected_piece.valid()) {
             m_marked_move.target = adjusted;
+        } else {
+            result false;
         }
     } else {
         if (not m_selected_piece.valid()) {
