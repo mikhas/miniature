@@ -90,20 +90,9 @@ public:
     //! @param id the game advertisement id
     Q_INVOKABLE void toggleGameAdvertisementHighlighting(uint id);
 
-    //! Selects a piece. Silently fails if piece was of wrong color or square is empty.
-    //! @param target the target square of the selected piece [0-63].
-    Q_INVOKABLE void selectPiece(int target);
-
-    //! Performs a move. Will be sent once confirmed.
-    //! @param origin the original square of the moved piece [0-63].
-    //! @param target the target square of the moved piece [0-63].
-    //! @param promotion the promotion to use (optional, defaults to queen).
-    Q_INVOKABLE void movePiece(int origin,
-                               int target,
-                               const QString &promotion = QString("queen"));
-
-    //! Undoes last move.
-    Q_INVOKABLE void undoMove();
+    //! Selects a square. Returns whether selection succeeded.
+    //! @param index the index of the selected square [0-63].
+    Q_INVOKABLE bool selectSquare(int index);
 
     //! Returns whether last move was valid.
     Q_INVOKABLE bool validMove() const;

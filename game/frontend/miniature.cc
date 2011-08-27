@@ -355,70 +355,21 @@ void Miniature::toggleGameAdvertisementHighlighting(uint id)
     }
 }
 
-void Miniature::selectPiece(int target)
+bool Miniature::selectSquare(int target)
 {
     Q_D(Miniature);
-    d->chess_board.selectPiece(toSquare(d->chess_board.adjustedIndex(target)));
-}
 
-void Miniature::movePiece(int origin,
-                         int target,
-                         const QString &promotion)
-{
-    Q_UNUSED(promotion)
-    if (origin == target) {
-        return;
+    if (not d->chess_board.selectSquare(target)) {
+        return false;
+    } else {
+        const bool was_valid(d->valid_move);
+        d->valid_move = d->chess_board.isValidMove();
+        if (d->valid_move != was_valid) {
+            emit validMoveChanged(d->valid_move);
+        }
     }
 
-    Q_D(Miniature);
-
-    const Square o(toSquare(d->chess_board.adjustedIndex(origin)));
-    const Square t(toSquare(d->chess_board.adjustedIndex(target)));
-
-    if (not o.valid() || not t.valid()) {
-        return;
-    }
-
-    // Undo last move and invalidate:
-    const bool was_valid(d->valid_move);
-    d->chess_board.undo();
-    d->valid_move = false;
-
-    // Find piece in current position:
-    Position pos(d->chess_board.position());
-    Piece p0(pos.pieceAt(o));
-    const Piece &p1(pos.pieceAt(t));
-
-    // Select piece:
-    d->chess_board.selectPiece(o);
-    p0.setSquare(t);
-
-    // TODO: Send through validator, detect castling etc ... info needs to be set on Position.
-    // Easier: send move to chess engine and just get new position ;-)
-    const Color c(d->game.data()->localSideColor() == LocalSideIsWhite ? ColorWhite
-                                                                       : ColorBlack);
-    d->valid_move = (p0.valid()
-                     && p0.color() == pos.nextToMove()
-                     && p0.color() != p1.color()
-                     && (d->mode == TestFicsMode ? true : (pos.nextToMove() == c)));
-
-    if (was_valid != d->valid_move) {
-        emit validMoveChanged(d->valid_move);
-    }
-
-    if (d->valid_move) {
-        pos.setMovedPiece(MovedPiece(p0, o));
-        d->chess_board.setPosition(pos);
-    }
-}
-
-void Miniature::undoMove()
-{
-    Q_D(Miniature);
-    d->chess_board.undo();
-
-    d->valid_move = false;
-    emit validMoveChanged(false);
+    return true;
 }
 
 bool Miniature::validMove() const
@@ -436,10 +387,16 @@ void Miniature::confirmMove()
         return;
     }
 
-    d->chess_board.commitMove();
+    if (not d->chess_board.confirmMove()) {
+        // TODO: recover from this
+        qWarning() << __PRETTY_FUNCTION__
+                   << "Unable to confirm move.";
+        return;
+    }
+
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
 
-    if (d->mode != TestFicsMode) {
+    if (d->mode == FicsMode) {
         Command::Move m(TargetEngine, id, d->chess_board.position());
         sendCommand(&m);
     }
@@ -490,7 +447,7 @@ void Miniature::sendCommand(AbstractCommand *command)
 void Miniature::onPositionChanged(const Position &position)
 {
     Q_D(Miniature);
-    d->chess_board.setPosition(position, ChessBoard::NoUndo);
+    d->chess_board.setPosition(position);
 }
 
 }} // namespace Game, Frontend

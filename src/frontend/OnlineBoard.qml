@@ -286,7 +286,6 @@ Page {
         // Creating variables to detect valid piece moves and clean unused squares
         Item {
             id: checkMove
-            property int lastIndex: -1
             property int moveNumber: 0 // Used by the timer to know when to start
         }
 
@@ -316,10 +315,10 @@ Page {
                     anchors.fill: parent
                     onClicked: {
                         if (checkMove.lastIndex != -1) {
-                            miniature.movePiece(checkMove.lastIndex, index)
+                            if (!miniature.selectSquare(index)) {
+                                // FIXME: flash square red.
+                            }
                         }
-
-                        checkMove.lastIndex = index
                     }
                 }
             }

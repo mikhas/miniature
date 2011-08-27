@@ -129,10 +129,8 @@ void Game::play(uint advertisement_id)
 
 void Game::setPosition(const Position &position)
 {
-    qDebug() << __PRETTY_FUNCTION__;
     Q_D(Game);
     if (d->position != position) {
-        qDebug() << __PRETTY_FUNCTION__ << "new pos";
         d->position = position;
         emit positionChanged(d->position);
     }

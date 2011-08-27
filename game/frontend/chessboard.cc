@@ -21,6 +21,8 @@
 #include "chessboard.h"
 #include "miniature.h"
 
+#include <QColor>
+
 namespace Game { namespace Frontend { namespace {
     typedef QHash<Piece::Type, QString> PieceMap;
     PieceMap pieceMap()
@@ -84,11 +86,15 @@ namespace Game { namespace Frontend { namespace {
     }
 }
 
+ChessBoard::MarkedMove::MarkedMove()
+    : origin(-1)
+    , target(-1)
+{}
+
 ChessBoard::ChessBoard(QObject *parent)
     : QAbstractListModel(parent)
     , m_position()
-    , m_undo_position()
-    , m_square_color(64, SquareColorTransparent)
+    , m_marked_move()
     , m_orienation(WhiteAtBottom)
 {
     // QML cannot cope with c-style-variable-names!
@@ -117,33 +123,14 @@ Position ChessBoard::position() const
     return m_position;
 }
 
-void ChessBoard::setPosition(const Position &position,
-                             Undo undo)
+void ChessBoard::setPosition(const Position &position)
 {
-    const bool was_initial_position(m_position.pieces().count() == 0
-                                    && position.pieces().count() > 0);
-    const bool was_castling(not was_initial_position
-                            && m_position.castlingFlags() != position.castlingFlags());
-
-    m_undo_position = (undo == SaveUndo ? m_position : Position());
     m_position = position;
     m_selected_piece = Piece();
+    m_marked_move = MarkedMove();
 
-    // Requires full board update:
-    if (true || was_initial_position || was_castling) {
-        emit dataChanged(index(0, 0), index(63, 0));
-    } else {
-        const MovedPiece &m(m_position.movedPiece());
-        const Piece &p(m.piece());
-
-        const QModelIndex &origin(index(indexFromSquare(m.origin(), m_orienation), 0));
-        const QModelIndex &target(index(indexFromSquare(p.square(), m_orienation), 0));
-
-        emit dataChanged(origin, origin);
-        emit dataChanged(target, target);
-
-        // TODO: Handle en-passant
-    }
+    // TODO: Optimize model updates. Currently, the whole model is invalided with each position change.
+    triggerDataChanged();
 }
 
 void ChessBoard::setOrientation(Orientation orientation)
@@ -162,63 +149,102 @@ QVariant ChessBoard::data(const QModelIndex &index,
 {
     int row(adjustedIndex(index.row()));
     const Piece &p(m_position.pieceAt(toSquare(row)));
-    const bool valid_selection(p.type() != Piece::None
-                               && p == m_selected_piece);
-    const bool wrong_color(m_selected_piece.type() != Piece::None
-                           && m_selected_piece.color() != m_position.nextToMove());
 
     switch(role) {
     case RolePiece: return fromPiece(p);
     case RolePieceImage: return imageFromPiece(p);
     case RolePieceColor: return fromColor(p.color());
-    case RoleSquareColor: return (valid_selection ? "green"
-                                                  : wrong_color ? "red"
-                                                                : fromSquareColor(m_square_color.at(row)));
+    case RoleSquareColor: {
+        QColor square_color(Qt::transparent);
+        if (m_marked_move.origin == row) {
+            square_color = QColor(Qt::blue);
+        } else if (m_marked_move.target == row) {
+            square_color = QColor(Qt::green);
+        }
+        return square_color;
+    }
     }
 
     return QVariant();
 }
 
-void ChessBoard::selectPiece(const Square &target)
+bool ChessBoard::selectSquare(int index)
 {
-    m_selected_piece = m_position.pieceAt(target);
+    bool result = true;
+    const int adjusted(adjustedIndex(index));
+    const Piece &p(m_position.pieceAt(toSquare(adjusted)));
+    const int old_origin = adjustedIndex(m_marked_move.origin);
+    const int old_target = adjustedIndex(m_marked_move.target);
+
+    if (p.valid()) {
+        if (p.color() == m_position.nextToMove()) {
+            m_selected_piece = p;
+            m_marked_move.origin = adjusted;
+            m_marked_move.target = -1;
+        } else {
+            m_marked_move.target = adjusted;
+        }
+    } else {
+        if (not m_selected_piece.valid()) {
+            result = false;
+        } else {
+            m_marked_move.target = adjusted;
+        }
+    }
+
+    emit dataChanged(this->index(index, 0),
+                     this->index(index, 0));
+
+    if (old_origin > -1) {
+        emit dataChanged(this->index(old_origin, 0),
+                         this->index(old_origin, 0));
+    }
+
+    if (old_target > -1) {
+        emit dataChanged(this->index(old_target, 0),
+                         this->index(old_target, 0));
+    }
+
+    return result;
 }
 
-void ChessBoard::undo()
+bool ChessBoard::isValidMove() const
 {
-    if (m_undo_position.pieces().count() > 0
-        && m_position != m_undo_position) {
-        m_position = m_undo_position;
-        triggerDataChanged();
-    }
+    // TODO: be more strict?
+    return (m_marked_move.origin > -1
+            && m_marked_move.target > -1);
 }
 
-void ChessBoard::commitMove(Undo undo)
+bool ChessBoard::confirmMove()
 {
-    if (undo == NoUndo) {
-        m_undo_position = Position();
+    if (not isValidMove()) {
+        return false;
     }
 
-    m_position.setNextToMove(m_position.nextToMove() == ColorWhite ? ColorBlack
-                                                                   : ColorWhite);
+    m_selected_piece.setSquare(toSquare(m_marked_move.target));
+    MovedPiece m(m_selected_piece, toSquare(m_marked_move.origin));
+    m_position.setMovedPiece(m);
+    m_position.setNextToMove(m_selected_piece.color() == ColorWhite ? ColorBlack
+                                                                    : ColorWhite);
+
+    m_marked_move = MarkedMove();
+    m_selected_piece = Piece();
+
+    // TODO: optimize ...
+    triggerDataChanged();
+
+    return true;
 }
 
 int ChessBoard::adjustedIndex(int index) const
 {
-    return (m_orienation == WhiteAtBottom ? index
-                                          : qAbs<int>(index - 63));
-}
-
-QString ChessBoard::fromSquareColor(SquareColor sq) const
-{
-    switch(sq) {
-    case SquareColorTransparent: return "transparent"; break;
-    case SquareColorGreen: return "green";
-    case SquareColorBlue: return "blue";
-    case SquareColorRed: return "red";
+    // Invalid index remains invalid:
+    if (index == -1) {
+        return -1;
     }
 
-    return "";
+    return (m_orienation == WhiteAtBottom ? index
+                                          : qAbs<int>(index - 63));
 }
 
 }} // namespace Game, Frontend

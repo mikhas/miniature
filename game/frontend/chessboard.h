@@ -43,16 +43,15 @@ public:
     };
 
 private:
-    enum SquareColor {
-        SquareColorTransparent,
-        SquareColorBlue,
-        SquareColorGreen,
-        SquareColorRed
+    struct MarkedMove {
+        int origin;
+        int target;
+
+        MarkedMove();
     };
 
     Position m_position;
-    Position m_undo_position;
-    QVector<SquareColor> m_square_color;
+    MarkedMove m_marked_move;
     Piece m_selected_piece;
     Orientation m_orienation;
 
@@ -64,11 +63,6 @@ public:
         RoleSquareColor
     };
 
-    enum Undo {
-        NoUndo,
-        SaveUndo
-    };
-
     explicit ChessBoard(QObject *parent = 0);
 
     Q_INVOKABLE QVariant get(int index,
@@ -77,8 +71,7 @@ public:
     void triggerDataChanged();
 
     Position position() const;
-    void setPosition(const Position &position,
-                     Undo undo = SaveUndo);
+    void setPosition(const Position &position);
 
     void setOrientation(Orientation orientation);
 
@@ -86,14 +79,11 @@ public:
     QVariant data(const QModelIndex &index,
                   int role) const;
 
-    void selectPiece(const Square &target);
-    void undo();
+    bool selectSquare(int index);
+    bool isValidMove() const;
 
-    void commitMove(Undo undo = NoUndo);
+    bool confirmMove();
     int adjustedIndex(int index) const;
-
-private:
-    QString fromSquareColor(SquareColor sq) const;
 };
 
 }} // namespace Game, Frontend
