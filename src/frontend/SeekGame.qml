@@ -113,7 +113,6 @@ Page {
             }
         }
 
-
         Button {
             id: seekRated
             text: ratedDialog.model.get(ratedDialog.selectedIndex).name
@@ -159,7 +158,7 @@ Page {
         anchors {
             top: headerBackground.bottom
             bottom: seekToolbar.top
-            bottomMargin: 10
+            // bottomMargin: 10
             left: parent.left
             leftMargin: 15
             right: parent.right
@@ -184,15 +183,6 @@ Page {
             property int highOpponentRating
             property string highOpponentColor
 
-
-            Connections {
-                id: sortingStyle
-                target: advertisements
-                // var flowing = "seekList.positionViewAtEnd()" // FIXME This attempt to keep the highlighted item on view won't work
-                // onRowsInserted: flowing // FIXME This attempt to keep the highlighted item on view won't work
-                onRowsInserted: seekList.positionViewAtEnd()
-            }
-
             delegate: Item {
                 id: listItem
                 property Item previouslySelected: gameData
@@ -209,9 +199,10 @@ Page {
                     Rectangle {
                         id: nonselectedEffect
                         anchors.fill: parent
-                        color: "white"
-                        opacity: 0.4
+                        color: "lightgrey"
+                        opacity: 0.9
                         radius: 10
+                        z: 20
                         visible:  model.highlighted
                     }
 
@@ -257,7 +248,6 @@ Page {
                         }
                     }
 
-
                     Text {
                         id: ratedGame
                         text: model.rated ? "rated" : "unrated"
@@ -297,26 +287,6 @@ Page {
                                 left: parent.left
                                 leftMargin: 10
                             }
-                        }
-                    }
-
-                    Rectangle {
-                        id: counterBackground
-                        width: seekList.width * 0.2
-                        height: parent.height
-                        color: "transparent"
-                        anchors {
-                            verticalCenter: gameData.verticalCenter
-                            left: parent.right
-                        }
-
-                        Text {
-                            id: counter
-                            text: index + 1
-                            font.bold: true
-                            font.pointSize: 40
-                            color: "whitesmoke"
-                            anchors.centerIn: parent
                         }
                     }
 
@@ -363,25 +333,49 @@ Page {
         }
     }
 
+    Rectangle { // counter of games listed
+        id: counterBackground
+        width: 80
+        height: 80
+        color: "transparent"
+        anchors {
+            top: headerBackground.bottom
+            topMargin: 20
+            right: parent.right
+            rightMargin: 10
+        }
+
+        Text {
+            id: counter
+            text: seekList.count
+            font.bold: true
+            font.pointSize: 40
+            color: "whitesmoke"
+            anchors.centerIn: parent
+        }
+    }
+
     // Highlighted item. It's basically a copy of a ListView item.
 
     Rectangle {
         id: highgameArea
-        height: 100
+        height: 120
         width:  parent.width
-        color: "royalblue"
+        color: "cornflowerblue"
         anchors.bottom: seekToolbar.top
-         visible: false
+        visible: false
 
         Rectangle {
             id: highgameData
             color: "olivedrab"
             width: parent.width * 0.8
             height: 80
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 10
-            anchors.left: parent.left
-            anchors.leftMargin: 15
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 20
+                left: parent.left
+                leftMargin: 15
+            }
             radius: 10
 
             Text {
@@ -425,7 +419,6 @@ Page {
                     bottomMargin: 40
                 }
             }
-
 
             Text {
                 id: highratedGame
@@ -499,9 +492,6 @@ Page {
             }
         }
     }
-
-
-
 
     // Toolbar at the bottom of the page - probably this needs to be part of a stacked page
     ToolBar {
