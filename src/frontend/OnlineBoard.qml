@@ -210,7 +210,7 @@ Page {
         Text {
             id: opponentInfo
             text: remoteSide.id
-            color: parent.color == "white" ? "black" : "white" // Doesn't seem to invert colors correctly?
+            color: localSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: opponentZone.verticalCenter
@@ -231,7 +231,7 @@ Page {
                 return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
             }
             text: time
-            color: "white" // or black, opposite of opponentZone
+            color: localSide.color
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
@@ -258,14 +258,14 @@ Page {
 
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
-            color: "black" // FIXME needs to be always == opponent's color
+            color: remoteSide.color
             width: parent.width
             height:  50
             anchors.top: parent.top
             z: -1
         }
         Rectangle {
-            color: "white" // FIXME needs to be always == user's color
+            color: localSide.color
             width: parent.width
             height:  50
             anchors.bottom: parent.bottom
@@ -335,7 +335,7 @@ Page {
         Text {
             id: userInfo
             text: localSide.id
-            color: parent.color == "white" ? "black" : "white" // Doesn't seem to invert colors correctly?
+            color: remoteSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
@@ -355,7 +355,7 @@ Page {
                 return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)}
 
             text: time
-            color: "black" // or white, opposite of opponentZone
+            color: remoteSide.color
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
