@@ -79,7 +79,8 @@ public:
     QVariant data(const QModelIndex &index,
                   int role) const;
 
-    bool selectSquare(int index);
+    bool selectSquare(int index,
+                      Color color);
     bool isValidMove() const;
 
     bool confirmMove();

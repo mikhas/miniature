@@ -412,7 +412,11 @@ bool Miniature::selectSquare(int target)
 {
     Q_D(Miniature);
 
-    if (not d->chess_board.selectSquare(target)) {
+    const ::Game::Color local_color(d->mode == FicsMode ? (d->local_side.color() == Qt::white ? ColorWhite
+                                                                                              : ColorBlack)
+                                                        : d->chess_board.position().nextToMove());
+
+    if (not d->chess_board.selectSquare(target, local_color)) {
         return false;
     } else {
         const bool was_valid(d->valid_move);
@@ -450,6 +454,8 @@ void Miniature::confirmMove()
     const uint id(d->game.isNull() ? 999u : d->game.data()->id());
 
     if (d->mode == FicsMode) {
+        qDebug() << __PRETTY_FUNCTION__
+                 << "move confirmed ...";
         Command::Move m(TargetEngine, id, d->chess_board.position());
         sendCommand(&m);
     }

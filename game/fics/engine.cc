@@ -433,12 +433,16 @@ void Engine::play(uint advertisement_id)
 
     m_state = StatePlayPending;
     emit stateChanged(m_state);
+    qDebug() << __PRETTY_FUNCTION__
+             << play_command.arg(advertisement_id).toLatin1();
     m_channel.write(play_command.arg(advertisement_id).toLatin1());
 }
 
 void Engine::movePiece(const MovedPiece &moved_piece)
 {
     // TODO: Process invalid moves.
+
+
     m_channel.write(moveNotation(moved_piece).toLatin1());
     m_channel.write("\n");
 }

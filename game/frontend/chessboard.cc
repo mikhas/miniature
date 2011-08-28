@@ -168,7 +168,8 @@ QVariant ChessBoard::data(const QModelIndex &index,
     return QVariant();
 }
 
-bool ChessBoard::selectSquare(int index)
+bool ChessBoard::selectSquare(int index,
+                              Color color)
 {
     bool result = true;
     const int adjusted(adjustedIndex(index));
@@ -177,7 +178,8 @@ bool ChessBoard::selectSquare(int index)
     const int old_target = adjustedIndex(m_marked_move.target);
 
     if (p.valid()) {
-        if (p.color() == m_position.nextToMove()) {
+        if (p.color() == color
+            && p.color() == m_position.nextToMove()) {
             m_selected_piece = p;
             m_marked_move.origin = adjusted;
             m_marked_move.target = -1;
