@@ -139,6 +139,16 @@ public:
     virtual void login(const QString &username,
                        const QString &password);
 
+    //! Sends out a game offer.
+    //! @param time initial time.
+    //! @param increment time increment for each turn.
+    //! @param rating whether the game is rated.
+    //! @param color the preferred color
+    virtual void seek(uint time,
+                      uint increment,
+                      Rating rating,
+                      Color color);
+
     //! Play a game.
     //! @param advertisement_id the play request was the response to a previous
     //!        game advertisement; this is the ad's id (optional).

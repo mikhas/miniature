@@ -27,3 +27,4 @@
 #include "commands/move.h"
 #include "commands/creategame.h"
 #include "commands/activategame.h"
+#include "commands/seek.h"

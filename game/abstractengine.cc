@@ -42,6 +42,9 @@ void AbstractEngine::login(const QString &,
                          const QString &)
 {}
 
+void AbstractEngine::seek(uint, uint, Rating, Color)
+{}
+
 void AbstractEngine::play(uint)
 {}
 

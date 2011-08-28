@@ -410,8 +410,6 @@ Page {
                 onClicked: {
                     miniature.confirmMove()
 
-                    checkMove.lastIndex = -1 // back to pre-move conditions
-
                     checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
                     if (checkMove.moveNumber === 3) { userTime.increment = 5000 ; opponentTime.increment = 5000 } // FIXME increments must be substituted by variables
                     if (checkMove.moveNumber > 1)

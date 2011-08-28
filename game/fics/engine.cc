@@ -75,6 +75,17 @@ namespace {
                                "\\s+(\\d+):(\\d+)\\s+\\-\\s+(\\d+):(\\d+)\\s+"
                                "\\((\\d+)\\-(\\d+)\\)\\s+(\\w):\\s+(\\d+)");
 
+    QString fromColor(Game::Color c)
+    {
+        switch (c) {
+        case Game::ColorWhite: return "white";
+        case Game::ColorBlack: return "black";
+        default: return "";
+        }
+
+        return "";
+    }
+
     bool parseRating(Game::RecordSeekBase *rsb,
                      uint *rating,
                      const QString &captured)
@@ -383,6 +394,37 @@ void Engine::login(const QString &username,
     m_extra_delimiter.append('%');
 }
 
+void Engine::seek(uint time,
+                  uint increment,
+                  Rating rating,
+                  Color color)
+{
+    if (m_state != StateReady) {
+        return;
+    }
+
+    QString r;
+    if (rating == RatingEnabled) {
+        r = "rated";
+    } else if (rating == RatingDisabled) {
+        r = "unrated";
+    }
+
+    // TODO: set waiting for seek flag
+    m_state = StatePlayPending;
+    emit stateChanged(StatePlayPending);
+
+    const QString &cmd(QString("seek %1 %2 %3 %4\n")
+                       .arg(time)
+                       .arg(increment)
+                       .arg(r)
+                       .arg(fromColor(color)));
+    qDebug() << __PRETTY_FUNCTION__
+             << cmd;
+
+    m_channel.write(cmd.toLatin1());
+}
+
 void Engine::play(uint advertisement_id)
 {
     if (m_state != StateReady) {
@@ -406,6 +448,8 @@ void Engine::processToken(const QByteArray &token)
     if (not m_enabled || token.isEmpty()) {
         return;
     }
+
+    qDebug() << "FICS:" << token;
 
     switch(m_state) {
     case StateLoginFailed:
@@ -491,6 +535,9 @@ void Engine::processLogin(const QByteArray &line)
         if (m_username == "guest") {
             m_username = match_confirm_login.cap(1);
         }
+
+        Command::Login lc(TargetFrontend, m_username, "");
+        sendCommand(&lc);
     } else if (line.startsWith(enter_password)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();

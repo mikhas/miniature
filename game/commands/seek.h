@@ -22,6 +22,8 @@
 #define SEEK_H
 
 #include "abstractcommand.h"
+#include "namespace.h"
+
 #include <QtCore>
 
 namespace Game { namespace Command {
@@ -31,12 +33,21 @@ class Seek
 {
 private:
     Target m_target;
+    uint m_time;
+    uint m_increment;
+    Rating m_rating;
+    Color m_color;
 
 public:
     //! \reimp
-    explicit Seek(Target t);
+    explicit Seek(Target t,
+                  uint time,
+                  uint increment,
+                  Rating rating,
+                  Color color);
     virtual ~Seek();
     virtual Target target() const;
+    virtual void exec(AbstractEngine *target);
     //! \reimp_end
 };
 

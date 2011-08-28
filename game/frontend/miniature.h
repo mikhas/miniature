@@ -45,11 +45,12 @@ class Miniature
     Q_OBJECT
     Q_DISABLE_COPY(Miniature)
     Q_DECLARE_PRIVATE(Miniature)
-    Q_ENUMS(GameMode)
+    Q_ENUMS(Mode)
+    Q_ENUMS(Rating)
 
-    Q_PROPERTY(GameMode gameMode READ gameMode
-                                 WRITE setGameMode
-                                 NOTIFY gameModeChanged)
+    Q_PROPERTY(Mode mode READ mode
+                         WRITE setMode
+                         NOTIFY modeChanged)
 
     Q_PROPERTY(bool validMove READ validMove
                               NOTIFY validMoveChanged)
@@ -58,13 +59,25 @@ private:
     const QScopedPointer<MiniaturePrivate> d_ptr;
 
 public:
-    enum GameMode {
+    enum Mode {
         TestFicsMode,
         FicsMode
     };
 
+    enum Color {
+        Auto = ColorNone,
+        White = ColorWhite,
+        Black = ColorBlack
+    };
+
+    enum Rating {
+        RatingAny = ::Game::RatingAny,
+        RatingEnabled = ::Game::RatingEnabled,
+        RatingDisabled = ::Game::RatingDisabled
+    };
+
     explicit Miniature(Dispatcher *dispatcher,
-                      QObject *parent = 0);
+                       QObject *parent = 0);
     virtual ~Miniature();
     virtual void show(const QUrl &ui);
     virtual void showBoard();
@@ -72,13 +85,33 @@ public:
     virtual void handleRecord(const Record &r);
     virtual void handleSeek(const Seek &s);
 
-    //! Sets game mode.
-    Q_INVOKABLE void setGameMode(GameMode mode);
-    Q_INVOKABLE GameMode gameMode() const;
-    Q_SIGNAL void gameModeChanged(GameMode mode);
+    //! Mode property
+    Q_INVOKABLE void setMode(Mode mode);
+    Q_INVOKABLE Mode mode() const;
+    Q_SIGNAL void modeChanged(Mode mode);
 
     Q_INVOKABLE void login(const QString &username,
                            const QString &password);
+
+    //! Sends out a game offer.
+    //! @param time initial time.
+    //! @param increment time increment for each turn.
+    //! @param rating whether the game is rated.
+    //! @param color the preferred color
+    Q_INVOKABLE void seek(uint time,
+                          uint increment,
+                          Rating rating,
+                          Color color);
+
+    //! Sends out a game offer.
+    //! @param time initial time.
+    //! @param increment time increment for each turn.
+    //! @param rating whether the game is rated.
+    //! @param color the preferred color
+    Q_INVOKABLE void seek(uint time,
+                          uint increment,
+                          const QString &rating,
+                          const QString &color);
 
     //! Respond to a game advertisement. Will trigger a match if id is valid
     //! (and opponent accepts, in case of manual starts).
@@ -108,6 +141,9 @@ public:
 
     //! Returns agive game, can be 0.
     Game * activeGame() const;
+
+    //! Sets username.
+    void setUsername(const QString &username);
 
 private:
     void sendCommand(AbstractCommand *command);

@@ -19,12 +19,21 @@
  */
 
 #include "seek.h"
+#include "abstractengine.h"
 
 namespace Game { namespace Command {
 
-Seek::Seek(Target t)
+Seek::Seek(Target t,
+           uint time,
+           uint increment,
+           Rating rating,
+           Color color)
     : AbstractCommand(t)
     , m_target(t)
+    , m_time(time)
+    , m_increment(increment)
+    , m_rating(rating)
+    , m_color(color)
 {}
 
 Seek::~Seek()
@@ -33,6 +42,15 @@ Seek::~Seek()
 Target Seek::target() const
 {
     return m_target;
+}
+
+void Seek::exec(AbstractEngine *target)
+{
+    if (not target) {
+        return;
+    }
+
+    target->seek(m_time, m_increment, m_rating, m_color);
 }
 
 }} // namespace Command, Game

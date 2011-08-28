@@ -18,11 +18,10 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TEMPLATE_H
-#define TEMPLATE_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include "abstractcommand.h"
-#include "abstractengine.h"
 
 #include <QtCore>
 
@@ -45,9 +44,10 @@ public:
     virtual ~Login();
     virtual Target target() const;
     virtual void exec(AbstractEngine *);
+    virtual void exec(Frontend::Miniature *);
     //! \reimp_end
 };
 
 }} // namespace Command, Game
 
-#endif // TEMPLATE_H
+#endif // LOGIN_H

@@ -1,5 +1,6 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
+import org.maemo.miniature 1.0
 
 Page {
     id: ficsSeekGame
@@ -531,10 +532,15 @@ Page {
                                  timeDialog.model.get(timeDialog.selectedIndex).name + " " +
                                  incrementDialog.model.get(incrementDialog.selectedIndex).name + " " +
                                  ratedDialog.model.get(ratedDialog.selectedIndex).name + "\n" +
-                                 "1033 Username" // This still needs the real variables
+                                 localSide.id
                                  )
                     acceptButtonText: "Yes"
                     onAccepted: {
+                        loadScreen("OnlineBoard.qml") // FIXME only load chessboard when seek accepted
+                        miniature.seek(timeDialog.model.get(timeDialog.selectedIndex).name,
+                                       incrementDialog.model.get(incrementDialog.selectedIndex).name,
+                                       ratedDialog.model.get(ratedDialog.selectedIndex).name,
+                                       "Auto")
                         // FIXME instructions to send a new seek
                     }
                     rejectButtonText: "No"

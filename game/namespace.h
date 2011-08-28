@@ -90,6 +90,12 @@ enum LocalSideColor {
     LocalSideIsBlack
 };
 
+enum Rating {
+    RatingAny,
+    RatingEnabled,
+    RatingDisabled
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)

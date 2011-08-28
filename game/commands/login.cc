@@ -20,6 +20,7 @@
 
 #include "login.h"
 #include "abstractengine.h"
+#include "frontend/miniature.h"
 
 namespace Game { namespace Command {
 
@@ -47,6 +48,15 @@ void Login::exec(AbstractEngine *target)
     }
 
     target->login(m_username, m_password);
+}
+
+void Login::exec(Frontend::Miniature *target)
+{
+    if (not target) {
+        return;
+    }
+
+    target->setUsername(m_username);
 }
 
 }} // namespace Command, Game

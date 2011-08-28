@@ -57,6 +57,10 @@ public:
     virtual State state() const;
     virtual void login(const QString &username,
                        const QString &password);
+    virtual void seek(uint time,
+                      uint increment,
+                      Rating rating,
+                      Color color);
     virtual void play(uint advertisement_id);
     virtual void movePiece(const MovedPiece &moved_piece);
     virtual void processToken(const QByteArray &token);

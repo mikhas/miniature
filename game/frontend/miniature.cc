@@ -46,6 +46,28 @@ namespace Game { namespace Frontend { namespace {
         elem->setId(side->identifier());
         elem->setColor(color);
     }
+
+    Miniature::Rating toRating(const QString &rating)
+    {
+        if (rating == "Unrated") {
+            return Miniature::RatingDisabled;
+        } else if (rating == "Rated") {
+            return Miniature::RatingEnabled;
+        }
+
+        return Miniature::RatingAny;
+    }
+
+    Miniature::Color toColor(const QString &color)
+    {
+        if (color == "White") {
+            return Miniature::White;
+        } else if (color == "Black") {
+            return Miniature::Black;
+        }
+
+        return Miniature::Auto;
+    }
 }
 
 QString fromColor(Color color)
@@ -210,7 +232,7 @@ public:
     Advertisements advertisements;
     ChessBoard chess_board;
     bool valid_move;
-    Miniature::GameMode mode;
+    Miniature::Mode mode;
     WeakGame game;
     SideElement local_side;
     SideElement remote_side;
@@ -236,7 +258,7 @@ public:
 };
 
 Miniature::Miniature(Dispatcher *dispatcher,
-                   QObject *parent)
+                     QObject *parent)
     : QObject(parent)
     , d_ptr(new MiniaturePrivate(dispatcher))
 {
@@ -300,18 +322,18 @@ void Miniature::handleSeek(const Seek &s)
     d->advertisements.append(s);
 }
 
-void Miniature::setGameMode(GameMode mode)
+void Miniature::setMode(Mode mode)
 {
     Q_D(Miniature);
     if (d->mode != mode) {
         qDebug() << __PRETTY_FUNCTION__
                  << "mode:" << mode;
         d->mode = mode;
-        emit gameModeChanged(d->mode);
+        emit modeChanged(d->mode);
     }
 }
 
-Miniature::GameMode Miniature::gameMode() const
+Miniature::Mode Miniature::mode() const
 {
     Q_D(const Miniature);
     return d->mode;
@@ -324,9 +346,40 @@ void Miniature::login(const QString &username,
     sendCommand(&login);
 }
 
+void Miniature::seek(uint time,
+                     uint increment,
+                     Rating rating,
+                     Color color)
+{
+    Q_D(const Miniature);
+    switch(d->mode) {
+    default:
+    case FicsMode: {
+        Command::Seek seek(TargetEngine, time, increment,
+                           static_cast< ::Game::Rating >(rating),
+                           static_cast< ::Game::Color >(color));
+        sendCommand(&seek);
+    } break;
+
+    case TestFicsMode: {
+        Command::CreateGame cg(TargetRegistry, 999u, d->dispatcher.data(),
+                               "test123", "test456", LocalSideIsBlack);
+        sendCommand(&cg);
+    } break;
+    }
+}
+
+void Miniature::seek(uint time,
+                     uint increment,
+                     const QString &rating,
+                     const QString &color)
+{
+    seek(time, increment, toRating(rating), toColor(color));
+}
+
 void Miniature::play(uint id)
 {
-    Q_D(Miniature);
+    Q_D(const Miniature);
     switch(d->mode) {
     default:
     case FicsMode: {
@@ -434,6 +487,12 @@ Game * Miniature::activeGame() const
 {
     Q_D(const Miniature);
     return d->game.data();
+}
+
+void Miniature::setUsername(const QString &username)
+{
+    Q_D(Miniature);
+    d->local_side.setId(username);
 }
 
 void Miniature::sendCommand(AbstractCommand *command)

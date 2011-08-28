@@ -121,14 +121,14 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         text:  checked ? "TESTING MODE ON"
                        : "TESTING MODE OFF"
         checkable: true
-        checked: miniature.gameMode == Miniature.TestFicsMode
+        checked: miniature.mode == Miniature.TestFicsMode
         opacity: 0.8
         anchors.top: registerButton.bottom
         anchors.topMargin: 100
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
-            miniature.setGameMode(testingButton.checked ? Miniature.TestFicsMode
-                                                        : Miniature.FicsMode)
+            miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
+                                                    : Miniature.FicsMode)
         }
     }
 }
