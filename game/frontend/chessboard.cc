@@ -157,9 +157,9 @@ QVariant ChessBoard::data(const QModelIndex &index,
     case RoleSquareColor: {
         QColor square_color(Qt::transparent);
         if (m_marked_move.origin == row) {
-            square_color = QColor(Qt::blue);
+            square_color = QColor("cornflowerblue");
         } else if (m_marked_move.target == row) {
-            square_color = QColor(Qt::green);
+            square_color = QColor("olivedrab");
         }
         return square_color;
     }
