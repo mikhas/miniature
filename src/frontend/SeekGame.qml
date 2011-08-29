@@ -82,7 +82,7 @@ Page {
                     ListElement { name: "30" }
                     ListElement { name: "60" }
                 }
-                selectedIndex: 0
+                selectedIndex: 3
                 visualParent: dialogWrapper
             }
         }
@@ -113,7 +113,7 @@ Page {
                     ListElement { name: "12" }
                     ListElement { name: "30" }
                 }
-                selectedIndex: 0
+                selectedIndex: 5
                 visualParent: dialogWrapper
             }
         }
