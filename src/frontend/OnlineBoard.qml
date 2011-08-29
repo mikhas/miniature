@@ -209,7 +209,7 @@ Page {
 
         Text {
             id: opponentInfo
-            text: remoteSide.id
+            text: "++++" + " " + remoteSide.id // FIXME must be changed for rating variable.
             color: localSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
@@ -334,7 +334,7 @@ Page {
 
         Text {
             id: userInfo
-            text: localSide.id
+            text: "++++" + " " + localSide.id // FIXME rating must be changed for variables.
             color: remoteSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
