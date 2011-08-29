@@ -373,7 +373,7 @@ Page {
         Rectangle {
             id: highgameData
             color: "olivedrab"
-            width: parent.width * 0.8
+            width: (parent.width - 25) * 0.8
             height: 80
             anchors {
                 bottom: parent.bottom
@@ -478,12 +478,13 @@ Page {
 
         Rectangle {
             id: highcounterBackground
-            width: parent.width * 0.2
-            height: 100
+            width: 80
+            height: 80
             color: "transparent"
             anchors {
-                verticalCenter: highgameData.verticalCenter
+                verticalCenter: parent.verticalCenter
                 right: parent.right
+                rightMargin: 10
             }
 
             ToolIcon { // Confirms the game
