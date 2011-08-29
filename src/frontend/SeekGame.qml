@@ -69,15 +69,20 @@ Page {
                 titleText: "Time"
                 model:  ListModel { // Is there a convenient number picker component available somewhere?
                     ListElement { name: "*" } // Any time is good
+                    ListElement { name: "0" }
                     ListElement { name: "1" }
+                    ListElement { name: "2" }
                     ListElement { name: "3" }
+                    ListElement { name: "4" }
                     ListElement { name: "5" }
+                    ListElement { name: "7" }
                     ListElement { name: "10" }
                     ListElement { name: "15" }
+                    ListElement { name: "20" }
                     ListElement { name: "30" }
                     ListElement { name: "60" }
                 }
-                selectedIndex: 3
+                selectedIndex: 0
                 visualParent: dialogWrapper
             }
         }
@@ -104,11 +109,11 @@ Page {
                     ListElement { name: "0" }
                     ListElement { name: "1" }
                     ListElement { name: "3" }
-                    ListElement { name: "6" }
+                    ListElement { name: "5" }
                     ListElement { name: "12" }
                     ListElement { name: "30" }
                 }
-                selectedIndex: 5
+                selectedIndex: 0
                 visualParent: dialogWrapper
             }
         }
