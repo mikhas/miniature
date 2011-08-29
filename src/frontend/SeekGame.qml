@@ -152,7 +152,7 @@ Page {
         id: dialogWrapper
         color:  "transparent"
         anchors.top: headerBackground.bottom
-        anchors.bottom: seekToolbar.top
+        anchors.bottom: userZone.top
         width: parent.width
         z: 10
     }
@@ -162,7 +162,7 @@ Page {
         color:  "lightgray"
         anchors {
             top: headerBackground.bottom
-            bottom: seekToolbar.top
+            bottom: userZone.top
             // bottomMargin: 10
             left: parent.left
             leftMargin: 15
@@ -367,7 +367,7 @@ Page {
         height: 120
         width:  parent.width
         color: "cornflowerblue"
-        anchors.bottom: seekToolbar.top
+        anchors.bottom: userZone.top
         visible: false
 
         Rectangle {
@@ -497,6 +497,35 @@ Page {
             }
         }
     }
+
+    // Local user info
+
+
+    Rectangle {
+        id: userZone
+        width: parent.width
+        height: 40 // FIXME how to make it relative to text height?
+        color: "lightgrey"
+        anchors.bottom:  seekToolbar.top
+
+        Rectangle {
+            height: 1
+            width:  parent.width
+            color: "cornflowerblue"
+            anchors.bottom: userZone.top
+        }
+
+        Text {
+            id: userInfo
+            text: "++++" + " " + "localuser123" // FIXME must be changed for variables.
+            font.pointSize: 16
+            font.weight: Font.DemiBold
+            anchors.verticalCenter: userZone.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 30
+        }
+    }
+
 
     // Toolbar at the bottom of the page - probably this needs to be part of a stacked page
     ToolBar {
