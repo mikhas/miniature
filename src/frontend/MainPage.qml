@@ -56,6 +56,39 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         }
     }
 
+    // Login error message
+    Rectangle {
+        id: loginErrorBkg
+        color: "red"
+        opacity: 0.5
+        visible: false
+        radius: 10
+        anchors {
+            top: idForm.top
+            topMargin: -40
+            bottom: loginButton.bottom
+            bottomMargin: -10
+            left: anonymousButton.left
+            leftMargin: -10
+            right: anonymousButton.right
+            rightMargin: -10
+        }
+    }
+
+    Text {
+        id: loginError
+        text:  ""
+        font.pointSize: 20
+        color: "white"
+        visible: false
+        anchors {
+            top: loginErrorBkg.top
+            topMargin: 8
+            horizontalCenter: parent.horizontalCenter
+        }
+    }
+
+    // Login form
     TextField {
         id: idForm
         placeholderText: "username"
@@ -77,14 +110,22 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: loginButton
+        property bool loginCorrect: true // FIXME this is just a trick for testing, it's the backend who needs to tell whether the login is correct or not
         text: "Log in"
         anchors.top:  idPassword.bottom
         anchors.topMargin: 10
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
         onClicked: {
-            miniature.login(idForm.text, idPassword.text)
-            loadScreen("SeekGame.qml")
+            if (loginCorrect == false) {
+                loginErrorBkg.visible = true
+                loginError.visible = true
+                loginError.text = "Wrong"
+                idForm.text = ""
+                idPassword.text = ""}
+            else {
+                miniature.login(idForm.text, idPassword.text)
+                loadScreen("SeekGame.qml") }
         }
     }
 
