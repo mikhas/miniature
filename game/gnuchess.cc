@@ -19,10 +19,13 @@
  */
 
 #include "gnuchess.h"
+#include "commands.h"
 
 namespace {
     const char * const GnuChessCmd = "/usr/games/gnuchess";
-    const QString CmdMove("My move is :");
+
+    // matches "My move is : Nf6"
+    const QRegExp match_move("My move is : (\\w+=)");
 
     bool kill(Q_PID pid,
               const QString &signal)
@@ -38,26 +41,56 @@ namespace {
 
 namespace Game {
 
-GnuChess::GnuChess(const QString &identifier)
-    : Side(identifier)
+GnuChess::GnuChess(Dispatcher *dispatcher,
+                   QObject *parent)
+    : AbstractEngine(parent)
     , m_proc()
+    , m_dispatcher(dispatcher)
 {
     connect(&m_proc, SIGNAL(readyRead()),
             this,    SLOT(onReadyRead()),
             Qt::UniqueConnection);
-
-    m_proc.start(GnuChessCmd, QIODevice::ReadWrite | QIODevice::Unbuffered);
-    m_proc.setReadChannel(QProcess::StandardOutput);
-
-    if (m_proc.state() != QProcess::Running) {
-        m_proc.waitForStarted();
-    }
 }
 
 GnuChess::~GnuChess()
 {
     m_proc.kill();
     m_proc.waitForFinished();
+}
+
+void GnuChess::setEnabled(bool enable)
+{
+    if (enable) {
+        m_proc.start(GnuChessCmd, QIODevice::ReadWrite | QIODevice::Unbuffered);
+        m_proc.setReadChannel(QProcess::StandardOutput);
+
+        if (m_proc.state() != QProcess::Running) {
+            m_proc.waitForStarted();
+        }
+    } else {
+        m_proc.terminate();
+    }
+}
+
+void GnuChess::play(uint)
+{
+    m_proc.write("new\n");
+}
+
+void GnuChess::movePiece(const MovedPiece &moved_piece)
+{
+    m_proc.write(moveNotation(moved_piece).toLatin1());
+    m_proc.write("\n");
+}
+
+void GnuChess::processToken(const QByteArray &token)
+{
+    bool valid = match_move.exactMatch(token);
+    if (valid) {
+        // TODO: parse & send move correctly. Also need to do sth. about the game id.
+        Command::Move m(TargetFrontend, 999u, Position());
+        sendCommand(&m);
+    }
 }
 
 void GnuChess::runInBackground()
@@ -70,20 +103,17 @@ void GnuChess::runInForeground()
     kill(m_proc.pid(), "SIGCONT");
 }
 
-void GnuChess::startTurn(const Position &result)
-{
-    m_proc.write(moveNotation(result.movedPiece()).toLatin1());
-    m_proc.write("\n");
-    m_proc.waitForBytesWritten();
-}
-
 void GnuChess::onReadyRead()
 {
     while (m_proc.canReadLine()) {
-        QString result(m_proc.readLine());
-        if (result.startsWith(CmdMove)) {
-            emit turnEnded(Position());
-        }
+        processToken(m_proc.readLine());
+    }
+}
+
+void GnuChess::sendCommand(AbstractCommand *command)
+{
+    if (Dispatcher *dispatcher = m_dispatcher.data()) {
+        dispatcher->sendCommand(command);
     }
 }
 
