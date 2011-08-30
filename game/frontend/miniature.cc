@@ -23,7 +23,6 @@
 #include "directinputdevice.h"
 #include "registry.h"
 #include "frontend/chessboard.h"
-#include "frontend/chessboardelement.h"
 #include "frontend/sideelement.h"
 
 #ifdef MINIATURE_GUI_ENABLED
