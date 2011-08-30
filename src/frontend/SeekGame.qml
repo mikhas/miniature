@@ -364,10 +364,10 @@ Page {
 
     Rectangle {
         id: highgameArea
-        height: 120
+        height: 90
         width:  parent.width
         color: "cornflowerblue"
-        anchors.bottom: userZone.top
+        anchors.bottom: separator.top
         visible: false
 
         Rectangle {
@@ -377,7 +377,7 @@ Page {
             height: 80
             anchors {
                 bottom: parent.bottom
-                bottomMargin: 20
+                bottomMargin: 5
                 left: parent.left
                 leftMargin: 15
             }
@@ -439,6 +439,9 @@ Page {
                 }
             }
 
+
+
+
             // Opponent info
             Rectangle {
                 id: highopponentData
@@ -499,8 +502,146 @@ Page {
         }
     }
 
-    // Local user info
+    // New seek item.
+    Rectangle {
+        id: newgameArea
+        height: 90
+        width:  parent.width
+        color: "cornflowerblue"
+        anchors.bottom: seekToolbar.top
+        visible: false
+        z: 10
 
+        Rectangle {
+            id: newgameData
+            color: "olivedrab"
+            width: (parent.width - 25) * 0.8
+            height: 80
+            radius: 10
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 5
+                left: parent.left
+                leftMargin: 15
+            }
+
+            Text {
+                id: newtypeChess
+                text: typeDialog.model.get(typeDialog.selectedIndex).name
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                    left: parent.left
+                    leftMargin: 10
+                }
+            }
+
+            Text {
+                id: newtimeGame
+                text: timeDialog.model.get(timeDialog.selectedIndex).name
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: newincrementGame.left
+                    rightMargin: 15
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+            Text {
+                id: newincrementGame
+                text: incrementDialog.model.get(incrementDialog.selectedIndex).name
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: newratedGame.left
+                    rightMargin: 22
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+            Text {
+                id: newratedGame
+                text: ratedDialog.model.get(ratedDialog.selectedIndex).name
+                font.family: "Nokia Pure Headline"
+                font.pointSize: 22
+                color: "black"
+                anchors {
+                    right: parent.right
+                    rightMargin: 10
+                    bottom: parent.bottom
+                    bottomMargin: 40
+                }
+            }
+
+            Rectangle {
+                id: newplayerData
+                width: parent.width - 10
+                height: 35 // FIXME how to make it relative to text height?
+                color: "lightgrey"
+                anchors {
+                    bottom: newgameData.bottom
+                    bottomMargin: 5
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                Text {
+                    id: newplayerInfo
+                    text: "++++" + " " + localSide.id // FIXME rating must be changed for a variable.
+                    color: "black"
+                    font.pointSize: 16
+                    font.weight: Font.DemiBold
+                    anchors {
+                        verticalCenter: newplayerData.verticalCenter
+                        left: parent.left
+                        leftMargin: 10
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill:  parent
+                onClicked: {
+                    loadScreen("OnlineBoard.qml")
+                    miniature.play(seekList.highId)
+                }
+            }
+        }
+
+        Rectangle {
+            id: newcounterBackground
+            width: 80
+            height: 80
+            color: "transparent"
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: parent.right
+                rightMargin: 10
+            }
+
+            BusyIndicator { // Confirms the game
+                id: newSpinner
+                anchors.centerIn: parent
+                running: true
+            }
+        }
+    }
+
+    // Local user info
+    Rectangle {
+        id: separator
+        height: 1
+        width:  parent.width
+        color: "cornflowerblue"
+        anchors.bottom: userZone.top
+    }
 
     Rectangle {
         id: userZone
@@ -508,13 +649,6 @@ Page {
         height: 40 // FIXME how to make it relative to text height?
         color: "lightgrey"
         anchors.bottom:  seekToolbar.top
-
-        Rectangle {
-            height: 1
-            width:  parent.width
-            color: "cornflowerblue"
-            anchors.bottom: userZone.top
-        }
 
         Text {
             id: userInfo
@@ -526,7 +660,6 @@ Page {
             anchors.leftMargin: 30
         }
     }
-
 
     // Toolbar at the bottom of the page - probably this needs to be part of a stacked page
     ToolBar {
@@ -561,12 +694,14 @@ Page {
                                  )
                     acceptButtonText: "Yes"
                     onAccepted: {
-                        loadScreen("OnlineBoard.qml") // FIXME only load chessboard when seek accepted
                         miniature.seek(timeDialog.model.get(timeDialog.selectedIndex).name,
                                        incrementDialog.model.get(incrementDialog.selectedIndex).name,
                                        ratedDialog.model.get(ratedDialog.selectedIndex).name,
                                        "Auto")
-                        // FIXME instructions to send a new seek
+                        newgameArea.visible = true
+                        separator.anchors.top = newgameArea.top
+                        // FIXME instructions to send a new seek to the backend.
+                        // We are supporting one seek at a time at this point. If the user sends a new seek the old one is cancelled.
                     }
                     rejectButtonText: "No"
                     visualParent: dialogWrapper
