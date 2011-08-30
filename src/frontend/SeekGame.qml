@@ -298,6 +298,8 @@ Page {
                     MouseArea {
                         anchors.fill:  parent
                         onClicked: {
+                            miniature.play(seekList.highId) // FIXME here goes an instruction to send the response to the selected challenge
+                            // FIXME note that selecting a new seek implies that the old response is cancelled/withdrawn
                             miniature.toggleGameAdvertisementHighlighting(model.id)
                             highgameArea.visible = true
                             seekListWindow.anchors.bottom = highgameArea.top
@@ -490,13 +492,17 @@ Page {
                 rightMargin: 10
             }
 
-            ToolIcon { // Confirms the game
-                id: highconfirmButton
-                iconId: "toolbar-add"
+            BusyIndicator {
+                id: highSpinner
                 anchors.centerIn: parent
-                onClicked: {
-                    loadScreen("OnlineBoard.qml")
-                    miniature.play(seekList.highId)
+                running: true
+
+                // Used only for testing as a way to access OnlineBoard, needs to be commented in releases
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        loadScreen("OnlineBoard.qml")
+                    }
                 }
             }
         }
@@ -626,7 +632,7 @@ Page {
                 rightMargin: 10
             }
 
-            BusyIndicator { // Confirms the game
+            BusyIndicator {
                 id: newSpinner
                 anchors.centerIn: parent
                 running: true
