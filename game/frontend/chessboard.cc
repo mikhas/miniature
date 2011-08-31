@@ -228,8 +228,6 @@ bool ChessBoard::confirmMove()
     m_selected_piece.setSquare(toSquare(m_marked_move.target));
     MovedPiece m(m_selected_piece, toSquare(m_marked_move.origin));
     m_position.setMovedPiece(m);
-    m_position.setNextToMove(m_selected_piece.color() == ColorWhite ? ColorBlack
-                                                                    : ColorWhite);
 
     m_marked_move = MarkedMove();
     m_selected_piece = Piece();

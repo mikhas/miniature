@@ -50,19 +50,42 @@ private:
     {
         Dispatcher dispatcher;
 
-        Registry *registry = new Registry(&dispatcher, m_app.data());
-        dispatcher.resetRegistry(registry);
-
         Frontend::Miniature *miniature = new Frontend::Miniature(&dispatcher, m_app.data());
         dispatcher.setFrontend(miniature);
 
+        const QByteArray local("local");
+        const QByteArray remote("remote");
         Command::CreateGame cg(TargetRegistry, 999u, WeakDispatcher(&dispatcher),
-                            "  white", "black", LocalSideIsBlack);
+                               local, remote, LocalSideIsBlack);
         dispatcher.sendCommand(&cg);
 
         QVERIFY(miniature->activeGame());
-        Position pos(miniature->activeGame()->position());
-        QCOMPARE(pos, createStartPosition());
+        QCOMPARE(miniature->activeGame()->id(), 999u);
+        Position pos0(miniature->activeGame()->position());
+        QCOMPARE(pos0, createStartPosition());
+        QCOMPARE(miniature->activeGame()->activeSide().name, remote);
+
+        // TODO: turn into data-driven test?
+        const Piece &pg4(Piece(Piece::Pawn, ColorWhite).setSquare(toSquare("g4")));
+        MovedPiece mp0(pg4, toSquare("g2"));
+        pos0.setMovedPiece(mp0);
+
+        Command::Move mc0(TargetFrontend, 999u, pos0);
+        dispatcher.sendCommand(&mc0);
+
+        QCOMPARE(miniature->activeGame()->position().pieceAt(toSquare("g4")), pg4);
+        QCOMPARE(miniature->activeGame()->activeSide().name, local);
+
+        Position pos1(miniature->activeGame()->position());
+        const Piece &pe5(Piece(Piece::Pawn, ColorBlack).setSquare(toSquare("e5")));
+        MovedPiece mp1(pe5, toSquare("e7"));
+        pos1.setMovedPiece(mp1);
+
+        Command::Move mc1(TargetFrontend, 999u, pos1);
+        dispatcher.sendCommand(&mc1);
+
+        QCOMPARE(miniature->activeGame()->position().pieceAt(toSquare("e5")), pe5);
+        QCOMPARE(miniature->activeGame()->activeSide().name, remote);
     }
 
     Q_SLOT void testCli()

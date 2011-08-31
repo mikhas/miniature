@@ -195,6 +195,8 @@ void Position::setMovedPiece(const MovedPiece &moved_piece)
 {
     m_moved_piece = moved_piece;
     setPiece(m_moved_piece.piece());
+    m_next_to_move = (m_moved_piece.piece().color() == ColorWhite ? ColorBlack
+                                                                  : ColorWhite);
 
     Piece none(Piece::None, ColorNone);
     none.setSquare(moved_piece.origin());
@@ -218,7 +220,10 @@ Color Position::nextToMove() const
 
 void Position::setNextToMove(Color color)
 {
-    m_next_to_move = color;
+    // FIXME: check for valid move, not valid piece.
+    if (not movedPiece().piece().valid()) {
+        m_next_to_move = color;
+    }
 }
 
 File Position::doublePawnPush() const
