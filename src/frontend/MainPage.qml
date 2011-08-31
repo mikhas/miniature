@@ -141,7 +141,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Text {
         id: ficsDescription
-        text: "freechess.org"
+        text: "The Miniature Project"
         font.pointSize: 20
         font.underline: true
         color: "white"
@@ -154,7 +154,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         }
         MouseArea {
             anchors.fill: parent
-            onClicked: Qt.openUrlExternally("http://freechess.org/") }
+            onClicked: Qt.openUrlExternally("http://wiki.maemo.org/Miniature") }
     }
 
     Button { // Toggle between testing mode and real mode - to be commented in releases
