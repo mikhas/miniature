@@ -147,7 +147,7 @@ private:
         fics->processToken(m_play_log.at(8));
         const Game::Position &pos(game->position());
         QCOMPARE(pos.pieceAt(Game::toSquare("g4")),
-                 Game::Piece(Game::Piece::Pawn, Game::ColorWhite));
+                 Game::Piece(Game::Piece::Pawn, Game::ColorWhite).setSquare(Game::toSquare("g4")));
         QCOMPARE(pos.nextToMove(), Game::ColorBlack);
     }
 };

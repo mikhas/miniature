@@ -56,7 +56,7 @@ public:
     Color color() const;
 
     Square square() const;
-    void setSquare(const Square &square);
+    Piece & setSquare(const Square &square);
 };
 
 //! Convenience type that can be used to describe a move.

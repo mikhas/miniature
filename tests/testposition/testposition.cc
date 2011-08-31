@@ -41,21 +41,27 @@ private:
 
     Q_SLOT void testStartPosition()
     {
-        const Position p(createStartPosition());
+        const Position pos(createStartPosition());
         const Piece none;
 
         // Invalid access:
-        QCOMPARE(p.pieceAt(Square(FileCount, RankCount)), none);
+        QCOMPARE(pos.pieceAt(Square(FileCount, RankCount)), none);
 
         // Default-constructed piece represents empty square, too:
-        QCOMPARE(p.pieceAt(Square(FileA, Rank3)), none);
+        QCOMPARE(pos.pieceAt(Square(FileA, Rank3)), none);
 
-        QCOMPARE(p.pieceAt(Square(FileC, Rank2)), Piece(Piece::Pawn, ColorWhite));
-        QCOMPARE(p.pieceAt(Square(FileC, Rank7)), Piece(Piece::Pawn, ColorBlack));
-        QCOMPARE(p.pieceAt(Square(FileD, Rank1)), Piece(Piece::Queen, ColorWhite));
-        QCOMPARE(p.pieceAt(Square(FileF, Rank8)), Piece(Piece::Bishop, ColorBlack));
-        QCOMPARE(p.pieceAt(Square(FileA, Rank1)), Piece(Piece::Rook, ColorWhite));
-        QCOMPARE(p.pieceAt(Square(FileH, Rank8)), Piece(Piece::Rook, ColorBlack));
+        QCOMPARE(pos.pieceAt(toSquare("c2")),
+                 Piece(Piece::Pawn, ColorWhite).setSquare(toSquare("c2")));
+        QCOMPARE(pos.pieceAt(toSquare("c7")),
+                 Piece(Piece::Pawn, ColorBlack).setSquare(toSquare("c7")));
+        QCOMPARE(pos.pieceAt(toSquare("d1")),
+                 Piece(Piece::Queen, ColorWhite).setSquare(toSquare("d1")));
+        QCOMPARE(pos.pieceAt(toSquare("f8")),
+                 Piece(Piece::Bishop, ColorBlack).setSquare(toSquare("f8")));
+        QCOMPARE(pos.pieceAt(toSquare("a1")),
+                 Piece(Piece::Rook, ColorWhite).setSquare(toSquare("a1")));
+        QCOMPARE(pos.pieceAt(toSquare("h8")),
+                 Piece(Piece::Rook, ColorBlack).setSquare(toSquare("h8")));
     }
 };
 

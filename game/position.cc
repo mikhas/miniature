@@ -117,9 +117,10 @@ Square Piece::square() const
     return m_square;
 }
 
-void Piece::setSquare(const Square &square)
+Piece & Piece::setSquare(const Square &square)
 {
     m_square = square;
+    return *this;
 }
 
 MovedPiece::MovedPiece()
