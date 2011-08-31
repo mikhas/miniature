@@ -23,31 +23,16 @@ Page {
         height: 70
         anchors.top: parent.top
 
-        Button {
-            id: seekTypeChess
-            text: typeDialog.model.get(typeDialog.selectedIndex).name
-            width: 150
-            anchors {
-                bottom: headerBackground.bottom
-                bottomMargin: 10
-                left: parent.left
-                leftMargin: 10
-            }
-            onClicked: {
-                typeDialog.open();
-            }
-
-            SelectionDialog {
-                id: typeDialog
-                titleText: "Chess variant"
-                model:  ListModel {
-                    ListElement { name: "Standard" }
-                    ListElement { name: "Crazyhouse" }
-                    ListElement { name: "Suicide" }
-                }
-                selectedIndex: 0
-                visualParent: dialogWrapper
-            }
+        Text {
+            id: typeChess
+            text: "Standard" // FIXME onPress Suicide, Bughouse, etc
+            font.family: "Nokia Pure Headline"
+            font.pointSize: 28
+            color: "white"
+            anchors.bottom: headerBackground.bottom
+            anchors.bottomMargin: 10
+            anchors.left: parent.left
+            anchors.leftMargin: 10
         }
 
         Button {
@@ -383,7 +368,7 @@ Page {
 
             Text {
                 id: newtypeChess
-                text: typeDialog.model.get(typeDialog.selectedIndex).name
+                text: "Standard"
                 font.family: "Nokia Pure Headline"
                 font.pointSize: 22
                 color: "black"
@@ -550,7 +535,7 @@ Page {
                     id: newSeekDialog
                     titleText: "New seek"
                     message: (
-                                 typeDialog.model.get(typeDialog.selectedIndex).name + " " +
+                                 "Standard" + " " +
                                  timeDialog.model.get(timeDialog.selectedIndex).name + " " +
                                  incrementDialog.model.get(incrementDialog.selectedIndex).name + " " +
                                  ratedDialog.model.get(ratedDialog.selectedIndex).name + "\n" +
