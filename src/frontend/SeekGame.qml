@@ -163,7 +163,6 @@ Page {
         anchors {
             top: headerBackground.bottom
             bottom: userZone.top
-            // bottomMargin: 10
             left: parent.left
             leftMargin: 15
             right: parent.right
@@ -179,19 +178,8 @@ Page {
 
             model: advertisements
 
-            property int highId: -1
-            property string highType
-            property int highTime
-            property int highIncrement
-            property string highRating: "unrated"
-            property string highOpponent
-            property int highOpponentRating
-            property string highOpponentColor
-
             delegate: Item {
                 id: listItem
-                property Item previouslySelected: gameData
-                property int previousIndex // Only used for debugging
                 height: 80
                 width: parent.width * 0.8
 
@@ -205,10 +193,10 @@ Page {
                         id: nonselectedEffect
                         anchors.fill: parent
                         color: "lightgrey"
-                        opacity: 0.9
+                        opacity: 0.6
                         radius: 10
                         z: 20
-                        visible:  model.highlighted
+                        visible: model.highlighted
                     }
 
                     Text {
@@ -298,22 +286,30 @@ Page {
                     MouseArea {
                         anchors.fill:  parent
                         onClicked: {
+                            miniature.toggleGameAdvertisementHighlighting(model.id)
+                            // loadScreen("OnlineBoard.qml") FIXME: commented for testing spinner, press new seek spinner to access OnlineBoard
                             miniature.play(seekList.highId) // FIXME here goes an instruction to send the response to the selected challenge
                             // FIXME note that selecting a new seek implies that the old response is cancelled/withdrawn
-                            miniature.toggleGameAdvertisementHighlighting(model.id)
-                            highgameArea.visible = true
-                            seekListWindow.anchors.bottom = highgameArea.top
-                            seekList.highId = model.id
-                            seekList.highType = "Standard" // FIXME the right model* variable goes here
-                            seekList.highTime = model.time
-                            seekList.highIncrement = model.increment
-                            seekList.highOpponent = model.playerName
-                            seekList.highOpponentRating = model.rating
-                            seekList.highOpponentColor = model.color
-                            if (model.rated == "rated")
-                                seekList.highRating = model.rated
-
                         }
+                    }
+                }
+
+                Rectangle {
+                    id: spinnerBackground
+                    width: (parent.width * 0.25) + 10
+                    height: 80
+                    color: "transparent"
+                    visible: model.highlighted
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        right: parent.right
+                        rightMargin: -((parent.width * 0.25) + 10)
+                    }
+
+                    BusyIndicator {
+                        id: spinner
+                        anchors.centerIn: parent
+                        running: model.highlighted
                     }
                 }
             }
@@ -359,152 +355,6 @@ Page {
             font.pointSize: 40
             color: "whitesmoke"
             anchors.centerIn: parent
-        }
-    }
-
-    // Highlighted item. It's basically a copy of a ListView item.
-
-    Rectangle {
-        id: highgameArea
-        height: 90
-        width:  parent.width
-        color: "cornflowerblue"
-        anchors.bottom: separator.top
-        visible: false
-
-        Rectangle {
-            id: highgameData
-            color: "olivedrab"
-            width: (parent.width - 25) * 0.8
-            height: 80
-            anchors {
-                bottom: parent.bottom
-                bottomMargin: 5
-                left: parent.left
-                leftMargin: 15
-            }
-            radius: 10
-
-            Text {
-                id: hightypeChess
-                text: seekList.highType
-                font.family: "Nokia Pure Headline"
-                font.pointSize: 22
-                color: "black"
-                anchors {
-                    bottom: parent.bottom
-                    bottomMargin: 40
-                    left: parent.left
-                    leftMargin: 10
-                }
-            }
-
-            Text {
-                id: hightimeGame
-                text: seekList.highTime
-                font.family: "Nokia Pure Headline"
-                font.pointSize: 22
-                color: "black"
-                anchors {
-                    right: highincrementGame.left
-                    rightMargin: 15
-                    bottom: parent.bottom
-                    bottomMargin: 40
-                }
-            }
-
-            Text {
-                id: highincrementGame
-                text: seekList.highIncrement
-                font.family: "Nokia Pure Headline"
-                font.pointSize: 22
-                color: "black"
-                anchors {
-                    right: highratedGame.left
-                    rightMargin: 22
-                    bottom: parent.bottom
-                    bottomMargin: 40
-                }
-            }
-
-            Text {
-                id: highratedGame
-                text: seekList.highRating
-                font.family: "Nokia Pure Headline"
-                font.pointSize: 22
-                color: "black"
-                anchors {
-                    right: parent.right
-                    rightMargin: 10
-                    bottom: parent.bottom
-                    bottomMargin: 40
-                }
-            }
-
-
-
-
-            // Opponent info
-            Rectangle {
-                id: highopponentData
-                width: parent.width - 10
-                height: 35 // FIXME how to make it relative to text height?
-                color: seekList.highOpponentColor == "auto" ? "lightgrey"
-                                                            : seekList.highOpponentColor
-                anchors {
-                    bottom: highgameData.bottom
-                    bottomMargin: 5
-                    horizontalCenter: parent.horizontalCenter
-                }
-
-                Text {
-                    id: highopponentInfo
-                    text: seekList.highOpponentRating + " " + seekList.highOpponent
-                    color: seekList.highOpponentColor == "black" ? "white"
-                                                                 : "black"
-                    font.pointSize: 16
-                    font.weight: Font.DemiBold
-                    anchors {
-                        verticalCenter: highopponentData.verticalCenter
-                        left: parent.left
-                        leftMargin: 10
-                    }
-                }
-            }
-
-            MouseArea {
-                anchors.fill:  parent
-                onClicked: {
-                    loadScreen("OnlineBoard.qml")
-                    miniature.play(seekList.highId)
-                }
-            }
-        }
-
-        Rectangle {
-            id: highcounterBackground
-            width: 80
-            height: 80
-            color: "transparent"
-            anchors {
-                verticalCenter: parent.verticalCenter
-                right: parent.right
-                rightMargin: 10
-            }
-
-            BusyIndicator {
-                id: highSpinner
-                anchors.centerIn: parent
-                running: true
-
-                // Used only for testing as a way to access OnlineBoard, needs to be commented in releases
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        loadScreen("OnlineBoard.qml")
-                    }
-                }
-            }
         }
     }
 
@@ -637,6 +487,14 @@ Page {
                 anchors.centerIn: parent
                 running: true
             }
+
+            MouseArea {
+                anchors.fill:  parent
+                onClicked: {
+                    loadScreen("OnlineBoard.qml")
+                    miniature.play(seekList.highId)
+                }
+            }
         }
     }
 
@@ -658,7 +516,7 @@ Page {
 
         Text {
             id: userInfo
-            text: "++++" + " " + "localuser123" // FIXME must be changed for variables.
+            text: "++++" + " " + localSide.id // FIXME rating must be changed for variable.
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
