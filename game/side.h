@@ -21,73 +21,20 @@
 #ifndef SIDE_H
 #define SIDE_H
 
-#include "namespace.h"
-#include "abstractengine.h"
-#include "position.h"
-#include "square.h"
-
 #include <QtCore>
 
 namespace Game {
 
-class Side;
-typedef QWeakPointer<Side> WeakSide;
-
-class SidePrivate;
-
-//! Represents a game side. Updated by Game instance.
-class Side
-    : public QObject
+//! Represents one player side in a game record.
+struct Side
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(Side)
-    Q_DECLARE_PRIVATE(Side)
+    bool valid;
+    QByteArray name;
+    uint rating;
+    uint remaining_time; // in secs
+    uint material_strength;
 
-private:
-    const QScopedPointer<SidePrivate> d_ptr;
-
-public:
-    //! C'tor
-    //! @param identifier the identifier for this side.
-    explicit Side(const QString &identifier);
-
-    //! D'tor
-    virtual ~Side();
-
-    //! Returns identifier for this side.
-    virtual QString identifier() const;
-
-    //! Emitted when a move has been submitted. If it is was this side's turn
-    //! and the submitted move is invalid, then startMove will be called again
-    //! (as if the turn had just started). Otherwise incorrectly sent moves
-    //! will be silently discarded.
-    //! @param result the resulting position.
-    Q_SIGNAL void turnEnded(const Position &result);
-
-    //! Starts new turn for this side. If move is the same as last move, then
-    //! the last submitted move was invalid.
-    //! @param result the new position.
-    virtual void startTurn(const Position &position);
-
-    //! Moves a piece, usually based on position from startTurn.
-    //! @returns whether move was valid.
-    //! @param moved_piece the moved piece.
-    //! @param manual_promotion only relevant if pawn is moved and reaches
-    //!        final rank. Replaces pawn with auto promoted piece if set to
-    //!        PromotionNone (default).
-    virtual bool move(const MovedPiece &moved_piece,
-                      Promotion manual_promotion = PromotionNone);
-
-    //! Confirms last valid move.
-    virtual void confirmMove();
-
-    //! Sets auto promotion for any pawn that reaches final rank. Initial value
-    //! should be PromotionQueen by default.
-    virtual void setAutoPromotion(Promotion promotion);
-
-    //! Returns position from the side's point of view.
-    virtual Position position() const;
-
+    explicit Side();
 };
 
 } // namespace GAME

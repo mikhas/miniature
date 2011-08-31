@@ -38,8 +38,8 @@ private:
     const Target m_target;
     const uint m_game_id;
     const WeakDispatcher m_dispatcher;
-    const QString m_local_id;
-    const QString m_remote_id;
+    const QByteArray m_local_id;
+    const QByteArray m_remote_id;
     LocalSideColor m_color;
 
 public:
@@ -47,8 +47,8 @@ public:
     explicit CreateGame(Target t,
                         uint id,
                         const WeakDispatcher &dispatcher,
-                        const QString &local_id,
-                        const QString &remote_id,
+                        const QByteArray &local_id,
+                        const QByteArray &remote_id,
                         LocalSideColor color);
     virtual ~CreateGame();
     virtual Target target() const;

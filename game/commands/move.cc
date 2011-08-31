@@ -77,22 +77,22 @@ Position Move::result() const
     return m_result;
 }
 
-void Move::setWhite(const PlayerRecord &player_record)
+void Move::setWhite(const Side &player_record)
 {
     m_white = player_record;
 }
 
-PlayerRecord Move::white() const
+Side Move::white() const
 {
     return m_white;
 }
 
-void Move::setBlack(const PlayerRecord &player_record)
+void Move::setBlack(const Side &player_record)
 {
     m_black = player_record;
 }
 
-PlayerRecord Move::black() const
+Side Move::black() const
 {
     return m_black;
 }

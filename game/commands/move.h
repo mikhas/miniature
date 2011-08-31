@@ -46,8 +46,8 @@ private:
     const uint m_game_id;
     const Position m_result;
     const MovedPiece m_moved_piece;
-    PlayerRecord m_white;
-    PlayerRecord m_black;
+    Side m_white;
+    Side m_black;
 
 public:
     //! \reimp
@@ -67,11 +67,11 @@ public:
     uint gameId() const;
     Position result() const;
 
-    PlayerRecord white() const;
-    void setWhite(const PlayerRecord &player_record);
+    Side white() const;
+    void setWhite(const Side &player_record);
 
-    PlayerRecord black() const;
-    void setBlack(const PlayerRecord &player_record);
+    Side black() const;
+    void setBlack(const Side &player_record);
 };
 
 }} // namespace Command, Game

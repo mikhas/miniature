@@ -27,8 +27,8 @@ namespace Game { namespace Command {
 CreateGame::CreateGame(Target t,
                        uint id,
                        const WeakDispatcher &dispatcher,
-                       const QString &local_id,
-                       const QString &remote_id,
+                       const QByteArray &local_id,
+                       const QByteArray &remote_id,
                        LocalSideColor color)
     : AbstractCommand(t)
     , m_target(t)

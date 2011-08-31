@@ -35,14 +35,14 @@ namespace Game { namespace Frontend { namespace {
                                     | CommandMove);
 
     void configureSideElement(SideElement *elem,
-                              Side *side,
+                              const Side &side,
                               const QColor &color)
     {
-        if (not elem || not side) {
+        if (not elem) {
             return;
         }
 
-        elem->setId(side->identifier());
+        elem->setId(side.name);
         elem->setColor(color);
     }
 

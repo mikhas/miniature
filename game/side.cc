@@ -19,67 +19,12 @@
  */
 
 #include "side.h"
-#include "position.h"
 
 namespace Game {
 
-class SidePrivate
-{
-public:
-    const QString identifier;
-    Position result;
-    MovedPiece moved_piece;
-    Promotion auto_promotion;
-
-    explicit SidePrivate(const QString &new_identifier)
-        : identifier(new_identifier)
-        , result()
-        , moved_piece()
-        , auto_promotion(PromotionQueen)
-    {}
-};
-
-Side::Side(const QString &identifier)
-    : QObject()
-    , d_ptr(new SidePrivate(identifier))
+Side::Side()
+    : valid(false)
 {}
-
-Side::~Side()
-{}
-
-QString Side::identifier() const
-{
-    Q_D(const Side);
-    return d->identifier;
-}
-
-void Side::startTurn(const Position &position)
-{
-    Q_UNUSED(position)
-}
-
-bool Side::move(const MovedPiece &moved_piece,
-                Promotion manual_promotion)
-{
-    Q_UNUSED(moved_piece)
-    Q_UNUSED(manual_promotion)
-
-    return true; // FIXME: assuming that move is valid, for now
-}
-
-void Side::confirmMove()
-{}
-
-void Side::setAutoPromotion(Promotion promotion)
-{
-    Q_D(Side);
-    d->auto_promotion = promotion;
-}
-
-Position Side::position() const
-{
-    return Position();
-}
 
 } // namespace Game
 

@@ -45,8 +45,8 @@ namespace {
             ObservingGame = 0
         };
 
-        Game::PlayerRecord white;
-        Game::PlayerRecord black;
+        Game::Side white;
+        Game::Side black;
         Role role;
         Game::Position position;
     };

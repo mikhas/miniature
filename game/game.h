@@ -39,12 +39,12 @@ typedef QWeakPointer<Game> WeakGame;
 //! Creates a game
 //! @param id the game id. If 0 then an unique identifier will be created.
 //! @param dispatcher the dispatcher.
-//! @param local_identifier the identifier for the local side.
-//! @param remote_identifier the identifier for the remote side.
+//! @param local_name the player'name.
+//! @param remote_name the opponent's name.
 Game *createGame(uint id,
                  Dispatcher *dispatcher,
-                 const QString &local_identifier,
-                 const QString &remote_identifier);
+                 const QByteArray &local_name,
+                 const QByteArray &remote_name);
 
 //! A Game instance represents exactly one game. A game goes from Idle =>
 //! Started => Ended and cannot be restarted.
@@ -75,8 +75,8 @@ public:
     //! @param parent the optional parent that owns this instance.
     explicit Game(uint id,
                   Dispatcher *dispatcher,
-                  Side *local,
-                  Side *remote,
+                  const Side &local,
+                  const Side &remote,
                   QObject *parent = 0);
     virtual ~Game();
 
@@ -107,24 +107,17 @@ public:
     Q_SIGNAL void positionChanged(const Position &position);
 
     //! Returns local side.
-    Side * localSide() const;
+    Side localSide() const;
 
     //! Returns remote side.
-    Side * remoteSide() const;
+    Side remoteSide() const;
 
     //! Returns active side.
-    Side * activeSide() const;
+    Side activeSide() const;
 
 private:
-    //! One side ended turn and submitted a move.
-    //! @param position the resulting position.
-    Q_SLOT void onTurnEnded(const Position &result);
-
-    //! Connects common parts for each side with controller.
-    //! @param side the side to connect.
-    void connectSide(Side *side);
-
     void sendCommand(AbstractCommand *command);
+    void computeActiveSide(Color next_to_move);
 };
 
 } // namespace Game

@@ -37,15 +37,18 @@ namespace Game {
 
 Game *createGame(uint id,
                  Dispatcher *dispatcher,
-                 const QString &local_identifier,
-                 const QString &remote_identifier)
+                 const QByteArray &local_name,
+                 const QByteArray &remote_name)
 {
     if (not dispatcher) {
         return 0;
     }
 
-    Side *local = new Side(local_identifier);
-    Side *remote = new Side(remote_identifier);
+    Side local;
+    local.name = local_name;
+
+    Side remote;
+    remote.name = remote_name;
     Game *game = new Game(id, dispatcher, local, remote);
 
     return game;
@@ -57,49 +60,35 @@ public:
     uint id;
     WeakDispatcher dispatcher;
     Position position;
-    const QScopedPointer<Side> local; //!< Side of the local player.
-    const QScopedPointer<Side> remote; //!< Side of the remote player.
+    Side local; //!< Side of the local player.
+    Side remote; //!< Side of the remote player.
     Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
     LocalSideColor local_color; //!< Color of local side.
 
     explicit GamePrivate(uint new_id,
                          Dispatcher *new_dispatcher,
-                         Side *new_local,
-                         Side *new_remote)
+                         const Side &new_local,
+                         const Side &new_remote)
         : id(new_id) // FIXME: create UID if 0
         , dispatcher(new_dispatcher)
         , position()
         , local(new_local)
         , remote(new_remote)
-        , active(new_local)// FIXME: Set correct active side (could be remote) already during construction!
+        , active(&local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
         , local_color(LocalSideIsWhite)
-    {
-        if (local.isNull() || remote.isNull()) {
-            qCritical() << __PRETTY_FUNCTION__
-                        << "Creating Game instance with invalid sides is not allowed.";
-        }
-
-        // Take over ownership:
-        local->setParent(0);
-        remote->setParent(0);
-    }
+    {}
 };
 
 Game::Game(uint id,
            Dispatcher *dispatcher,
-           Side *local,
-           Side *remote,
+           const Side &local,
+           const Side &remote,
            QObject *parent)
     : QObject(parent)
     , d_ptr(new GamePrivate(id, dispatcher, local, remote))
-{
-    Q_D(Game);
-
-    connectSide(d->local.data());
-    connectSide(d->remote.data());
-}
+{}
 
 Game::~Game()
 {}
@@ -118,9 +107,6 @@ void Game::play(uint advertisement_id)
     }
 
     d->state = Game::Started;
-    d->active = d->local.data();
-    d->active->startTurn(Position());
-    printTurnMessage(d->active->identifier());
 
     // Notify backend, too:
     Command::Play play(TargetEngine, advertisement_id);
@@ -132,6 +118,7 @@ void Game::setPosition(const Position &position)
     Q_D(Game);
     if (d->position != position) {
         d->position = position;
+        computeActiveSide(d->position.nextToMove());
         emit positionChanged(d->position);
     }
 }
@@ -154,53 +141,22 @@ LocalSideColor Game::localSideColor() const
     return d->local_color;
 }
 
-Side * Game::localSide() const
+Side Game::localSide() const
 {
     Q_D(const Game);
-    return d->local.data();
+    return d->local;
 }
 
-Side * Game::remoteSide() const
+Side Game::remoteSide() const
 {
     Q_D(const Game);
-    return d->remote.data();
+    return d->remote;
 }
 
-Side * Game::activeSide() const
+Side Game::activeSide() const
 {
     Q_D(const Game);
-    return d->active;
-}
-
-void Game::onTurnEnded(const Position &result)
-{
-    // TOOD: Validate move, call startTurn again with last valid move, on (still active) side.
-    Q_D(Game);
-
-    if (d->state != Game::Started) {
-        qWarning() << __PRETTY_FUNCTION__
-                   << "Game not started yet, ignoring.";
-        return;
-    }
-
-    if (sender() != d->active) {
-        qWarning() << __PRETTY_FUNCTION__
-                   << "Move received from inactive side, ignoring.";
-        return;
-    }
-
-    d->active = (d->active == d->local.data() ? d->remote.data()
-                                              : d->local.data());
-
-    d->active->startTurn(result);
-    printTurnMessage(d->active->identifier());
-}
-
-void Game::connectSide(Side *side)
-{
-    connect(side, SIGNAL(turnEnded(Position)),
-            this, SLOT(onTurnEnded(Position)),
-            Qt::UniqueConnection);
+    return (d->active ? *d->active : d->local);
 }
 
 void Game::sendCommand(AbstractCommand *command)
@@ -209,6 +165,28 @@ void Game::sendCommand(AbstractCommand *command)
     if (Dispatcher *dispatcher = d->dispatcher.data()) {
         dispatcher->sendCommand(command);
     }
+}
+
+void Game::computeActiveSide(Color next_to_move)
+{
+    Q_D(Game);
+
+    switch(next_to_move) {
+    case ColorWhite:
+        d->active = (d->local_color == LocalSideIsWhite ? &d->local
+                                                        : &d->remote);
+        break;
+
+    case ColorBlack:
+        d->active = (d->local_color == LocalSideIsBlack ? &d->local
+                                                        : &d->remote);
+        break;
+
+    default:
+        break;
+    }
+
+    printTurnMessage(d->active->name);
 }
 
 } // namespace Game

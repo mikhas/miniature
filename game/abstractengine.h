@@ -23,6 +23,7 @@
 
 #include "namespace.h"
 #include "position.h"
+#include "side.h"
 
 #include <QtCore>
 
@@ -38,24 +39,12 @@ struct RecordSeekBase
     uint increment; // in secs
 };
 
-//! Represents one player side in a game record.
-struct PlayerRecord
-{
-    bool valid;
-    QByteArray name;
-    uint rating;
-    uint remaining_time; // in secs
-    uint material_strength;
-
-    explicit PlayerRecord();
-};
-
 //! Represents one entry from a list of games.
 struct Record
     : public RecordSeekBase
 {
-    PlayerRecord white;
-    PlayerRecord black;
+    Side white;
+    Side black;
     bool white_to_move;
     uint turn;
 };

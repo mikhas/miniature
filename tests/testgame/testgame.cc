@@ -23,10 +23,15 @@
 #include "side.h"
 #include "gnuchess.h"
 #include "dispatcher.h"
+#include "commands.h"
+#include "registry.h"
+#include "frontend/miniature.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
+
+using namespace Game;
 
 class TestGame
     : public QObject
@@ -43,32 +48,21 @@ private:
 
     Q_SLOT void testLocalGame()
     {
-        // After each valid move, active side should switch. So we can test a
-        // valid move sequence simply by checking the active side against the
-        // expected value.
-        Game::Dispatcher dispatcher;
-        Game::Side *white = new Game::Side("white");
-        Game::Side *black = new Game::Side("black");
-        Game::Game subject(0, &dispatcher, white, black);
-        QCOMPARE(subject.activeSide(), white);
+        Dispatcher dispatcher;
 
-        // Trying to submit move before starting game => ignore:
-        emit white->turnEnded(Game::Position());
-        QCOMPARE(subject.activeSide(), white);
+        Registry *registry = new Registry(&dispatcher, m_app.data());
+        dispatcher.resetRegistry(registry);
 
-        subject.play();
+        Frontend::Miniature *miniature = new Frontend::Miniature(&dispatcher, m_app.data());
+        dispatcher.setFrontend(miniature);
 
-        // Switch sides after submitting move:
-        emit white->turnEnded(Game::Position());
-        QCOMPARE(subject.activeSide(), black);
+        Command::CreateGame cg(TargetRegistry, 999u, WeakDispatcher(&dispatcher),
+                            "  white", "black", LocalSideIsBlack);
+        dispatcher.sendCommand(&cg);
 
-        // Trying to submit move twice in a row => ignore:
-        emit white->turnEnded(Game::Position());
-        QCOMPARE(subject.activeSide(), black);
-
-        // Switch sides again after submitting move:
-        emit black->turnEnded(Game::Position());
-        QCOMPARE(subject.activeSide(), white);
+        QVERIFY(miniature->activeGame());
+        Position pos(miniature->activeGame()->position());
+        QCOMPARE(pos, createStartPosition());
     }
 
     Q_SLOT void testCli()

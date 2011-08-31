@@ -22,10 +22,6 @@
 
 namespace Game {
 
-PlayerRecord::PlayerRecord()
-    : valid(false)
-{}
-
 AbstractEngine::AbstractEngine(QObject *parent)
     : QObject(parent)
 {}
