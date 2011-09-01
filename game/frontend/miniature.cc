@@ -363,6 +363,9 @@ void Miniature::seek(uint time,
     case TestFicsMode: {
         Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
         sendCommand(&cg);
+
+        Command::Move m(TargetFrontend, 999u, createStartPosition());
+        sendCommand(&m);
     } break;
     }
 }
@@ -388,6 +391,9 @@ void Miniature::play(uint id)
     case TestFicsMode: {
         Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
         sendCommand(&cg);
+
+        Command::Move m(TargetFrontend, 999u, createStartPosition());
+        sendCommand(&m);
     } break;
     }
 }
@@ -441,19 +447,28 @@ void Miniature::confirmMove()
         return;
     }
 
-    if (not d->chess_board.confirmMove()) {
+    const Position &pos(d->chess_board.confirmMove());
+    if (not pos.valid()) {
         // TODO: recover from this
         qWarning() << __PRETTY_FUNCTION__
                    << "Unable to confirm move.";
         return;
     }
 
-    const uint id(d->game.isNull() ? 999u : d->game.data()->id());
+    uint id = 999u;
+    if (Game *g = d->game.data()) {
+        g->setPosition(pos);
+        id = g->id();
+    } else {
+        qWarning() << __PRETTY_FUNCTION__
+                   << "No active game found!";
+        return;
+    }
 
     if (d->mode == FicsMode) {
         qDebug() << __PRETTY_FUNCTION__
                  << "move confirmed ...";
-        Command::Move m(TargetEngine, id, d->chess_board.position());
+        Command::Move m(TargetEngine, id, pos);
         sendCommand(&m);
     }
 

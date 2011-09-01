@@ -51,8 +51,19 @@ namespace {
         Game::Position position;
     };
 
+    struct InvalidMove
+    {
+        bool valid;
+        QByteArray move;
+    };
+
+    const char * const not_your_move("It is not your move");
+
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
+
+    // Matches: 'Illegal move (Qd2).'
+    const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
 
     // Matches: 'Press return to enter the server as "GuestZCQM":'
     const QRegExp match_confirm_login("Press return to enter the server as \"(\\w*)\"");
@@ -286,6 +297,21 @@ namespace {
         return result;
     }
 
+    InvalidMove parseInvalidMove(const QByteArray &token)
+    {
+        InvalidMove im;
+
+        if (token.contains(not_your_move)) {
+            im.valid = true;
+            return im;
+        }
+
+        im.valid = match_illegal_move.exactMatch(token);
+        im.move = match_illegal_move.cap(1).toLatin1();
+
+        return im;
+    }
+
     void debugOutput(const Game::Seek s)
     {
         qDebug() << s.valid
@@ -327,6 +353,7 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_enabled(false)
     , m_login_abort_timer()
     , m_extra_delimiter()
+    , m_current_game_id(0)
 {
     m_login_abort_timer.setSingleShot(true);
     m_login_abort_timer.setInterval(10000);
@@ -467,12 +494,17 @@ void Engine::processToken(const QByteArray &token)
         const GameInfo &gi(parseCreateGame(token));
         debugOutput(gi);
         if (gi.valid) {
+            m_current_game_id = gi.id;
             const QByteArray &local_side(gi.white == m_username ? gi.white : gi.black);
             const QByteArray &remote_side(gi.white == local_side ? gi.black : gi.white);
 
             Command::CreateGame cg(TargetRegistry, gi.id, local_side, remote_side,
                                    (local_side == gi.white ? LocalSideIsWhite : LocalSideIsBlack));
             sendCommand(&cg);
+
+            Command::Move m(TargetFrontend, gi.id, createStartPosition());
+            sendCommand(&m);
+
             m_state = StateReady;
             emit stateChanged(m_state);
         }
@@ -491,7 +523,6 @@ void Engine::processToken(const QByteArray &token)
             sendCommand(&m);
         } else {
             const Seek &s(parseSeek(token));
-            debugOutput(s);
             if (s.valid) {
                 Command::Advertisement ac(TargetFrontend, s);
                 sendCommand(&ac);
@@ -500,6 +531,12 @@ void Engine::processToken(const QByteArray &token)
                 if (r.valid) {
                     Command::Record rc(TargetFrontend, r);
                     sendCommand(&rc);
+                } else {
+                    const InvalidMove &im(parseInvalidMove(token));
+                    if (im.valid) {
+                        Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
+                        sendCommand(&imc);
+                    }
                 }
             }
         }

@@ -134,6 +134,9 @@ public:
     //! Confirms current move.
     Q_INVOKABLE void confirmMove();
 
+    //! Sends a message to frontend.
+    Q_SIGNAL void invalidMove(const QString &move);
+
 
     //! Sets the active game.
     //! @param game the game.

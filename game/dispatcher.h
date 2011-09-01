@@ -37,6 +37,10 @@ namespace Frontend {
     class Miniature;
 }
 
+namespace Command {
+    class Move;
+}
+
 Dispatcher *createDispatcher(QObject *owner = 0);
 
 //! Dispatches commands.
@@ -61,6 +65,15 @@ public:
     //! Optional. Can be used to replace original registry.
     //! @param registry the new registry instance, Dispatcher claims ownership.
     virtual void resetRegistry(Registry *registry);
+
+    //! Push move onto game's undo stack.
+    //! @param game_id the game id.
+    virtual void pushMove(uint game_id,
+                                 const Command::Move &move);
+
+    //! Finds last move command seen for specified game and pops it from game's undo stack.
+    //! @param game_id the game id.
+    virtual Command::Move popMove(uint game_id);
 };
 
 } // namespace Game

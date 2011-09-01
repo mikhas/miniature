@@ -24,6 +24,14 @@
 
 namespace Game { namespace Command {
 
+Move::Move()
+    : AbstractCommand()
+    , m_game_id(0)
+    , m_result()
+    , m_white()
+    , m_black()
+{}
+
 Move::Move(Target target,
            uint game_id,
            const Position &result)
@@ -37,22 +45,23 @@ Move::Move(Target target,
 Move::~Move()
 {}
 
-void Move::exec(Dispatcher *,
+void Move::exec(Dispatcher *dispatcher,
                 AbstractEngine *target)
 {
-    if (not target) {
+    if (not dispatcher || not target) {
         return;
     }
 
     qDebug() << __PRETTY_FUNCTION__
              << moveNotation(m_result.movedPiece());
     target->movePiece(m_result.movedPiece());
+    dispatcher->pushMove(m_game_id, *this);
 }
 
-void Move::exec(Dispatcher *,
+void Move::exec(Dispatcher *dispatcher,
                 Frontend::Miniature *target)
 {
-    if (not target) {
+    if (not dispatcher || not target) {
             return;
     }
 
@@ -60,6 +69,7 @@ void Move::exec(Dispatcher *,
         qDebug() << __PRETTY_FUNCTION__
                  << moveNotation(m_result.movedPiece());
         g->setPosition(m_result);
+        dispatcher->pushMove(m_game_id, *this);
     }
 }
 

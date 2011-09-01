@@ -25,6 +25,7 @@
 #include "fics/engine.h"
 #include "game.h"
 #include "registry.h"
+#include "commands.h"
 
 namespace Game {
 
@@ -41,9 +42,12 @@ Dispatcher *createDispatcher(QObject *owner)
 class DispatcherPrivate
 {
 public:
+    typedef QVector<Command::Move> MoveStack;
+
     QWeakPointer<Frontend::Miniature> active_frontend;
     QWeakPointer<AbstractEngine> active_backend;
     QScopedPointer<Registry> registry;
+    QHash<uint, MoveStack> move_stacks;
 
     explicit DispatcherPrivate(Dispatcher *q)
         : active_frontend()
@@ -123,6 +127,31 @@ void Dispatcher::resetRegistry(Registry *registry)
 {
     Q_D(Dispatcher);
     d->registry.reset(registry);
+}
+
+void Dispatcher::pushMove(uint game_id,
+                                 const Command::Move &move)
+{
+    Q_D(Dispatcher);
+
+    if (d->registry->isRegisteredGame(game_id)) {
+        d->move_stacks[game_id].append(move);
+    }
+}
+
+Command::Move Dispatcher::popMove(uint game_id)
+{
+    Q_D(Dispatcher);
+
+    if (not d->registry->isRegisteredGame(game_id)) {
+        return Command::Move();
+    }
+
+    DispatcherPrivate::MoveStack &ms(d->move_stacks[game_id]);
+    Command::Move move(ms.last());
+    ms.pop_back();
+
+    return move;
 }
 
 } // namespace Game

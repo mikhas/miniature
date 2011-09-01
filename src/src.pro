@@ -38,6 +38,7 @@ LIBS += \
         $${GAME_DIR}/commands/creategame.h \
         $${GAME_DIR}/commands/activategame.h \
         $${GAME_DIR}/commands/seek.h \
+        $${GAME_DIR}/commands/invalidmove.h \
         $${GAME_DIR}/frontend/miniature.h \
         $${GAME_DIR}/frontend/chessboard.h \
         $${GAME_DIR}/frontend/sideelement.h \
@@ -65,6 +66,7 @@ LIBS += \
         $${GAME_DIR}/commands/creategame.cc \
         $${GAME_DIR}/commands/activategame.cc \
         $${GAME_DIR}/commands/seek.cc \
+        $${GAME_DIR}/commands/invalidmove.cc \
         $${GAME_DIR}/frontend/miniature.cc \
         $${GAME_DIR}/frontend/chessboard.cc \
         $${GAME_DIR}/frontend/sideelement.cc \

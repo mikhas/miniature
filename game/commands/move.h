@@ -36,14 +36,16 @@ class Move
     : public AbstractCommand
 {
 private:
-    const uint m_game_id;
-    const Position m_result;
-    const MovedPiece m_moved_piece;
+    uint m_game_id;
+    Position m_result;
+    MovedPiece m_moved_piece;
     Side m_white;
     Side m_black;
 
 public:
     //! \reimp
+    Move();
+
     //! C'tor
     //! @param game_id the game id.
     //! @param result the resulting position.
@@ -60,6 +62,7 @@ public:
 
     void setWhite(const Side &player_record);
     void setBlack(const Side &player_record);
+    bool valid();
 };
 
 }} // namespace Command, Game

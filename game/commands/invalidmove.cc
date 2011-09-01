@@ -18,54 +18,44 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "registry.h"
-#include "game.h"
-#include "namespace.h"
-#include "side.h"
+#include "invalidmove.h"
+#include "commands/move.h"
 #include "frontend/miniature.h"
-#include "commands.h"
+#include "dispatcher.h"
 
-namespace Game {
+namespace Game { namespace Command {
 
-Registry::Registry(Dispatcher *dispatcher,
-                   QObject *parent)
-    : QObject(parent)
-    , m_dispatcher(dispatcher)
-    , m_games()
+InvalidMove::InvalidMove(Target t,
+                         uint id,
+                         const QByteArray &move)
+    : AbstractCommand(t)
+    , m_target(t)
+    , m_game_id(id)
+    , m_move(move)
 {}
 
-Registry::~Registry()
+InvalidMove::~InvalidMove()
 {}
 
-void Registry::registerGame(Game *game)
+Target InvalidMove::target() const
 {
-    if (m_games.contains(game)) {
+    return m_target;
+}
+
+void InvalidMove::exec(Dispatcher *dispatcher,
+                       Frontend::Miniature *target)
+{
+    if (not dispatcher || not target) {
         return;
     }
 
-    m_games.append(game);
+    qDebug() << __PRETTY_FUNCTION__;
+    emit target->invalidMove(QString(m_move));
 
-    // TODO: Who gets to decide about game activation?
-    Command::ActivateGame ag(TargetFrontend, game);
-    if (Dispatcher *dispatcher = m_dispatcher.data()) {
-        dispatcher->sendCommand(&ag);
-    }
+    (void) dispatcher->popMove(m_game_id); // the invalid move
+    Command::Move m(dispatcher->popMove(m_game_id)); // the last valid move
+    dispatcher->sendCommand(&m);
 }
 
-Game * Registry::game(uint id) const
-{
-    foreach(Game *g, m_games) {
-        if (g->id() == id) {
-            return g;
-        }
-    }
+}} // namespace Command, Game
 
-    return 0;
-}
-
-bool Registry::isRegisteredGame(uint id) const
-{
-    return (game(id) != 0);
-}
-
-} // namespace Game

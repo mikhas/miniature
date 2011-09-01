@@ -24,12 +24,13 @@
 #include "game.h"
 #include "position.h"
 #include "registry.h"
+#include "commands.h"
 
 #include <QtCore>
 #include <QtGui>
 #include <QtTest>
 
-namespace {
+namespace Game { namespace {
     bool loadIntoCache(const QString &fileName,
                        QVector<QByteArray> *cache)
     {
@@ -47,9 +48,8 @@ namespace {
 
         return (not cache->isEmpty());
     }
-}
+} // namespace
 
-namespace Game {
 class DummyFrontend
     : public Frontend::Miniature
 {
@@ -90,8 +90,6 @@ class DummyRegistry
     {}
 };
 
-}
-
 class TestFics
     : public QObject
 {
@@ -113,15 +111,15 @@ private:
 
     Q_SLOT void testParsing()
     {
-        Game::Dispatcher dispatcher;
-        Game::Registry *registry = new Game::Registry(&dispatcher);
+        Dispatcher dispatcher;
+        Registry *registry = new Registry(&dispatcher);
         dispatcher.resetRegistry(registry);
 
-        Game::Fics::Engine *fics = new Game::Fics::Engine(&dispatcher);
+        Fics::Engine *fics = new Fics::Engine(&dispatcher);
         fics->enableTesting();
         dispatcher.setBackend(fics);
 
-        Game::DummyFrontend frontend(&dispatcher);
+        DummyFrontend frontend(&dispatcher);
         dispatcher.setFrontend(&frontend);
 
         QCOMPARE(frontend.m_received_records.size(), 0);
@@ -138,19 +136,37 @@ private:
 
         // Emable backend to parse create-game token:
         fics->play(1);
-        QCOMPARE(fics->state(), Game::Fics::Engine::StatePlayPending);
+        QCOMPARE(fics->state(), Fics::Engine::StatePlayPending);
 
         fics->processToken(m_play_log.at(3));
-        Game::Game *game = registry->game(414u);
+        Game *game = registry->game(414u);
         QVERIFY(game);
 
         fics->processToken(m_play_log.at(8));
-        const Game::Position &pos(game->position());
-        QCOMPARE(pos.pieceAt(Game::toSquare("g4")),
-                 Game::Piece(Game::Piece::Pawn, Game::ColorWhite).setSquare(Game::toSquare("g4")));
-        QCOMPARE(pos.nextToMove(), Game::ColorBlack);
+        QCOMPARE(game->position().pieceAt(toSquare("g4")),
+                 Piece(Piece::Pawn, ColorWhite, toSquare("g4")));
+        QCOMPARE(game->position().nextToMove(), ColorBlack);
+
+        fics->processToken(m_play_log.at(10));
+        QCOMPARE(game->position().pieceAt(toSquare("e5")),
+                 Piece(Piece::Pawn, ColorBlack, toSquare("e5")));
+
+        Position pos(game->position());
+        // Constructing an invalid move:
+        pos.setMovedPiece(MovedPiece(Piece(Piece::Pawn, ColorWhite, toSquare("f6")),
+                                     toSquare("f2")));
+        game->setPosition(pos);
+        Command::Move move(TargetEngine, 414u, pos);
+        dispatcher.sendCommand(&move);
+
+        fics->processToken(m_play_log.at(39));
+        QVERIFY(not game->position().pieceAt(toSquare("f6")).valid());
+        QCOMPARE(game->position().pieceAt(toSquare("f2")),
+                 Piece(Piece::Pawn, ColorWhite, toSquare("f2")));
     }
 };
 
-QTEST_APPLESS_MAIN(TestFics)
+} // namespace Game
+
+QTEST_APPLESS_MAIN(Game::TestFics)
 #include ".moc/testfics.moc"

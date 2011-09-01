@@ -83,7 +83,7 @@ public:
                       Color color);
     bool isValidMove() const;
 
-    bool confirmMove();
+    Position confirmMove() const;
     int adjustedIndex(int index) const;
 };
 

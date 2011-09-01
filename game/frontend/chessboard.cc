@@ -219,23 +219,18 @@ bool ChessBoard::isValidMove() const
             && m_marked_move.target > -1);
 }
 
-bool ChessBoard::confirmMove()
+Position ChessBoard::confirmMove() const
 {
     if (not isValidMove()) {
-        return false;
+        return Position();
     }
 
-    m_selected_piece.setSquare(toSquare(m_marked_move.target));
-    MovedPiece m(m_selected_piece, toSquare(m_marked_move.origin));
-    m_position.setMovedPiece(m);
+    MovedPiece m(Piece(m_selected_piece.type(), m_selected_piece.color(), toSquare(m_marked_move.target)),
+                 toSquare(m_marked_move.origin));
+    Position pos(m_position);
+    pos.setMovedPiece(m);
 
-    m_marked_move = MarkedMove();
-    m_selected_piece = Piece();
-
-    // TODO: optimize ...
-    triggerDataChanged();
-
-    return true;
+    return pos;
 }
 
 int ChessBoard::adjustedIndex(int index) const

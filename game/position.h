@@ -119,6 +119,8 @@ public:
     File doublePawnPush() const;
     void setDoublePawnPush(File file);
 
+    bool valid() const;
+
 private:
     void setPiece(const Piece &piece);
     void clearSquare(const Square &square);

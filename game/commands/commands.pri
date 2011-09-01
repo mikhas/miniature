@@ -10,6 +10,7 @@ HEADERS += \
     $${COMMANDS_DIR}/creategame.h \
     $${COMMANDS_DIR}/activategame.h \
     $${COMMANDS_DIR}/seek.h \
+    $${COMMANDS_DIR}/invalidmove.h \
 
 SOURCES += \
     $${COMMANDS_DIR}/login.cc \
@@ -21,6 +22,7 @@ SOURCES += \
     $${COMMANDS_DIR}/creategame.cc \
     $${COMMANDS_DIR}/activategame.cc \
     $${COMMANDS_DIR}/seek.cc \
+    $${COMMANDS_DIR}/invalidmove.cc \
 
 #INCLUDEPATH += $${COMMANDS_DIR}
 DEPENDPATH += $${COMMANDS_DIR}

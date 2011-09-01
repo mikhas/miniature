@@ -317,6 +317,11 @@ void Position::setDoublePawnPush(File file)
     m_double_pawn_push = file;
 }
 
+bool Position::valid() const
+{
+    return (not m_pieces.isEmpty());
+}
+
 void Position::setPiece(const Piece &piece)
 {
     for (int i = 0; i < m_pieces.count(); ++i) {

@@ -18,45 +18,42 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef REGISTRY_H
-#define REGISTRY_H
+#ifndef INVALIDMOVE_H
+#define INVALIDMOVE_H
 
+#include "abstractcommand.h"
 #include "dispatcher.h"
+
 #include <QtCore>
 
-namespace Game {
+namespace Game { namespace Frontend {
+class Miniature;
+}
 
-class Game;
+namespace Command {
 
-//! Registry for games.
-class Registry
-    : public QObject
-{    
+//! Command to start a game. Takes an (optional) advertisement id, in case this
+//! is a reponse to a previous game advertisement.
+class InvalidMove
+    : public AbstractCommand
+{
 private:
-    WeakDispatcher m_dispatcher;
-    QVector<Game *> m_games;
+    Target m_target;
+    uint m_game_id;
+    QByteArray m_move;
 
 public:
-    //! C'tor
-    //! @param dispatcher the command dispatcher.
-    //! @param parent the (optional) owner of this instance.
-    explicit Registry(Dispatcher *dispatcher,
-                      QObject *parent = 0);
-    virtual ~Registry();
-
-    //! Registers a newly created game.
-    //! @param game the game instance to register.
-    void registerGame(Game *game);
-
-    //! @returns game with given id, or 0 if not found.
-    //! @param id the game id.
-    Game * game(uint id) const;
-
-    //! @returns whether game id is registered.
-    //! @param id the game id
-    bool isRegisteredGame(uint id) const;
+    //! \reimp
+    explicit InvalidMove(Target t,
+                  uint id,
+                  const QByteArray &move);
+    virtual ~InvalidMove();
+    virtual Target target() const;
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
 };
 
-} // namespace Game
+}} // namespace Command, Game
 
-#endif // REGISTRY_H
+#endif // INVALIDMOVE_H

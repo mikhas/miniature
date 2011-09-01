@@ -60,6 +60,9 @@ public:
     //! \returns the target for this command.
     virtual Target target() const;
 
+    //! \returns whether command is valid.
+    virtual bool valid() const;
+
     //! Execute command on registry.
     virtual void exec(Dispatcher *dispatcher,
                       Registry *target);

@@ -36,6 +36,8 @@ fics%
 fics%     
 <12> ----rr-k p-p---pp --p-P--- ---n---- ---N-pbB --PB-N-- PP---PPP R---KR-- B -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 38 32 84 78 25 P/@@-e6 (0:04) P@e6 0 1 528
 <b1> game 270 white [Q] black [PNBB]
+fics% f6
+fics% Illegal move (f6).
 fics% f4
 <12> ----rr-k p-p---pp --p-b--- ---n---- ---N-p-B --PB-N-- PP---PPP R---KR-- W -1 0 1 0 0 0 270 Razo YScorpion 0 2 0 37 32 84 76 26 B/g4-e6 (0:01) Bxe6 0 1 279
 <b1> game 270 white [Q] black [PNBB]

@@ -49,7 +49,6 @@ void CreateGame::exec(Dispatcher *dispatcher,
 
     Game *game = createGame(m_game_id, dispatcher, m_local_id, m_remote_id);
     game->setLocalSideColor(m_color);
-    game->setPosition(createStartPosition());
     target->registerGame(game);
 }
 

@@ -58,6 +58,9 @@ private:
         Command::CreateGame cg(TargetRegistry, 999u, local, remote, LocalSideIsBlack);
         dispatcher.sendCommand(&cg);
 
+        Command::Move m(TargetFrontend, 999u, createStartPosition());
+        dispatcher.sendCommand(&m);
+
         QVERIFY(miniature->activeGame());
         QCOMPARE(miniature->activeGame()->id(), 999u);
         Position pos0(miniature->activeGame()->position());

@@ -35,6 +35,11 @@ Target AbstractCommand::target() const
     return m_target;
 }
 
+bool AbstractCommand::valid() const
+{
+    return (m_target != TargetNone);
+}
+
 void AbstractCommand::exec(Dispatcher *,
                            Registry *)
 {}
