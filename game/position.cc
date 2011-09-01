@@ -80,6 +80,44 @@ namespace {
             return (square.file + square.rank * Game::FileCount);
         }
     }
+
+    const Game::Square wk_origin(Game::FileE, Game::Rank1);
+    const Game::Piece wk_short_castling(Game::Piece::King, Game::ColorWhite,
+                                        Game::toSquare("g1"));
+    const Game::Piece wk_long_castling(Game::Piece::King, Game::ColorWhite,
+                                       Game::toSquare("c1"));
+
+    const Game::Square bk_origin(Game::FileE, Game::Rank8);
+    const Game::Piece bk_short_castling(Game::Piece::King, Game::ColorBlack,
+                                        Game::toSquare("g8"));
+    const Game::Piece bk_long_castling(Game::Piece::King, Game::ColorBlack,
+                                       Game::toSquare("c8"));
+
+    // TODO: Only works for regular chess. Needs to also work for 960.
+    bool isLongCastling(const Game::MovedPiece &moved_piece)
+    {
+        if ((moved_piece.piece() == wk_long_castling
+             && moved_piece.origin() == wk_origin)
+            || (moved_piece.piece() == bk_long_castling
+                && moved_piece.origin() == bk_origin)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // TODO: Only works for regular chess. Needs to also work for 960.
+    bool isShortCastling(const Game::MovedPiece &moved_piece)
+    {
+        if ((moved_piece.piece() == wk_short_castling
+             && moved_piece.origin() == wk_origin)
+            || (moved_piece.piece() == bk_short_castling
+                && moved_piece.origin() == bk_origin)) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 namespace Game {
@@ -95,6 +133,14 @@ Piece::Piece(Type type,
     : m_type(type)
     , m_color(color)
     , m_square(FileCount, RankCount)
+{}
+
+Piece::Piece(Type type,
+             Color color,
+             const Square &square)
+    : m_type(type)
+    , m_color(color)
+    , m_square(square)
 {}
 
 bool Piece::valid() const
@@ -252,6 +298,12 @@ void Position::setPiece(const Piece &piece)
 
 QString moveNotation(const MovedPiece &moved_piece)
 {
+    if (isLongCastling(moved_piece)) {
+        return "0-0-0";
+    } else if (isShortCastling(moved_piece)) {
+        return "0-0";
+    }
+
     // TODO: This is gnuchess-style notation, allow for different types?
     return QString("%1%2").arg(toString(moved_piece.origin()))
                           .arg(toString(moved_piece.target()));

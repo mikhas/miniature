@@ -63,6 +63,25 @@ private:
         QCOMPARE(pos.pieceAt(toSquare("h8")),
                  Piece(Piece::Rook, ColorBlack).setSquare(toSquare("h8")));
     }
+
+    Q_SLOT void testCastlingNotation()
+    {
+        MovedPiece wk_long_castling(Piece(Piece::King, ColorWhite, toSquare("c1")), toSquare("e1"));
+        QCOMPARE(moveNotation(wk_long_castling), QString("0-0-0"));
+
+        MovedPiece wk_short_castling(Piece(Piece::King, ColorWhite, toSquare("g1")), toSquare("e1"));
+        QCOMPARE(moveNotation(wk_short_castling), QString("0-0"));
+
+        MovedPiece bk_long_castling(Piece(Piece::King, ColorBlack, toSquare("c8")), toSquare("e8"));
+        QCOMPARE(moveNotation(bk_long_castling), QString("0-0-0"));
+
+        MovedPiece bk_short_castling(Piece(Piece::King, ColorBlack, toSquare("g8")), toSquare("e8"));
+        QCOMPARE(moveNotation(bk_short_castling), QString("0-0"));
+
+        MovedPiece fake_castling(Piece(Piece::King, ColorBlack, toSquare("c6")), toSquare("e6"));
+        QVERIFY(moveNotation(fake_castling) != QString("0-0-0"));
+
+    }
 };
 
 QTEST_APPLESS_MAIN(TestPosition)
