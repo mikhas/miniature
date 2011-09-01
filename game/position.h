@@ -121,6 +121,7 @@ public:
 
 private:
     void setPiece(const Piece &piece);
+    void clearSquare(const Square &square);
 };
 
 //! A human readable notation of a move, based on the resulting position and

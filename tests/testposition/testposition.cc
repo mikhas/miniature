@@ -82,6 +82,67 @@ private:
         QVERIFY(moveNotation(fake_castling) != QString("0-0-0"));
 
     }
+
+    Q_SLOT void testCastling_data()
+    {
+        QTest::addColumn<bool>("white");
+        QTest::addColumn<QString>("origin");
+        QTest::addColumn<QString>("target");
+        QTest::addColumn<QString>("expectedRookSquare");
+        QTest::addColumn<int>("expectedFlags");
+
+        QTest::newRow("white castles short")
+                << true << "e1" << "g1" << "f1"
+                << (Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+
+        QTest::newRow("white castles long")
+                << true << "e1" << "c1" << "d1"
+                << (Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+
+        QTest::newRow("black castles short")
+                << false << "e8" << "g8" << "f8"
+                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong);
+        QTest::newRow("black castles long")
+                << false << "e8" << "c8" << "d8"
+                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong);
+
+
+        QTest::newRow("invalid castling")
+                << false << "e8" << "c6" << "a8"
+                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong
+                    | Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+
+
+    }
+
+    Q_SLOT void testCastling()
+    {
+        QFETCH(bool, white);
+        QFETCH(QString, origin);
+        QFETCH(QString, target);
+        QFETCH(QString, expectedRookSquare);
+        QFETCH(int, expectedFlags);
+
+        Position pos;
+
+        Piece wk(Piece::King, ColorWhite, toSquare("e1"));
+        pos.addPiece(wk);
+
+        Piece bk(Piece::King, ColorBlack, toSquare("e8"));
+        pos.addPiece(bk);
+
+        pos.addPiece(Piece(Piece::Rook, ColorWhite, toSquare("a1")));
+        pos.addPiece(Piece(Piece::Rook, ColorWhite, toSquare("h1")));
+        pos.addPiece(Piece(Piece::Rook, ColorBlack, toSquare("a8")));
+        pos.addPiece(Piece(Piece::Rook, ColorBlack, toSquare("h8")));
+
+        MovedPiece mp(Piece(Piece::King, white ? ColorWhite : ColorBlack, toSquare(target.toLatin1())),
+                      toSquare(origin.toLatin1()));
+        pos.setMovedPiece(mp);
+        QCOMPARE(pos.pieceAt(toSquare(target.toLatin1())).type(), Piece::King);
+        QCOMPARE(pos.pieceAt(toSquare(expectedRookSquare.toLatin1())).type(), Piece::Rook);
+        QCOMPARE(pos.castlingFlags(), expectedFlags);
+    }
 };
 
 QTEST_APPLESS_MAIN(TestPosition)

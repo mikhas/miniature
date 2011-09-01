@@ -84,14 +84,22 @@ namespace {
     const Game::Square wk_origin(Game::FileE, Game::Rank1);
     const Game::Piece wk_short_castling(Game::Piece::King, Game::ColorWhite,
                                         Game::toSquare("g1"));
+    const Game::Piece wr_short_castling(Game::Piece::Rook, Game::ColorWhite,
+                                        Game::toSquare("f1"));
     const Game::Piece wk_long_castling(Game::Piece::King, Game::ColorWhite,
                                        Game::toSquare("c1"));
+    const Game::Piece wr_long_castling(Game::Piece::Rook, Game::ColorWhite,
+                                       Game::toSquare("d1"));
 
     const Game::Square bk_origin(Game::FileE, Game::Rank8);
     const Game::Piece bk_short_castling(Game::Piece::King, Game::ColorBlack,
                                         Game::toSquare("g8"));
+    const Game::Piece br_short_castling(Game::Piece::Rook, Game::ColorBlack,
+                                        Game::toSquare("f8"));
     const Game::Piece bk_long_castling(Game::Piece::King, Game::ColorBlack,
                                        Game::toSquare("c8"));
+    const Game::Piece br_long_castling(Game::Piece::Rook, Game::ColorBlack,
+                                       Game::toSquare("d8"));
 
     // TODO: Only works for regular chess. Needs to also work for 960.
     bool isWhiteCastlingLong(const Game::MovedPiece &moved_piece)
@@ -246,9 +254,34 @@ void Position::setMovedPiece(const MovedPiece &moved_piece)
     m_next_to_move = (m_moved_piece.piece().color() == ColorWhite ? ColorBlack
                                                                   : ColorWhite);
 
-    Piece none(Piece::None, ColorNone);
-    none.setSquare(moved_piece.origin());
-    setPiece(none);
+    clearSquare(moved_piece.origin());
+
+    // TODO: Does not work 960:
+    if (isWhiteCastlingShort(moved_piece)) {
+        m_castling_flags &= ~CanWhiteCastleShort;
+        m_castling_flags &= ~CanWhiteCastleLong;
+        Piece rook(Piece::Rook, ColorWhite, Square(FileF, Rank1));
+        setPiece(rook);
+        clearSquare(Square(FileH, Rank1));
+    } else if (isWhiteCastlingLong(moved_piece)) {
+        m_castling_flags &= ~CanWhiteCastleShort;
+        m_castling_flags &= ~CanWhiteCastleLong;
+        Piece rook(Piece::Rook, ColorWhite, Square(FileD, Rank1));
+        setPiece(rook);
+        clearSquare(Square(FileA, Rank1));
+    } else if (isBlackCastlingShort(moved_piece)) {
+        m_castling_flags &= ~CanBlackCastleShort;
+        m_castling_flags &= ~CanBlackCastleLong;
+        Piece rook(Piece::Rook, ColorBlack, Square(FileF, Rank8));
+        setPiece(rook);
+        clearSquare(Square(FileH, Rank8));
+    } else if (isBlackCastlingLong(moved_piece)) {
+        m_castling_flags &= ~CanBlackCastleShort;
+        m_castling_flags &= ~CanBlackCastleLong;
+        Piece rook(Piece::Rook, ColorBlack, Square(FileD, Rank8));
+        setPiece(rook);
+        clearSquare(Square(FileA, Rank8));
+    }
 }
 
 Position::CastlingFlags Position::castlingFlags() const
@@ -296,6 +329,16 @@ void Position::setPiece(const Piece &piece)
 
     // Since we weren't able to replace a piece, this piece must be new:
     addPiece(piece);
+}
+
+void Position::clearSquare(const Square &square)
+{
+    for (int i = 0; i < m_pieces.count(); ++i) {
+        if (m_pieces.at(i).square() == square) {
+            m_pieces.remove(i);
+            return;
+        }
+    }
 }
 
 QString moveNotation(const MovedPiece &moved_piece)
