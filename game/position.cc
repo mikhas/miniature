@@ -94,29 +94,31 @@ namespace {
                                        Game::toSquare("c8"));
 
     // TODO: Only works for regular chess. Needs to also work for 960.
-    bool isLongCastling(const Game::MovedPiece &moved_piece)
+    bool isWhiteCastlingLong(const Game::MovedPiece &moved_piece)
     {
-        if ((moved_piece.piece() == wk_long_castling
-             && moved_piece.origin() == wk_origin)
-            || (moved_piece.piece() == bk_long_castling
-                && moved_piece.origin() == bk_origin)) {
-            return true;
-        }
-
-        return false;
+        return (moved_piece.piece() == wk_long_castling
+                && moved_piece.origin() == wk_origin);
     }
 
     // TODO: Only works for regular chess. Needs to also work for 960.
-    bool isShortCastling(const Game::MovedPiece &moved_piece)
+    bool isWhiteCastlingShort(const Game::MovedPiece &moved_piece)
     {
-        if ((moved_piece.piece() == wk_short_castling
-             && moved_piece.origin() == wk_origin)
-            || (moved_piece.piece() == bk_short_castling
-                && moved_piece.origin() == bk_origin)) {
-            return true;
-        }
+        return (moved_piece.piece() == wk_short_castling
+                && moved_piece.origin() == wk_origin);
+    }
 
-        return false;
+    // TODO: Only works for regular chess. Needs to also work for 960.
+    bool isBlackCastlingLong(const Game::MovedPiece &moved_piece)
+    {
+        return (moved_piece.piece() == bk_long_castling
+                && moved_piece.origin() == bk_origin);
+    }
+
+    // TODO: Only works for regular chess. Needs to also work for 960.
+    bool isBlackCastlingShort(const Game::MovedPiece &moved_piece)
+    {
+        return (moved_piece.piece() == bk_short_castling
+                && moved_piece.origin() == bk_origin);
     }
 }
 
@@ -298,9 +300,9 @@ void Position::setPiece(const Piece &piece)
 
 QString moveNotation(const MovedPiece &moved_piece)
 {
-    if (isLongCastling(moved_piece)) {
+    if (isWhiteCastlingLong(moved_piece) || isBlackCastlingLong(moved_piece)) {
         return "0-0-0";
-    } else if (isShortCastling(moved_piece)) {
+    } else if (isWhiteCastlingShort(moved_piece) || isBlackCastlingShort(moved_piece)) {
         return "0-0";
     }
 
