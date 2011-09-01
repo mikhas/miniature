@@ -18,31 +18,30 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "activategame.h"
-#include "registry.h"
-#include "frontend/miniature.h"
+#ifndef INVALIDSEEK_H
+#define INVALIDSEEK_H
+
+#include "abstractcommand.h"
+#include <QtCore>
 
 namespace Game { namespace Command {
 
-ActivateGame::ActivateGame(Target target,
-                           Game *game)
-    : AbstractCommand(target)
-    , m_game(game)
-{}
-
-ActivateGame::~ActivateGame()
-{}
-
-void ActivateGame::exec(Dispatcher *,
-                        Frontend::Miniature *target)
+class InvalidSeek
+    : public AbstractCommand
 {
-    if (not target) {
-        return;
-    }
+private:
+    uint m_seek_id;
 
-    target->setActiveGame(m_game.data());
-    emit target->gameStarted();
-}
+public:
+    //! \reimp
+    explicit InvalidSeek(Target target,
+                         uint seek_id);
+    virtual ~InvalidSeek();
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
+};
 
 }} // namespace Command, Game
 
+#endif // INVALIDSEEK_H

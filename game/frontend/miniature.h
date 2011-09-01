@@ -134,9 +134,14 @@ public:
     //! Confirms current move.
     Q_INVOKABLE void confirmMove();
 
-    //! Sends a message to frontend.
+    //! Emitted when invalid move was submitted to engine.
     Q_SIGNAL void invalidMove(const QString &move);
 
+    //! Emitted when both sides accepted game and it was started.
+    Q_SIGNAL void gameStarted();
+
+    //! Emitted when player responded to an invalid seek.
+    Q_SIGNAL void seekCancelled();
 
     //! Sets the active game.
     //! @param game the game.

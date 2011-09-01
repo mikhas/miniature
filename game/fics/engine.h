@@ -48,6 +48,7 @@ private:
     QTimer m_login_abort_timer;
     QVector<char> m_extra_delimiter;
     uint m_current_game_id; // The game we currently play on FICS.
+    uint m_current_advertisment_id; // The ad id we have responed to.
 
 public:
     //! \reimp

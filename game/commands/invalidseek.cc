@@ -18,31 +18,28 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "activategame.h"
-#include "registry.h"
+#include "invalidseek.h"
 #include "frontend/miniature.h"
 
 namespace Game { namespace Command {
 
-ActivateGame::ActivateGame(Target target,
-                           Game *game)
+InvalidSeek::InvalidSeek(Target target,
+                         uint seek_id)
     : AbstractCommand(target)
-    , m_game(game)
+    , m_seek_id(seek_id)
 {}
 
-ActivateGame::~ActivateGame()
+InvalidSeek::~InvalidSeek()
 {}
 
-void ActivateGame::exec(Dispatcher *,
-                        Frontend::Miniature *target)
+void InvalidSeek::exec(Dispatcher *,
+                       Frontend::Miniature *target)
 {
     if (not target) {
         return;
     }
 
-    target->setActiveGame(m_game.data());
-    emit target->gameStarted();
+    emit target->seekCancelled();
 }
 
 }} // namespace Command, Game
-

@@ -29,3 +29,4 @@
 #include "commands/activategame.h"
 #include "commands/seek.h"
 #include "commands/invalidmove.h"
+#include "commands/invalidseek.h"

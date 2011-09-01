@@ -58,6 +58,7 @@ namespace {
     };
 
     const char * const not_your_move("It is not your move");
+    const char * const seek_not_available("That seek is not available.");
 
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
@@ -354,6 +355,7 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_login_abort_timer()
     , m_extra_delimiter()
     , m_current_game_id(0)
+    , m_current_advertisment_id(0)
 {
     m_login_abort_timer.setSingleShot(true);
     m_login_abort_timer.setInterval(10000);
@@ -458,6 +460,7 @@ void Engine::play(uint advertisement_id)
         return;
     }
 
+    m_current_advertisment_id = advertisement_id;
     m_state = StatePlayPending;
     emit stateChanged(m_state);
     qDebug() << __PRETTY_FUNCTION__
@@ -507,6 +510,9 @@ void Engine::processToken(const QByteArray &token)
 
             m_state = StateReady;
             emit stateChanged(m_state);
+        } else if (token.contains(seek_not_available)) {
+            Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
+            sendCommand(&is);
         }
     } break;
 

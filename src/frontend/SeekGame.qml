@@ -6,6 +6,11 @@ Page {
     id: ficsSeekGame
     orientationLock: PageOrientation.LockPortrait
 
+    Connections {
+        target: miniature
+        onGameStarted: loadScreen("OnlineBoard.qml")
+    }
+
     // Generic app window style
 
     Rectangle {
@@ -272,7 +277,6 @@ Page {
                         anchors.fill:  parent
                         onClicked: {
                             miniature.toggleGameAdvertisementHighlighting(model.id)
-                            // loadScreen("OnlineBoard.qml") FIXME: commented for testing spinner, press new seek spinner to access OnlineBoard
                             miniature.play(seekList.highId) // FIXME here goes an instruction to send the response to the selected challenge
                             // FIXME note that selecting a new seek implies that the old response is cancelled/withdrawn
                         }
@@ -289,6 +293,19 @@ Page {
                         verticalCenter: parent.verticalCenter
                         right: parent.right
                         rightMargin: -((parent.width * 0.25) + 10)
+                    }
+
+                    Connections {
+                        target: miniature
+                        onSeekCancelled: {
+                            visible = false
+                            spinner.running = false
+                        }
+
+                        onGameStarted: {
+                            visible = false
+                            spinner.running = false
+                        }
                     }
 
                     BusyIndicator {
@@ -450,7 +467,6 @@ Page {
             MouseArea {
                 anchors.fill:  parent
                 onClicked: {
-                    loadScreen("OnlineBoard.qml")
                     miniature.play(seekList.highId)
                 }
             }
@@ -467,16 +483,24 @@ Page {
                 rightMargin: 10
             }
 
+            Connections {
+                target: miniature
+                onGameStarted: {
+                    visible = false
+                    newSpinner.running = false
+                }
+            }
+
+
             BusyIndicator {
                 id: newSpinner
                 anchors.centerIn: parent
-                running: true
+                running: newgameArea.visible
             }
 
             MouseArea {
                 anchors.fill:  parent
                 onClicked: {
-                    loadScreen("OnlineBoard.qml")
                     miniature.play(seekList.highId)
                 }
             }
