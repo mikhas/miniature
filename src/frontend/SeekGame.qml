@@ -277,7 +277,7 @@ Page {
                         anchors.fill:  parent
                         onClicked: {
                             miniature.toggleGameAdvertisementHighlighting(model.id)
-                            miniature.play(seekList.highId) // FIXME here goes an instruction to send the response to the selected challenge
+                            miniature.play(model.id) // FIXME here goes an instruction to send the response to the selected challenge
                             // FIXME note that selecting a new seek implies that the old response is cancelled/withdrawn
                         }
                     }
