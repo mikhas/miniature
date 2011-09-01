@@ -25,6 +25,7 @@
 
 namespace Game {
 
+class Dispatcher;
 class Registry;
 class AbstractEngine;
 
@@ -37,6 +38,7 @@ namespace Frontend {
 //! responsbility of the command's exec override to filter the actual target
 //! from a list of offered targets.
 enum Target {
+    TargetNone, // Commands with no target are skipped.
     TargetFrontend, // GUI, command line, ...
     TargetEngine, // The currently active engine, e.g., freechess.org
     TargetRegistry // The game registry. Knows about all (active) games.
@@ -48,21 +50,27 @@ enum Target {
 //! the Dispatcher can find the concrete receiver.
 class AbstractCommand
 {
+private:
+    Target m_target;
+
 public:
-    explicit AbstractCommand(Target t);
+    explicit AbstractCommand(Target target = TargetNone);
     virtual ~AbstractCommand() = 0;
 
     //! \returns the target for this command.
-    virtual Target target() const = 0;
+    virtual Target target() const;
 
     //! Execute command on registry.
-    virtual void exec(Registry *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Registry *target);
 
     //! Execute command on backend.
-    virtual void exec(AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
 
     //! Execute command on frontend.
-    virtual void exec(Frontend::Miniature *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
 };
 
 } // namespace Game

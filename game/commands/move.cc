@@ -28,7 +28,6 @@ Move::Move(Target target,
            uint game_id,
            const Position &result)
     : AbstractCommand(target)
-    , m_target(target)
     , m_game_id(game_id)
     , m_result(result)
     , m_white()
@@ -38,12 +37,8 @@ Move::Move(Target target,
 Move::~Move()
 {}
 
-Target Move::target() const
-{
-    return m_target;
-}
-
-void Move::exec(AbstractEngine *target)
+void Move::exec(Dispatcher *,
+                AbstractEngine *target)
 {
     if (not target) {
         return;
@@ -54,7 +49,8 @@ void Move::exec(AbstractEngine *target)
     target->movePiece(m_result.movedPiece());
 }
 
-void Move::exec(Frontend::Miniature *target)
+void Move::exec(Dispatcher *,
+                Frontend::Miniature *target)
 {
     if (not target) {
             return;
@@ -67,34 +63,14 @@ void Move::exec(Frontend::Miniature *target)
     }
 }
 
-uint Move::gameId() const
-{
-    return m_game_id;
-}
-
-Position Move::result() const
-{
-    return m_result;
-}
-
 void Move::setWhite(const Side &player_record)
 {
     m_white = player_record;
 }
 
-Side Move::white() const
-{
-    return m_white;
-}
-
 void Move::setBlack(const Side &player_record)
 {
     m_black = player_record;
-}
-
-Side Move::black() const
-{
-    return m_black;
 }
 
 }} // namespace Command, Game

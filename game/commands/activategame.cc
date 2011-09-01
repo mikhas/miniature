@@ -24,22 +24,17 @@
 
 namespace Game { namespace Command {
 
-ActivateGame::ActivateGame(Target t,
+ActivateGame::ActivateGame(Target target,
                            Game *game)
-    : AbstractCommand(t)
-    , m_target(t)
+    : AbstractCommand(target)
     , m_game(game)
 {}
 
 ActivateGame::~ActivateGame()
 {}
 
-Target ActivateGame::target() const
-{
-    return m_target;
-}
-
-void ActivateGame::exec(Frontend::Miniature *target)
+void ActivateGame::exec(Dispatcher *,
+                        Frontend::Miniature *target)
 {
     target->setActiveGame(m_game.data());
 }

@@ -35,16 +35,15 @@ class Play
     : public AbstractCommand
 {
 private:
-    Target m_target;
     uint m_advertisement_id;
 
 public:
     //! \reimp
-    explicit Play(Target t,
+    explicit Play(Target target,
                   uint id = 0);
     virtual ~Play();
-    virtual Target target() const;
-    virtual void exec(AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
     //! \reimp_end
 };
 

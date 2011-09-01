@@ -23,22 +23,17 @@
 
 namespace Game { namespace Command {
 
-Advertisement::Advertisement(Target t,
+Advertisement::Advertisement(Target target,
                              const Seek &s)
-    : AbstractCommand(t)
-    , m_target(t)
+    : AbstractCommand(target)
     , m_seek(s)
 {}
 
 Advertisement::~Advertisement()
 {}
 
-Target Advertisement::target() const
-{
-    return m_target;
-}
-
-void Advertisement::exec(Frontend::Miniature *target)
+void Advertisement::exec(Dispatcher *,
+                         Frontend::Miniature *target)
 {
     target->handleSeek(m_seek);
 }

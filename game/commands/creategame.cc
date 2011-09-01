@@ -21,19 +21,17 @@
 #include "creategame.h"
 #include "registry.h"
 #include "game.h"
+#include "dispatcher.h"
 
 namespace Game { namespace Command {
 
-CreateGame::CreateGame(Target t,
+CreateGame::CreateGame(Target target,
                        uint id,
-                       const WeakDispatcher &dispatcher,
                        const QByteArray &local_id,
                        const QByteArray &remote_id,
                        LocalSideColor color)
-    : AbstractCommand(t)
-    , m_target(t)
+    : AbstractCommand(target)
     , m_game_id(id)
-    , m_dispatcher(dispatcher)
     , m_local_id(local_id)
     , m_remote_id(remote_id)
     , m_color(color)
@@ -42,19 +40,17 @@ CreateGame::CreateGame(Target t,
 CreateGame::~CreateGame()
 {}
 
-Target CreateGame::target() const
+void CreateGame::exec(Dispatcher *dispatcher,
+                      Registry *target)
 {
-    return m_target;
-}
+    if (not dispatcher || not target) {
+        return;
+    }
 
-void CreateGame::exec(Registry *target)
-{
-    // TODO: Dont register game on frontend? Target should be game registry, use new command to inform frontend and backend about sides?
-    Game *game = createGame(m_game_id, m_dispatcher.data(), m_local_id, m_remote_id);
+    Game *game = createGame(m_game_id, dispatcher, m_local_id, m_remote_id);
     game->setLocalSideColor(m_color);
     game->setPosition(createStartPosition());
     target->registerGame(game);
 }
 
 }} // namespace Command, Game
-

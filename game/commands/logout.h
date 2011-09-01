@@ -29,14 +29,10 @@ namespace Game { namespace Command {
 class Logout
     : public AbstractCommand
 {
-private:
-    Target m_target;
-
 public:
     //! \reimp
-    explicit Logout(Target t);
+    explicit Logout(Target target);
     virtual ~Logout();
-    virtual Target target() const;
     //! \reimp_end
 };
 

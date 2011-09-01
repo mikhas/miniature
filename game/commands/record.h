@@ -23,6 +23,7 @@
 
 #include "abstractcommand.h"
 #include "abstractengine.h"
+
 #include <QtCore>
 
 namespace Game { namespace Command {
@@ -31,16 +32,15 @@ class Record
     : public AbstractCommand
 {
 private:
-    Target m_target;
     ::Game::Record m_record;
 
 public:
     //! \reimp
-    explicit Record(Target t,
-                    const ::Game::Record &r);
+    explicit Record(Target target,
+                    const ::Game::Record &record);
     virtual ~Record();
-    virtual Target target() const;
-    virtual void exec(Frontend::Miniature *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
     //! \reimp_end
 };
 

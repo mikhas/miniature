@@ -22,13 +22,11 @@
 #define ADVERTISEMENTCOMMAND_H
 
 #include "abstractcommand.h"
-#include "abstractengine.h"
+#include "abstractengine.h" // FIXME: Seek
 
 #include <QtCore>
 
-namespace Game { namespace Frontend {
-    class Miniature;
-}
+namespace Game {
 
 namespace Command {
 
@@ -36,16 +34,15 @@ class Advertisement
     : public AbstractCommand
 {
 private:
-    Target m_target;
     Seek m_seek;
 
 public:
     //! \reimp
-    explicit Advertisement(Target t,
+    explicit Advertisement(Target target,
                            const Seek &s);
     virtual ~Advertisement();
-    virtual Target target() const;
-    virtual void exec(Frontend::Miniature *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
     //! \reimp_end
 };
 

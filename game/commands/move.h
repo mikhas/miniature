@@ -29,20 +29,13 @@
 
 #include <QtCore>
 
-namespace Game { namespace Frontend {
-class Miniature;
-}
-
-class AbstractEngine;
-
-namespace Command {
+namespace Game { namespace Command {
 
 //! Command to move a piece.
 class Move
     : public AbstractCommand
 {
 private:
-    const Target m_target;
     const uint m_game_id;
     const Position m_result;
     const MovedPiece m_moved_piece;
@@ -59,18 +52,13 @@ public:
                   const Position &result);
 
     virtual ~Move();
-    virtual Target target() const;
-    virtual void exec(AbstractEngine *target);
-    virtual void exec(Frontend::Miniature *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
     //! \reimp_end
 
-    uint gameId() const;
-    Position result() const;
-
-    Side white() const;
     void setWhite(const Side &player_record);
-
-    Side black() const;
     void setBlack(const Side &player_record);
 };
 

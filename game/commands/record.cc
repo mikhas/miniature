@@ -23,23 +23,22 @@
 
 namespace Game { namespace Command {
 
-Record::Record(Target t,
-               const ::Game::Record &r)
-    : AbstractCommand(t)
-    , m_target(t)
-    , m_record(r)
+Record::Record(Target target,
+               const ::Game::Record &record)
+    : AbstractCommand(target)
+    , m_record(record)
 {}
 
 Record::~Record()
 {}
 
-Target Record::target() const
+void Record::exec(Dispatcher *,
+                  Frontend::Miniature *target)
 {
-    return m_target;
-}
+    if (not target) {
+        return;
+    }
 
-void Record::exec(Frontend::Miniature *target)
-{
     target->handleRecord(m_record);
 }
 

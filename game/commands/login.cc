@@ -28,7 +28,6 @@ Login::Login(Target target,
              const QString &username,
              const QString &password)
     : AbstractCommand(target)
-    , m_target(target)
     , m_username(username)
     , m_password(password)
 {}
@@ -36,12 +35,8 @@ Login::Login(Target target,
 Login::~Login()
 {}
 
-Target Login::target() const
-{
-    return m_target;
-}
-
-void Login::exec(AbstractEngine *target)
+void Login::exec(Dispatcher *,
+                 AbstractEngine *target)
 {
     if (not target) {
         return;
@@ -50,7 +45,8 @@ void Login::exec(AbstractEngine *target)
     target->login(m_username, m_password);
 }
 
-void Login::exec(Frontend::Miniature *target)
+void Login::exec(Dispatcher *,
+                 Frontend::Miniature *target)
 {
     if (not target) {
         return;

@@ -22,18 +22,11 @@
 
 namespace Game { namespace Command {
 
-Logout::Logout(Target t)
-    : AbstractCommand(t)
-    , m_target(t)
+Logout::Logout(Target target)
+    : AbstractCommand(target)
 {}
 
 Logout::~Logout()
 {}
 
-Target Logout::target() const
-{
-    return m_target;
-}
-
 }} // namespace Command, Game
-

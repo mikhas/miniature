@@ -73,20 +73,22 @@ bool Dispatcher::sendCommand(AbstractCommand *command)
     case TargetEngine:
         if (AbstractEngine *backend = d->active_backend.data()) {
             result = true;
-            command->exec(backend);
+            command->exec(this, backend);
         }
         break;
 
     case TargetFrontend:
         if (Frontend::Miniature *frontend = d->active_frontend.data()) {
             result = true;
-            command->exec(frontend);
+            command->exec(this, frontend);
         }
         break;
 
     case TargetRegistry:
-        result = true;
-        command->exec(d->registry.data());
+        if (Registry *registry = d->registry.data()) {
+            result = true;
+            command->exec(this, registry);
+        }
         break;
 
     default:

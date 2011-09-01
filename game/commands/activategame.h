@@ -27,9 +27,7 @@
 
 #include <QtCore>
 
-namespace Game { namespace Frontend {
-    class Miniature;
-}
+namespace Game {
 
 namespace Command {
 
@@ -38,16 +36,15 @@ class ActivateGame
     : public AbstractCommand
 {
 private:
-    const Target m_target;
     WeakGame m_game;
 
 public:
     //! \reimp
-    explicit ActivateGame(Target t,
+    explicit ActivateGame(Target target,
                           Game *game);
     virtual ~ActivateGame();
-    virtual Target target() const;
-    virtual void exec(Frontend::Miniature *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
     //! \reimp_end
 };
 

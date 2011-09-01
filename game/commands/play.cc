@@ -22,22 +22,17 @@
 
 namespace Game { namespace Command {
 
-Play::Play(Target t,
+Play::Play(Target target,
            uint id)
-    : AbstractCommand(t)
-    , m_target(t)
+    : AbstractCommand(target)
     , m_advertisement_id(id)
 {}
 
 Play::~Play()
 {}
 
-Target Play::target() const
-{
-    return m_target;
-}
-
-void Play::exec(AbstractEngine *target)
+void Play::exec(Dispatcher *,
+                AbstractEngine *target)
 {
     target->play(m_advertisement_id);
 }

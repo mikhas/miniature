@@ -470,9 +470,8 @@ void Engine::processToken(const QByteArray &token)
             const QByteArray &local_side(gi.white == m_username ? gi.white : gi.black);
             const QByteArray &remote_side(gi.white == local_side ? gi.black : gi.white);
 
-            Command::CreateGame cg(TargetRegistry, gi.id, m_dispatcher.data(),
-                                   local_side, remote_side, (local_side == gi.white ? LocalSideIsWhite
-                                                                                    : LocalSideIsBlack));
+            Command::CreateGame cg(TargetRegistry, gi.id, local_side, remote_side,
+                                   (local_side == gi.white ? LocalSideIsWhite : LocalSideIsBlack));
             sendCommand(&cg);
             m_state = StateReady;
             emit stateChanged(m_state);

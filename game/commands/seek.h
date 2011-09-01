@@ -32,7 +32,6 @@ class Seek
     : public AbstractCommand
 {
 private:
-    Target m_target;
     uint m_time;
     uint m_increment;
     Rating m_rating;
@@ -40,14 +39,14 @@ private:
 
 public:
     //! \reimp
-    explicit Seek(Target t,
+    explicit Seek(Target target,
                   uint time,
                   uint increment,
                   Rating rating,
                   Color color);
     virtual ~Seek();
-    virtual Target target() const;
-    virtual void exec(AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
     //! \reimp_end
 };
 

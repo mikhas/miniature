@@ -32,7 +32,6 @@ class Login
     : public AbstractCommand
 {
 private:
-    Target m_target;
     QString m_username;
     QString m_password;
 
@@ -42,9 +41,10 @@ public:
                    const QString &username,
                    const QString &password);
     virtual ~Login();
-    virtual Target target() const;
-    virtual void exec(AbstractEngine *);
-    virtual void exec(Frontend::Miniature *);
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
     //! \reimp_end
 };
 

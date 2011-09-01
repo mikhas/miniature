@@ -23,7 +23,6 @@
 
 #include "abstractcommand.h"
 #include "abstractengine.h"
-#include "registry.h"
 
 #include <QtCore>
 
@@ -35,24 +34,21 @@ class CreateGame
     : public AbstractCommand
 {
 private:
-    const Target m_target;
     const uint m_game_id;
-    const WeakDispatcher m_dispatcher;
     const QByteArray m_local_id;
     const QByteArray m_remote_id;
     LocalSideColor m_color;
 
 public:
     //! \reimp
-    explicit CreateGame(Target t,
+    explicit CreateGame(Target target,
                         uint id,
-                        const WeakDispatcher &dispatcher,
                         const QByteArray &local_id,
                         const QByteArray &remote_id,
                         LocalSideColor color);
     virtual ~CreateGame();
-    virtual Target target() const;
-    virtual void exec(Registry *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Registry *target);
     //! \reimp_end
 };
 

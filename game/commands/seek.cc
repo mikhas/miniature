@@ -23,13 +23,12 @@
 
 namespace Game { namespace Command {
 
-Seek::Seek(Target t,
+Seek::Seek(Target target,
            uint time,
            uint increment,
            Rating rating,
            Color color)
-    : AbstractCommand(t)
-    , m_target(t)
+    : AbstractCommand(target)
     , m_time(time)
     , m_increment(increment)
     , m_rating(rating)
@@ -39,12 +38,8 @@ Seek::Seek(Target t,
 Seek::~Seek()
 {}
 
-Target Seek::target() const
-{
-    return m_target;
-}
-
-void Seek::exec(AbstractEngine *target)
+void Seek::exec(Dispatcher *,
+                AbstractEngine *target)
 {
     if (not target) {
         return;

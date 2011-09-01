@@ -23,19 +23,28 @@
 
 namespace Game {
 
-AbstractCommand::AbstractCommand(Target)
+AbstractCommand::AbstractCommand(Target target)
+    : m_target(target)
 {}
 
 AbstractCommand::~AbstractCommand()
 {}
 
-void AbstractCommand::exec(Registry *)
+Target AbstractCommand::target() const
+{
+    return m_target;
+}
+
+void AbstractCommand::exec(Dispatcher *,
+                           Registry *)
 {}
 
-void AbstractCommand::exec(AbstractEngine *)
+void AbstractCommand::exec(Dispatcher *,
+                           AbstractEngine *)
 {}
 
-void AbstractCommand::exec(Frontend::Miniature *)
+void AbstractCommand::exec(Dispatcher *,
+                           Frontend::Miniature *)
 {}
 
 } // namespace Game

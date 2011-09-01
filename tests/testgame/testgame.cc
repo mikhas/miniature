@@ -55,8 +55,7 @@ private:
 
         const QByteArray local("local");
         const QByteArray remote("remote");
-        Command::CreateGame cg(TargetRegistry, 999u, WeakDispatcher(&dispatcher),
-                               local, remote, LocalSideIsBlack);
+        Command::CreateGame cg(TargetRegistry, 999u, local, remote, LocalSideIsBlack);
         dispatcher.sendCommand(&cg);
 
         QVERIFY(miniature->activeGame());

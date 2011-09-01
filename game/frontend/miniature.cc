@@ -361,8 +361,7 @@ void Miniature::seek(uint time,
     } break;
 
     case TestFicsMode: {
-        Command::CreateGame cg(TargetRegistry, 999u, d->dispatcher.data(),
-                               "test123", "test456", LocalSideIsWhite);
+        Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
         sendCommand(&cg);
     } break;
     }
@@ -387,8 +386,7 @@ void Miniature::play(uint id)
     } break;
 
     case TestFicsMode: {
-        Command::CreateGame cg(TargetRegistry, 999u, d->dispatcher.data(),
-                               "test123", "test456", LocalSideIsWhite);
+        Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
         sendCommand(&cg);
     } break;
     }
