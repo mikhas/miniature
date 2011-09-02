@@ -220,18 +220,19 @@ Page {
 
         Text { // I guess there is a way not to have two timers defined in a single file but here we go for now.
             id: opponentTime
-            property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
+            property int milliseconds: 1000 * 60 * 0.2 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
             property int increment
 
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
                 var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-
-                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
+                if (milliseconds > 10000) opponentTime.color = localSide.color
+                else opponentTime.color = "red"
+                if (milliseconds < 0) return "..."
+                else return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
             }
             text: time
-            color: localSide.color
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
@@ -345,17 +346,19 @@ Page {
 
         Text {
             id: userTime
-            property int milliseconds: 1000 * 60 * 10 // ten minutes, FIXME needs to be a real variable
+            property int milliseconds: 1000 * 60 * 0.2 // ten minutes, FIXME needs to be a real variable
             property string time: getTime()
             property int increment
 
             function getTime() {
                 var minutes = Math.floor(milliseconds / 1000 / 60)
                 var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-                return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)}
+                if (milliseconds > 10000) userTime.color = remoteSide.color
+                else userTime.color = "red"
+                if (milliseconds < 0) return "...";
+                else return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)}
 
             text: time
-            color: remoteSide.color
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
@@ -416,11 +419,6 @@ Page {
                     { if (userTimer.running === true)
                         { userTime.milliseconds += userTime.increment ; userTimer.running = false ; opponentTimer.running = true }
                         else { opponentTime.milliseconds += opponentTime.increment ; opponentTimer.running = false ; userTimer.running = true }}
-
-                    console.log(checkMove.colorPlaying + " " + checkMove.moveNumber  + " " + userTimer.running + " " + opponentTimer.running)
-                    if (checkMove.colorPlaying === "white") // turn for the other player
-                        checkMove.colorPlaying = "black"
-                    else checkMove.colorPlaying = "white"
                 }
             }
 
