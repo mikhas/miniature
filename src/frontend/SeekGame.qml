@@ -547,10 +547,10 @@ Page {
                 }
             }
 
-            ToolButton { // New seek button
+            ToolIcon { // New seek button
                 id: newSeek
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "New"
+                iconId: "toolbar-add"
                 onClicked: {
                     newSeekDialog.open();
                 }
