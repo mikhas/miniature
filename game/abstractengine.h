@@ -84,21 +84,6 @@ class AbstractEngine
     Q_DISABLE_COPY(AbstractEngine)
 
 public:
-    // FIXME: Use flags instead of states!
-    // Allows a backend to say "I expect this, this and that message, but not that one.".
-    //! The link's state.
-    enum State {
-        StateIdle,
-        StateLoginPending,
-        StateLoginFailed,
-        StatePlayPending,
-        StatePlayFailed,
-        StateReady,
-    };
-
-    Q_ENUMS(State)
-    Q_PROPERTY(State state READ state NOTIFY stateChanged)
-
     //! C'tor
     //! @param parent the owner of this instance (optional).
     explicit AbstractEngine(QObject *parent = 0);
@@ -115,12 +100,6 @@ public:
     //! @param token the token to be processed. If the token could be
     //!              translated into a command, commandFound will be emitted.
     Q_SLOT virtual void processToken(const QByteArray &token) = 0;
-
-    //! Returns state of this link.
-    virtual State state() const;
-
-    //! Emitted whenever state changes.
-    Q_SIGNAL void stateChanged(State state);
 
     //! Login to remote server.
     //! @param username the username of the account.

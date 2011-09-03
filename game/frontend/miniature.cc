@@ -339,8 +339,9 @@ Miniature::Mode Miniature::mode() const
 }
 
 void Miniature::login(const QString &username,
-                     const QString &password)
+                      const QString &password)
 {
+    qDebug() << __PRETTY_FUNCTION__;
     Command::Login login(TargetEngine, username, password);
     sendCommand(&login);
 }

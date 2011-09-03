@@ -84,14 +84,10 @@ public:
 
     virtual void login(const QString &,
                        const QString &)
-    {
-        emit stateChanged(Game::AbstractEngine::StateLoginFailed);
-    }
+    {}
 
     virtual void play(uint)
-    {
-        emit stateChanged(Game::AbstractEngine::StatePlayFailed);
-    }
+    {}
 };
 
 } // namespace TestUtils

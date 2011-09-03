@@ -37,13 +37,27 @@ class Engine
     Q_OBJECT
     Q_DISABLE_COPY(Engine)
 
+public:
+    //! Engine uses MessageFilter for incoming messages from FICS.
+    enum MessageFilter {
+        None = 0x0,
+        LoginRequest = 0x1,
+        PlayRequest = 0x2,
+        InGame = 0x4,
+        WaitingForSeeks = 0x8,
+        WaitingForGames = 0x10
+    };
+
+    Q_ENUMS(MessageFilter)
+    Q_DECLARE_FLAGS(MessageFilterFlags, MessageFilter)
+
 private:
     WeakDispatcher m_dispatcher;
     QTcpSocket m_channel;
     QByteArray m_buffer;
     QString m_username;
     QString m_password;
-    State m_state;
+    MessageFilterFlags m_filter;
     bool m_enabled;
     QTimer m_login_abort_timer;
     QVector<char> m_extra_delimiter;
@@ -56,7 +70,6 @@ public:
                     QObject *parent = 0);
     virtual ~Engine();
     virtual void setEnabled(bool enable);
-    virtual State state() const;
     virtual void login(const QString &username,
                        const QString &password);
     virtual void seek(uint time,
@@ -68,7 +81,8 @@ public:
     virtual void processToken(const QByteArray &token);
     //! \reimp_end
 
-    virtual void enableTesting();
+    //! Test API
+    virtual void setMessageFilter(const MessageFilterFlags &flags = MessageFilterFlags(InGame));
 
 private:
     Q_SLOT void onReadyRead();

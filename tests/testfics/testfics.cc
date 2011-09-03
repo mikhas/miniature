@@ -116,7 +116,6 @@ private:
         dispatcher.resetRegistry(registry);
 
         Fics::Engine *fics = new Fics::Engine(&dispatcher);
-        fics->enableTesting();
         dispatcher.setBackend(fics);
 
         DummyFrontend frontend(&dispatcher);
@@ -125,6 +124,9 @@ private:
         QCOMPARE(frontend.m_received_records.size(), 0);
         QCOMPARE(frontend.m_received_seeks.size(), 0);
 
+        fics->setMessageFilter(Fics::Engine::MessageFilterFlags(Fics::Engine::WaitingForGames
+                                                                | Fics::Engine::WaitingForSeeks
+                                                                | Fics::Engine::InGame));
         fics->processToken(m_session_log.at(15));
         QCOMPARE(frontend.m_received_records.size(), 0);
 
@@ -136,7 +138,6 @@ private:
 
         // Emable backend to parse create-game token:
         fics->play(1);
-        QCOMPARE(fics->state(), Fics::Engine::StatePlayPending);
 
         fics->processToken(m_play_log.at(3));
         Game *game = registry->game(414u);

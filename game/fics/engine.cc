@@ -350,7 +350,7 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_buffer()
     , m_username()
     , m_password()
-    , m_state(StateIdle)
+    , m_filter(None)
     , m_enabled(false)
     , m_login_abort_timer()
     , m_extra_delimiter()
@@ -380,36 +380,16 @@ void Engine::setEnabled(bool enable)
     if (not m_enabled) {
         m_channel.disconnectFromHost();
         m_channel.waitForDisconnected();
-
-        if (m_state != StateIdle) {
-            m_state = StateIdle;
-            emit stateChanged(m_state);
-        }
     } else if (not m_channel.isOpen()) {
         m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
         m_channel.waitForConnected();
-
-        if (m_state != StateReady) {
-            m_state = StateReady;
-            emit stateChanged(m_state);
-        }
     }
-}
-
-AbstractEngine::State Engine::state() const
-{
-    return m_state;
 }
 
 void Engine::login(const QString &username,
-                    const QString &password)
+                   const QString &password)
 {
-    if (m_state != StateReady) {
-        return;
-    }
-
-    m_state = StateLoginPending;
-    emit stateChanged(m_state);
+    m_filter |= LoginRequest;
     m_login_abort_timer.start();
 
     m_username = username;
@@ -428,7 +408,8 @@ void Engine::seek(uint time,
                   Rating rating,
                   Color color)
 {
-    if (m_state != StateReady) {
+    // Can only send out seeks when also waiting for them:
+    if (not (m_filter & WaitingForSeeks)) {
         return;
     }
 
@@ -439,40 +420,25 @@ void Engine::seek(uint time,
         r = "unrated";
     }
 
-    // TODO: set waiting for seek flag
-    m_state = StatePlayPending;
-    emit stateChanged(StatePlayPending);
+    m_filter |= PlayRequest;
 
     const QString &cmd(QString("seek %1 %2 %3 %4\n")
                        .arg(time)
                        .arg(increment)
                        .arg(r)
                        .arg(fromColor(color)));
-    qDebug() << __PRETTY_FUNCTION__
-             << cmd;
-
     m_channel.write(cmd.toLatin1());
 }
 
 void Engine::play(uint advertisement_id)
 {
-    if (m_state != StateReady) {
-        return;
-    }
-
     m_current_advertisment_id = advertisement_id;
-    m_state = StatePlayPending;
-    emit stateChanged(m_state);
-    qDebug() << __PRETTY_FUNCTION__
-             << play_command.arg(advertisement_id).toLatin1();
+    m_filter |= PlayRequest;
     m_channel.write(play_command.arg(advertisement_id).toLatin1());
 }
 
 void Engine::movePiece(const MovedPiece &moved_piece)
 {
-    // TODO: Process invalid moves.
-
-
     m_channel.write(moveNotation(moved_piece).toLatin1());
     m_channel.write("\n");
 }
@@ -485,15 +451,11 @@ void Engine::processToken(const QByteArray &token)
 
     qDebug() << "FICS:" << token;
 
-    switch(m_state) {
-    case StateLoginFailed:
-    case StateLoginPending:
+    if (m_filter & LoginRequest) {
         processLogin(token);
-        break;
+    }
 
-    // TODO: This currently makes us ignore all other input, not good ...
-    case StatePlayFailed:
-    case StatePlayPending: {
+    if (m_filter & PlayRequest) {
         const GameInfo &gi(parseCreateGame(token));
         debugOutput(gi);
         if (gi.valid) {
@@ -508,19 +470,19 @@ void Engine::processToken(const QByteArray &token)
             Command::Move m(TargetFrontend, gi.id, createStartPosition());
             sendCommand(&m);
 
-            m_state = StateReady;
-            emit stateChanged(m_state);
+            m_filter |= InGame;
+            m_filter &= ~WaitingForSeeks;
+            m_filter &= ~PlayRequest;
         } else if (token.contains(seek_not_available)) {
             Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
             sendCommand(&is);
+
+            m_filter |= WaitingForSeeks;
+            m_filter &= ~PlayRequest;
         }
-    } break;
+    }
 
-    case StateIdle:
-        (void) m_channel.readAll();
-        break;
-
-    case StateReady: {
+    if (m_filter & InGame) {
         const GameUpdate &gu(parseGameUpdate(token));
         if (gu.valid) {
             Command::Move m(TargetFrontend, gu.id, gu.position);
@@ -528,32 +490,39 @@ void Engine::processToken(const QByteArray &token)
             m.setBlack(gu.black);
             sendCommand(&m);
         } else {
-            const Seek &s(parseSeek(token));
-            if (s.valid) {
-                Command::Advertisement ac(TargetFrontend, s);
-                sendCommand(&ac);
-            } else {
-                const Record &r(parseRecord(token));
-                if (r.valid) {
-                    Command::Record rc(TargetFrontend, r);
-                    sendCommand(&rc);
-                } else {
-                    const InvalidMove &im(parseInvalidMove(token));
-                    if (im.valid) {
-                        Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
-                        sendCommand(&imc);
-                    }
-                }
+            const InvalidMove &im(parseInvalidMove(token));
+            if (im.valid) {
+                Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
+                sendCommand(&imc);
             }
         }
-    } break;
+    }
+
+    if (m_filter & WaitingForSeeks) {
+        const Seek &s(parseSeek(token));
+        if (s.valid) {
+            Command::Advertisement ac(TargetFrontend, s);
+            sendCommand(&ac);
+        }
+    }
+
+    if (m_filter & WaitingForGames) {
+        const Record &r(parseRecord(token));
+        if (r.valid) {
+            Command::Record rc(TargetFrontend, r);
+            sendCommand(&rc);
+        }
+    }
+
+    if (m_filter == None) {
+        (void) m_channel.readAll();
     }
 }
 
-void Engine::enableTesting()
+void Engine::setMessageFilter(const MessageFilterFlags &flags)
 {
     m_enabled = true;
-    m_state = StateReady;
+    m_filter = flags;
 }
 
 void Engine::onReadyRead()
@@ -592,8 +561,7 @@ void Engine::processLogin(const QByteArray &line)
     } else if (line.startsWith(fics_prompt)) {
         m_login_abort_timer.stop();
         m_extra_delimiter.clear();
-        m_state = StateReady;
-        emit stateChanged(m_state);
+        m_filter |= WaitingForSeeks;
     }
 }
 
@@ -604,13 +572,12 @@ void Engine::onHostFound()
 
 void Engine::abortLogin()
 {
-    if (m_state != StateLoginPending) {
+    if (not (m_filter & LoginRequest)) {
         return;
     }
 
     qDebug() << "Failed to login in with as" << m_username;
-    m_state = StateLoginFailed;
-    emit stateChanged(m_state);
+    m_filter &= ~LoginRequest;
 }
 
 void Engine::configurePrompt()

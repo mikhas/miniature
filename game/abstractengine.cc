@@ -29,11 +29,6 @@ AbstractEngine::AbstractEngine(QObject *parent)
 AbstractEngine::~AbstractEngine()
 {}
 
-AbstractEngine::State AbstractEngine::state() const
-{
-    return StateIdle;
-}
-
 void AbstractEngine::login(const QString &,
                          const QString &)
 {}

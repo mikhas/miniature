@@ -38,10 +38,12 @@ Login::~Login()
 void Login::exec(Dispatcher *,
                  AbstractEngine *target)
 {
+    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
     if (not target) {
         return;
     }
 
+    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
     target->login(m_username, m_password);
 }
 
