@@ -33,6 +33,9 @@ void AbstractEngine::login(const QString &,
                          const QString &)
 {}
 
+void AbstractEngine::logout()
+{}
+
 void AbstractEngine::seek(uint, uint, Rating, Color)
 {}
 

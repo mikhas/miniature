@@ -27,13 +27,13 @@
 #include "abstractengine.h"
 #include "game.h"
 #include "position.h"
+#include "availableseeks.h"
 
 #include <QtCore>
 
 namespace Game { namespace Frontend {
 
-QString fromColor(Color color);
-
+class AvailableSeeks;
 class MiniaturePrivate;
 
 //! This class communicates with the engine, handles the active game state
@@ -92,6 +92,9 @@ public:
 
     Q_INVOKABLE void login(const QString &username,
                            const QString &password);
+    Q_INVOKABLE void logout();
+    Q_SIGNAL void loginSucceeded();
+    Q_SIGNAL void loginFailed();
 
     //! Sends out a game offer.
     //! @param time initial time.

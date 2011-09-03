@@ -398,7 +398,10 @@ Page {
                         MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
                         MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
                         MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
-                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: loadScreen("MainPage.qml") }
+                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
+                            miniature.logout()
+                            loadScreen("MainPage.qml")
+                        }}
                     }
                 }
             }

@@ -55,12 +55,14 @@ private:
     WeakDispatcher m_dispatcher;
     QTcpSocket m_channel;
     QByteArray m_buffer;
+    QByteArray m_last_token;
     QString m_username;
     QString m_password;
     MessageFilterFlags m_filter;
     bool m_enabled;
     bool m_logged_in;
     bool m_past_welcome_screen;
+    uint m_login_count;
     QTimer m_login_abort_timer;
     QVector<char> m_extra_delimiter;
     uint m_current_game_id; // The game we currently play on FICS.
@@ -92,7 +94,9 @@ private:
     void processLogin(const QByteArray &line);
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
+    Q_SLOT void reconnect();
     void configurePrompt();
+    void sendLogin();
     void finalizeLogin();
     void sendCommand(AbstractCommand *command);
 };

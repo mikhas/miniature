@@ -33,6 +33,9 @@ public:
     //! \reimp
     explicit Logout(Target target);
     virtual ~Logout();
+
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
     //! \reimp_end
 };
 

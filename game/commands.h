@@ -21,6 +21,7 @@
 #include "abstractcommand.h"
 #include "commands/login.h"
 #include "commands/logout.h"
+#include "commands/loginfailed.h"
 #include "commands/advertisement.h"
 #include "commands/record.h"
 #include "commands/play.h"

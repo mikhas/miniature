@@ -8,6 +8,21 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     // Generic app window style
 
+    Connections {
+        target: miniature
+        onLoginFailed: {
+            loginErrorBkg.visible = true
+            loginError.visible = true
+            loginError.text = "Wrong"
+            idForm.text = ""
+            idPassword.text = ""
+        }
+
+        onLoginSucceeded: {
+            loadScreen("SeekGame.qml")
+        }
+    }
+
     Rectangle {
         id: windowBackground
         color: "lightgray"
@@ -52,7 +67,6 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             miniature.login("guest", "")
-            loadScreen("SeekGame.qml")
         }
     }
 
@@ -110,22 +124,13 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: loginButton
-        property bool loginCorrect: true // FIXME this is just a trick for testing, it's the backend who needs to tell whether the login is correct or not
         text: "Log in"
         anchors.top:  idPassword.bottom
         anchors.topMargin: 10
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
         onClicked: {
-            if (loginCorrect == false) {
-                loginErrorBkg.visible = true
-                loginError.visible = true
-                loginError.text = "Wrong"
-                idForm.text = ""
-                idPassword.text = ""}
-            else {
-                miniature.login(idForm.text, idPassword.text)
-                loadScreen("SeekGame.qml") }
+            miniature.login(idForm.text, idPassword.text)
         }
     }
 

@@ -107,6 +107,9 @@ public:
     virtual void login(const QString &username,
                        const QString &password);
 
+    //! Logs out from remote server.
+    virtual void logout();
+
     //! Sends out a game offer.
     //! @param time initial time.
     //! @param increment time increment for each turn.

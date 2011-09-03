@@ -18,45 +18,32 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "login.h"
-#include "abstractengine.h"
-#include "frontend/miniature.h"
+#ifndef LOGINFAILED_H
+#define LOGINFAILED_H
+
+#include "abstractcommand.h"
+
+#include <QtCore>
 
 namespace Game { namespace Command {
 
-Login::Login(Target target,
-             const QString &username,
-             const QString &password)
-    : AbstractCommand(target)
-    , m_username(username)
-    , m_password(password)
-{}
-
-Login::~Login()
-{}
-
-void Login::exec(Dispatcher *,
-                 AbstractEngine *target)
+//! LoginFailed to remote server.
+class LoginFailed
+    : public AbstractCommand
 {
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
-    if (not target) {
-        return;
-    }
+private:
+    QString m_username;
+    QString m_password;
 
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
-    target->login(m_username, m_password);
-}
-
-void Login::exec(Dispatcher *,
-                 Frontend::Miniature *target)
-{
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
-    if (not target) {
-        return;
-    }
-
-    target->setUsername(m_username);
-    emit target->loginSucceeded();
-}
+public:
+    //! \reimp
+    explicit LoginFailed(Target target);
+    virtual ~LoginFailed();
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
+};
 
 }} // namespace Command, Game
+
+#endif // LOGINFAILED_H

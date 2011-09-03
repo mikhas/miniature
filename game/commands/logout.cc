@@ -19,6 +19,8 @@
  */
 
 #include "logout.h"
+#include "frontend/miniature.h"
+#include "abstractengine.h"
 
 namespace Game { namespace Command {
 
@@ -28,5 +30,15 @@ Logout::Logout(Target target)
 
 Logout::~Logout()
 {}
+
+void Logout::exec(Dispatcher *dispatcher,
+                  AbstractEngine *target)
+{
+    if (not target) {
+        return;
+    }
+
+    target->logout();
+}
 
 }} // namespace Command, Game

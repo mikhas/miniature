@@ -57,6 +57,9 @@ namespace {
         QByteArray move;
     };
 
+    const char * const login_prompt("login");
+    const char * const password_prompt("password");
+    const char * const fics_prompt("fics");
     const char * const not_your_move("It is not your move");
     const char * const seek_not_available("That seek is not available.");
 
@@ -348,12 +351,14 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_dispatcher(dispatcher)
     , m_channel()
     , m_buffer()
+    , m_last_token()
     , m_username()
     , m_password()
     , m_filter(None)
     , m_enabled(false)
     , m_logged_in(false)
     , m_past_welcome_screen(false)
+    , m_login_count(0)
     , m_login_abort_timer()
     , m_extra_delimiter()
     , m_current_game_id(0)
@@ -370,6 +375,10 @@ Engine::Engine(Dispatcher *dispatcher,
 
     connect(&m_channel, SIGNAL(hostFound()),
             this,       SLOT(onHostFound()));
+
+    // First pings whether connection was recovered, then attempts relogin + resume.
+    connect (&m_channel, SIGNAL(disconnected()),
+             this,       SLOT(reconnect()));
 }
 
 Engine::~Engine()
@@ -390,14 +399,28 @@ void Engine::login(const QString &username,
     m_username = username;
     m_password = password;
 
+    m_extra_delimiter.clear();
+    m_extra_delimiter.append(':');
+    m_extra_delimiter.append('%');
+
     m_filter |= LoginRequest;
-    m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+
+    if (m_channel.state() != QAbstractSocket::ConnectedState) {
+        m_login_count = 0;
+        m_buffer.clear();
+        m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+    } else if (0 == strcmp(m_last_token.data(), login_prompt)) {
+        // A previous login attempt must have failed and FICS is showing us a
+        // login prompt already:
+        sendLogin();
+    }
 }
 
 void Engine::logout()
 {
     m_channel.close();
     m_logged_in = false;
+    m_past_welcome_screen = false;
 }
 
 void Engine::seek(uint time,
@@ -446,10 +469,13 @@ void Engine::processToken(const QByteArray &token)
         return;
     }
 
+    m_last_token = token;
     qDebug() << "FICS:" << token;
 
     if (m_filter & LoginRequest) {
         processLogin(token);
+        // There's no point in trying anything else at this point:
+        return;
     }
 
     if (m_filter & PlayRequest) {
@@ -520,22 +546,6 @@ void Engine::setMessageFilter(const MessageFilterFlags &flags)
 
 void Engine::onReadyRead()
 {
-    if (not m_past_welcome_screen) {
-        (void) m_channel.readAll();
-        m_past_welcome_screen = true;
-
-        m_login_abort_timer.start();
-
-        m_channel.write(m_username.toLatin1());
-        m_channel.write("\n");
-
-        m_extra_delimiter.clear();
-        m_extra_delimiter.append(':');
-        m_extra_delimiter.append('%');
-
-        return;
-    }
-
     int next_newline_pos = -1;
     const bool enable_echo = false;
     do {
@@ -545,11 +555,23 @@ void Engine::onReadyRead()
 
 void Engine::processLogin(const QByteArray &line)
 {
-    // TODO: write proper tokenizer?
-    static const QByteArray enter_password("password");
-    static const QByteArray fics_prompt("fics");
+    // TODO: write dedicated login class?
+    if (line.startsWith(login_prompt)) {
+        // Actually, login count will alternate between 0 and 1 ...
+        if (m_login_count > 0) {
+            Command::LoginFailed lf(TargetFrontend);
+            sendCommand(&lf);
+        } else {
+            sendLogin();
+        }
 
-    if (match_confirm_login.exactMatch(line)) {
+        ++m_login_count;
+    } else if (line.startsWith(password_prompt)) {
+        m_login_abort_timer.stop();
+        m_login_abort_timer.start();
+        m_channel.write(m_password.toLatin1());
+        m_channel.write("\n");
+    } else if (match_confirm_login.exactMatch(line)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();
         // Confirm login:
@@ -559,11 +581,6 @@ void Engine::processLogin(const QByteArray &line)
         if (m_username == "guest") {
             m_username = match_confirm_login.cap(1);
         }
-    } else if (line.startsWith(enter_password)) {
-        m_login_abort_timer.stop();
-        m_login_abort_timer.start();
-        m_channel.write(m_password.toLatin1());
-        m_channel.write("\n");
     } else if (line.startsWith(fics_prompt)) {
         finalizeLogin();
     }
@@ -581,9 +598,11 @@ void Engine::abortLogin()
     }
 
     qDebug() << "Failed to login in with as" << m_username;
-
     m_logged_in = false;
     m_filter &= ~LoginRequest;
+
+    Command::LoginFailed lf(TargetFrontend);
+    sendCommand(&lf);
 }
 
 void Engine::reconnect()
@@ -595,8 +614,16 @@ void Engine::configurePrompt()
     m_channel.write("\n");
 }
 
+void Engine::sendLogin()
+{
+    m_login_abort_timer.start();
+    m_channel.write(m_username.toLatin1());
+    m_channel.write("\n");
+}
+
 void Engine::finalizeLogin()
 {
+    m_login_count = 0;
     m_login_abort_timer.stop();
     m_extra_delimiter.clear();
 

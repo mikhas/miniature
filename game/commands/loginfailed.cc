@@ -18,45 +18,27 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "login.h"
-#include "abstractengine.h"
+#include "loginfailed.h"
 #include "frontend/miniature.h"
 
 namespace Game { namespace Command {
 
-Login::Login(Target target,
-             const QString &username,
-             const QString &password)
+LoginFailed::LoginFailed(Target target)
     : AbstractCommand(target)
-    , m_username(username)
-    , m_password(password)
 {}
 
-Login::~Login()
+LoginFailed::~LoginFailed()
 {}
 
-void Login::exec(Dispatcher *,
-                 AbstractEngine *target)
+void LoginFailed::exec(Dispatcher *,
+                       Frontend::Miniature *target)
 {
     qDebug() << __PRETTY_FUNCTION__ << __LINE__;
     if (not target) {
         return;
     }
 
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
-    target->login(m_username, m_password);
-}
-
-void Login::exec(Dispatcher *,
-                 Frontend::Miniature *target)
-{
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
-    if (not target) {
-        return;
-    }
-
-    target->setUsername(m_username);
-    emit target->loginSucceeded();
+    emit target->loginFailed();
 }
 
 }} // namespace Command, Game

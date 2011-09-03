@@ -166,7 +166,7 @@ Page {
             header: seekListHeader // empty header to avoid overlap of 1st item with shadow.
             spacing: 10
 
-            model: advertisements
+            model: availableSeeks
 
             delegate: Item {
                 id: listItem
@@ -300,11 +300,13 @@ Page {
                         onSeekCancelled: {
                             visible = false
                             spinner.running = false
+                            model.remove(model.id)
                         }
 
                         onGameStarted: {
                             visible = false
                             spinner.running = false
+                            model.remove(model.id)
                         }
                     }
 
@@ -543,6 +545,7 @@ Page {
                 id: backIcon
                 iconId: "toolbar-back";
                 onClicked: {
+                    miniature.logout()
                     loadScreen("MainPage.qml")
                 }
             }

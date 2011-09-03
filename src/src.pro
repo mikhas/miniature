@@ -31,6 +31,7 @@ LIBS += \
         $${GAME_DIR}/registry.h \
         $${GAME_DIR}/commands/login.h \
         $${GAME_DIR}/commands/logout.h \
+        $${GAME_DIR}/commands/loginfailed.h \
         $${GAME_DIR}/commands/advertisement.h \
         $${GAME_DIR}/commands/record.h \
         $${GAME_DIR}/commands/play.h \
@@ -43,6 +44,7 @@ LIBS += \
         $${GAME_DIR}/frontend/miniature.h \
         $${GAME_DIR}/frontend/chessboard.h \
         $${GAME_DIR}/frontend/sideelement.h \
+        $${GAME_DIR}/frontend/availableseeks.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -60,6 +62,7 @@ LIBS += \
         $${GAME_DIR}/registry.cc \
         $${GAME_DIR}/commands/login.cc \
         $${GAME_DIR}/commands/logout.cc \
+        $${GAME_DIR}/commands/loginfailed.cc \
         $${GAME_DIR}/commands/advertisement.cc \
         $${GAME_DIR}/commands/record.cc \
         $${GAME_DIR}/commands/play.cc \
@@ -72,6 +75,7 @@ LIBS += \
         $${GAME_DIR}/frontend/miniature.cc \
         $${GAME_DIR}/frontend/chessboard.cc \
         $${GAME_DIR}/frontend/sideelement.cc \
+        $${GAME_DIR}/frontend/availableseeks.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \

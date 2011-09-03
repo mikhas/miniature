@@ -24,6 +24,7 @@
 #include "registry.h"
 #include "frontend/chessboard.h"
 #include "frontend/sideelement.h"
+#include "frontend/availableseeks.h"
 
 #ifdef MINIATURE_GUI_ENABLED
 #include <QtDeclarative/QtDeclarative>
@@ -69,166 +70,13 @@ namespace Game { namespace Frontend { namespace {
     }
 }
 
-QString fromColor(Color color)
-{
-    switch(color) {
-    case ColorNone: return "auto";
-    case ColorWhite: return "white";
-    case ColorBlack: return "black";
-    }
-
-    return "";
-}
-
-class Advertisements
-    : public QAbstractItemModel
-{
-private:
-    QVector<Seek> m_advertisements;
-
-public:
-    enum Roles {
-        RoleId = Qt::UserRole + 1,
-        RoleMode,
-        RolePlayerName,
-        RoleRating,
-        RoleTime,
-        RoleIncrement,
-        RoleIsRated,
-        RoleColor,
-        RoleIsAutoStarted,
-        RoleUsesFormula,
-        RoleRatingLowerLimit,
-        RoleRatingUpperLimit,
-        RoleHighlighted
-    };
-
-    explicit Advertisements(QObject *parent = 0)
-        : QAbstractItemModel(parent)
-    {
-        // QML cannot cope with c-style-variable-names!
-        QHash<int, QByteArray> roles;
-        roles[RoleId] = "id";
-        roles[RoleMode] = "mode";
-        roles[RolePlayerName] = "playerName";
-        roles[RoleRating] = "rating";
-        roles[RoleTime] = "time";
-        roles[RoleIncrement] = "increment";
-        roles[RoleIsRated] = "isRated";
-        roles[RoleColor] = "color";
-        roles[RoleIsAutoStarted] = "isAutoStarted";
-        roles[RoleUsesFormula] = "usesFormula";
-        roles[RoleRatingLowerLimit] = "ratingLowerLimit";
-        roles[RoleRatingUpperLimit] = "ratingUpperLimit";
-        roles[RoleHighlighted] = "highlighted";
-        setRoleNames(roles);
-    }
-
-    virtual ~Advertisements()
-    {}
-
-    virtual void append(const Seek& s)
-    {
-        beginInsertRows(QModelIndex(), m_advertisements.size(), m_advertisements.size());
-        m_advertisements.append(s);
-        endInsertRows();
-
-        // Manage a sliding window of no more than 1024 entries:
-        // TODO: delete ads after x secs?
-        while (m_advertisements.size() > 1024) {
-            beginRemoveRows(QModelIndex(), 0, 0);
-            m_advertisements.pop_front();
-            endRemoveRows();
-        }
-    }
-
-    virtual int columnCount(const QModelIndex &index = QModelIndex()) const
-    {
-        Q_UNUSED(index)
-        return 1;
-    }
-
-    virtual int rowCount(const QModelIndex &index = QModelIndex()) const
-    {
-        Q_UNUSED(index)
-        return m_advertisements.size();
-    }
-
-    virtual QModelIndex index(int row,
-                              int column,
-                              const QModelIndex &index = QModelIndex()) const
-    {
-        Q_UNUSED(index)
-        return createIndex(row, column);
-    }
-
-    virtual QModelIndex parent(const QModelIndex &index = QModelIndex()) const
-    {
-        Q_UNUSED(index)
-        return QModelIndex();
-    }
-
-    virtual QVariant data(const QModelIndex &index,
-                          int role) const
-    {
-        if (m_advertisements.size() < index.row()) {
-            return QVariant();
-        }
-
-        const Seek &s(m_advertisements.at(index.row()));
-
-        switch(role) {
-        case RoleId: return QVariant(s.id);
-        case RoleMode: return QVariant(s.mode);
-        case RolePlayerName: return QVariant(s.player_name);
-        case RoleRating: return QVariant(s.rating);
-        case RoleTime: return QVariant(s.time);
-        case RoleIncrement: return QVariant(s.increment);
-        case RoleIsRated: return QVariant(s.is_rated);
-        case RoleColor: return QVariant(fromColor(s.color));
-        case RoleIsAutoStarted: return QVariant(s.is_auto_started);
-        case RoleUsesFormula: return QVariant(s.uses_formula);
-        case RoleRatingLowerLimit: return QVariant(s.rating_range.first);
-        case RoleRatingUpperLimit: return QVariant(s.rating_range.second);
-        case RoleHighlighted: return QVariant(s.highlighted);
-
-        default:
-            return QVariant();
-        }
-    }
-
-    virtual bool setData(const QModelIndex &index,
-                         const QVariant &value,
-                         int role)
-    {
-        if (m_advertisements.size() < index.row()) {
-            return false;
-        }
-
-        Seek &s(m_advertisements[index.row()]);
-
-
-        switch(role) {
-        case RoleHighlighted: s.highlighted = value.toBool();
-            emit dataChanged(index, index);
-            return true;
-
-        // Other data is "read-only":
-        default:
-            break;
-        }
-
-        return false;
-    }
-};
-
 class MiniaturePrivate
 {
 public:
     WeakDispatcher dispatcher;
     CommandLine command_line;
     LineReader line_reader;
-    Advertisements advertisements;
+    AvailableSeeks available_seeks;
     ChessBoard chess_board;
     bool valid_move;
     Miniature::Mode mode;
@@ -243,7 +91,7 @@ public:
         : dispatcher(new_dispatcher)
         , command_line(new_dispatcher)
         , line_reader()
-        , advertisements()
+        , available_seeks()
         , chess_board()
         , valid_move(false)
         , mode(Miniature::TestFicsMode)
@@ -268,7 +116,7 @@ Miniature::Miniature(Dispatcher *dispatcher,
                                          "Enables access to Miniature enums.");
     qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
 
-    d->ui.rootContext()->setContextProperty("advertisements", &d->advertisements);
+    d->ui.rootContext()->setContextProperty("availableSeeks", &d->available_seeks);
     d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
     d->ui.rootContext()->setContextProperty("miniature", this);
     d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
@@ -318,7 +166,7 @@ void Miniature::handleRecord(const Record &)
 void Miniature::handleSeek(const Seek &s)
 {
     Q_D(Miniature);
-    d->advertisements.append(s);
+    d->available_seeks.append(s);
 }
 
 void Miniature::setMode(Mode mode)
@@ -344,6 +192,15 @@ void Miniature::login(const QString &username,
     qDebug() << __PRETTY_FUNCTION__;
     Command::Login login(TargetEngine, username, password);
     sendCommand(&login);
+}
+
+void Miniature::logout()
+{
+    Q_D(Miniature);
+    d->available_seeks.removeAll();
+
+    Command::Logout logout(TargetEngine);
+    sendCommand(&logout);
 }
 
 void Miniature::seek(uint time,
@@ -403,12 +260,12 @@ void Miniature::toggleGameAdvertisementHighlighting(uint id)
 {
     Q_D(Miniature);
 
-    for (int index = 0; index < d->advertisements.rowCount(); ++index) {
-        const QModelIndex mi(d->advertisements.index(index, 0));
-        const bool found(d->advertisements.data(mi, Advertisements::RoleId).toUInt() == id);
-        const bool was_highlighted(d->advertisements.data(mi, Advertisements::RoleHighlighted).toBool());
+    for (int index = 0; index < d->available_seeks.rowCount(); ++index) {
+        const QModelIndex mi(d->available_seeks.index(index, 0));
+        const bool found(d->available_seeks.data(mi, AvailableSeeks::RoleId).toUInt() == id);
+        const bool was_highlighted(d->available_seeks.data(mi, AvailableSeeks::RoleHighlighted).toBool());
 
-        d->advertisements.setData(mi, found && not was_highlighted, Advertisements::RoleHighlighted);
+        d->available_seeks.setData(mi, found && not was_highlighted, AvailableSeeks::RoleHighlighted);
     }
 }
 
