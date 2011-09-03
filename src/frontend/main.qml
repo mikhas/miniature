@@ -19,15 +19,22 @@ PageStackWindow {
 
     // Borrowed function to jump from one qml file to another. There must be a simpler way?
 
-    function loadScreen(f_ScreenName) {
-        var component = Qt.createComponent(f_ScreenName)
+    function loadScreen(f_ScreenName)
+    {
+        var component = Qt.createComponent(f_ScreenName);
 
-        if (component.status == Component.Ready)
-        {
+        // FIXME: Actually, we are supposed to pop the pages from this very stack
+        // whenever we return from a page. Currently, we just keep reloading
+        // components ... leads to problems when same page is loaded twice!
+        // This hack removes any component with f_ScreenName before the push,
+        // ensuring that each page only exists once.
+        if (component.status == Component.Ready) {
+            pageStack.pop(pageStack.find(function(component) {
+                return component.name == "f_ScreenName";
+            }));
+
             pageStack.push(component);
-        }
-        else
-        {
+        } else {
             console.log("Error loading component:", component.errorString());
         }
     }
