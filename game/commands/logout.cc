@@ -31,7 +31,7 @@ Logout::Logout(Target target)
 Logout::~Logout()
 {}
 
-void Logout::exec(Dispatcher *dispatcher,
+void Logout::exec(Dispatcher *,
                   AbstractEngine *target)
 {
     if (not target) {
