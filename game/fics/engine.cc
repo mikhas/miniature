@@ -352,6 +352,8 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_password()
     , m_filter(None)
     , m_enabled(false)
+    , m_logged_in(false)
+    , m_past_welcome_screen(false)
     , m_login_abort_timer()
     , m_extra_delimiter()
     , m_current_game_id(0)
@@ -376,31 +378,26 @@ Engine::~Engine()
 void Engine::setEnabled(bool enable)
 {
     m_enabled = enable;
-
-    if (not m_enabled) {
-        m_channel.disconnectFromHost();
-        m_channel.waitForDisconnected();
-    } else if (not m_channel.isOpen()) {
-        m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
-        m_channel.waitForConnected();
-    }
 }
 
 void Engine::login(const QString &username,
                    const QString &password)
 {
-    m_filter |= LoginRequest;
-    m_login_abort_timer.start();
+    if (m_logged_in) {
+        return;
+    }
 
     m_username = username;
     m_password = password;
 
-    m_channel.write(m_username.toLatin1());
-    m_channel.write("\n");
+    m_filter |= LoginRequest;
+    m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+}
 
-    m_extra_delimiter.clear();
-    m_extra_delimiter.append(':');
-    m_extra_delimiter.append('%');
+void Engine::logout()
+{
+    m_channel.close();
+    m_logged_in = false;
 }
 
 void Engine::seek(uint time,
@@ -513,10 +510,6 @@ void Engine::processToken(const QByteArray &token)
             sendCommand(&rc);
         }
     }
-
-    if (m_filter == None) {
-        (void) m_channel.readAll();
-    }
 }
 
 void Engine::setMessageFilter(const MessageFilterFlags &flags)
@@ -527,6 +520,22 @@ void Engine::setMessageFilter(const MessageFilterFlags &flags)
 
 void Engine::onReadyRead()
 {
+    if (not m_past_welcome_screen) {
+        (void) m_channel.readAll();
+        m_past_welcome_screen = true;
+
+        m_login_abort_timer.start();
+
+        m_channel.write(m_username.toLatin1());
+        m_channel.write("\n");
+
+        m_extra_delimiter.clear();
+        m_extra_delimiter.append(':');
+        m_extra_delimiter.append('%');
+
+        return;
+    }
+
     int next_newline_pos = -1;
     const bool enable_echo = false;
     do {
@@ -550,18 +559,13 @@ void Engine::processLogin(const QByteArray &line)
         if (m_username == "guest") {
             m_username = match_confirm_login.cap(1);
         }
-
-        Command::Login lc(TargetFrontend, m_username, "");
-        sendCommand(&lc);
     } else if (line.startsWith(enter_password)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();
         m_channel.write(m_password.toLatin1());
         m_channel.write("\n");
     } else if (line.startsWith(fics_prompt)) {
-        m_login_abort_timer.stop();
-        m_extra_delimiter.clear();
-        m_filter |= WaitingForSeeks;
+        finalizeLogin();
     }
 }
 
@@ -577,13 +581,31 @@ void Engine::abortLogin()
     }
 
     qDebug() << "Failed to login in with as" << m_username;
+
+    m_logged_in = false;
     m_filter &= ~LoginRequest;
 }
+
+void Engine::reconnect()
+{}
 
 void Engine::configurePrompt()
 {
     m_channel.write("set style 12");
     m_channel.write("\n");
+}
+
+void Engine::finalizeLogin()
+{
+    m_login_abort_timer.stop();
+    m_extra_delimiter.clear();
+
+    Command::Login lc(TargetFrontend, m_username, "");
+    sendCommand(&lc);
+
+    m_logged_in = true;
+    m_filter &= ~LoginRequest;
+    m_filter |= WaitingForSeeks;
 }
 
 void Engine::sendCommand(AbstractCommand *command)

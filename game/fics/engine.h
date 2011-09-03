@@ -59,6 +59,8 @@ private:
     QString m_password;
     MessageFilterFlags m_filter;
     bool m_enabled;
+    bool m_logged_in;
+    bool m_past_welcome_screen;
     QTimer m_login_abort_timer;
     QVector<char> m_extra_delimiter;
     uint m_current_game_id; // The game we currently play on FICS.
@@ -72,6 +74,7 @@ public:
     virtual void setEnabled(bool enable);
     virtual void login(const QString &username,
                        const QString &password);
+    virtual void logout();
     virtual void seek(uint time,
                       uint increment,
                       Rating rating,
@@ -90,6 +93,7 @@ private:
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
     void configurePrompt();
+    void finalizeLogin();
     void sendCommand(AbstractCommand *command);
 };
 
