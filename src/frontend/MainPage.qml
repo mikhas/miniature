@@ -13,9 +13,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         onLoginFailed: {
             busyLogin.visible = false
             busyLogin.running = false
-            loginErrorBkg.visible = true
-            loginError.visible = true
-            loginError.text = "Wrong"
+            loginErrorBkgAnimation.restart()
+            loginErrorAnimation.restart()
             idForm.text = ""
             idPassword.text = ""
         }
@@ -89,9 +88,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     // Login error message
     Rectangle {
         id: loginErrorBkg
-        color: "red"
-        opacity: 0.5
-        visible: false
+        color: "transparent"
+        // opacity: 0.5
         radius: 10
         anchors {
             top: idForm.top
@@ -103,18 +101,29 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             right: anonymousButton.right
             rightMargin: -10
         }
+        SequentialAnimation on color {
+            id: loginErrorBkgAnimation
+            running: false
+            ColorAnimation { from: "red"; to: "red"; duration: 1000 }
+            ColorAnimation { from: "red"; to: "transparent"; duration: 1000; easing.type: Easing.OutQuart }
+        }
     }
 
     Text {
         id: loginError
-        text:  ""
+        text:  "Wrong"
         font.pointSize: 20
-        color: "white"
-        visible: false
+        color: "transparent"
         anchors {
             top: loginErrorBkg.top
             topMargin: 8
             horizontalCenter: parent.horizontalCenter
+        }
+        SequentialAnimation on color {
+            id: loginErrorAnimation
+            running: false
+            ColorAnimation { from: "white"; to: "white"; duration: 1000 }
+            ColorAnimation { from: "white"; to: "transparent"; duration: 1000; easing.type: Easing.OutQuart }
         }
     }
 
