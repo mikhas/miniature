@@ -11,6 +11,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Connections {
         target: miniature
         onLoginFailed: {
+            busyLogin.visible = false
+            busyLogin.running = false
             loginErrorBkg.visible = true
             loginError.visible = true
             loginError.text = "Wrong"
@@ -19,6 +21,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         }
 
         onLoginSucceeded: {
+            busyLogin.visible = false
+            busyLogin.running = false
             loadScreen("SeekGame.qml")
         }
     }
@@ -45,6 +49,16 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         width: parent.width
         height: 70
         anchors.top: parent.top
+
+        BusyIndicator {
+            id: busyLogin
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            // FIXME ideally this should be color white but I can't find the way to go away from default grey
+            visible: false
+            running: false
+        }
     }
 
     Text {
@@ -66,6 +80,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
+            busyLogin.visible = true
+            busyLogin.running = true
             miniature.login("guest", "")
         }
     }
@@ -130,6 +146,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
         onClicked: {
+            busyLogin.visible = true
+            busyLogin.running = true
             miniature.login(idForm.text, idPassword.text)
         }
     }
