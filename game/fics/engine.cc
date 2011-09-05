@@ -57,6 +57,14 @@ namespace {
         QByteArray move;
     };
 
+    struct GameAborted
+    {
+        bool valid;
+        uint id;
+        QByteArray player_name;
+        Game::Result result;
+    };
+
     const char * const login_prompt("login");
     const char * const password_prompt("password");
     const char * const fics_prompt("fics");
@@ -65,6 +73,10 @@ namespace {
 
     // %1 is a placeholder the game ad id.
     const QString play_command("play %1\n");
+
+    // Matches: '{Game 266 (gzest vs. GuestJTXB) GuestJTXB forfeits by disconnection} 1-0'
+    const QRegExp match_forfeit_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
+                                              "\\s+(\\w+)\\s+forfeits by disconnection\\}\\s+([012/-]+)");
 
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
@@ -316,6 +328,35 @@ namespace {
         return im;
     }
 
+    // TODO: also parse other instances that can lead to aborted games (currently only disconnect).
+    GameAborted parseGameAborted(const QByteArray &token)
+    {
+        GameAborted result;
+
+        result.valid = match_forfeit_by_disconnect.exactMatch(token);
+        if (not result.valid) {
+            return result;
+        }
+
+        bool converted = false;
+        result.id = match_forfeit_by_disconnect.cap(1).toUInt(&converted);
+        result.valid = result.valid && converted;
+        result.player_name = match_forfeit_by_disconnect.cap(2).toLatin1();
+
+        const QString &r(match_forfeit_by_disconnect.cap(3));
+        if (r == "1-0") {
+            result.result = Game::ResultWhiteWins;
+        } else if (r == "1/2-1/2") {
+            result.result = Game::ResultDraw;
+        } else if (r == "0-1") {
+            result.result = Game::ResultBlackWins;
+        } else {
+            result.valid = false;
+        }
+
+        return result;
+    }
+
     void debugOutput(const Game::Seek s)
     {
         qDebug() << s.valid
@@ -518,6 +559,11 @@ void Engine::processToken(const QByteArray &token)
             if (im.valid) {
                 Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
                 sendCommand(&imc);
+            } else {
+                const GameAborted &ga(parseGameAborted(token));
+                if (ga.valid) {
+                    // TODO: send command
+                }
             }
         }
     }

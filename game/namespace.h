@@ -96,6 +96,12 @@ enum Rating {
     RatingDisabled
 };
 
+enum Result {
+    ResultWhiteWins,
+    ResultBlackWins,
+    ResultDraw
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)
@@ -104,5 +110,7 @@ Q_DECLARE_METATYPE(Game::Mode)
 Q_DECLARE_METATYPE(Game::Promotion)
 Q_DECLARE_METATYPE(Game::Color)
 Q_DECLARE_METATYPE(Game::LocalSideColor)
+Q_DECLARE_METATYPE(Game::Rating)
+Q_DECLARE_METATYPE(Game::Result)
 
 #endif // NAMESPACE_H
