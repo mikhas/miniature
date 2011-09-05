@@ -396,8 +396,9 @@ void Engine::login(const QString &username,
         return;
     }
 
-    m_username = username;
-    m_password = password;
+    // Prevent FICS from tripping over trailing whitespace:
+    m_username = username.trimmed();
+    m_password = password.trimmed();
 
     m_extra_delimiter.clear();
     m_extra_delimiter.append(':');
@@ -574,13 +575,20 @@ void Engine::processLogin(const QByteArray &line)
         m_channel.write("\n");
     } else if (match_confirm_login.exactMatch(line)) {
         m_login_abort_timer.stop();
-        m_login_abort_timer.start();
-        // Confirm login:
-        m_channel.write("\n");
-        configurePrompt();
 
-        if (m_username == "guest") {
+        // Was it an attempt to login as a registered user?
+        if (not m_password.isEmpty()) {
+            // FICS does not allow us to recover from this, we have to reset the connection:
+            m_channel.close();
+            Command::LoginFailed lf(TargetFrontend);
+            sendCommand(&lf);
+        } else {
+            m_login_abort_timer.start();
             m_username = match_confirm_login.cap(1);
+            m_password.clear();
+
+            // Confirm guest login:
+            m_channel.write("\n");
         }
     } else if (line.startsWith(fics_prompt)) {
         finalizeLogin();
@@ -609,7 +617,7 @@ void Engine::abortLogin()
 void Engine::reconnect()
 {}
 
-void Engine::configurePrompt()
+void Engine::configurePromptForParsing()
 {
     m_channel.write("set style 12");
     m_channel.write("\n");
@@ -628,6 +636,7 @@ void Engine::finalizeLogin()
     m_login_abort_timer.stop();
     m_extra_delimiter.clear();
 
+    configurePromptForParsing();
     Command::Login lc(TargetFrontend, m_username, "");
     sendCommand(&lc);
 
