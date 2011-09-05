@@ -63,7 +63,7 @@ private:
     bool m_logged_in;
     bool m_past_welcome_screen;
     uint m_login_count;
-    QTimer m_login_abort_timer;
+    QTimer m_login_abort_timer; // TODO: make this a general watchdog over the FICS connection.
     QVector<char> m_extra_delimiter;
     uint m_current_game_id; // The game we currently play on FICS.
     uint m_current_advertisment_id; // The ad id we have responed to.

@@ -557,6 +557,7 @@ void Engine::processLogin(const QByteArray &line)
 {
     // TODO: write dedicated login class?
     if (line.startsWith(login_prompt)) {
+        m_login_abort_timer.stop(); // TODO: find a less racy way.
         // Actually, login count will alternate between 0 and 1 ...
         if (m_login_count > 0) {
             Command::LoginFailed lf(TargetFrontend);
