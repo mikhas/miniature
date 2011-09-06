@@ -238,13 +238,23 @@ Page {
             font.family: "Courier"
             anchors.verticalCenter: opponentZone.verticalCenter
             anchors.right: opponentZone.right
-            anchors.rightMargin: 10
+            anchors.rightMargin: 30
 
             Timer  {
                 id: opponentTimer
                 interval: 1000; running: false; repeat: true;
                 onTriggered: opponentTime.milliseconds -= 1000
             }
+        }
+
+        Rectangle {
+            id: remoteMoves
+            color: "cornflowerblue"
+            width: 20
+            height: parent.height
+            anchors.right: parent.right
+            z: 50
+            visible: false
         }
     }
 
@@ -259,6 +269,7 @@ Page {
 
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
+            id: remoteCorners
             color: remoteSide.color
             width: parent.width
             height:  50
@@ -266,6 +277,7 @@ Page {
             z: -1
         }
         Rectangle {
+            id: localCorners
             color: localSide.color
             width: parent.width
             height:  50
@@ -364,13 +376,23 @@ Page {
             font.family: "Courier"
             anchors.verticalCenter: userZone.verticalCenter
             anchors.right: userZone.right
-            anchors.rightMargin: 10
+            anchors.rightMargin: 30
 
             Timer  {
                 id: userTimer
                 interval: 1000; running: false; repeat: true;
                 onTriggered: userTime.milliseconds -= 1000
             }
+        }
+
+        Rectangle {
+            id: localMoves
+            color: "cornflowerblue"
+            width: 20
+            height: parent.height
+            anchors.right: parent.right
+            z: 50
+            visible: false
         }
     }
 
@@ -420,8 +442,23 @@ Page {
                     if (checkMove.moveNumber === 3) { userTime.increment = 5000 ; opponentTime.increment = 5000 } // FIXME increments must be substituted by variables
                     if (checkMove.moveNumber > 1)
                     { if (userTimer.running === true)
-                        { userTime.milliseconds += userTime.increment ; userTimer.running = false ; opponentTimer.running = true }
-                        else { opponentTime.milliseconds += opponentTime.increment ; opponentTimer.running = false ; userTimer.running = true }}
+                        { userTime.milliseconds += userTime.increment
+                            userTimer.running = false
+                            opponentTimer.running = true
+                            localCorners.color = localSide.color
+                            remoteCorners.color = "cornflowerblue"
+                            localMoves.visible = false
+                            remoteMoves.visible = true
+                        }
+                        else { opponentTime.milliseconds += opponentTime.increment
+                            opponentTimer.running = false
+                            userTimer.running = true
+                            remoteCorners.color = remoteSide.color
+                            localCorners.color = "cornflowerblue"
+                            remoteMoves.visible = false
+                            localMoves.visible = true
+                        }
+                    }
                 }
             }
 
