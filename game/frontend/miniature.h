@@ -45,8 +45,11 @@ class Miniature
     Q_OBJECT
     Q_DISABLE_COPY(Miniature)
     Q_DECLARE_PRIVATE(Miniature)
+
     Q_ENUMS(Mode)
     Q_ENUMS(Rating)
+    Q_ENUMS(Result)
+    Q_ENUMS(Reason)
 
     Q_PROPERTY(Mode mode READ mode
                          WRITE setMode
@@ -74,6 +77,21 @@ public:
         RatingAny = ::Game::RatingAny,
         RatingEnabled = ::Game::RatingEnabled,
         RatingDisabled = ::Game::RatingDisabled
+    };
+
+    enum Result {
+        ResultWhiteWins = ::Game::ResultWhiteWins,
+        ResultBlackWins = ::Game::ResultBlackWins,
+        ResultDraw = ::Game::ResultDraw
+    };
+
+    enum Reason {
+        ReasonUnknown = ::Game::ReasonUnknown,
+        ReasonForfeitByDisconnect = ::Game::ReasonForfeitByDisconnect,
+        ReasonSurrendered = ::Game::ReasonSurrendered,
+        ReasonCheckmated = ::Game::ReasonCheckmated,
+        ReasonDrawAccpeted = ::Game::ReasonDrawAccpeted,
+        ReasonAdjourned = ::Game::ReasonAdjourned
     };
 
     explicit Miniature(Dispatcher *dispatcher,
@@ -145,6 +163,10 @@ public:
 
     //! Emitted when player responded to an invalid seek.
     Q_SIGNAL void seekCancelled();
+
+    //! Emitted when the active game was ended.
+    Q_SIGNAL void gameEnded(int result,
+                            int reason);
 
     //! Sets the active game.
     //! @param game the game.

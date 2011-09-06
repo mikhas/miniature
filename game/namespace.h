@@ -102,6 +102,15 @@ enum Result {
     ResultDraw
 };
 
+enum Reason {
+    ReasonUnknown,
+    ReasonForfeitByDisconnect,
+    ReasonSurrendered,
+    ReasonCheckmated,
+    ReasonDrawAccpeted,
+    ReasonAdjourned
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)
@@ -112,5 +121,6 @@ Q_DECLARE_METATYPE(Game::Color)
 Q_DECLARE_METATYPE(Game::LocalSideColor)
 Q_DECLARE_METATYPE(Game::Rating)
 Q_DECLARE_METATYPE(Game::Result)
+Q_DECLARE_METATYPE(Game::Reason)
 
 #endif // NAMESPACE_H

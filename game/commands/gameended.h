@@ -18,17 +18,39 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GAMEENDED_H
+#define GAMEENDED_H
+
+#include "namespace.h"
 #include "abstractcommand.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/loginfailed.h"
-#include "commands/advertisement.h"
-#include "commands/record.h"
-#include "commands/play.h"
-#include "commands/move.h"
-#include "commands/creategame.h"
-#include "commands/activategame.h"
-#include "commands/seek.h"
-#include "commands/invalidmove.h"
-#include "commands/invalidseek.h"
-#include "commands/gameended.h"
+
+#include <QtCore>
+
+namespace Game { namespace Command {
+
+class GameEnded
+    : public AbstractCommand
+{
+private:
+    uint m_game_id;
+    Result m_result;
+    Reason m_reason;
+    QByteArray m_player_name;
+
+public:
+    //! \reimp
+    explicit GameEnded(Target target,
+                       uint game_id,
+                       Result result,
+                       Reason reason,
+                       const QByteArray &player_name);
+    virtual ~GameEnded();
+
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
+};
+
+}} // namespace Command, Game
+
+#endif // GAMEENDED_H

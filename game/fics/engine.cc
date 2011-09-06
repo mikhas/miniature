@@ -57,12 +57,13 @@ namespace {
         QByteArray move;
     };
 
-    struct GameAborted
+    struct GameEnded
     {
         bool valid;
         uint id;
-        QByteArray player_name;
         Game::Result result;
+        Game::Reason reason;
+        QByteArray player_name;
     };
 
     const char * const login_prompt("login");
@@ -329,13 +330,16 @@ namespace {
     }
 
     // TODO: also parse other instances that can lead to aborted games (currently only disconnect).
-    GameAborted parseGameAborted(const QByteArray &token)
+    GameEnded parseGameEnded(const QByteArray &token)
     {
-        GameAborted result;
+        GameEnded result;
+        result.reason = Game::ReasonUnknown;
 
         result.valid = match_forfeit_by_disconnect.exactMatch(token);
         if (not result.valid) {
             return result;
+        } else {
+            result.reason = Game::ReasonForfeitByDisconnect;
         }
 
         bool converted = false;
@@ -560,9 +564,17 @@ void Engine::processToken(const QByteArray &token)
                 Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
                 sendCommand(&imc);
             } else {
-                const GameAborted &ga(parseGameAborted(token));
-                if (ga.valid) {
-                    // TODO: send command
+                const GameEnded &ge(parseGameEnded(token));
+                if (ge.valid) {
+                    if (ge.id != m_current_game_id) {
+                        qWarning() << __PRETTY_FUNCTION__
+                                   << "Received aborted-game message, but id's don't match:"
+                                   << ge.id << "but expected" << m_current_game_id;
+                    } else {
+                        Command::GameEnded gec(TargetFrontend, m_current_game_id,
+                                               ge.result, ge.reason, ge.player_name);
+                        sendCommand(&gec);
+                    }
                 }
             }
         }
