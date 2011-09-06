@@ -434,10 +434,17 @@ Page {
     // Signals and their dialogs
 
     Connections {
+        id: gameResolutions
         target: miniature
-        onGameEnded: { // HELP: can't find the variable reporting the reason and result of gameEnded
-            console.log(miniature.gameEnded.reason + " " + miniature.gameEnded.result + " " + miniature.reason + " " + miniature.result )
-            remotedisconnectsDialog.open()
+        property string winnerIs
+        onGameEnded: {
+
+            if (result == Miniature.ResultWhiteWins) { gameResolutions.winnerIs = "White wins" }
+            if (result == Miniature.ResultBlackWins) { gameResolutions.winnerIs = "Black wins" }
+            if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
+
+            if (reason == Miniature.ReasonForfeitByDisconnect)
+                remotedisconnectsDialog.open()
         }
     }
 
@@ -531,7 +538,7 @@ Page {
     QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
         id: remotedisconnectsDialog
         titleText: "Bye bye!"
-        message:  "Your opponent, " + remoteSide.id + ", has lost contact or quit.\nResult: " + miniature.result
+        message:  remoteSide.id + " vanished.\n\nResult: " + gameResolutions.winnerIs
         acceptButtonText: "OK"
         onAccepted: {
             pageStack.pop()
