@@ -431,7 +431,16 @@ Page {
         }
     }
 
-    // Dialogs
+    // Signals and their dialogs
+
+    Connections {
+        target: miniature
+        onGameEnded: { // HELP: can't find the variable reporting the reason and result of gameEnded
+            console.log(miniature.gameEnded.reason + " " + miniature.gameEnded.result + " " + miniature.reason + " " + miniature.result )
+            remotedisconnectsDialog.open()
+        }
+    }
+
 
     QueryDialog { // Confirm resign
         id: resignDialog
@@ -516,6 +525,16 @@ Page {
         rejectButtonText: "Close app"
         onRejected: {
             // FIXME how to close the app?
+        }
+    }
+
+    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
+        id: remotedisconnectsDialog
+        titleText: "Bye bye!"
+        message:  "Your opponent, " + remoteSide.id + ", has lost contact or quit.\nResult: " + miniature.result
+        acceptButtonText: "OK"
+        onAccepted: {
+            pageStack.pop()
         }
     }
 }
