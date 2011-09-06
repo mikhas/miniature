@@ -31,6 +31,13 @@
 #include <QtTest>
 
 namespace Game { namespace {
+    void acceptAllMessages(Fics::Engine *fics) {
+        fics->setMessageFilter(Fics::Engine::MessageFilterFlags(Fics::Engine::WaitingForGames
+                                                                | Fics::Engine::WaitingForSeeks
+                                                                | Fics::Engine::InGame
+                                                                | Fics::Engine::PlayRequest));
+    }
+
     bool loadIntoCache(const QString &fileName,
                        QVector<QByteArray> *cache)
     {
@@ -99,7 +106,7 @@ private:
     QScopedPointer<QApplication> m_app;
     QVector<QByteArray> m_session_log;
     QVector<QByteArray> m_play_log;
-    QTextStream m_out;
+    QVector<QByteArray> m_commands_log;
 
     Q_SLOT void initTestCase()
     {
@@ -107,6 +114,7 @@ private:
 
         QVERIFY(loadIntoCache(MINIATURE_FICS_SESSION_LOG, &m_session_log));
         QVERIFY(loadIntoCache(MINIATURE_FICS_PLAY_LOG, &m_play_log));
+        QVERIFY(loadIntoCache(MINIATURE_FICS_COMMANDS_LOG, &m_commands_log));
     }
 
     Q_SLOT void testParsing()
@@ -120,13 +128,11 @@ private:
 
         DummyFrontend frontend(&dispatcher);
         dispatcher.setFrontend(&frontend);
+        acceptAllMessages(fics);
 
         QCOMPARE(frontend.m_received_records.size(), 0);
         QCOMPARE(frontend.m_received_seeks.size(), 0);
 
-        fics->setMessageFilter(Fics::Engine::MessageFilterFlags(Fics::Engine::WaitingForGames
-                                                                | Fics::Engine::WaitingForSeeks
-                                                                | Fics::Engine::InGame));
         fics->processToken(m_session_log.at(15));
         QCOMPARE(frontend.m_received_records.size(), 0);
 
@@ -164,6 +170,26 @@ private:
         QVERIFY(not game->position().pieceAt(toSquare("f6")).valid());
         QCOMPARE(game->position().pieceAt(toSquare("f2")),
                  Piece(Piece::Pawn, ColorWhite, toSquare("f2")));
+
+        // TODO: turn parsing of FICS commands into data-driven tests,
+        // dont use session or play logs for parsing tests.
+        acceptAllMessages(fics);
+        QSignalSpy game_started(&frontend, SIGNAL(gameStarted()));
+        QSignalSpy game_ended(&frontend, SIGNAL(gameEnded(int,int)));
+
+        fics->processToken(m_commands_log.at(0));
+        fics->processToken(m_commands_log.at(1));
+        fics->processToken(m_commands_log.at(3));
+
+        TestUtils::waitForSignal(&frontend, SIGNAL(gameEnded(int,int)));
+        QCOMPARE(game_started.count(), 1);
+        QCOMPARE(game_ended.count(), 1);
+
+        const QList<QVariant> &signal_args(game_ended.takeFirst());
+        QCOMPARE(signal_args.at(0).toInt(),
+                 static_cast<int>(ResultWhiteWins));
+        QCOMPARE(signal_args.at(1).toInt(),
+                 static_cast<int>(ReasonForfeitByDisconnect));
     }
 };
 
