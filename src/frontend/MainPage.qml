@@ -16,6 +16,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             loginErrorBkgAnimation.restart()
             loginErrorAnimation.restart()
             idForm.text = ""
+            idForm.focus = true
             idPassword.text = ""
         }
 
@@ -135,6 +136,9 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.topMargin: 70
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
+        Keys.onReturnPressed: {
+            idPassword.focus = true
+        }
     }
 
     TextField {
@@ -145,6 +149,11 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.topMargin: 5
         anchors.left: anonymousButton.left
         anchors.right: anonymousButton.right
+        Keys.onReturnPressed: {
+            busyLogin.visible = true
+            busyLogin.running = true
+            miniature.login(idForm.text, idPassword.text)
+        }
     }
 
     Button {
