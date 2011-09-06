@@ -79,6 +79,14 @@ namespace {
     const QRegExp match_forfeit_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
                                               "\\s+(\\w+)\\s+forfeits by disconnection\\}\\s+([012/-]+)");
 
+    // Matches: '{Game 53 (QuimGil vs. MiniatureTest) QuimGil lost connection and too few moves; game aborted} *'
+    const QRegExp match_aborted_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
+                                              "\\s+(\\w+)\\s+lost connection and too few moves; game aborted\\}\\s+\\*\\");
+
+    // Matches: '{Game 506 (QuimGil vs. MiniatureTest) QuimGil lost connection; game adjourned} *'
+    const QRegExp match_adjourned_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
+                                              "\\s+(\\w+)\\s+lost connection; game adjourned\\}\\s+\\*\\");
+    
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
 
