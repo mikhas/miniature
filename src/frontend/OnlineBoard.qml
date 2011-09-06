@@ -96,7 +96,7 @@ Page {
             anchors.leftMargin: 10
             anchors.rightMargin: 10
             clip: true
-//            lineHeight: 1.5 // // commenting out for MeeGo CE in N900 compatibility
+            //            lineHeight: 1.5 // // commenting out for MeeGo CE in N900 compatibility
             wrapMode: Text.Wrap
             verticalAlignment: Text.AlignBottom
 
@@ -255,7 +255,7 @@ Page {
         source: "chessboard.svg"
         anchors.bottom: userZone.top
         width: parent.width
-//        fillMode: Image.PreserveAspectFit // commenting out for MeeGo CE in N900 compatibility
+        //        fillMode: Image.PreserveAspectFit // commenting out for MeeGo CE in N900 compatibility
 
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
@@ -399,9 +399,9 @@ Page {
                         MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
                         MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
                         MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
-                            miniature.logout()
-                            loadScreen("MainPage.qml")
-                        }}
+                                miniature.logout()
+                                pageStack.pop(null)
+                            }}
                     }
                 }
             }
@@ -425,9 +425,9 @@ Page {
                 }
             }
 
-//            ToolIcon { // FIXME Settings page pending
-//                iconId: "toolbar-view-menu"
-//            }
+            //            ToolIcon { // FIXME Settings page pending
+            //                iconId: "toolbar-view-menu"
+            //            }
         }
     }
 
@@ -501,7 +501,7 @@ Page {
         }
         rejectButtonText: "Find other players"
         onRejected: {
-            loadScreen("SeekGame.qml")
+            pageStack.pop()
         }
     }
 

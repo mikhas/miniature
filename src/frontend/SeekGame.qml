@@ -536,7 +536,7 @@ Page {
         }
     }
 
-    // Toolbar at the bottom of the page - probably this needs to be part of a stacked page
+    // Toolbar at the bottom of the page
     ToolBar {
         id: seekToolbar
         anchors.bottom: parent.bottom
@@ -546,7 +546,7 @@ Page {
                 iconId: "toolbar-back";
                 onClicked: {
                     miniature.logout()
-                    loadScreen("MainPage.qml")
+                    pageStack.pop(null)
                 }
             }
 

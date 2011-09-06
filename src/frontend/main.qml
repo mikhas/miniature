@@ -5,38 +5,22 @@ PageStackWindow {
     id: appWindow
     initialPage: MainPage { }
 
-    // Still figuring out the app navigation. We need icons to replace these buttons.
-
-    // ToolBarLayout {
-    //    id: gameTypes
-    //    visible: false
-
-        // ToolIcon { iconId: "toolbar-back"; }
-        // ToolButton { text: "Online"; }
-        // ToolButton { text: "P2P"; }
-        // ToolButton { text: "F2F"; }
-        // ToolIcon { iconId: "toolbar-view-menu" }
-
-    // Borrowed function to jump from one qml file to another. There must be a simpler way?
-
-    function loadScreen(f_ScreenName)
-    {
+    // Funtion to push pages cleanly to the PageStack
+    function loadScreen(f_ScreenName) {
         var component = Qt.createComponent(f_ScreenName);
-
-        // FIXME: Actually, we are supposed to pop the pages from this very stack
-        // whenever we return from a page. Currently, we just keep reloading
-        // components ... leads to problems when same page is loaded twice!
-        // This hack removes any component with f_ScreenName before the push,
-        // ensuring that each page only exists once.
-        if (component.status == Component.Ready) {
-            pageStack.pop(pageStack.find(function(component) {
-                return component.name == "f_ScreenName";
-            }));
-
+        if (component.status == Component.Ready)
             pageStack.push(component);
-        } else {
-            console.log("Error loading component:", component.errorString());
-        }
+        else console.log("Error loading component:", component.errorString())
     }
 
+//    // Function available to go back to a specific page of the stack other that the previous one or the first
+//    // (commented because it is not used anywhere yet)
+//    // To go back one page just use pageStack.pop()
+//    // To go to the initial page just use pageStack.pop(null)
+//    function backScreen(b_ScreenName) {
+//        var component = Qt.createComponent(b_ScreenName);
+//        if (component.status == Component.Ready)
+//            pageStack.pop(component);
+//        else console.log("Error loading component:", component.errorString())
+//    }
 }
