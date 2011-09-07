@@ -112,6 +112,9 @@ private:
     {
         m_app.reset(TestUtils::createApp("testfics"));
 
+        // TODO: Introduce label suport for files, so that I can load a specific
+        // scenario from a file (that's what I actually want, instead of having
+        // too many different files.
         QVERIFY(loadIntoCache(MINIATURE_FICS_SESSION_LOG, &m_session_log));
         QVERIFY(loadIntoCache(MINIATURE_FICS_PLAY_LOG, &m_play_log));
         QVERIFY(loadIntoCache(MINIATURE_FICS_COMMANDS_LOG, &m_commands_log));
@@ -190,6 +193,23 @@ private:
                  static_cast<int>(ResultWhiteWins));
         QCOMPARE(signal_args.at(1).toInt(),
                  static_cast<int>(ReasonForfeitByDisconnect));
+
+        acceptAllMessages(fics);
+
+        fics->processToken(m_commands_log.at(6));
+        game = registry->game(92u);
+        QVERIFY(game);
+        QCOMPARE(game->id(), 92u);
+
+        fics->processToken(m_commands_log.at(7));
+        QCOMPARE(game->position().movedPiece().type(), Piece::King);
+        QCOMPARE(game->position().movedPiece().origin(), toSquare("e8"));
+        QCOMPARE(game->position().movedPiece().target(), toSquare("g8"));
+
+        fics->processToken(m_commands_log.at(8));
+        QCOMPARE(game->position().movedPiece().type(), Piece::King);
+        QCOMPARE(game->position().movedPiece().origin(), toSquare("e1"));
+        QCOMPARE(game->position().movedPiece().target(), toSquare("c1"));
     }
 };
 

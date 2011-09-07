@@ -96,6 +96,12 @@ namespace {
     // Matches: "P/g2-g4"
     const QRegExp match_move("(\\w)/(\\w\\d)-(\\w\\d)");
 
+    // Matches: "o-o", "O-O", "0-0"
+    const QRegExp match_short_castling("(o|O|0)-(o|O|0)");
+
+    // Matches: "o-o-o", "O-O-O", "0-0-0"
+    const QRegExp match_long_castling("(o|O|0)-(o|O|0)-(o|O|0)");
+
     // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
     const QRegExp match_create_game("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
                                     "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
@@ -278,21 +284,44 @@ namespace {
         result.role = static_cast<GameUpdate::Role>(cols.at(19).toInt(&converted));
         result.valid = result.valid && converted;
 
-        result.valid = result.valid && match_move.exactMatch(cols.at(27));
+        Game::Position &pos = result.position;
+        pos.setNextToMove(cols.at(9) == "W" ? Game::ColorWhite : Game::ColorBlack);
 
         int dpp_file = cols.at(19).toInt(&converted);
         result.valid = result.valid && converted;
 
-        Game::Position &pos = result.position;
         pos.setDoublePawnPush(dpp_file == -1 ? Game::FileCount : static_cast<Game::File>(dpp_file));
-        pos.setNextToMove(cols.at(9) == "W" ? Game::ColorWhite : Game::ColorBlack);
 
-        // The move notation is always capital and does not encode the color of the piece ...
-        Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0),
-                                    pos.nextToMove() == Game::ColorWhite ? Game::ColorBlack
-                                                                         : Game::ColorWhite));
-        p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
-        pos.setMovedPiece(Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1())));
+        const Game::Color moved_color(pos.nextToMove() == Game::ColorWhite ? Game::ColorBlack
+                                                                           : Game::ColorWhite);
+
+        const bool regular_move(match_move.exactMatch(cols.at(27)));
+        if (not regular_move) {
+
+            // Normalize castlings into king moves:
+            const Game::Square king_origin(Game::toSquare(moved_color == Game::ColorWhite ? "e1" : "e8"));
+            const Game::Square king_target_short(Game::toSquare(moved_color == Game::ColorWhite ? "g1" : "g8"));
+            const Game::Square king_target_long(Game::toSquare(moved_color == Game::ColorWhite ? "c1" : "c8"));
+
+            if (match_short_castling.exactMatch(cols.at(27))) {
+                Game::Piece p(Game::Piece::King, moved_color, king_target_short);
+                pos.setMovedPiece(Game::MovedPiece(p, king_origin));
+            } else if (match_long_castling.exactMatch(cols.at(27))) {
+                Game::Piece p(Game::Piece::King, moved_color, king_target_long);
+                pos.setMovedPiece(Game::MovedPiece(p, king_origin));
+            } else {
+                result.valid = false;
+            }
+        } else {
+            // The move notation is always (except for castlings) capital and
+            // does not encode the color of the piece ...
+            Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0),
+                                        pos.nextToMove() == Game::ColorWhite ? Game::ColorBlack
+                                                                             : Game::ColorWhite));
+
+            p.setSquare(Game::toSquare(match_move.cap(3).toLatin1()));
+            pos.setMovedPiece(Game::MovedPiece(p, Game::toSquare(match_move.cap(2).toLatin1())));
+        }
 
         Game::Position::CastlingFlags flags;
 

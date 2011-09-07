@@ -2,3 +2,8 @@
 <12> rnbqkbnr pppppppp -------- -------- -------- -------- PPPPPPPP RNBQKBNR W -1 1 1 1 1 0 414 GuestKSHN testonetwo 1 999 999 39 39 36000 36000 1 none (0:00) none 0 0 0
 {Game 414 (GuestKSHN vs. testonetwo) Game drawn by mutual agreement} 1/2-1/2
 {Game 414 (GuestKSHN vs. testonetwo) testonetwo forfeits by disconnection} 1-0
+
+### Castling
+{Game 92 (GuestXKCH vs. testPLEASEIGNORE) Creating unrated standard match.}
+<12> rnbq-rk- pppppppp -------- -------- -------- -------- PPPPPPPP RNBQKBNR W -1 0 0 0 0 8 92 GuestXKCH testPLEASEIGNORE -1 57 58 39 39 3618 3641 6 o-o (0:00) O-O 0 1 0
+<12> rnbq-rk- pppppppp -------- -------- -------- -------- PPPPPPPP --KR-BNR B -1 0 0 0 0 8 92 GuestXKCH testPLEASEIGNORE 1 57 58 39 39 3618 3641 6 o-o-o (0:00) O-O-O 0 1 0
