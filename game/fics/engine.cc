@@ -111,6 +111,9 @@ namespace {
                                "\\s+(\\d+):(\\d+)\\s+\\-\\s+(\\d+):(\\d+)\\s+"
                                "\\((\\d+)\\-(\\d+)\\)\\s+(\\w):\\s+(\\d+)");
 
+   // Matches "testPLEASEIGNORE declines the match offer."
+    const QRegExp match_declines_match_offer("\\s*(\\w+)\\s+declines the match offer.");
+
     QString fromColor(Game::Color c)
     {
         switch (c) {
@@ -550,7 +553,13 @@ void Engine::processToken(const QByteArray &token)
             m_filter |= InGame;
             m_filter &= ~WaitingForSeeks;
             m_filter &= ~PlayRequest;
-        } else if (token.contains(seek_not_available)) {
+        } if (token.contains(seek_not_available)) {
+            Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
+            sendCommand(&is);
+
+            m_filter |= WaitingForSeeks;
+            m_filter &= ~PlayRequest;
+        } else if (match_declines_match_offer.exactMatch(token)) {
             Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
             sendCommand(&is);
 

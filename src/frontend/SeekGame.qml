@@ -6,10 +6,20 @@ Page {
     id: ficsSeekGame
     orientationLock: PageOrientation.LockPortrait
 
+    property int selectedIndex: -1
+
     Connections {
         target: miniature
-        onGameStarted: loadScreen("OnlineBoard.qml")
+        onGameStarted: {
+            availableSeeks.removeAll()
+            loadScreen("OnlineBoard.qml")
+        }
+        onSeekCancelled: {
+            seekCancelledAnimation.restart()
+            availableSeeks.remove(ficsSeekGame.selectedIndex)
+        }
     }
+
 
     // Generic app window style
 
@@ -29,7 +39,7 @@ Page {
         anchors.top: parent.top
 
         Text {
-            id: typeChess
+            id: seektypeChess
             text: "Standard" // FIXME onPress Suicide, Bughouse, etc
             font.family: "Nokia Pure Headline"
             font.pointSize: 28
@@ -276,6 +286,7 @@ Page {
                     MouseArea {
                         anchors.fill:  parent
                         onClicked: {
+                            ficsSeekGame.selectedIndex = index
                             miniature.toggleGameAdvertisementHighlighting(model.id)
                             miniature.play(model.id) // FIXME here goes an instruction to send the response to the selected challenge
                             // FIXME note that selecting a new seek implies that the old response is cancelled/withdrawn
@@ -293,21 +304,6 @@ Page {
                         verticalCenter: parent.verticalCenter
                         right: parent.right
                         rightMargin: -((parent.width * 0.25) + 10)
-                    }
-
-                    Connections {
-                        target: miniature
-                        onSeekCancelled: {
-                            visible = false
-                            spinner.running = false
-                            model.remove(model.id)
-                        }
-
-                        onGameStarted: {
-                            visible = false
-                            spinner.running = false
-                            model.remove(model.id)
-                        }
                     }
 
                     BusyIndicator {
@@ -359,6 +355,13 @@ Page {
             font.pointSize: 40
             color: "whitesmoke"
             anchors.centerIn: parent
+
+            SequentialAnimation on color {
+                id: seekCancelledAnimation
+                running: false
+                ColorAnimation { from: "red"; to: "red"; duration: 1000 }
+                ColorAnimation { from: "red"; to: "whitesmoke"; duration: 1000; easing.type: Easing.OutQuart }
+            }
         }
     }
 
