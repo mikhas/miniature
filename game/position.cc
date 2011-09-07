@@ -349,9 +349,9 @@ void Position::clearSquare(const Square &square)
 QString moveNotation(const MovedPiece &moved_piece)
 {
     if (isWhiteCastlingLong(moved_piece) || isBlackCastlingLong(moved_piece)) {
-        return "0-0-0";
+        return "o-o-o";
     } else if (isWhiteCastlingShort(moved_piece) || isBlackCastlingShort(moved_piece)) {
-        return "0-0";
+        return "o-o";
     }
 
     // TODO: This is gnuchess-style notation, allow for different types?
