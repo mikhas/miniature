@@ -195,6 +195,21 @@ Piece MovedPiece::piece() const
     return m_piece;
 }
 
+bool MovedPiece::valid() const
+{
+    return m_piece.valid();
+}
+
+Piece::Type MovedPiece::type() const
+{
+    return m_piece.type();
+}
+
+Color MovedPiece::color() const
+{
+    return m_piece.color();
+}
+
 Square MovedPiece::origin() const
 {
     return m_origin;

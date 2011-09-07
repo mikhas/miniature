@@ -76,6 +76,10 @@ public:
                         const Square &origin);
 
     Piece piece() const;
+    bool valid() const;
+    Piece::Type type() const;
+    Color color() const;
+
     Square origin() const;
     Square target() const;
 };
