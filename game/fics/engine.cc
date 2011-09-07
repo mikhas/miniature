@@ -585,19 +585,9 @@ void Engine::processToken(const QByteArray &token)
             m_filter |= InGame;
             m_filter &= ~WaitingForSeeks;
             m_filter &= ~PlayRequest;
-        } if (token.contains(seek_not_available)) {
-            Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
-            sendCommand(&is);
-
-            m_filter |= WaitingForSeeks;
-            m_filter &= ~PlayRequest;
-        } if (match_declines_match_offer.exactMatch(token)) {
-            Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
-            sendCommand(&is);
-
-            m_filter |= WaitingForSeeks;
-            m_filter &= ~PlayRequest;
-        } else if (match_has_departed.exactMatch(token)) {
+        } else if (token.contains(seek_not_available)
+              || match_declines_match_offer.exactMatch(token)
+              || match_has_departed.exactMatch(token)) {
             Command::InvalidSeek is(TargetFrontend, m_current_advertisment_id);
             sendCommand(&is);
 
