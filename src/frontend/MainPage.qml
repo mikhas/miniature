@@ -69,6 +69,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         width: parent.width
         height: 70
         anchors.top: parent.top
+        z: 25
 
         BusyIndicator {
             id: busyLogin
@@ -83,7 +84,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Text {
         id: poormansHeader
-        text: "Play online - FICS"
+        text: "Miniature"
         font.family: "Nokia Pure Headline"
         font.pointSize: 28
         color: "white"
@@ -91,6 +92,21 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.bottomMargin: 10
         anchors.left: parent.left
         anchors.leftMargin: 10
+        z: 30
+    }
+
+    Text {
+        id: poormansHeaderVersion
+        text: "0.4"
+        font.family: "Nokia Pure Headline"
+        font.pointSize: 28
+        color: "white"
+        anchors.bottom: headerBackground.bottom
+        anchors.bottomMargin: 10
+        anchors.left: poormansHeader.right
+        anchors.leftMargin: 15
+        visible: false
+        z: 30
     }
 
     Button {
@@ -200,23 +216,6 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         onClicked: { Qt.openUrlExternally("http://www.freechess.org/cgi-bin/Register/FICS_register.cgi") }
     }
 
-    Text {
-        id: ficsDescription
-        text: "The Miniature Project"
-        font.pointSize: 20
-        font.underline: true
-        color: "white"
-        height: 40
-        verticalAlignment: Text.AlignVCenter
-        anchors {
-            top: registerButton.bottom
-            topMargin: 200
-            horizontalCenter: parent.horizontalCenter
-        }
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Qt.openUrlExternally("http://wiki.maemo.org/Miniature") }
-    }
 
     Button { // Toggle between testing mode and real mode - to be commented in releases
         id: testingButton
@@ -225,12 +224,110 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         checkable: true
         checked: miniature.mode == Miniature.TestFicsMode
         opacity: 0.8
-        anchors.top: registerButton.bottom
-        anchors.topMargin: 100
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 30
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
                                                     : Miniature.FicsMode)
+        }
+    }
+
+    Rectangle {
+        id: aboutMiniature
+        width: parent.width
+        anchors.top: headerBackground.bottom
+        anchors.bottom: parent.bottom
+        color: "black"
+        visible: false
+
+        Image {
+            id: board
+            source: "chessboard.svg"
+            width: parent.width * 0.8
+            height: parent.width * 0.8
+            anchors.top: parent.top
+            anchors.topMargin: -(board.width / 2)
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            Image {
+                source: "miniatureMedium.png"
+                width: 150
+                height: 150
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+            }
+        }
+
+        Text {
+            id: chatLog
+            width: parent.width
+            anchors.top: board.bottom
+            anchors.topMargin: 30
+            color: "white"
+            text: "Miniature is free software developed openly by volunteers and distributed with the GPLv2 license. " +
+                  "We welcome your feedback and contributions!\n\n" +
+                  "Special thanks to Colin M.L. Burnett for his free chess set used by Wikipedia.\n\n" +
+                  "(C) 2011 Michael Hasselmann & Quim Gil"
+            font.pointSize: 16
+            horizontalAlignment: Text.AlignHCenter
+            clip: true
+            lineHeight: 1.5
+            wrapMode: Text.Wrap
+        }
+
+        Text {
+            id: miniatureMail
+            text: "info@miniature-chess.org"
+            font.pointSize: 20
+            font.underline: true
+            color: "white"
+            height: 40
+            anchors {
+                bottom: miniatureURL.top
+                bottomMargin: 15
+                horizontalCenter: parent.horizontalCenter
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: Qt.openUrlExternally("mailto:info@miniature-chess.org") }
+        }
+
+        Text {
+            id: miniatureURL
+            text: "miniature-chess.org"
+            font.pointSize: 20
+            font.underline: true
+            color: "white"
+            height: 40
+            anchors {
+                bottom: parent.bottom
+                bottomMargin: 10
+                horizontalCenter: parent.horizontalCenter
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: Qt.openUrlExternally("http://miniature-chess.org") }
+        }
+    }
+
+    Button {
+        id: aboutButton
+        checkable: true
+        text: "i"
+        width: 50
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: 125
+            horizontalCenter: parent.horizontalCenter
+        }
+        onClicked: {
+            if (aboutButton.checked == true) {
+                aboutMiniature.visible = true
+                poormansHeaderVersion.visible = true }
+            else { aboutMiniature.visible = false
+                poormansHeaderVersion.visible = false }
         }
     }
 }

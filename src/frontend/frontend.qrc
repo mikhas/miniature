@@ -19,5 +19,6 @@
         <file>black/queen.png</file>
         <file>black/bishop.png</file>
         <file>miniatureBIG.png</file>
+        <file>miniatureMedium.png</file>
     </qresource>
 </RCC>
