@@ -97,10 +97,11 @@ enum Rating {
 };
 
 enum Result {
-    ResultUnknown,
     ResultWhiteWins,
     ResultBlackWins,
-    ResultDraw
+    ResultDraw,
+    ResultUnknown,
+    ResultAdjourned
 };
 
 enum Reason {

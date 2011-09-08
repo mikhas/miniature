@@ -499,12 +499,13 @@ Page {
             if (result == Miniature.ResultWhiteWins) { gameResolutions.winnerIs = "White wins" }
             if (result == Miniature.ResultBlackWins) { gameResolutions.winnerIs = "Black wins" }
             if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
+            if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
+            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
 
-            if (reason == Miniature.ReasonForfeitByDisconnect)
-                remotedisconnectsDialog.open()
-        }
+            if (reason == Miniature.ReasonForfeitByDisconnect || Miniature.ReasonAbortedByDisconnect || Miniature.ReasonAdjournedByDisconnect)
+            {remotedisconnectsDialog.open()}
+           }
     }
-
 
     QueryDialog { // Confirm resign
         id: resignDialog

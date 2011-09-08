@@ -81,11 +81,11 @@ namespace {
 
     // Matches: '{Game 53 (QuimGil vs. MiniatureTest) QuimGil lost connection and too few moves; game aborted} *'
     const QRegExp match_aborted_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
-                                              "\\s+(\\w+)\\s+lost connection and too few moves; game aborted\\}\\s+\\*\\");
+                                              "\\s+(\\w+)\\s+lost connection and too few moves; game aborted\\}\\s+\\*");
 
     // Matches: '{Game 506 (QuimGil vs. MiniatureTest) QuimGil lost connection; game adjourned} *'
     const QRegExp match_adjourned_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
-                                              "\\s+(\\w+)\\s+lost connection; game adjourned\\}\\s+\\*\\");
+                                              "\\s+(\\w+)\\s+lost connection; game adjourned\\}\\s+\\*");
     
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
@@ -409,7 +409,7 @@ namespace {
         } else if (match_adjourned_by_disconnect.exactMatch(token)) {
             result.valid = true;
             result.reason = Game::ReasonAdjournedByDisconnect;
-            result.result = Game::ResultUnknown;
+            result.result = Game::ResultAdjourned;
 
             bool converted = false;
             result.id = match_adjourned_by_disconnect.cap(1).toUInt(&converted);

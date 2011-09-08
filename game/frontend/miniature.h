@@ -82,12 +82,16 @@ public:
     enum Result {
         ResultWhiteWins = ::Game::ResultWhiteWins,
         ResultBlackWins = ::Game::ResultBlackWins,
-        ResultDraw = ::Game::ResultDraw
+        ResultDraw = ::Game::ResultDraw,
+        ResultUnknown = ::Game::ResultUnknown,
+        ResultAdjourned = ::Game::ResultAdjourned
     };
 
     enum Reason {
         ReasonUnknown = ::Game::ReasonUnknown,
         ReasonForfeitByDisconnect = ::Game::ReasonForfeitByDisconnect,
+        ReasonAbortedByDisconnect = ::Game::ReasonAbortedByDisconnect,
+        ReasonAdjournedByDisconnect = ::Game::ReasonAdjournedByDisconnect,
         ReasonSurrendered = ::Game::ReasonSurrendered,
         ReasonCheckmated = ::Game::ReasonCheckmated,
         ReasonDrawAccpeted = ::Game::ReasonDrawAccpeted,
