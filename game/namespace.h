@@ -97,6 +97,7 @@ enum Rating {
 };
 
 enum Result {
+    ResultUnknown,
     ResultWhiteWins,
     ResultBlackWins,
     ResultDraw
@@ -105,6 +106,8 @@ enum Result {
 enum Reason {
     ReasonUnknown,
     ReasonForfeitByDisconnect,
+    ReasonAbortedByDisconnect,
+    ReasonAdjournedByDisconnect,
     ReasonSurrendered,
     ReasonCheckmated,
     ReasonDrawAccpeted,

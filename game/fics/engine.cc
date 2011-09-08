@@ -373,32 +373,52 @@ namespace {
     }
 
     // TODO: also parse other instances that can lead to aborted games (currently only disconnect).
-    GameEnded parseGameEnded(const QByteArray &token)
+    GameEnded parseGameEndedByDisconnect(const QByteArray &token)
     {
         GameEnded result;
         result.reason = Game::ReasonUnknown;
 
-        result.valid = match_forfeit_by_disconnect.exactMatch(token);
-        if (not result.valid) {
-            return result;
-        } else {
+        if (match_forfeit_by_disconnect.exactMatch(token)) {
+            result.valid = true;
             result.reason = Game::ReasonForfeitByDisconnect;
-        }
 
-        bool converted = false;
-        result.id = match_forfeit_by_disconnect.cap(1).toUInt(&converted);
-        result.valid = result.valid && converted;
-        result.player_name = match_forfeit_by_disconnect.cap(2).toLatin1();
+            bool converted = false;
+            result.id = match_forfeit_by_disconnect.cap(1).toUInt(&converted);
+            result.valid = result.valid && converted;
+            result.player_name = match_forfeit_by_disconnect.cap(2).toLatin1();
 
-        const QString &r(match_forfeit_by_disconnect.cap(3));
-        if (r == "1-0") {
-            result.result = Game::ResultWhiteWins;
-        } else if (r == "1/2-1/2") {
-            result.result = Game::ResultDraw;
-        } else if (r == "0-1") {
-            result.result = Game::ResultBlackWins;
+            const QString &r(match_forfeit_by_disconnect.cap(3));
+            if (r == "1-0") {
+                result.result = Game::ResultWhiteWins;
+            } else if (r == "1/2-1/2") {
+                result.result = Game::ResultDraw;
+            } else if (r == "0-1") {
+                result.result = Game::ResultBlackWins;
+            } else {
+                result.valid = false;
+            }
+        } else if (match_aborted_by_disconnect.exactMatch(token)) {
+            result.valid = true;
+            result.reason = Game::ReasonAbortedByDisconnect;
+            result.result = Game::ResultUnknown;
+
+            bool converted = false;
+            result.id = match_aborted_by_disconnect.cap(1).toUInt(&converted);
+            result.valid = result.valid && converted;
+            result.player_name = match_aborted_by_disconnect.cap(2).toLatin1();
+        } else if (match_adjourned_by_disconnect.exactMatch(token)) {
+            result.valid = true;
+            result.reason = Game::ReasonAdjournedByDisconnect;
+            result.result = Game::ResultUnknown;
+
+            bool converted = false;
+            result.id = match_adjourned_by_disconnect.cap(1).toUInt(&converted);
+            result.valid = result.valid && converted;
+            result.player_name = match_adjourned_by_disconnect.cap(2).toLatin1();
         } else {
             result.valid = false;
+            result.reason = Game::ReasonUnknown;
+            result.id = 0; // invalid
         }
 
         return result;
@@ -609,7 +629,7 @@ void Engine::processToken(const QByteArray &token)
                 Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
                 sendCommand(&imc);
             } else {
-                const GameEnded &ge(parseGameEnded(token));
+                const GameEnded &ge(parseGameEndedByDisconnect(token));
                 if (ge.valid) {
                     if (ge.id != m_current_game_id) {
                         qWarning() << __PRETTY_FUNCTION__
