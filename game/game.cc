@@ -65,6 +65,8 @@ public:
     Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
     LocalSideColor local_color; //!< Color of local side.
+    uint time; //!< Initial time.
+    uint time_increment; //! < Time increment for each move.
 
     explicit GamePrivate(uint new_id,
                          Dispatcher *new_dispatcher,
@@ -78,6 +80,8 @@ public:
         , active(&local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
         , local_color(LocalSideIsWhite)
+        , time(0)
+        , time_increment(0)
     {}
 };
 
@@ -157,6 +161,30 @@ Side Game::activeSide() const
 {
     Q_D(const Game);
     return (d->active ? *d->active : d->local);
+}
+
+void Game::setTime(uint time)
+{
+    Q_D(Game);
+    d->time = time;
+}
+
+uint Game::time() const
+{
+    Q_D(const Game);
+    return d->time;
+}
+
+void Game::setTimeIncrement(uint time_increment)
+{
+    Q_D(Game);
+    d->time_increment = time_increment;
+}
+
+uint Game::timeIncrement() const
+{
+    Q_D(const Game);
+    return d->time_increment;
 }
 
 void Game::sendCommand(AbstractCommand *command)
