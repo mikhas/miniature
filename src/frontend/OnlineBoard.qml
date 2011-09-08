@@ -270,9 +270,9 @@ Page {
         Rectangle {
             id: remoteMoves
             color: "cornflowerblue"
-            width: 20
-            height: parent.height
-            anchors.right: parent.right
+            width: parent.width
+            height: 5
+            anchors.bottom: parent.bottom
             z: 50
             visible: false
         }
@@ -372,6 +372,7 @@ Page {
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
+            anchors.verticalCenterOffset: 3
             anchors.left: parent.left
             anchors.leftMargin: 10
         }
@@ -395,6 +396,7 @@ Page {
             font.weight: Font.Bold
             font.family: "Courier"
             anchors.verticalCenter: userZone.verticalCenter
+            anchors.verticalCenterOffset: 3
             anchors.right: userZone.right
             anchors.rightMargin: 30
 
@@ -408,9 +410,9 @@ Page {
         Rectangle {
             id: localMoves
             color: "cornflowerblue"
-            width: 20
-            height: parent.height
-            anchors.right: parent.right
+            width: parent.width
+            height: 5
+            anchors.top: parent.top
             z: 50
             visible: false
         }
