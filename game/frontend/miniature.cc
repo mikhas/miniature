@@ -24,6 +24,7 @@
 #include "registry.h"
 #include "frontend/chessboard.h"
 #include "frontend/sideelement.h"
+#include "frontend/gameelement.h"
 #include "frontend/availableseeks.h"
 
 #ifdef MINIATURE_GUI_ENABLED
@@ -35,9 +36,9 @@ namespace Game { namespace Frontend { namespace {
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
 
-    void configureSideElement(SideElement *elem,
-                              const Side &side,
-                              const QColor &color)
+    void updateSideElement(SideElement *elem,
+                           const Side &side,
+                           const QColor &color)
     {
         if (not elem) {
             return;
@@ -45,6 +46,9 @@ namespace Game { namespace Frontend { namespace {
 
         elem->setId(side.name);
         elem->setColor(color);
+        elem->setRating(side.rating);
+        elem->setMaterialStrength(side.material_strength);
+        elem->setRemainingTime(side.remaining_time);
     }
 
     Miniature::Rating toRating(const QString &rating)
@@ -83,6 +87,7 @@ public:
     WeakGame game;
     SideElement local_side;
     SideElement remote_side;
+    GameElement game_element;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView ui;
 #endif
@@ -98,6 +103,7 @@ public:
         , game()
         , local_side()
         , remote_side()
+        , game_element()
 #ifdef MINIATURE_GUI_ENABLED
         , ui()
 #endif
@@ -121,6 +127,7 @@ Miniature::Miniature(Dispatcher *dispatcher,
     d->ui.rootContext()->setContextProperty("miniature", this);
     d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
     d->ui.rootContext()->setContextProperty("remoteSide", &d->remote_side);
+    d->ui.rootContext()->setContextProperty("activeGame", &d->game_element);
 #endif
 
     d->command_line.setFlags(all_commands);
@@ -353,10 +360,14 @@ void Miniature::setActiveGame(Game *game)
                                                                              : ChessBoard::WhiteAtTop);
     onPositionChanged(game->position());
 
-    configureSideElement(&d->local_side, game->localSide(),
+    updateSideElement(&d->local_side, game->localSide(),
                          game->localSideColor() == LocalSideIsWhite ? Qt::white : Qt::black);
-    configureSideElement(&d->remote_side, game->remoteSide(),
+    updateSideElement(&d->remote_side, game->remoteSide(),
                          game->localSideColor() == LocalSideIsBlack ? Qt::white : Qt::black);
+
+    d->game_element.setId(game->id());
+    d->game_element.setTime(game->time());
+    d->game_element.setTimeIncrement(game->timeIncrement());
 }
 
 Game * Miniature::activeGame() const
@@ -371,6 +382,19 @@ void Miniature::setUsername(const QString &username)
     d->local_side.setId(username);
 }
 
+void Miniature::updateLocalSide(const Side &local_side)
+{
+    Q_D(Miniature);
+    updateSideElement(&d->local_side, local_side, d->local_side.color());
+
+}
+
+void Miniature::updateRemoteSide(const Side &remote_side)
+{
+    Q_D(Miniature);
+    updateSideElement(&d->remote_side, remote_side, d->remote_side.color());
+}
+
 void Miniature::sendCommand(AbstractCommand *command)
 {
     Q_D(Miniature);
@@ -383,6 +407,16 @@ void Miniature::onPositionChanged(const Position &position)
 {
     Q_D(Miniature);
     d->chess_board.setPosition(position);
+
+    if (Game *g = d->game.data()) {
+        const bool is_local_side_active((g->localSideColor() == LocalSideIsWhite
+                                         && position.nextToMove() == ColorWhite)
+                                        || (g->localSideColor() == LocalSideIsBlack
+                                            && position.nextToMove() == ColorBlack));
+
+        d->local_side.setActive(is_local_side_active);
+        d->remote_side.setActive(not is_local_side_active);
+    }
 }
 
 }} // namespace Game, Frontend

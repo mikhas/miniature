@@ -182,7 +182,15 @@ public:
     //! Sets username.
     void setUsername(const QString &username);
 
-private:
+    //! Updates the UI facing side element from local_side.
+    //! @param local_side the update for local side.
+    void updateLocalSide(const Side &local_side);
+
+    //! Updates the UI facing side element from remote_side.
+    //! @param remote_side the update for remote side.
+    void updateRemoteSide(const Side &remote_side);
+
+private:    
     void sendCommand(AbstractCommand *command);
     Q_SLOT void onPositionChanged(const Position &position);
 };

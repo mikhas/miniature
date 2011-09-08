@@ -115,6 +115,18 @@ public:
     //! Returns active side.
     Side activeSide() const;
 
+    //! Sets initial time.
+    void setTime(uint time);
+
+    //! Returns initial time.
+    uint time() const;
+
+    //! Sets time increment.
+    void setTimeIncrement(uint time_increment);
+
+    //! Returns time increment.
+    uint timeIncrement() const;
+
 private:
     void sendCommand(AbstractCommand *command);
     void computeActiveSide(Color next_to_move);
