@@ -41,9 +41,29 @@ class SideElement
                             WRITE setColor
                             NOTIFY colorChanged)
 
+    Q_PROPERTY(bool active READ active
+                           WRITE setActive
+                           NOTIFY activeChanged)
+
+    Q_PROPERTY(uint rating READ rating
+                           WRITE setRating
+                           NOTIFY ratingChanged)
+
+    Q_PROPERTY(uint materialStrength READ materialStrength
+                                     WRITE setMaterialStrength
+                                     NOTIFY materialStrengthChanged)
+
+    Q_PROPERTY(uint remainingTime READ remainingTime
+                                  WRITE setRemainingTime
+                                  NOTIFY remainingTimeChanged)
+
 private:
     QString m_id;
     QColor m_color;
+    bool m_active;
+    uint m_rating;
+    uint m_material_strength;
+    uint m_remaining_time;
 
 public:
     explicit SideElement(QObject *parent = 0);
@@ -55,6 +75,22 @@ public:
     Q_INVOKABLE void setColor(const QColor &color);
     Q_INVOKABLE QColor color() const;
     Q_SIGNAL void colorChanged(const QColor &color);
+
+    Q_INVOKABLE void setActive(bool active);
+    Q_INVOKABLE bool active() const;
+    Q_SIGNAL void activeChanged(bool active);
+
+    Q_INVOKABLE void setRating(uint rating);
+    Q_INVOKABLE uint rating() const;
+    Q_SIGNAL void ratingChanged(uint rating);
+
+    Q_INVOKABLE void setMaterialStrength(uint material_strength);
+    Q_INVOKABLE uint materialStrength() const;
+    Q_SIGNAL void materialStrengthChanged(uint material_strength);
+
+    Q_INVOKABLE void setRemainingTime(uint remaining_time);
+    Q_INVOKABLE uint remainingTime() const;
+    Q_SIGNAL void remainingTimeChanged(uint remaining_time);
 };
 
 }} // namespace Game, Frontend

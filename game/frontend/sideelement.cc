@@ -26,6 +26,10 @@ SideElement::SideElement(QObject *parent)
     : QObject(parent)
     , m_id()
     , m_color()
+    , m_active(false)
+    , m_rating(0)
+    , m_material_strength(0)
+    , m_remaining_time(0)
 {}
 
 void SideElement::setId(const QString &id)
@@ -52,6 +56,58 @@ void SideElement::setColor(const QColor &color)
 QColor SideElement::color() const
 {
     return m_color;
+}
+
+void SideElement::setActive(bool active)
+{
+    if (m_active != active) {
+        m_active = active;
+        emit activeChanged(m_active);
+    }
+}
+
+bool SideElement::active() const
+{
+    return m_active;
+}
+
+void SideElement::setRating(uint rating)
+{
+    if (m_rating != rating) {
+        m_rating = rating;
+        emit ratingChanged(m_rating);
+    }
+}
+
+uint SideElement::rating() const
+{
+    return m_rating;
+}
+
+void SideElement::setMaterialStrength(uint material_strength)
+{
+    if (m_material_strength != material_strength) {
+        m_material_strength = material_strength;
+        emit materialStrengthChanged(m_material_strength);
+    }
+}
+
+uint SideElement::materialStrength() const
+{
+    return m_material_strength;
+}
+
+void SideElement::setRemainingTime(uint remaining_time)
+{
+    if (m_remaining_time != remaining_time) {
+        m_remaining_time = remaining_time;
+        emit remainingTimeChanged(m_remaining_time);
+    }
+}
+
+uint SideElement::remainingTime() const
+{
+    return m_remaining_time;
 }
 
 }} // namespace GameGame, Frontend
