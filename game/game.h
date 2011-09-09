@@ -127,6 +127,12 @@ public:
     //! Returns time increment.
     uint timeIncrement() const;
 
+    //! Sets game rating.
+    void setRating(uint rating);
+
+    //! Returns game rating.
+    uint rating() const;
+
 private:
     void sendCommand(AbstractCommand *command);
     void computeActiveSide(Color next_to_move);

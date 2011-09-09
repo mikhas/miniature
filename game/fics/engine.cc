@@ -106,6 +106,11 @@ namespace {
     const QRegExp match_create_game("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
                                     "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
 
+    // Matches: "Creating: GuestDKWC (++++) GuestWSWL (++++) unrated standard 57 58"
+    // note that the rating (usually an int) is "++++" for guests
+    const QRegExp match_create_game_data("Creating\\:\\s+(\\w+)\\s+\\((\\w+)\\)\\s+(\\w+)\\s+\\((\\w+)\\)"
+                                      "\\s+(\\w+)\\s+(\\w+)\\s+(\\d+)\\s+(\\d+)");
+
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
     const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
                              "\\s+(\\w+)\\s+(\\w+)\\s+(\\[(\\w+)\\])?\\s*(m|a)?\\s*(f)?"

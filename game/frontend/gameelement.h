@@ -33,21 +33,26 @@ class GameElement
     Q_DISABLE_COPY(GameElement)
 
     Q_PROPERTY(uint id READ id
-                       WRITE setId
-                       NOTIFY idChanged)
+               WRITE setId
+               NOTIFY idChanged)
 
     Q_PROPERTY(uint time READ time
-                                  WRITE setTime
-                                  NOTIFY timeChanged)
+               WRITE setTime
+               NOTIFY timeChanged)
 
     Q_PROPERTY(uint timeIncrement READ timeIncrement
-                                  WRITE setTimeIncrement
-                                  NOTIFY timeIncrementChanged)
+               WRITE setTimeIncrement
+               NOTIFY timeIncrementChanged)
+
+    Q_PROPERTY(uint rating READ rating
+               WRITE setRating
+               NOTIFY ratingChanged)
 
 private:
     uint m_id;
     uint m_time;
     uint m_time_increment;
+    uint m_rating;
 
 public:
     explicit GameElement(QObject *parent = 0);
@@ -63,6 +68,10 @@ public:
     Q_INVOKABLE void setTimeIncrement(uint time_increment);
     Q_INVOKABLE uint timeIncrement() const;
     Q_SIGNAL void timeIncrementChanged(uint time_increment);
+
+    Q_INVOKABLE void setRating(uint rating);
+    Q_INVOKABLE uint rating() const;
+    Q_SIGNAL void ratingChanged(uint rating);
 };
 
 }} // namespace Game, Frontend

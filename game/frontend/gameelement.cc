@@ -27,6 +27,7 @@ GameElement::GameElement(QObject *parent)
     , m_id(0)
     , m_time(0)
     , m_time_increment(0)
+    , m_rating(0)
 {}
 
 void GameElement::setId(uint id)
@@ -66,6 +67,19 @@ void GameElement::setTimeIncrement(uint time_increment)
 uint GameElement::timeIncrement() const
 {
     return m_time_increment;
+}
+
+void GameElement::setRating(uint rating)
+{
+    if (m_rating != rating) {
+        m_rating = rating;
+        emit ratingChanged(m_rating);
+    }
+}
+
+uint GameElement::rating() const
+{
+    return m_rating;
 }
 
 }} // namespace GameGame, Frontend

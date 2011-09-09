@@ -368,6 +368,7 @@ void Miniature::setActiveGame(Game *game)
     d->game_element.setId(game->id());
     d->game_element.setTime(game->time());
     d->game_element.setTimeIncrement(game->timeIncrement());
+    d->game_element.setRating(game->rating());
 }
 
 Game * Miniature::activeGame() const

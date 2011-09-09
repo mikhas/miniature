@@ -67,6 +67,7 @@ public:
     LocalSideColor local_color; //!< Color of local side.
     uint time; //!< Initial time.
     uint time_increment; //! < Time increment for each move.
+    uint rating; //! < Game rating
 
     explicit GamePrivate(uint new_id,
                          Dispatcher *new_dispatcher,
@@ -82,6 +83,7 @@ public:
         , local_color(LocalSideIsWhite)
         , time(0)
         , time_increment(0)
+        , rating(0)
     {}
 };
 
@@ -185,6 +187,18 @@ uint Game::timeIncrement() const
 {
     Q_D(const Game);
     return d->time_increment;
+}
+
+void Game::setRating(uint rating)
+{
+    Q_D(Game);
+    d->rating = rating;
+}
+
+uint Game::rating() const
+{
+    Q_D(const Game);
+    return d->rating;
 }
 
 void Game::sendCommand(AbstractCommand *command)

@@ -22,11 +22,15 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 import org.maemo.miniature 1.0
 
-// Pending: proper parenting between groups of items
-
 Page {
     id: ficsBoard
     orientationLock: PageOrientation.LockPortrait
+
+    // property int rated: activeGame.rating
+    function gameRated() { // trick to convert int activeGame.rating to the right value
+        if (activeGame.rating === 0) return "unrated"
+        else return "rated"
+    }
 
     Rectangle {
         id: windowBackground
@@ -59,7 +63,7 @@ Page {
 
         Text {
             id: timeGame
-            text: "10"
+            text: activeGame.time
             font.family: "Nokia Pure Headline"
             font.pointSize: 28
             color: "white"
@@ -71,7 +75,7 @@ Page {
 
         Text {
             id: incrementGame
-            text: "05"
+            text: activeGame.timeIncrement
             font.family: "Nokia Pure Headline"
             font.pointSize: 28
             color: "white"
@@ -84,7 +88,7 @@ Page {
 
         Text {
             id: ratedGame
-            text: "Rated"
+            text: gameRated()
             font.family: "Nokia Pure Headline"
             font.pointSize: 28
             color: "white"
