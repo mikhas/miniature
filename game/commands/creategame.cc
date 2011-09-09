@@ -26,14 +26,10 @@
 namespace Game { namespace Command {
 
 CreateGame::CreateGame(Target target,
-                       uint id,
-                       const QByteArray &local_id,
-                       const QByteArray &remote_id,
+                       const GameInfo &game_info,
                        LocalSideColor color)
     : AbstractCommand(target)
-    , m_game_id(id)
-    , m_local_id(local_id)
-    , m_remote_id(remote_id)
+    , m_game_info(game_info)
     , m_color(color)
 {}
 
@@ -47,8 +43,15 @@ void CreateGame::exec(Dispatcher *dispatcher,
         return;
     }
 
-    Game *game = createGame(m_game_id, dispatcher, m_local_id, m_remote_id);
+    Game *game = createGame(m_game_info.id, dispatcher,
+                            (m_color == LocalSideIsWhite ? m_game_info.white.name
+                                                         : m_game_info.black.name),
+                            (m_color == LocalSideIsBlack ? m_game_info.white.name
+                                                         : m_game_info.black.name));
+
     game->setLocalSideColor(m_color);
+    game->setTime(m_game_info.time);
+    game->setTimeIncrement(m_game_info.time_increment);
     target->registerGame(game);
 }
 

@@ -66,9 +66,11 @@ void Move::exec(Dispatcher *dispatcher,
     }
 
     if (Game *g = target->activeGame()) {
-        qDebug() << __PRETTY_FUNCTION__
-                 << moveNotation(m_result.movedPiece());
         g->setPosition(m_result);
+
+        target->updateLocalSide(g->localSideColor() == LocalSideIsWhite ? m_white : m_black);
+        target->updateRemoteSide(g->localSideColor() == LocalSideIsBlack ? m_white : m_black);
+
         dispatcher->pushMove(m_game_id, *this);
     }
 }

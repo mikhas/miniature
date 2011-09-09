@@ -63,6 +63,17 @@ struct Seek
     bool highlighted;
 };
 
+struct GameInfo {
+    uint id;
+    bool valid;
+    Side white;
+    Side black;
+    Rating rating;
+    Mode mode;
+    uint time;
+    uint time_increment;
+};
+
 class AbstractEngine;
 typedef QSharedPointer<AbstractEngine> SharedEngine;
 

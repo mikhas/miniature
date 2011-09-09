@@ -72,6 +72,24 @@ namespace Game { namespace Frontend { namespace {
 
         return Miniature::Auto;
     }
+
+    GameInfo dummyGameInfo()
+    {
+        Side local;
+        local.name = "test123";
+        local.rating = 1846u;
+
+        Side remote;
+        remote.name = "test456";
+        remote.rating = 2022u;
+
+        GameInfo gi;
+        gi.id = 999u;
+        gi.white = local;
+        gi.black = remote;
+
+        return gi;
+    }
 }
 
 class MiniaturePrivate
@@ -226,7 +244,8 @@ void Miniature::seek(uint time,
     } break;
 
     case TestFicsMode: {
-        Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
+
+        Command::CreateGame cg(TargetRegistry, dummyGameInfo(),  LocalSideIsWhite);
         sendCommand(&cg);
 
         Command::Move m(TargetFrontend, 999u, createStartPosition());
@@ -254,7 +273,7 @@ void Miniature::play(uint id)
     } break;
 
     case TestFicsMode: {
-        Command::CreateGame cg(TargetRegistry, 999u, "test123", "test456", LocalSideIsWhite);
+        Command::CreateGame cg(TargetRegistry, dummyGameInfo(), LocalSideIsWhite);
         sendCommand(&cg);
 
         Command::Move m(TargetFrontend, 999u, createStartPosition());

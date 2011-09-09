@@ -24,14 +24,6 @@
 #include "position.h"
 
 namespace {
-    struct GameInfo {
-        uint id;
-        bool valid;
-        QByteArray white;
-        QByteArray black;
-        Game::Mode mode;
-    };
-
     struct GameUpdate
             : public Game::RecordSeekBase
     {
@@ -102,14 +94,14 @@ namespace {
     // Matches: "o-o-o", "O-O-O", "0-0-0"
     const QRegExp match_long_castling("(o|O|0)-(o|O|0)-(o|O|0)");
 
-    // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
-    const QRegExp match_create_game("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
-                                    "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
+    // Matches: "Creating: ignoreme (++++) dontjoin (++++) unrated standard 999 999"
+    const QRegExp match_creating_game("\\s*Creating: (\\w+)\\s+\\(([0-9+]+)\\)"
+                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)\\s+(\\w)"
+                                      "\\s+(\\w)\\s+(\\d+)\\s+(\\d+)");
 
-    // Matches: "Creating: GuestDKWC (++++) GuestWSWL (++++) unrated standard 57 58"
-    // note that the rating (usually an int) is "++++" for guests
-    const QRegExp match_create_game_data("Creating\\:\\s+(\\w+)\\s+\\((\\w+)\\)\\s+(\\w+)\\s+\\((\\w+)\\)"
-                                      "\\s+(\\w+)\\s+(\\w+)\\s+(\\d+)\\s+(\\d+)");
+    // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
+    const QRegExp match_game_created("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
+                                    "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
 
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
     const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
@@ -139,11 +131,10 @@ namespace {
         return "";
     }
 
-    bool parseRating(Game::RecordSeekBase *rsb,
-                     uint *rating,
+    bool parseRating(uint *rating,
                      const QString &captured)
     {
-        if (not rsb || not rating) {
+        if (not rating) {
             return false;
         }
 
@@ -175,7 +166,7 @@ namespace {
 
         result.id = match_seek.cap(14).toInt(&converted);
         result.valid = result.valid && converted;
-        /*result.valid = result.valid &&*/ parseRating(&result, &result.rating, match_seek.cap(2));
+        /*result.valid = result.valid &&*/ parseRating(&result.rating, match_seek.cap(2));
         // TODO: parse game mode.
         result.player_name = match_seek.cap(1).toLatin1();
         result.time = match_seek.cap(3).toInt(&converted);
@@ -211,9 +202,9 @@ namespace {
 
         result.id = match_record.cap(1).toInt(&converted);
         result.valid = result.valid && converted;
-        result.valid = result.valid && parseRating(&result, &result.white.rating, match_record.cap(2));
+        result.valid = result.valid && parseRating(&result.white.rating, match_record.cap(2));
         result.white.name = match_record.cap(3).toLatin1();
-        result.valid = result.valid && parseRating(&result, &result.black.rating, match_record.cap(4));
+        result.valid = result.valid && parseRating(&result.black.rating, match_record.cap(4));
         result.black.name = match_record.cap(5).toLatin1();
         // TODO: parse game mode.
         //result.mode = match_record.cap(6).toInt(&converted);
@@ -235,23 +226,52 @@ namespace {
         return result;
     }
 
-    GameInfo parseCreateGame(const QByteArray &token)
+    bool parseCreatingGame(const QByteArray &token,
+                           Game::GameInfo *result)
     {
-        GameInfo result;
-        bool converted = false;
-
-        result.valid = match_create_game.exactMatch(token);
-        if (not result.valid) {
-            return result;
+        const QRegExp &re(match_creating_game);
+        if (not result || not re.exactMatch(token)) {
+            return false;
         }
 
-        // FIXME: Is it really local/remote, or white/black?
-        result.id = match_create_game.cap(1).toUInt(&converted);
-        result.valid = result.valid && converted;
-        result.white = match_create_game.cap(2).toLatin1();
-        result.black = match_create_game.cap(3).toLatin1();
+        result->valid = true;
+        bool converted = false;
 
-        return result;
+        result->white.name = re.cap(1).toLatin1();
+        result->valid = result->valid && parseRating(&result->white.rating, re.cap(2));
+
+        result->black.name = re.cap(3).toLatin1();
+        result->valid = result->valid && parseRating(&result->black.rating, re.cap(4));
+
+        result->rating = (re.cap(5) == "rated" ? Game::RatingEnabled
+                                               : Game::RatingDisabled);
+
+        result->time = re.cap(6).toUInt(&converted);
+        result->valid = result->valid && converted;
+
+        result->time_increment = re.cap(7).toUInt(&converted);
+        result->valid = result->valid && converted;
+
+        return result->valid;
+    }
+
+    bool parseGameCreated(const QByteArray &token,
+                         Game::GameInfo *result)
+    {
+        if (not result || not match_game_created.exactMatch(token)) {
+            return false;
+        }
+
+        result->valid = true;
+        bool converted = false;
+
+        // FIXME: Is it really local/remote, or white/black?
+        result->id = match_game_created.cap(1).toUInt(&converted);
+        result->valid = result->valid && converted;
+        result->white.name = match_game_created.cap(2).toLatin1();
+        result->black.name = match_game_created.cap(3).toLatin1();
+
+        return result->valid;
     }
 
     GameUpdate parseGameUpdate(const QByteArray &token)
@@ -281,6 +301,18 @@ namespace {
         result.valid = result.valid && converted;
 
         result.increment = cols.at(21).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.white.material_strength = cols.at(22).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.black.material_strength = cols.at(23).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.white.remaining_time = cols.at(24).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.black.remaining_time = cols.at(25).toUInt(&converted);
         result.valid = result.valid && converted;
 
         result.white.name = cols.at(17);
@@ -449,10 +481,10 @@ namespace {
                  << r.white_to_move << r.turn;
     }
 
-    void debugOutput(const GameInfo gi)
+    void debugOutput(const Game::GameInfo &gi)
     {
         qDebug() << gi.valid
-                 << gi.id << gi.white << gi.black << gi.mode;
+                 << gi.id << gi.white.name << gi.black.name << gi.mode;
     }
 }
 
@@ -474,8 +506,8 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_login_count(0)
     , m_login_abort_timer()
     , m_extra_delimiter()
-    , m_current_game_id(0)
     , m_current_advertisment_id(0)
+    , m_current_game()
 {
     m_login_abort_timer.setSingleShot(true);
     m_login_abort_timer.setInterval(10000);
@@ -593,18 +625,17 @@ void Engine::processToken(const QByteArray &token)
     }
 
     if (m_filter & PlayRequest) {
-        const GameInfo &gi(parseCreateGame(token));
-        debugOutput(gi);
-        if (gi.valid) {
-            m_current_game_id = gi.id;
-            const QByteArray &local_side(gi.white == m_username ? gi.white : gi.black);
-            const QByteArray &remote_side(gi.white == local_side ? gi.black : gi.white);
-
-            Command::CreateGame cg(TargetRegistry, gi.id, local_side, remote_side,
-                                   (local_side == gi.white ? LocalSideIsWhite : LocalSideIsBlack));
+        if (parseCreatingGame(token, &m_current_game)
+            && m_current_game.valid) {
+            // Wait for second part of message (match_game_created)
+        } else  if (parseGameCreated(token, &m_current_game)
+            && m_current_game.valid) {
+            Command::CreateGame cg(TargetRegistry, m_current_game,
+                                   (m_current_game.white.name == m_username ? LocalSideIsWhite
+                                                                            : LocalSideIsBlack));
             sendCommand(&cg);
 
-            Command::Move m(TargetFrontend, gi.id, createStartPosition());
+            Command::Move m(TargetFrontend, m_current_game.id, createStartPosition());
             sendCommand(&m);
 
             m_filter |= InGame;
@@ -631,17 +662,17 @@ void Engine::processToken(const QByteArray &token)
         } else {
             const InvalidMove &im(parseInvalidMove(token));
             if (im.valid) {
-                Command::InvalidMove imc(TargetFrontend, m_current_game_id, im.move);
+                Command::InvalidMove imc(TargetFrontend, m_current_game.id, im.move);
                 sendCommand(&imc);
             } else {
                 const GameEnded &ge(parseGameEndedByDisconnect(token));
                 if (ge.valid) {
-                    if (ge.id != m_current_game_id) {
+                    if (ge.id != m_current_game.id) {
                         qWarning() << __PRETTY_FUNCTION__
                                    << "Received aborted-game message, but id's don't match:"
-                                   << ge.id << "but expected" << m_current_game_id;
+                                   << ge.id << "but expected" << m_current_game.id;
                     } else {
-                        Command::GameEnded gec(TargetFrontend, m_current_game_id,
+                        Command::GameEnded gec(TargetFrontend, m_current_game.id,
                                                ge.result, ge.reason, ge.player_name);
                         sendCommand(&gec);
                     }

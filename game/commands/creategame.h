@@ -34,17 +34,13 @@ class CreateGame
     : public AbstractCommand
 {
 private:
-    const uint m_game_id;
-    const QByteArray m_local_id;
-    const QByteArray m_remote_id;
+    GameInfo m_game_info;
     LocalSideColor m_color;
 
 public:
     //! \reimp
     explicit CreateGame(Target target,
-                        uint id,
-                        const QByteArray &local_id,
-                        const QByteArray &remote_id,
+                        const GameInfo &game_info,
                         LocalSideColor color);
     virtual ~CreateGame();
     virtual void exec(Dispatcher *dispatcher,
