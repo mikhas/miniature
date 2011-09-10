@@ -247,11 +247,14 @@ namespace {
         result->rating = (re.cap(5) == "rated" ? Game::RatingEnabled
                                                : Game::RatingDisabled);
 
-        result->time = re.cap(7).toUInt(&converted);
+        result->time = re.cap(7).toUInt(&converted) * 60; // reported in minutes here
         result->valid = result->valid && converted;
 
         result->time_increment = re.cap(8).toUInt(&converted);
         result->valid = result->valid && converted;
+
+        result->white.remaining_time = result->time;
+        result->black.remaining_time = result->time;
 
         return result->valid;
     }
@@ -637,6 +640,8 @@ void Engine::processToken(const QByteArray &token)
             sendCommand(&cg);
 
             Command::Move m(TargetFrontend, m_current_game.id, createStartPosition());
+            m.setWhite(m_current_game.white);
+            m.setBlack(m_current_game.black);
             sendCommand(&m);
 
             m_filter |= InGame;
