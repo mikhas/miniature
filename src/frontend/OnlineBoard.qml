@@ -459,7 +459,14 @@ Page {
         id: gameResolutions
         target: miniature
         property string winnerIs
+        property string description
         onGameEnded: {
+            if (reason == Miniature.ReasonCheckmated) {
+                gameResolutions.description = "Checkmate!"
+            } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + "accepts draw."
+            } else {
+                remoteSide.id + " vanished."
+            }
 
             if (result == Miniature.ResultWhiteWins) { gameResolutions.winnerIs = "White wins" }
             if (result == Miniature.ResultBlackWins) { gameResolutions.winnerIs = "Black wins" }
@@ -467,9 +474,10 @@ Page {
             if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
             if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
 
-            if (reason == Miniature.ReasonForfeitByDisconnect || Miniature.ReasonAbortedByDisconnect || Miniature.ReasonAdjournedByDisconnect)
-            {remotedisconnectsDialog.open()}
-           }
+            if (reason != Miniature.ReasonUnknown) {
+                gameEndedDialog.open()
+            }
+        }
     }
 
     QueryDialog { // Confirm resign
@@ -558,10 +566,10 @@ Page {
         }
     }
 
-    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
-        id: remotedisconnectsDialog
+    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now. And it should allow for post-match chat or so.
+        id: gameEndedDialog
         titleText: "Bye bye!"
-        message:  remoteSide.id + " vanished.\n\nResult: " + gameResolutions.winnerIs
+        message:  gameResolutions.description + "\n\nResult: " + gameResolutions.winnerIs
         acceptButtonText: "OK"
         onAccepted: {
             pageStack.pop()

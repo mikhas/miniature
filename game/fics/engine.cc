@@ -78,6 +78,11 @@ namespace {
     // Matches: '{Game 506 (QuimGil vs. MiniatureTest) QuimGil lost connection; game adjourned} *'
     const QRegExp match_adjourned_by_disconnect("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
                                               "\\s+(\\w+)\\s+lost connection; game adjourned\\}\\s+\\*");
+
+    // Matches: '{Game 328 (GuestNDFD vs. pleaseIgnoreMe) GuestNDFD checkmated} 0-1'
+    // TODO: should also match draws.
+    const QRegExp match_game_ended("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
+                                   "\\s+(\\w+)\\s+(\\w+)\\}\\s+([012/-]+)");
     
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
@@ -414,7 +419,8 @@ namespace {
     }
 
     // TODO: also parse other instances that can lead to aborted games (currently only disconnect).
-    GameEnded parseGameEndedByDisconnect(const QByteArray &token)
+    // TODO: cleanup code duplication
+    GameEnded parseGameEnded(const QByteArray &token)
     {
         GameEnded result;
         result.reason = Game::ReasonUnknown;
@@ -456,6 +462,26 @@ namespace {
             result.id = match_adjourned_by_disconnect.cap(1).toUInt(&converted);
             result.valid = result.valid && converted;
             result.player_name = match_adjourned_by_disconnect.cap(2).toLatin1();
+        } else if(match_game_ended.exactMatch(token)) {
+            result.valid = true;
+            result.reason = match_game_ended.cap(3) == "checkmated" ? Game::ReasonCheckmated
+                                                                    : Game::ReasonUnknown;
+
+            bool converted = false;
+            result.id = match_game_ended.cap(1).toUInt(&converted);
+            result.valid = result.valid && converted;
+            result.player_name = match_game_ended.cap(2).toLatin1();
+
+            const QString &r(match_game_ended.cap(4));
+            if (r == "1-0") {
+                result.result = Game::ResultWhiteWins;
+            } else if (r == "1/2-1/2") {
+                result.result = Game::ResultDraw;
+            } else if (r == "0-1") {
+                result.result = Game::ResultBlackWins;
+            } else {
+                result.valid = false;
+            }
         } else {
             result.valid = false;
             result.reason = Game::ReasonUnknown;
@@ -671,7 +697,7 @@ void Engine::processToken(const QByteArray &token)
                 Command::InvalidMove imc(TargetFrontend, m_current_game.id, im.move);
                 sendCommand(&imc);
             } else {
-                const GameEnded &ge(parseGameEndedByDisconnect(token));
+                const GameEnded &ge(parseGameEnded(token));
                 if (ge.valid) {
                     if (ge.id != m_current_game.id) {
                         qWarning() << __PRETTY_FUNCTION__
