@@ -707,6 +707,9 @@ void Engine::processToken(const QByteArray &token)
                         Command::GameEnded gec(TargetFrontend, m_current_game.id,
                                                ge.result, ge.reason, ge.player_name);
                         sendCommand(&gec);
+
+                        m_filter |= WaitingForSeeks;
+                        m_filter &= ~InGame;
                     }
                 }
             }
