@@ -135,7 +135,6 @@ public:
 
 private:
     void sendCommand(AbstractCommand *command);
-    void computeActiveSide(Color next_to_move);
 };
 
 } // namespace Game

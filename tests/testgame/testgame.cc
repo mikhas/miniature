@@ -33,6 +33,26 @@
 
 using namespace Game;
 
+GameInfo dummyGameInfo()
+{
+    Side local;
+    local.name = "local";
+    local.rating = 1846u;
+
+    Side remote;
+    remote.name = "remote";
+    remote.rating = 2022u;
+
+    GameInfo gi;
+    gi.id = 999u;
+
+    // Because we use LocalSideIsBlack when creating the game:
+    gi.black = local;
+    gi.white = remote;
+
+    return gi;
+}
+
 class TestGame
     : public QObject
 {
@@ -55,7 +75,7 @@ private:
 
         const QByteArray local("local");
         const QByteArray remote("remote");
-        Command::CreateGame cg(TargetRegistry, 999u, local, remote, LocalSideIsBlack);
+        Command::CreateGame cg(TargetRegistry, dummyGameInfo(), LocalSideIsBlack);
         dispatcher.sendCommand(&cg);
 
         Command::Move m(TargetFrontend, 999u, createStartPosition());
@@ -65,6 +85,8 @@ private:
         QCOMPARE(miniature->activeGame()->id(), 999u);
         Position pos0(miniature->activeGame()->position());
         QCOMPARE(pos0, createStartPosition());
+        QCOMPARE(pos0.nextToMove(), ColorWhite);
+        QCOMPARE(miniature->activeGame()->localSideColor(), LocalSideIsBlack);
         QCOMPARE(miniature->activeGame()->activeSide().name, remote);
 
         // TODO: turn into data-driven test?

@@ -62,7 +62,6 @@ public:
     Position position;
     Side local; //!< Side of the local player.
     Side remote; //!< Side of the remote player.
-    Side *active; //!< Points to active side.
     Game::GameState state; //!< The game's state.
     LocalSideColor local_color; //!< Color of local side.
     uint time; //!< Initial time.
@@ -78,7 +77,6 @@ public:
         , position()
         , local(new_local)
         , remote(new_remote)
-        , active(&local)// FIXME: Set correct active side (could be remote) already during construction!
         , state(Game::Idle)
         , local_color(LocalSideIsWhite)
         , time(0)
@@ -124,7 +122,6 @@ void Game::setPosition(const Position &position)
     Q_D(Game);
     if (d->position != position) {
         d->position = position;
-        computeActiveSide(d->position.nextToMove());
         emit positionChanged(d->position);
     }
 }
@@ -162,7 +159,15 @@ Side Game::remoteSide() const
 Side Game::activeSide() const
 {
     Q_D(const Game);
-    return (d->active ? *d->active : d->local);
+    if (d->local_color == LocalSideIsWhite) {
+        return (d->position.nextToMove() == ColorWhite ? d->local
+                                                       : d->remote);
+    } else if (d->local_color == LocalSideIsBlack) {
+        return (d->position.nextToMove() == ColorBlack ? d->local
+                                                       : d->remote);
+    }
+
+    return Side();
 }
 
 void Game::setTime(uint time)
@@ -207,28 +212,6 @@ void Game::sendCommand(AbstractCommand *command)
     if (Dispatcher *dispatcher = d->dispatcher.data()) {
         dispatcher->sendCommand(command);
     }
-}
-
-void Game::computeActiveSide(Color next_to_move)
-{
-    Q_D(Game);
-
-    switch(next_to_move) {
-    case ColorWhite:
-        d->active = (d->local_color == LocalSideIsWhite ? &d->local
-                                                        : &d->remote);
-        break;
-
-    case ColorBlack:
-        d->active = (d->local_color == LocalSideIsBlack ? &d->local
-                                                        : &d->remote);
-        break;
-
-    default:
-        break;
-    }
-
-    printTurnMessage(d->active->name);
 }
 
 } // namespace Game

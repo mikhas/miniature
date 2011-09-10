@@ -67,19 +67,19 @@ private:
     Q_SLOT void testCastlingNotation()
     {
         MovedPiece wk_long_castling(Piece(Piece::King, ColorWhite, toSquare("c1")), toSquare("e1"));
-        QCOMPARE(moveNotation(wk_long_castling), QString("0-0-0"));
+        QCOMPARE(moveNotation(wk_long_castling), QString("o-o-o"));
 
         MovedPiece wk_short_castling(Piece(Piece::King, ColorWhite, toSquare("g1")), toSquare("e1"));
-        QCOMPARE(moveNotation(wk_short_castling), QString("0-0"));
+        QCOMPARE(moveNotation(wk_short_castling), QString("o-o"));
 
         MovedPiece bk_long_castling(Piece(Piece::King, ColorBlack, toSquare("c8")), toSquare("e8"));
-        QCOMPARE(moveNotation(bk_long_castling), QString("0-0-0"));
+        QCOMPARE(moveNotation(bk_long_castling), QString("o-o-o"));
 
         MovedPiece bk_short_castling(Piece(Piece::King, ColorBlack, toSquare("g8")), toSquare("e8"));
-        QCOMPARE(moveNotation(bk_short_castling), QString("0-0"));
+        QCOMPARE(moveNotation(bk_short_castling), QString("o-o"));
 
         MovedPiece fake_castling(Piece(Piece::King, ColorBlack, toSquare("c6")), toSquare("e6"));
-        QVERIFY(moveNotation(fake_castling) != QString("0-0-0"));
+        QVERIFY(moveNotation(fake_castling) != QString("o-o-o"));
 
     }
 
