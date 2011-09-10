@@ -58,6 +58,14 @@ namespace {
         QByteArray player_name;
     };
 
+    struct Message
+    {
+        bool valid;
+        uint game_id;
+        QByteArray player_name;
+        QByteArray data;
+    };
+
     const char * const login_prompt("login");
     const char * const password_prompt("password");
     const char * const fics_prompt("fics");
@@ -125,6 +133,9 @@ namespace {
 
     // Matches "testPLEASEIGNORE, whom you were challenging, has departed."
     const QRegExp match_has_departed("\\s*(\\w+)\\,\\s+whom you were challenging, has departed.");
+
+    // Matches "MiniatureTest[448] says: hi" and "GuestXYZ(U)[123] says: hi"
+    const QRegExp match_remote_side_message("\\s*(\\w+)(\\(U\\))?\\[(\\d+)\\]\\s+says:\\s+(.*)");
 
     QString fromColor(Game::Color c)
     {
@@ -491,6 +502,27 @@ namespace {
         return result;
     }
 
+    Message parseMessage(const QByteArray &token)
+    {
+        qDebug() << __PRETTY_FUNCTION__ << token;
+        const QRegExp &re(match_remote_side_message);
+        Message result;
+
+        result.valid = re.exactMatch(token);
+        if (not result.valid) {
+            return result;
+        }
+
+        bool converted = false;
+        result.game_id = re.cap(3).toUInt(&converted);
+        result.valid = result.valid && converted;
+
+        result.player_name = re.cap(1).toLatin1();
+        result.data = re.cap(4).toLatin1();
+
+        return result;
+    }
+
     void debugOutput(const Game::Seek s)
     {
         qDebug() << s.valid
@@ -710,6 +742,17 @@ void Engine::processToken(const QByteArray &token)
 
                         m_filter |= WaitingForSeeks;
                         m_filter &= ~InGame;
+                    }
+                } else {
+                    const Message &msg(parseMessage(token));
+                    if (msg.valid) {
+                        if (msg.game_id != m_current_game.id) {
+                            qWarning() << __PRETTY_FUNCTION__
+                                       << "Received message from opponent, but game id's don't match:"
+                                       << msg.game_id << "but expected" << m_current_game.id;
+                        } else {
+                            // TODO: send message to frontend.
+                        }
                     }
                 }
             }
