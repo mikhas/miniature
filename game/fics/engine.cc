@@ -85,8 +85,8 @@ namespace {
     // Matches: 'Press return to enter the server as "GuestZCQM":'
     const QRegExp match_confirm_login("Press return to enter the server as \"(\\w*)\"");
 
-    // Matches: "P/g2-g4"
-    const QRegExp match_move("(\\w)/(\\w\\d)-(\\w\\d)");
+    // Matches: "P/g2-g4" and "P/h7-g8=Q"
+    const QRegExp match_move("(\\w)/(\\w\\d)-(\\w\\d)(=(\\w))?");
 
     // Matches: "o-o", "O-O", "0-0"
     const QRegExp match_short_castling("(o|O|0)-(o|O|0)");
@@ -338,7 +338,6 @@ namespace {
 
         const bool regular_move(match_move.exactMatch(cols.at(27)));
         if (not regular_move) {
-
             // Normalize castlings into king moves:
             const Game::Square king_origin(Game::toSquare(moved_color == Game::ColorWhite ? "e1" : "e8"));
             const Game::Square king_target_short(Game::toSquare(moved_color == Game::ColorWhite ? "g1" : "g8"));
@@ -356,7 +355,8 @@ namespace {
         } else {
             // The move notation is always (except for castlings) capital and
             // does not encode the color of the piece ...
-            Game::Piece p(Game::toPiece(match_move.cap(1).toLatin1().at(0),
+            const QString &piece_encoding(match_move.cap(5).isEmpty() ? match_move.cap(1) : match_move.cap(5));
+            Game::Piece p(Game::toPiece(piece_encoding.toLatin1().at(0),
                                         pos.nextToMove() == Game::ColorWhite ? Game::ColorBlack
                                                                              : Game::ColorWhite));
 
