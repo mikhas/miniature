@@ -23,6 +23,19 @@ import com.nokia.meego 1.0
 import org.maemo.miniature 1.0
 
 Page {
+    // Taken from http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-%28javascript%29
+    function formatTime(secs) {
+            var hr = Math.floor(secs / 3600);
+            var min = Math.floor((secs - (hr * 3600))/60);
+            var sec = secs - (hr * 3600) - (min * 60);
+
+            if (hr < 10) {hr = "0" + hr; }
+            if (min < 10) {min = "0" + min;}
+            if (sec < 10) {sec = "0" + sec;}
+            if (hr) {hr = "00";}
+            return hr + ':' + min + ':' + sec;
+    }
+
     id: ficsBoard
     orientationLock: PageOrientation.LockPortrait
 
@@ -63,7 +76,7 @@ Page {
 
         Text {
             id: timeGame
-            text: activeGame.time
+            text: (activeGame.time / 60).toFixed(0) // Show in minutes.
             font.family: "Nokia Pure Headline"
             font.pointSize: 28
             color: "white"
@@ -242,33 +255,16 @@ Page {
             anchors.leftMargin: 10
         }
 
-        Text { // I guess there is a way not to have two timers defined in a single file but here we go for now.
+        Text {
             id: opponentTime
-            property int milliseconds: 1000 * 60 * 0.2 // ten minutes, FIXME needs to be a real variable
-            property string time: getTime()
-            property int increment
-
-            function getTime() {
-                var minutes = Math.floor(milliseconds / 1000 / 60)
-                var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-                if (milliseconds > 10000) opponentTime.color = localSide.color
-                else opponentTime.color = "red"
-                if (milliseconds < 0) return "..."
-                else return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)
-            }
-            text: time
+            text: formatTime(remoteSide.remainingTimeClock)
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
+            color: localSide.color
             anchors.verticalCenter: opponentZone.verticalCenter
             anchors.right: opponentZone.right
             anchors.rightMargin: 30
-
-            Timer  {
-                id: opponentTimer
-                interval: 1000; running: false; repeat: true;
-                onTriggered: opponentTime.milliseconds -= 1000
-            }
         }
 
         Rectangle {
@@ -278,7 +274,7 @@ Page {
             height: 5
             anchors.bottom: parent.bottom
             z: 50
-            visible: false
+            visible: remoteSide.active
         }
     }
 
@@ -383,32 +379,15 @@ Page {
 
         Text {
             id: userTime
-            property int milliseconds: 1000 * 60 * 0.2 // ten minutes, FIXME needs to be a real variable
-            property string time: getTime()
-            property int increment
-
-            function getTime() {
-                var minutes = Math.floor(milliseconds / 1000 / 60)
-                var seconds = Math.floor((milliseconds-minutes*1000*60) / 1000)
-                if (milliseconds > 10000) userTime.color = remoteSide.color
-                else userTime.color = "red"
-                if (milliseconds < 0) return "...";
-                else return "00:" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds)}
-
-            text: time
+            text: formatTime(localSide.remainingTimeClock)
             font.pointSize: 24
             font.weight: Font.Bold
             font.family: "Courier"
+            color: remoteSide.color
             anchors.verticalCenter: userZone.verticalCenter
             anchors.verticalCenterOffset: 3
             anchors.right: userZone.right
             anchors.rightMargin: 30
-
-            Timer  {
-                id: userTimer
-                interval: 1000; running: false; repeat: true;
-                onTriggered: userTime.milliseconds -= 1000
-            }
         }
 
         Rectangle {
@@ -418,7 +397,7 @@ Page {
             height: 5
             anchors.top: parent.top
             z: 50
-            visible: false
+            visible: localSide.active
         }
     }
 
@@ -465,26 +444,6 @@ Page {
                     miniature.confirmMove()
 
                     checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
-                    if (checkMove.moveNumber === 3) { userTime.increment = 5000 ; opponentTime.increment = 5000 } // FIXME increments must be substituted by variables
-                    if (checkMove.moveNumber > 1)
-                    { if (userTimer.running === true)
-                        { userTime.milliseconds += userTime.increment
-                            userTimer.running = false
-                            opponentTimer.running = true
-                            localCorners.color = localSide.color
-                            remoteCorners.color = "cornflowerblue"
-                            localMoves.visible = false
-                            remoteMoves.visible = true
-                        }
-                        else { opponentTime.milliseconds += opponentTime.increment
-                            opponentTimer.running = false
-                            userTimer.running = true
-                            remoteCorners.color = remoteSide.color
-                            localCorners.color = "cornflowerblue"
-                            remoteMoves.visible = false
-                            localMoves.visible = true
-                        }
-                    }
                 }
             }
 

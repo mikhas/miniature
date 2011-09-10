@@ -30,7 +30,15 @@ SideElement::SideElement(QObject *parent)
     , m_rating(0)
     , m_material_strength(0)
     , m_remaining_time(0)
-{}
+    , m_remaining_time_clock(0)
+    , m_timer()
+{
+    m_timer.setInterval(1000);
+    m_timer.setSingleShot(false);
+
+    connect(&m_timer, SIGNAL(timeout()),
+            this,     SLOT(adjustRemainingTimeClock()));
+}
 
 void SideElement::setId(const QString &id)
 {
@@ -63,6 +71,12 @@ void SideElement::setActive(bool active)
     if (m_active != active) {
         m_active = active;
         emit activeChanged(m_active);
+
+        if (m_active) {
+            m_timer.start();
+        } else {
+            m_timer.stop();
+        }
     }
 }
 
@@ -102,12 +116,28 @@ void SideElement::setRemainingTime(uint remaining_time)
     if (m_remaining_time != remaining_time) {
         m_remaining_time = remaining_time;
         emit remainingTimeChanged(m_remaining_time);
+
+        if (m_remaining_time_clock != m_remaining_time) {
+            m_remaining_time_clock = m_remaining_time;
+            emit remainingTimeClockChanged(m_remaining_time_clock);
+        }
     }
 }
 
 uint SideElement::remainingTime() const
 {
     return m_remaining_time;
+}
+
+uint SideElement::remainingTimeClock() const
+{
+    return m_remaining_time_clock;
+}
+
+void SideElement::adjustRemainingTimeClock()
+{
+    m_remaining_time_clock = qMin<uint>(m_remaining_time_clock, m_remaining_time_clock - 1);
+    emit remainingTimeClockChanged(m_remaining_time_clock);
 }
 
 }} // namespace GameGame, Frontend

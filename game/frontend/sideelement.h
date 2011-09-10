@@ -57,6 +57,9 @@ class SideElement
                                   WRITE setRemainingTime
                                   NOTIFY remainingTimeChanged)
 
+    Q_PROPERTY(uint remainingTimeClock READ remainingTimeClock
+                                       NOTIFY remainingTimeClockChanged)
+
 private:
     QString m_id;
     QColor m_color;
@@ -64,6 +67,8 @@ private:
     uint m_rating;
     uint m_material_strength;
     uint m_remaining_time;
+    uint m_remaining_time_clock;
+    QTimer m_timer;
 
 public:
     explicit SideElement(QObject *parent = 0);
@@ -91,6 +96,12 @@ public:
     Q_INVOKABLE void setRemainingTime(uint remaining_time);
     Q_INVOKABLE uint remainingTime() const;
     Q_SIGNAL void remainingTimeChanged(uint remaining_time);
+
+    Q_INVOKABLE uint remainingTimeClock() const;
+    Q_SIGNAL void remainingTimeClockChanged(uint remaining_time_clock);
+
+private:
+    Q_SLOT void adjustRemainingTimeClock();
 };
 
 }} // namespace Game, Frontend

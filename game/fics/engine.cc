@@ -95,9 +95,10 @@ namespace {
     const QRegExp match_long_castling("(o|O|0)-(o|O|0)-(o|O|0)");
 
     // Matches: "Creating: ignoreme (++++) dontjoin (++++) unrated standard 999 999"
-    const QRegExp match_creating_game("\\s*Creating: (\\w+)\\s+\\(([0-9+]+)\\)"
-                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)\\s+(\\w)"
-                                      "\\s+(\\w)\\s+(\\d+)\\s+(\\d+)");
+    const QRegExp match_creating_game("\\s*Creating:"
+                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)"
+                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)"
+                                      "\\s+(\\w+)\\s+(\\w+)\\s+(\\d+)\\s+(\\d+)");
 
     // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
     const QRegExp match_game_created("\\s*\\{Game\\s+(\\d+)\\s\\((\\w+)\\s+vs\\.\\s+(\\w+)\\)"
@@ -209,9 +210,9 @@ namespace {
         // TODO: parse game mode.
         //result.mode = match_record.cap(6).toInt(&converted);
         // TODO: Parse remaining_time
-        result.time = match_record.cap(7).toInt(&converted) * 60;
+        result.time = match_record.cap(7).toInt(&converted);
         result.valid = result.valid && converted;
-        result.increment = match_record.cap(9).toInt(&converted) * 60
+        result.increment = match_record.cap(9).toInt(&converted)
                             + match_record.cap(10).toInt(&converted);
         result.valid = result.valid && converted;
         result.valid = result.valid && converted;
@@ -246,10 +247,10 @@ namespace {
         result->rating = (re.cap(5) == "rated" ? Game::RatingEnabled
                                                : Game::RatingDisabled);
 
-        result->time = re.cap(6).toUInt(&converted);
+        result->time = re.cap(7).toUInt(&converted);
         result->valid = result->valid && converted;
 
-        result->time_increment = re.cap(7).toUInt(&converted);
+        result->time_increment = re.cap(8).toUInt(&converted);
         result->valid = result->valid && converted;
 
         return result->valid;
