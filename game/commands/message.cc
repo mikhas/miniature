@@ -18,18 +18,43 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "abstractcommand.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/loginfailed.h"
-#include "commands/advertisement.h"
-#include "commands/record.h"
-#include "commands/play.h"
-#include "commands/move.h"
-#include "commands/creategame.h"
-#include "commands/activategame.h"
-#include "commands/seek.h"
-#include "commands/invalidmove.h"
-#include "commands/invalidseek.h"
-#include "commands/gameended.h"
-#include "commands/message.h"
+#include "message.h"
+#include "frontend/miniature.h"
+#include "abstractengine.h"
+
+namespace Game { namespace Command {
+
+Message::Message(Target target,
+                 const QByteArray &player_name,
+                 const QByteArray &message)
+    : AbstractCommand(target)
+    , m_player_name(player_name)
+    , m_message(message)
+{}
+
+Message::~Message()
+{}
+
+void Message::exec(Dispatcher *,
+                   AbstractEngine *target)
+{
+    if (not target) {
+        return;
+    }
+
+    //target->sendMessage(m_player_name, m_message);
+}
+
+void Message::exec(Dispatcher *,
+                   Frontend::Miniature *target)
+{
+    if (not target) {
+        return;
+    }
+
+    //if (Frontend::MessageLog *log = target->log()) {
+    //    log->append(m_player_name, m_message);
+    //}
+}
+
+}} // namespace Command, Game

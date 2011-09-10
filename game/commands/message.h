@@ -18,18 +18,35 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
 #include "abstractcommand.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/loginfailed.h"
-#include "commands/advertisement.h"
-#include "commands/record.h"
-#include "commands/play.h"
-#include "commands/move.h"
-#include "commands/creategame.h"
-#include "commands/activategame.h"
-#include "commands/seek.h"
-#include "commands/invalidmove.h"
-#include "commands/invalidseek.h"
-#include "commands/gameended.h"
-#include "commands/message.h"
+#include <QtCore>
+
+namespace Game { namespace Command {
+
+class Message
+    : public AbstractCommand
+{
+private:
+    QByteArray m_player_name;
+    QByteArray m_message;
+
+public:
+    //! \reimp
+    explicit Message(Target target,
+                     const QByteArray &player_name,
+                     const QByteArray &message);
+    virtual ~Message();
+
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
+};
+
+}} // namespace Command, Game
+
+#endif // MESSAGE_H

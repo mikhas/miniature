@@ -14,6 +14,7 @@ HEADERS += \
     $${COMMANDS_DIR}/invalidseek.h \
     $${COMMANDS_DIR}/invalidmove.h \
     $${COMMANDS_DIR}/gameended.h \
+    $${COMMANDS_DIR}/message.h \
 
 SOURCES += \
     $${COMMANDS_DIR}/login.cc \
@@ -29,6 +30,7 @@ SOURCES += \
     $${COMMANDS_DIR}/invalidseek.cc \
     $${COMMANDS_DIR}/invalidmove.cc \
     $${COMMANDS_DIR}/gameended.cc \
+    $${COMMANDS_DIR}/message.cc \
 
 #INCLUDEPATH += $${COMMANDS_DIR}
 DEPENDPATH += $${COMMANDS_DIR}

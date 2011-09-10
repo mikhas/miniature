@@ -42,6 +42,7 @@ LIBS += \
         $${GAME_DIR}/commands/invalidseek.h \
         $${GAME_DIR}/commands/invalidmove.h \
         $${GAME_DIR}/commands/gameended.h \
+        $${GAME_DIR}/commands/message.h \
         $${GAME_DIR}/frontend/miniature.h \
         $${GAME_DIR}/frontend/chessboard.h \
         $${GAME_DIR}/frontend/sideelement.h \
@@ -75,6 +76,7 @@ LIBS += \
         $${GAME_DIR}/commands/invalidseek.cc \
         $${GAME_DIR}/commands/invalidmove.cc \
         $${GAME_DIR}/commands/gameended.cc \
+        $${GAME_DIR}/commands/message.cc \
         $${GAME_DIR}/frontend/miniature.cc \
         $${GAME_DIR}/frontend/chessboard.cc \
         $${GAME_DIR}/frontend/sideelement.cc \
