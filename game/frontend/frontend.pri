@@ -6,6 +6,7 @@ HEADERS += \
     $${FRONTEND_DIR}/sideelement.h \
     $${FRONTEND_DIR}/gameelement.h \
     $${FRONTEND_DIR}/availableseeks.h \
+    $${FRONTEND_DIR}/messagelog.h \
 
 SOURCES += \
     $${FRONTEND_DIR}/miniature.cc \
@@ -13,6 +14,7 @@ SOURCES += \
     $${FRONTEND_DIR}/sideelement.cc \
     $${FRONTEND_DIR}/gameelement.cc \
     $${FRONTEND_DIR}/availableseeks.cc \
+    $${FRONTEND_DIR}/messagelog.cc \
 
 #INCLUDEPATH += $${FRONTEND_DIR}
 DEPENDPATH += $${FRONTEND_DIR}

@@ -48,6 +48,7 @@ LIBS += \
         $${GAME_DIR}/frontend/sideelement.h \
         $${GAME_DIR}/frontend/gameelement.h \
         $${GAME_DIR}/frontend/availableseeks.h \
+        $${GAME_DIR}/frontend/messagelog.h \
         $${GAME_DIR}/directinputdevice.h \
         $${GAME_DIR}/linereader.h \
         $${GAME_DIR}/commandline.h \
@@ -82,6 +83,7 @@ LIBS += \
         $${GAME_DIR}/frontend/sideelement.cc \
         $${GAME_DIR}/frontend/gameelement.cc \ 
         $${GAME_DIR}/frontend/availableseeks.cc \
+        $${GAME_DIR}/frontend/messagelog.cc \
         $${GAME_DIR}/directinputdevice.cc \
         $${GAME_DIR}/linereader.cc \
         $${GAME_DIR}/commandline.cc \
