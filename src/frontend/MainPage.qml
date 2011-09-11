@@ -224,8 +224,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         checkable: true
         checked: miniature.mode == Miniature.TestFicsMode
         opacity: 0.8
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 30
+        anchors.top: aboutButton.bottom
+        anchors.topMargin: 40
         anchors.horizontalCenter: parent.horizontalCenter
         onClicked: {
             miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
@@ -318,8 +318,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         text: "i"
         width: 50
         anchors {
-            bottom: parent.bottom
-            bottomMargin: 125
+            top: registerButton.bottom
+            topMargin: 110
             horizontalCenter: parent.horizontalCenter
         }
         onClicked: {
