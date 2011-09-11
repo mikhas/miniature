@@ -319,7 +319,7 @@ Page {
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
             id: remoteCorners
-            color: remoteSide.color
+            color: remoteSide.active ? "cornflowerblue" : remoteSide.color
             width: parent.width
             height:  50
             anchors.top: parent.top
@@ -327,7 +327,7 @@ Page {
         }
         Rectangle {
             id: localCorners
-            color: localSide.color
+            color: localSide.active ? "cornflowerblue" : localSide.color
             width: parent.width
             height:  50
             anchors.bottom: parent.bottom
@@ -470,6 +470,7 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 onClicked: {
+                    console.log(localSide.active + " " + remoteSide.active)
                     miniature.confirmMove()
 
                     checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
