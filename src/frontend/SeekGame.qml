@@ -32,6 +32,10 @@ Page {
         target: miniature
         onGameStarted: {
             availableSeeks.removeAll()
+            seekListWindow.anchors.bottom = userZone.top
+            newgameArea.visible = false
+            newSpinner.visible = false
+            newSpinner.running = false
             loadScreen("OnlineBoard.qml")
         }
         onSeekCancelled: {
@@ -39,7 +43,6 @@ Page {
             availableSeeks.remove(ficsSeekGame.selectedIndex)
         }
     }
-
 
     // Generic app window style
 
@@ -508,15 +511,6 @@ Page {
                 rightMargin: 10
             }
 
-            Connections {
-                target: miniature
-                onGameStarted: {
-                    visible = false
-                    newSpinner.running = false
-                }
-            }
-
-
             BusyIndicator {
                 id: newSpinner
                 anchors.centerIn: parent
@@ -550,7 +544,7 @@ Page {
 
         Text {
             id: userInfo
-            text: "++++" + " " + localSide.id // FIXME rating must be changed for variable.
+            text: localSide.rating + " " + localSide.id // FIXME rating must be changed for variable.
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
@@ -598,8 +592,7 @@ Page {
                                        ratedDialog.model.get(ratedDialog.selectedIndex).name,
                                        "Auto")
                         newgameArea.visible = true
-                        separator.anchors.top = newgameArea.top
-                        // FIXME instructions to send a new seek to the backend.
+                        seekListWindow.anchors.bottom = newgameArea.top
                         // We are supporting one seek at a time at this point. If the user sends a new seek the old one is cancelled.
                     }
                     rejectButtonText: "No"
