@@ -34,6 +34,7 @@
 namespace Game { namespace Frontend {
 
 class AvailableSeeks;
+class MessageLog;
 class MiniaturePrivate;
 
 //! This class communicates with the engine, handles the active game state
@@ -159,6 +160,10 @@ public:
     //! Confirms current move.
     Q_INVOKABLE void confirmMove();
 
+    //! Sends a message from player to current opponent.
+    //! @param message the message.
+    Q_INVOKABLE void sendMessage(const QString &message);
+
     //! Emitted when invalid move was submitted to engine.
     Q_SIGNAL void invalidMove(const QString &move);
 
@@ -178,6 +183,9 @@ public:
 
     //! Returns agive game, can be 0.
     Game * activeGame() const;
+
+    //! Returns the message log.
+    Frontend::MessageLog * messageLog() const;
 
     //! Sets username.
     void setUsername(const QString &username);

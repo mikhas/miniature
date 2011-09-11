@@ -84,6 +84,8 @@ public:
     virtual void play(uint advertisement_id);
     virtual void movePiece(const MovedPiece &moved_piece);
     virtual void processToken(const QByteArray &token);
+    virtual void sendMessage(const QByteArray &player_name,
+                             const QByteArray &message);
     //! \reimp_end
 
     //! Test API

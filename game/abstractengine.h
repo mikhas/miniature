@@ -139,6 +139,12 @@ public:
     //! Move piece.
     //! @param moved_piece the moved piece.
     virtual void movePiece(const MovedPiece &moved_piece);
+
+    //! Sends a message from player to current opponent.
+    //! @param player_name the player name.
+    //! @param message the message.
+    virtual void sendMessage(const QByteArray &player_name,
+                             const QByteArray &message);
 };
 
 } // namespace Game

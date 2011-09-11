@@ -45,4 +45,8 @@ void AbstractEngine::play(uint)
 void AbstractEngine::movePiece(const MovedPiece &)
 {}
 
+void AbstractEngine::sendMessage(const QByteArray &,
+                                 const QByteArray &)
+{}
+
 } // namespace Game

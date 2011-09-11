@@ -40,7 +40,12 @@ void MessageLog::append(const QByteArray &player_name,
                         const QByteArray &message)
 {
     beginInsertRows(QModelIndex(), m_log.size(), m_log.size());
-    m_log.append(Message(player_name, message));
+
+    Message m;
+    m.player_name = player_name;
+    m.data = message;
+    m_log.append(m);
+
     endInsertRows();
 
     // Manage a sliding window of no more than 1024 entries:
@@ -92,7 +97,7 @@ QModelIndex MessageLog::parent(const QModelIndex &index) const
 }
 
 QVariant MessageLog::data(const QModelIndex &index,
-                            int role) const
+                          int role) const
 {
     if (m_log.size() < index.row()) {
         return QVariant();

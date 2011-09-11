@@ -26,6 +26,7 @@
 #include "frontend/sideelement.h"
 #include "frontend/gameelement.h"
 #include "frontend/availableseeks.h"
+#include "frontend/messagelog.h"
 
 #ifdef MINIATURE_GUI_ENABLED
 #include <QtDeclarative/QtDeclarative>
@@ -99,6 +100,7 @@ public:
     CommandLine command_line;
     LineReader line_reader;
     AvailableSeeks available_seeks;
+    mutable MessageLog message_log;
     ChessBoard chess_board;
     bool valid_move;
     Miniature::Mode mode;
@@ -115,6 +117,7 @@ public:
         , command_line(new_dispatcher)
         , line_reader()
         , available_seeks()
+        , message_log()
         , chess_board()
         , valid_move(false)
         , mode(Miniature::TestFicsMode)
@@ -141,6 +144,7 @@ Miniature::Miniature(Dispatcher *dispatcher,
     qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
 
     d->ui.rootContext()->setContextProperty("availableSeeks", &d->available_seeks);
+    d->ui.rootContext()->setContextProperty("messageLog", &d->message_log);
     d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
     d->ui.rootContext()->setContextProperty("miniature", this);
     d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
@@ -360,6 +364,18 @@ void Miniature::confirmMove()
     emit validMoveChanged(false);
 }
 
+void Miniature::sendMessage(const QString &message)
+{
+    Q_D(Miniature);
+
+    const QByteArray &pn(d->local_side.id().toLatin1());
+    const QByteArray &m(message.toLatin1());
+
+    d->message_log.append(pn, m);
+    Command::Message msg(TargetEngine, pn, m);
+    sendCommand(&msg);
+}
+
 void Miniature::setActiveGame(Game *game)
 {
     Q_D(Miniature);
@@ -394,6 +410,12 @@ Game * Miniature::activeGame() const
 {
     Q_D(const Miniature);
     return d->game.data();
+}
+
+Frontend::MessageLog * Miniature::messageLog() const
+{
+    Q_D(const Miniature);
+    return &d->message_log;
 }
 
 void Miniature::setUsername(const QString &username)

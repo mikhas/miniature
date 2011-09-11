@@ -504,7 +504,6 @@ namespace {
 
     Message parseMessage(const QByteArray &token)
     {
-        qDebug() << __PRETTY_FUNCTION__ << token;
         const QRegExp &re(match_remote_side_message);
         Message result;
 
@@ -751,7 +750,8 @@ void Engine::processToken(const QByteArray &token)
                                        << "Received message from opponent, but game id's don't match:"
                                        << msg.game_id << "but expected" << m_current_game.id;
                         } else {
-                            // TODO: send message to frontend.
+                            Command::Message mc(TargetFrontend, msg.player_name, msg.data);
+                            sendCommand(&mc);
                         }
                     }
                 }
@@ -774,6 +774,18 @@ void Engine::processToken(const QByteArray &token)
             sendCommand(&rc);
         }
     }
+}
+
+void Engine::sendMessage(const QByteArray &,
+                         const QByteArray &message)
+{
+    if (not m_filter & InGame) {
+        return;
+    }
+
+    m_channel.write("say ");
+    m_channel.write(message);
+    m_channel.write("\n");
 }
 
 void Engine::setMessageFilter(const MessageFilterFlags &flags)

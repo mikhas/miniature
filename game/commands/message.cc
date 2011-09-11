@@ -19,8 +19,9 @@
  */
 
 #include "message.h"
-#include "frontend/miniature.h"
 #include "abstractengine.h"
+#include "frontend/miniature.h"
+#include "frontend/messagelog.h"
 
 namespace Game { namespace Command {
 
@@ -42,7 +43,7 @@ void Message::exec(Dispatcher *,
         return;
     }
 
-    //target->sendMessage(m_player_name, m_message);
+    target->sendMessage(m_player_name, m_message);
 }
 
 void Message::exec(Dispatcher *,
@@ -52,9 +53,9 @@ void Message::exec(Dispatcher *,
         return;
     }
 
-    //if (Frontend::MessageLog *log = target->log()) {
-    //    log->append(m_player_name, m_message);
-    //}
+    if (Frontend::MessageLog *log = target->messageLog()) {
+        log->append(m_player_name, m_message);
+    }
 }
 
 }} // namespace Command, Game

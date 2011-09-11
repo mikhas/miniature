@@ -112,6 +112,14 @@ Page {
         }
     }
 
+    Component {
+        id: emptyHeader
+        Rectangle {
+            height: 20
+            width: parent.width
+            color: "transparent"
+        }
+    }
 
     // Chat area
     Rectangle {
@@ -125,22 +133,29 @@ Page {
         anchors.right: parent.right
         z: 20
 
-        Text { // It would be cool to have different text colors for FICS, user and opponent - inspired in IRC & Eboard's console.
+        ListView {
             id: chatLog
-            color: "white"
-            font.pointSize: 16
             anchors.fill: parent
             anchors.leftMargin: 10
             anchors.rightMargin: 10
-            clip: true
-            //            lineHeight: 1.5 // // commenting out for MeeGo CE in N900 compatibility
-            wrapMode: Text.Wrap
-            verticalAlignment: Text.AlignBottom
+            header: emptyHeader // empty header to avoid overlap of 1st item with shadow.
+            spacing: 0
 
-            // FIXME this needs to be the real log from FICS
-            property string liveLog:
-                "Creating: Garry (1333) (++++) Me (1333) unrated standard 10 05\n> Hi from $PLACE! I'm playing with my $DEVICE - sorry if I don't talk too much...\nGarry: Hi from Baku. No problem, this is my first game here. Please have some mercy with me!"
-            text: chatLog.liveLog
+            model: messageLog
+
+            Connections {
+                target: messageLog
+                onRowsInserted: chatLog.positionViewAtEnd()
+            }
+
+            delegate: Text {
+                color: "white"
+                font.pointSize: 16
+                wrapMode: Text.Wrap
+                verticalAlignment: Text.AlignBottom
+                text: model.playerName + ": " + model.message
+                clip: false
+            }
         }
 
         MouseArea {
@@ -220,6 +235,13 @@ Page {
             anchors.rightMargin: 10
             visible: false
             z: 20
+
+            Keys.onReturnPressed:  {
+                miniature.sendMessage(chatField.text)
+                chatBkg.state = ""
+                chatField.text = ""
+                chatField.focus = false
+            }
         }
 
         Button {
@@ -232,6 +254,13 @@ Page {
             anchors.bottomMargin: 10
             visible: false
             z: 20
+
+            onClicked: {
+                miniature.sendMessage(chatField.text)
+                chatBkg.state = ""
+                chatField.text = ""
+                chatField.focus = false
+            }
         }
     }
 
