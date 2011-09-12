@@ -138,6 +138,7 @@ Page {
             anchors.fill: parent
             anchors.leftMargin: 10
             anchors.rightMargin: 10
+            clip: true
             header: emptyHeader // empty header to avoid overlap of 1st item with shadow.
             spacing: 0
 
@@ -174,7 +175,9 @@ Page {
                 name: "expanded"
                 PropertyChanges {
                     target: chatField
+                    text: ""
                     visible: true
+                    focus: true
                 }
                 PropertyChanges {
                     target: chatInputArea
@@ -201,17 +204,17 @@ Page {
 
         ]
 
-        transitions: [
-            Transition {
-                ParallelAnimation  {
-                    PropertyAnimation {
-                        property: "opacity"; from: 0; to: 0.8
-                        easing.type: Easing.OutQuint
-                    }
-                    AnchorAnimation { easing.type: Easing.OutQuint }
-                }
-            }
-        ]
+//        transitions: [
+//            Transition {
+//                ParallelAnimation  {
+//                    PropertyAnimation {
+//                        property: "opacity"; from: 0; to: 0.8
+//                        easing.type: Easing.OutQuint
+//                    }
+//                    AnchorAnimation { easing.type: Easing.OutQuint }
+//                }
+//            }
+//        ]
     }
 
     Rectangle { // Little effect of shadow in chat
@@ -237,6 +240,7 @@ Page {
 
         TextField {
             id: chatField
+            text: ""
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 10
             anchors.left: parent.left
@@ -249,8 +253,8 @@ Page {
             Keys.onReturnPressed:  {
                 miniature.sendMessage(chatField.text)
                 chatBkg.state = ""
-                chatField.text = ""
-                chatField.focus = false
+                // chatField.text = ""
+                // chatField.focus = true
             }
         }
 
@@ -268,8 +272,7 @@ Page {
             onClicked: {
                 miniature.sendMessage(chatField.text)
                 chatBkg.state = ""
-                chatField.text = ""
-                chatField.focus = false
+                // chatField.focus = false
             }
         }
     }
