@@ -154,6 +154,7 @@ Page {
                 wrapMode: Text.Wrap
                 verticalAlignment: Text.AlignBottom
                 text: model.playerName + ": " + model.message
+                width: parent.width
                 clip: false
             }
         }
@@ -188,7 +189,16 @@ Page {
                     target: chatBkg
                     anchors.bottom: chatInputArea.top
                 }
+            },
+
+            State {
+                name: ""
+                AnchorChanges {
+                    target: chatBkg
+                    anchors.bottom: opponentZone.top
+                }
             }
+
         ]
 
         transitions: [
@@ -470,7 +480,6 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 onClicked: {
-                    console.log(localSide.active + " " + remoteSide.active)
                     miniature.confirmMove()
 
                     checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
