@@ -493,8 +493,6 @@ namespace {
                 result.result = Game::ResultDraw;
             } else if (r == "0-1") {
                 result.result = Game::ResultBlackWins;
-            } else {
-                result.valid = false;
             }
         } else {
             result.valid = false;
@@ -704,7 +702,10 @@ void Engine::processToken(const QByteArray &token)
         return;
     }
 
-    if (m_filter & WaitingForWrappedChatMessage) {
+    bool tokenProcessed = false;
+
+    if (not tokenProcessed
+        && (m_filter & WaitingForWrappedChatMessage)) {
         m_filter &= ~WaitingForWrappedChatMessage;
         if (match_chat_message_wrapped.exactMatch(token)) {
             const Message &last_msg(parseMessage(m_last_token));
@@ -719,13 +720,14 @@ void Engine::processToken(const QByteArray &token)
                     sendCommand(&mc);
                     m_filter |= WaitingForWrappedChatMessage;
 
-                    return;
+                    tokenProcessed = true;
                 }
             }
         }
     }
 
-    if (m_filter & PlayRequest) {
+    if (not tokenProcessed
+        && (m_filter & PlayRequest)) {
         if (parseCreatingGame(token, &m_current_game)
             && m_current_game.valid) {
             // Wait for second part of message (match_game_created)
@@ -744,6 +746,8 @@ void Engine::processToken(const QByteArray &token)
             m_filter |= InGame;
             m_filter &= ~WaitingForSeeks;
             m_filter &= ~PlayRequest;
+
+            tokenProcessed = true;
         } else if (token.contains(seek_not_available)
               || match_declines_match_offer.exactMatch(token)
               || match_has_departed.exactMatch(token)) {
@@ -752,10 +756,13 @@ void Engine::processToken(const QByteArray &token)
 
             m_filter |= WaitingForSeeks;
             m_filter &= ~PlayRequest;
+
+            tokenProcessed = true;
         }
     }
 
-    if (m_filter & InGame) {
+    if (not tokenProcessed
+        && (m_filter & InGame)) {
         GameUpdate gu(parseGameUpdate(token));
         if (gu.valid) {
             if (gu.id == m_current_game.id) {
@@ -770,11 +777,15 @@ void Engine::processToken(const QByteArray &token)
             m.setWhite(gu.white);
             m.setBlack(gu.black);
             sendCommand(&m);
+
+            tokenProcessed = true;
         } else {
             const InvalidMove &im(parseInvalidMove(token));
             if (im.valid) {
                 Command::InvalidMove imc(TargetFrontend, m_current_game.id, im.move);
                 sendCommand(&imc);
+
+                tokenProcessed = true;
             } else {
                 const GameEnded &ge(parseGameEnded(token));
                 if (ge.valid) {
@@ -790,6 +801,8 @@ void Engine::processToken(const QByteArray &token)
                         m_current_game = GameInfo();
                         m_filter |= WaitingForSeeks;
                         m_filter &= ~InGame;
+
+                        tokenProcessed = true;
                     }
                 } else {
                     const Message &msg(parseMessage(token));
@@ -802,6 +815,8 @@ void Engine::processToken(const QByteArray &token)
                             Command::Message mc(TargetFrontend, msg.player_name, msg.data);
                             sendCommand(&mc);
                             m_filter |= WaitingForWrappedChatMessage;
+
+                            tokenProcessed = true;
                         }
                     }
                 }
@@ -809,19 +824,25 @@ void Engine::processToken(const QByteArray &token)
         }
     }
 
-    if (m_filter & WaitingForSeeks) {
+    if (not tokenProcessed
+        && (m_filter & WaitingForSeeks)) {
         const Seek &s(parseSeek(token));
         if (s.valid) {
             Command::Advertisement ac(TargetFrontend, s);
             sendCommand(&ac);
+
+            tokenProcessed = true;
         }
     }
 
-    if (m_filter & WaitingForGames) {
+    if (not tokenProcessed
+        && (m_filter & WaitingForGames)) {
         const Record &r(parseRecord(token));
         if (r.valid) {
             Command::Record rc(TargetFrontend, r);
             sendCommand(&rc);
+
+            tokenProcessed = true;
         }
     }
 }
