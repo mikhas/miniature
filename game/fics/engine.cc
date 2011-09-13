@@ -135,7 +135,10 @@ namespace {
     const QRegExp match_has_departed("\\s*(\\w+)\\,\\s+whom you were challenging, has departed.");
 
     // Matches "MiniatureTest[448] says: hi" and "GuestXYZ(U)[123] says: hi"
-    const QRegExp match_remote_side_message("\\s*(\\w+)(\\(U\\))?\\[(\\d+)\\]\\s+says:\\s+(.*)");
+    const QRegExp match_chat_message("\\s*(\\w+)(\\(U\\))?\\[(\\d+)\\]\\s+says:\\s+(.*)");
+
+    // Matches: "\    this chatline got wrapped"
+    const QRegExp match_chat_message_wrapped("\\\\\\s+(.*)");
 
     QString fromColor(Game::Color c)
     {
@@ -504,7 +507,7 @@ namespace {
 
     Message parseMessage(const QByteArray &token)
     {
-        const QRegExp &re(match_remote_side_message);
+        const QRegExp &re(match_chat_message);
         Message result;
 
         result.valid = re.exactMatch(token);
@@ -672,17 +675,31 @@ void Engine::movePiece(const MovedPiece &moved_piece)
 
 void Engine::processToken(const QByteArray &token)
 {
-    if (not m_enabled || token.isEmpty()) {
-        return;
-    }
-
-    m_last_token = token;
-    qDebug() << "FICS:" << token;
-
     if (m_filter & LoginRequest) {
         processLogin(token);
         // There's no point in trying anything else at this point:
         return;
+    }
+
+    if (m_filter & WaitingForWrappedChatMessage) {
+        m_filter &= ~WaitingForWrappedChatMessage;
+        if (match_chat_message_wrapped.exactMatch(token)) {
+            const Message &last_msg(parseMessage(m_last_token));
+            if (last_msg.valid) {
+                if (last_msg.game_id != m_current_game.id) {
+                        qWarning() << __PRETTY_FUNCTION__
+                                   << "Received message from opponent, but game id's don't match:"
+                                   << last_msg.game_id << "but expected" << m_current_game.id;
+                } else {
+                    Command::Message mc(TargetFrontend, last_msg.player_name,
+                                        match_chat_message_wrapped.cap(1).toLatin1().trimmed());
+                    sendCommand(&mc);
+                    m_filter |= WaitingForWrappedChatMessage;
+
+                    return;
+                }
+            }
+        }
     }
 
     if (m_filter & PlayRequest) {
@@ -752,6 +769,7 @@ void Engine::processToken(const QByteArray &token)
                         } else {
                             Command::Message mc(TargetFrontend, msg.player_name, msg.data);
                             sendCommand(&mc);
+                            m_filter |= WaitingForWrappedChatMessage;
                         }
                     }
                 }
@@ -799,7 +817,12 @@ void Engine::onReadyRead()
     int next_newline_pos = -1;
     const bool enable_echo = false;
     do {
-        processToken(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
+        const QByteArray &token(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
+        if (m_enabled && not token.isEmpty()) {
+            qDebug() << "FICS:" << token;
+            processToken(token);
+            m_last_token = token;
+        }
     } while (next_newline_pos != -1);
 }
 

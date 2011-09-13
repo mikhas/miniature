@@ -45,7 +45,8 @@ public:
         PlayRequest = 0x2,
         InGame = 0x4,
         WaitingForSeeks = 0x8,
-        WaitingForGames = 0x10
+        WaitingForGames = 0x10,
+        WaitingForWrappedChatMessage = 0x20
     };
 
     Q_ENUMS(MessageFilter)

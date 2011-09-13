@@ -44,12 +44,25 @@ void MessageLog::append(const QByteArray &player_name,
         return;
     }
 
+    static Message empty;
+    Message &prev_msg(m_log.isEmpty() ? empty
+                                      : m_log[m_log.size() - 1]);
+
+    // Check whether previous message was from same player:
+    if (prev_msg.player_name == player_name) {
+        prev_msg.data.append(message);
+        const QModelIndex &changed(index(m_log.size() - 1, 0));
+        emit dataChanged(changed, changed);
+
+        return;
+    }
+
     beginInsertRows(QModelIndex(), m_log.size(), m_log.size());
 
-    Message m;
-    m.player_name = player_name;
-    m.data = message;
-    m_log.append(m);
+    Message msg;
+    msg.player_name = player_name;
+    msg.data = message;
+    m_log.append(msg);
 
     endInsertRows();
 

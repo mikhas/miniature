@@ -371,6 +371,7 @@ void Miniature::sendMessage(const QString &message)
     const QByteArray &pn(d->local_side.id().toLatin1());
     const QByteArray &m(message.toLatin1());
 
+    // TODO: check for message limit, e.g. don't append if backend refuses to accept message for transmission.
     d->message_log.append(pn, m);
     Command::Message msg(TargetEngine, pn, m);
     sendCommand(&msg);
