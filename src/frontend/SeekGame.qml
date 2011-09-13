@@ -266,7 +266,7 @@ Page {
 
                     Text {
                         id: ratedGame
-                        text: model.rated ? "rated" : "unrated"
+                        text: model.isRated ? "rated" : "unrated"
                         font.family: "Nokia Pure Headline"
                         font.pointSize: 22
                         color: "black"
