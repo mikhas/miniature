@@ -52,6 +52,7 @@ void CreateGame::exec(Dispatcher *dispatcher,
     game->setLocalSideColor(m_color);
     game->setTime(m_game_info.time);
     game->setTimeIncrement(m_game_info.time_increment);
+    game->setRating(m_game_info.rating);
     target->registerGame(game);
 }
 
