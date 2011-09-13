@@ -18,49 +18,32 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gameended.h"
-#include "frontend/miniature.h"
-#include "frontend/messagelog.h"
-#include "dispatcher.h"
 #include "destroygame.h"
+#include "registry.h"
+#include "game.h"
 
 namespace Game { namespace Command {
 
-GameEnded::GameEnded(Target target,
-                     uint game_id,
-                     Result result,
-                     Reason reason,
-                     const QByteArray &player_name)
+DestroyGame::DestroyGame(Target target,
+                         uint game_id)
     : AbstractCommand(target)
     , m_game_id(game_id)
-    , m_result(result)
-    , m_reason(reason)
-    , m_player_name(player_name)
 {}
 
-GameEnded::~GameEnded()
+DestroyGame::~DestroyGame()
 {}
 
-void GameEnded::exec(Dispatcher *dispatcher,
-                     Frontend::Miniature *target)
+void DestroyGame::exec(Dispatcher *,
+                       Registry *target)
 {
-    if (not dispatcher || not target) {
+    if (not target) {
         return;
     }
 
-    // QML still has issues with signals and enums?
-    // https://bugreports.qt.nokia.com/browse/QTBUG-15983
-    emit target->gameEnded(static_cast<int>(m_result), static_cast<int>(m_reason));
-
-    // Game ended, clear message log
-    if (Frontend::MessageLog *log = target->messageLog()) {
-        log->removeAll();
+    if (Game *g = target->game(m_game_id)) {
+        target->unregisterGame(g);
+        delete g;
     }
-
-    target->setActiveGame(0);
-    Command::DestroyGame dg(TargetRegistry, m_game_id);
-    dispatcher->sendCommand(&dg);
-
 }
 
 }} // namespace Command, Game

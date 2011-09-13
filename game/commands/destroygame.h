@@ -18,19 +18,32 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef DESTROYGAME_H
+#define DESTROYGAME_H
+
 #include "abstractcommand.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/loginfailed.h"
-#include "commands/advertisement.h"
-#include "commands/record.h"
-#include "commands/play.h"
-#include "commands/move.h"
-#include "commands/creategame.h"
-#include "commands/activategame.h"
-#include "commands/destroygame.h"
-#include "commands/seek.h"
-#include "commands/invalidmove.h"
-#include "commands/invalidseek.h"
-#include "commands/gameended.h"
-#include "commands/message.h"
+#include "abstractengine.h"
+
+#include <QtCore>
+
+namespace Game { namespace Command {
+
+class DestroyGame
+    : public AbstractCommand
+{
+private:
+    uint m_game_id;
+
+public:
+    //! \reimp
+    explicit DestroyGame(Target target,
+                         uint game_id);
+    virtual ~DestroyGame();
+    virtual void exec(Dispatcher *,
+                      Registry *target);
+    //! \reimp_end
+};
+
+}} // namespace Command, Game
+
+#endif // DESTROYGAME_H

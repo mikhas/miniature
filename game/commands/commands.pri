@@ -10,6 +10,7 @@ HEADERS += \
     $${COMMANDS_DIR}/move.h \
     $${COMMANDS_DIR}/creategame.h \
     $${COMMANDS_DIR}/activategame.h \
+    $${COMMANDS_DIR}/destroygame.h \
     $${COMMANDS_DIR}/seek.h \
     $${COMMANDS_DIR}/invalidseek.h \
     $${COMMANDS_DIR}/invalidmove.h \
@@ -26,6 +27,7 @@ SOURCES += \
     $${COMMANDS_DIR}/move.cc \
     $${COMMANDS_DIR}/creategame.cc \
     $${COMMANDS_DIR}/activategame.cc \
+    $${COMMANDS_DIR}/destroygame.cc \
     $${COMMANDS_DIR}/seek.cc \
     $${COMMANDS_DIR}/invalidseek.cc \
     $${COMMANDS_DIR}/invalidmove.cc \

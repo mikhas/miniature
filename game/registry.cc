@@ -39,7 +39,7 @@ Registry::~Registry()
 
 void Registry::registerGame(Game *game)
 {
-    if (m_games.contains(game)) {
+    if (not game || m_games.contains(game)) {
         return;
     }
 
@@ -49,6 +49,19 @@ void Registry::registerGame(Game *game)
     Command::ActivateGame ag(TargetFrontend, game);
     if (Dispatcher *dispatcher = m_dispatcher.data()) {
         dispatcher->sendCommand(&ag);
+    }
+}
+
+void Registry::unregisterGame(Game *game)
+{
+    if (not game) {
+        return;
+    }
+
+    int index = m_games.indexOf(game);
+    while (-1 != index) {
+        m_games.remove(index);
+        index = m_games.indexOf(game);
     }
 }
 

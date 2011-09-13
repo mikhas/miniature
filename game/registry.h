@@ -48,6 +48,10 @@ public:
     //! @param game the game instance to register.
     void registerGame(Game *game);
 
+    //! Unregisters a game, usually before game is deleted.
+    //! @param game the game instance to unregister.
+    void unregisterGame(Game *game);
+
     //! @returns game with given id, or 0 if not found.
     //! @param id the game id.
     Game * game(uint id) const;
