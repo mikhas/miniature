@@ -468,21 +468,22 @@ Page {
                     exitMenu.open()
                 }
 
-                Menu {
+                Menu { // Commenting cases not covered for 0.4 release
                     id: exitMenu
                     MenuLayout {
                         MenuItem {text: "Resign"; onClicked: resignDialog.open() }
-                        MenuItem {text: "Propose a draw"; onClicked: proposedrawDialog.open() }
-                        MenuItem {text: "Request to adjourn"; onClicked: requestadjournDialog.open() }
-                        MenuItem {text: "Testing: accept draw"; onClicked: acceptdrawDialog.open() }
-                        MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
-                        MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
-                        MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
-                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
-                                miniature.logout()
-                                pageStack.pop(null)
-                                suppressGameEndedDialog = true
-                            }}
+//                        MenuItem {text: "Propose a draw"; onClicked: proposedrawDialog.open() }
+//                        MenuItem {text: "Request to adjourn"; onClicked: requestadjournDialog.open() }
+//                        MenuItem {text: "Testing: accept draw"; onClicked: acceptdrawDialog.open() }
+//                        MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
+//                        MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
+//                        MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
+//                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
+//                                miniature.logout()
+//                                pageStack.pop(null)
+//                                suppressGameEndedDialog = true
+//                            }
+//                        }
                     }
                 }
             }

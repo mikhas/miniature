@@ -120,7 +120,7 @@ public:
         , message_log()
         , chess_board()
         , valid_move(false)
-        , mode(Miniature::TestFicsMode)
+        , mode(Miniature::FicsMode)
         , game()
         , local_side()
         , remote_side()
