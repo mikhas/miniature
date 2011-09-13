@@ -545,6 +545,7 @@ Page {
         acceptButtonText: "Yes"
         onAccepted: {
             miniature.resign()
+            pageStack.pop()
         }
         rejectButtonText: "No"
     }
