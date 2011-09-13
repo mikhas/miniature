@@ -168,7 +168,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     TextField {
         id: idForm
         placeholderText: "username"
-        inputMethodHints: Qt.ImhNoAutoUppercase
+        inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
         anchors.top:  anonymousButton.bottom
         anchors.topMargin: 70
         anchors.left: anonymousButton.left
