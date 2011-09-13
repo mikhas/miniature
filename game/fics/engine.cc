@@ -739,8 +739,16 @@ void Engine::processToken(const QByteArray &token)
     }
 
     if (m_filter & InGame) {
-        const GameUpdate &gu(parseGameUpdate(token));
+        GameUpdate gu(parseGameUpdate(token));
         if (gu.valid) {
+            if (gu.id == m_current_game.id) {
+                // FICS only sends rating at the beginning of a game, but we
+                // decided that rating is part of a side's info. To keep things
+                // easy, we just always send rating, too:
+                gu.white.rating = m_current_game.white.rating;
+                gu.black.rating = m_current_game.black.rating;
+            }
+
             Command::Move m(TargetFrontend, gu.id, gu.position);
             m.setWhite(gu.white);
             m.setBlack(gu.black);
