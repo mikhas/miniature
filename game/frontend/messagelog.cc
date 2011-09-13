@@ -39,6 +39,11 @@ MessageLog::~MessageLog()
 void MessageLog::append(const QByteArray &player_name,
                         const QByteArray &message)
 {
+    if (message.isEmpty()) {
+        // Nothing to append, ignore.
+        return;
+    }
+
     beginInsertRows(QModelIndex(), m_log.size(), m_log.size());
 
     Message m;
