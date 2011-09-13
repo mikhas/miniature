@@ -184,7 +184,7 @@ Page {
                     // Programmatically setting the focus does not request VKB:
                     script: {
                         chatField.forceActiveFocus()
-                        chatField.openSoftwareInputPanel()
+                        chatField.platformOpenSoftwareInputPanel()
                     }
                 }
 
