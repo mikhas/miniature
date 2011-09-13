@@ -43,8 +43,14 @@ Page {
 
     // property int rated: activeGame.rating
     function gameRated() { // trick to convert int activeGame.rating to the right value
-        if (activeGame.rating === 0) return "unrated"
-        else return "rated"
+        switch (activeGame.rating) {
+        default:
+        case Miniature.RatingDisabled:
+            return "unrated"
+
+        case Miniature.RatingEnabled:
+            return "rated";
+        }
     }
 
     Rectangle {
