@@ -90,7 +90,7 @@ namespace {
     // Matches: '{Game 328 (GuestNDFD vs. pleaseIgnoreMe) GuestNDFD checkmated} 0-1'
     // TODO: should also match draws.
     const QRegExp match_game_ended("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
-                                   "\\s+(\\w+)\\s+(\\w+)\\}\\s+([012/-]+)");
+                                   "\\s+(\\w+)\\s+(.*)\\}(\\s+(.*))?");
     
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
@@ -486,7 +486,7 @@ namespace {
             result.valid = result.valid && converted;
             result.player_name = match_game_ended.cap(2).toLatin1();
 
-            const QString &r(match_game_ended.cap(4));
+            const QString &r(match_game_ended.cap(5));
             if (r == "1-0") {
                 result.result = Game::ResultWhiteWins;
             } else if (r == "1/2-1/2") {
@@ -671,6 +671,23 @@ void Engine::play(uint advertisement_id)
     m_current_advertisment_id = advertisement_id;
     m_filter |= PlayRequest;
     m_channel.write(play_command.arg(advertisement_id).toLatin1());
+}
+
+void Engine::endGame(Reason reason)
+{
+    switch (reason) {
+    case ReasonUnknown:
+    case ReasonSurrendered:
+        m_channel.write("resign\n");
+
+        m_current_game = GameInfo();
+        m_filter |= WaitingForSeeks;
+        m_filter &= ~InGame;
+        break;
+
+    default:
+        break;
+    }
 }
 
 void Engine::movePiece(const MovedPiece &moved_piece)

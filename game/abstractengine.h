@@ -138,6 +138,10 @@ public:
     //!        game advertisement; this is the ad's id (optional).
     virtual void play(uint advertisement_id = 0);
 
+    //! Ends a game.
+    //! @param reason why/how the game was ended.
+    virtual void endGame(Reason reason);
+
     //! Move piece.
     //! @param moved_piece the moved piece.
     virtual void movePiece(const MovedPiece &moved_piece);

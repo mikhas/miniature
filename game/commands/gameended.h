@@ -47,6 +47,9 @@ public:
     virtual ~GameEnded();
 
     virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
+
+    virtual void exec(Dispatcher *dispatcher,
                       Frontend::Miniature *target);
     //! \reimp_end
 };

@@ -516,6 +516,8 @@ Page {
         property string winnerIs
         property string description
         onGameEnded: {
+            gameResolutions.description = "Game ended, reason unknown."
+
             if (reason == Miniature.ReasonCheckmated) {
                 gameResolutions.description = "Checkmate!"
             } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + "accepts draw."
@@ -529,7 +531,7 @@ Page {
             if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
             if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
 
-            if (!suppressGameEndedDialog && reason != Miniature.ReasonUnknown) {
+            if (!suppressGameEndedDialog) {
                 // Suppression flag is only valid for one time:
                 suppressGameEndedDialog = false
                 gameEndedDialog.open()
@@ -542,7 +544,7 @@ Page {
         titleText: "Resign?"
         acceptButtonText: "Yes"
         onAccepted: {
-            // FIXME instructions to send a resign command
+            miniature.resign()
         }
         rejectButtonText: "No"
     }

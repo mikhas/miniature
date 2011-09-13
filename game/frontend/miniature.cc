@@ -286,6 +286,20 @@ void Miniature::play(uint id)
     }
 }
 
+void Miniature::resign()
+{
+    Q_D(Miniature);
+
+    if (Game *g = d->game.data()) {
+        Command::GameEnded gec(TargetEngine, g->id(),
+                               ::Game::ResultUnknown, ::Game::ReasonSurrendered,
+                               d->local_side.id().toLatin1());
+        sendCommand(&gec);
+
+        d->message_log.removeAll();
+    }
+}
+
 void Miniature::toggleGameAdvertisementHighlighting(uint id)
 {
     Q_D(Miniature);

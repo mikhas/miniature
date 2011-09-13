@@ -42,6 +42,19 @@ GameEnded::~GameEnded()
 {}
 
 void GameEnded::exec(Dispatcher *dispatcher,
+                     AbstractEngine *target)
+{
+    if (not dispatcher || not target) {
+        return;
+    }
+
+    target->endGame(m_reason);
+
+    Command::DestroyGame dg(TargetRegistry, m_game_id);
+    dispatcher->sendCommand(&dg);
+}
+
+void GameEnded::exec(Dispatcher *dispatcher,
                      Frontend::Miniature *target)
 {
     if (not dispatcher || not target) {
@@ -60,7 +73,6 @@ void GameEnded::exec(Dispatcher *dispatcher,
     target->setActiveGame(0);
     Command::DestroyGame dg(TargetRegistry, m_game_id);
     dispatcher->sendCommand(&dg);
-
 }
 
 }} // namespace Command, Game

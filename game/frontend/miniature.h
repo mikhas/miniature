@@ -144,6 +144,9 @@ public:
     //! @param id the game advertisement id.
     Q_INVOKABLE void play(uint id);
 
+    //! Resign from active game.
+    Q_INVOKABLE void resign();
+
     //! Toggles whether a game advertisement is highlighted. Only one ad can be
     //! highlighted at a time.
     //! @param id the game advertisement id

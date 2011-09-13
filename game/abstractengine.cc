@@ -53,6 +53,9 @@ void AbstractEngine::seek(uint, uint, Rating, Color)
 void AbstractEngine::play(uint)
 {}
 
+void AbstractEngine::endGame(Reason)
+{}
+
 void AbstractEngine::movePiece(const MovedPiece &)
 {}
 

@@ -83,6 +83,7 @@ public:
                       Rating rating,
                       Color color);
     virtual void play(uint advertisement_id);
+    virtual void endGame(Reason reason);
     virtual void movePiece(const MovedPiece &moved_piece);
     virtual void processToken(const QByteArray &token);
     virtual void sendMessage(const QByteArray &player_name,
