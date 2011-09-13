@@ -631,6 +631,12 @@ void Engine::logout()
     m_channel.close();
     m_logged_in = false;
     m_past_welcome_screen = false;
+
+    Command::GameEnded gec(TargetFrontend, m_current_game.id,
+                           ResultUnknown, ReasonUnknown, m_username.toLatin1());
+    sendCommand(&gec);
+
+    m_current_game = GameInfo();
 }
 
 void Engine::seek(uint time,
@@ -756,6 +762,7 @@ void Engine::processToken(const QByteArray &token)
                                                ge.result, ge.reason, ge.player_name);
                         sendCommand(&gec);
 
+                        m_current_game = GameInfo();
                         m_filter |= WaitingForSeeks;
                         m_filter &= ~InGame;
                     }

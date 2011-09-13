@@ -57,8 +57,8 @@ private:
     QTcpSocket m_channel;
     QByteArray m_buffer;
     QByteArray m_last_token;
-    QString m_username;
-    QString m_password;
+    QString m_username; // FIXME: Change to QBA.
+    QString m_password; // FIXME: Change to QBA.
     MessageFilterFlags m_filter;
     bool m_enabled;
     bool m_logged_in;

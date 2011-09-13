@@ -22,6 +22,17 @@
 
 namespace Game {
 
+GameInfo::GameInfo()
+    : id(0)
+    , valid(false)
+    , white()
+    , black()
+    , rating(RatingAny)
+    , mode(ModeNone)
+    , time(0)
+    , time_increment(0)
+{}
+
 AbstractEngine::AbstractEngine(QObject *parent)
     : QObject(parent)
 {}

@@ -24,6 +24,10 @@ namespace Game {
 
 Side::Side()
     : valid(false)
+    , name()
+    , rating(0)
+    , remaining_time(0)
+    , material_strength(0)
 {}
 
 } // namespace Game

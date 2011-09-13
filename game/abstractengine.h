@@ -72,6 +72,8 @@ struct GameInfo {
     Mode mode;
     uint time;
     uint time_increment;
+
+    GameInfo();
 };
 
 class AbstractEngine;

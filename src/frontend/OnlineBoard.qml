@@ -23,6 +23,8 @@ import com.nokia.meego 1.0
 import org.maemo.miniature 1.0
 
 Page {
+    property bool suppressGameEndedDialog: false
+
     // Taken from http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-%28javascript%29
     function formatTime(secs) {
             var hr = Math.floor(secs / 3600);
@@ -479,6 +481,7 @@ Page {
                         MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
                                 miniature.logout()
                                 pageStack.pop(null)
+                                suppressGameEndedDialog = true
                             }}
                     }
                 }
@@ -525,7 +528,9 @@ Page {
             if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
             if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
 
-            if (reason != Miniature.ReasonUnknown) {
+            if (!suppressGameEndedDialog && reason != Miniature.ReasonUnknown) {
+                // Suppression flag is only valid for one time:
+                suppressGameEndedDialog = false
                 gameEndedDialog.open()
             }
         }
