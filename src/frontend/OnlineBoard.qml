@@ -179,6 +179,15 @@ Page {
                     visible: true
                     focus: true
                 }
+
+                StateChangeScript {
+                    // Programmatically setting the focus does not request VKB:
+                    script: {
+                        chatField.forceActiveFocus()
+                        chatField.openSoftwareInputPanel()
+                    }
+                }
+
                 PropertyChanges {
                     target: chatInputArea
                     visible: true
