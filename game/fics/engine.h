@@ -98,7 +98,7 @@ private:
     Q_SLOT void onHostFound();
     Q_SLOT void abortLogin();
     Q_SLOT void reconnect();
-    void configurePromptForParsing();
+    void configureFics();
     void sendLogin();
     void finalizeLogin();
     void sendCommand(AbstractCommand *command);

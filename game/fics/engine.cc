@@ -889,10 +889,10 @@ void Engine::abortLogin()
 void Engine::reconnect()
 {}
 
-void Engine::configurePromptForParsing()
+void Engine::configureFics()
 {
-    m_channel.write("set style 12");
-    m_channel.write("\n");
+    m_channel.write("set style 12\n");
+    m_channel.write("set seek 1\n");
 }
 
 void Engine::sendLogin()
@@ -908,7 +908,7 @@ void Engine::finalizeLogin()
     m_login_abort_timer.stop();
     m_extra_delimiter.clear();
 
-    configurePromptForParsing();
+    configureFics();
     Command::Login lc(TargetFrontend, m_username, "");
     sendCommand(&lc);
 
