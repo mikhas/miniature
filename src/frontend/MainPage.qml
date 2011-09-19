@@ -217,22 +217,21 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         onClicked: { Qt.openUrlExternally("http://www.freechess.org/cgi-bin/Register/FICS_register.cgi") }
     }
 
-//    // Commenting for 0.4 release
-//    Button { // Toggle between testing mode and real mode - to be commented in releases
-//        id: testingButton
-//        text:  checked ? "TESTING MODE ON"
-//                       : "TESTING MODE OFF"
-//        checkable: true
-//        checked: miniature.mode == Miniature.TestFicsMode
-//        opacity: 0.8
-//        anchors.top: aboutButton.bottom
-//        anchors.topMargin: 40
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        onClicked: {
-//            miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
-//                                                    : Miniature.FicsMode)
-//        }
-//    }
+    Button { // Toggle between testing mode and real mode - to be commented in releases
+        id: testingButton
+        text:  checked ? "TESTING MODE ON"
+                       : "TESTING MODE OFF"
+        checkable: true
+        checked: miniature.mode == Miniature.TestFicsMode
+        opacity: 0.8
+        anchors.top: aboutButton.bottom
+        anchors.topMargin: 40
+        anchors.horizontalCenter: parent.horizontalCenter
+        onClicked: {
+            miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
+                                                    : Miniature.FicsMode)
+        }
+    }
 
     Rectangle {
         id: aboutMiniature
