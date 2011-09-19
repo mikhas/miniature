@@ -545,10 +545,17 @@ Page {
         }
     }
 
+    Item { // visualParent for end game dialogs
+        id: dialogWindow
+        opacity: 0.8
+        anchors.fill: imageBoard
+    }
+
     QueryDialog { // Confirm resign
         id: resignDialog
         titleText: "Resign?"
         acceptButtonText: "Yes"
+        visualParent: dialogWindow
         onAccepted: {
             miniature.resign()
             pageStack.pop()
@@ -558,6 +565,7 @@ Page {
 
     QueryDialog { // Propose draw
         id: proposedrawDialog
+        visualParent: dialogWindow
         titleText: "Propose a draw?"
         message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
         acceptButtonText: "Yes"
@@ -570,6 +578,7 @@ Page {
 
     QueryDialog { // Request adjourn
         id: requestadjournDialog
+        visualParent: dialogWindow
         titleText: "Request to adjourn?"
         message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
         acceptButtonText: "Yes"
@@ -582,6 +591,7 @@ Page {
 
     QueryDialog { // Accept draw?
         id: acceptdrawDialog
+        visualParent: dialogWindow
         titleText: "Is this a draw?"
         message:  "$OPPONENT is proposing to end this game with a draw." // FIXME real variable for $OPPONENT
         acceptButtonText: "Accept"
@@ -594,6 +604,7 @@ Page {
 
     QueryDialog { // Accept adjourn?
         id: acceptadjournDialog
+        visualParent: dialogWindow
         titleText: "See you later?"
         message:  "$OPPONENT is requesting to adjourn this game." // FIXME real variable for $OPPONENT
         acceptButtonText: "Accept"
@@ -606,6 +617,7 @@ Page {
 
     QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
         id: gameoverDialog
+        visualParent: dialogWindow
         titleText: "You won!" // FIXME or "Sorry...", depending.
         message:  "$whitePlayer: 1033 >> 1026\n$blackPlayer: 1033 >> 1041\nWhat's next?" // FIXME real variables
         acceptButtonText: "Challenge $OPPONENT"
@@ -620,6 +632,7 @@ Page {
 
     QueryDialog { // Connection lost
         id: connectionlostDialog
+        visualParent: dialogWindow
         titleText: "Lost connection"
         message:  "You have lost the connection to the server." // FIXME real variables
         acceptButtonText: "Log in again"
@@ -634,6 +647,7 @@ Page {
 
     QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now. And it should allow for post-match chat or so.
         id: gameEndedDialog
+        visualParent: dialogWindow
         titleText: "Bye bye!"
         message:  gameResolutions.description + "\n\nResult: " + gameResolutions.winnerIs
         acceptButtonText: "OK"
