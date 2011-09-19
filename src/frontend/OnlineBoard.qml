@@ -23,7 +23,6 @@ import com.nokia.meego 1.0
 import org.maemo.miniature 1.0
 
 Page {
-    property bool suppressGameEndedDialog: false
 
     // Taken from http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-%28javascript%29
     function formatTime(secs) {
@@ -487,7 +486,6 @@ Page {
 //                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
 //                                miniature.logout()
 //                                pageStack.pop(null)
-//                                suppressGameEndedDialog = true
 //                            }
 //                        }
                     }
@@ -521,7 +519,22 @@ Page {
         target: miniature
         property string winnerIs
         property string description
+        property string newRatings
         onGameEnded: {
+            // Defining the result string to be used as title
+            if (result == Miniature.ResultWhiteWins) {
+            if (localSide.color == "white") { gameResolutions.winnerIs = "You win!" }
+            else { gameResolutions.winnerIs = "You lose..." }
+            }
+            if (result == Miniature.ResultBlackWins) {
+            if (localSide.color == "black") { gameResolutions.winnerIs = "You win!" }
+            else { gameResolutions.winnerIs = "You lose..." }
+            }
+            if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
+            if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
+            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
+
+            // Defining the reason string to be used as description
             gameResolutions.description = "Game ended, reason unknown."
 
             if (reason == Miniature.ReasonCheckmated) {
@@ -531,24 +544,22 @@ Page {
                 gameResolutions.description = remoteSide.id + " vanished."
             }
 
-            if (result == Miniature.ResultWhiteWins) { gameResolutions.winnerIs = "White wins" }
-            if (result == Miniature.ResultBlackWins) { gameResolutions.winnerIs = "Black wins" }
-            if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
-            if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
-            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
+            // Defining the ratings strings to be used in the description
 
-            if (!suppressGameEndedDialog) {
-                // Suppression flag is only valid for one time:
-                suppressGameEndedDialog = false
-                gameEndedDialog.open()
-            }
+            if (gameRated() == "unrated") { gameResolutions.newRatings = "No ratings adjustment done" }
+            else gameResolutions.newRatings = localSide.id + ": " + localSide.rating + " > " + "FIXME\n" +
+            remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
+
+            gameoverDialog.open()
         }
     }
 
     Item { // visualParent for end game dialogs
         id: dialogWindow
-        opacity: 0.8
-        anchors.fill: imageBoard
+        opacity: 0.9
+        width: parent.width
+        anchors.top: opponentZone.top
+        anchors.bottom: parent.bottom
     }
 
     QueryDialog { // Confirm resign
@@ -615,21 +626,6 @@ Page {
         rejectButtonText: "Ignore"
     }
 
-    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
-        id: gameoverDialog
-        visualParent: dialogWindow
-        titleText: "You won!" // FIXME or "Sorry...", depending.
-        message:  "$whitePlayer: 1033 >> 1026\n$blackPlayer: 1033 >> 1041\nWhat's next?" // FIXME real variables
-        acceptButtonText: "Challenge $OPPONENT"
-        onAccepted: {
-            // FIXME instructions to send a challenge to OPPONENT with the same parameters as the previous game
-        }
-        rejectButtonText: "Find other players"
-        onRejected: {
-            pageStack.pop()
-        }
-    }
-
     QueryDialog { // Connection lost
         id: connectionlostDialog
         visualParent: dialogWindow
@@ -645,13 +641,17 @@ Page {
         }
     }
 
-    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now. And it should allow for post-match chat or so.
-        id: gameEndedDialog
+    QueryDialog { // End of game // FIXME this dialog needs to be nicer and wiser! Not spending extra time now.
+        id: gameoverDialog
         visualParent: dialogWindow
-        titleText: "Bye bye!"
-        message:  gameResolutions.description + "\n\nResult: " + gameResolutions.winnerIs
-        acceptButtonText: "OK"
-        onAccepted: {
+        titleText: gameResolutions.winnerIs
+        message:  gameResolutions.description + "\n\n" + gameResolutions.newRatings
+
+        acceptButtonText: "Rematch"
+        onAccepted: { // FIXME match functiona needs to be implemented
+        }
+        rejectButtonText: "Seek games"
+        onRejected: {
             pageStack.pop()
         }
     }
