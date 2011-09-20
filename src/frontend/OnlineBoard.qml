@@ -40,7 +40,6 @@ Page {
     id: ficsBoard
     orientationLock: PageOrientation.LockPortrait
 
-    // property int rated: activeGame.rating
     function gameRated() { // trick to convert int activeGame.rating to the right value
         switch (activeGame.rating) {
         default:
@@ -219,18 +218,6 @@ Page {
             }
 
         ]
-
-//        transitions: [
-//            Transition {
-//                ParallelAnimation  {
-//                    PropertyAnimation {
-//                        property: "opacity"; from: 0; to: 0.8
-//                        easing.type: Easing.OutQuint
-//                    }
-//                    AnchorAnimation { easing.type: Easing.OutQuint }
-//                }
-//            }
-//        ]
     }
 
     Rectangle { // Little effect of shadow in chat
@@ -373,13 +360,6 @@ Page {
         model: chessBoard
         delegate: chessboardGridDelegate
 
-
-        // Creating variables to detect valid piece moves and clean unused squares
-        Item {
-            id: checkMove
-            property int moveNumber: 0 // Used by the timer to know when to start
-        }
-
         // Drawing the pieces on the board
         Component {
             id: chessboardGridDelegate
@@ -473,36 +453,21 @@ Page {
                     exitMenu.open()
                 }
 
-                Menu { // Commenting cases not covered for 0.4 release
+                Menu {
                     id: exitMenu
                     MenuLayout {
                         MenuItem {text: "Resign"; onClicked: resignDialog.open() }
-//                        MenuItem {text: "Propose a draw"; onClicked: proposedrawDialog.open() }
-//                        MenuItem {text: "Request to adjourn"; onClicked: requestadjournDialog.open() }
-//                        MenuItem {text: "Testing: accept draw"; onClicked: acceptdrawDialog.open() }
-//                        MenuItem {text: "Testing: accept adjourn"; onClicked: acceptadjournDialog.open() }
-//                        MenuItem {text: "Testing: end game"; onClicked: gameoverDialog.open() }
-//                        MenuItem {text: "Testing: connection lost"; onClicked: connectionlostDialog.open() }
-//                        MenuItem {text: "Convenient: Back to MainPage"; onClicked: {
-//                                miniature.logout()
-//                                pageStack.pop(null)
-//                            }
-//                        }
                     }
                 }
             }
 
-
-            ToolIcon { // Confirms the move. Visible only when lastIndex && toIndex are selected.
+            ToolIcon {
                 id: confirmButton
                 iconId: "toolbar-add"
                 visible: miniature.validMove
                 anchors.horizontalCenter: parent.horizontalCenter
-
                 onClicked: {
                     miniature.confirmMove()
-
-                    checkMove.moveNumber += 1 // timer switcher FIXME the opponent moves will be signaled by the backend and this needs to reflect it
                 }
             }
 
@@ -517,31 +482,29 @@ Page {
     Connections {
         id: gameResolutions
         target: miniature
-        property string winnerIs
+        property string winnerIs: "You lose..."
         property string description
         property string newRatings
         onGameEnded: {
             // Defining the result string to be used as title
             if (result == Miniature.ResultWhiteWins) {
-            if (localSide.color == "white") { gameResolutions.winnerIs = "You win!" }
-            else { gameResolutions.winnerIs = "You lose..." }
+            if (localSide.color == "#ffffff") gameResolutions.winnerIs = "You win!"
             }
             if (result == Miniature.ResultBlackWins) {
-            if (localSide.color == "black") { gameResolutions.winnerIs = "You win!" }
-            else { gameResolutions.winnerIs = "You lose..." }
+            if (localSide.color == "#000000") gameResolutions.winnerIs = "You win!"
             }
             if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
             if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
-            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "Game aborted" }
+            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "What happened?" }
 
             // Defining the reason string to be used as description
             gameResolutions.description = "Game ended, reason unknown."
 
             if (reason == Miniature.ReasonCheckmated) {
-                gameResolutions.description = "Checkmate!"
+                gameResolutions.description = "Checkmate"
             } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + "accepts draw."
             } else {
-                gameResolutions.description = remoteSide.id + " vanished."
+                gameResolutions.description = remoteSide.id + " vanished"
             }
 
             // Defining the ratings strings to be used in the description
@@ -551,6 +514,9 @@ Page {
             remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
 
             gameoverDialog.open()
+
+            // Used for debugging game endings
+            console.log(Miniature.ResultWhiteWins + " " + Miniature.ResultBlackWins + " " + result + " " + reason + " " + localSide.color)
         }
     }
 
@@ -569,7 +535,7 @@ Page {
         visualParent: dialogWindow
         onAccepted: {
             miniature.resign()
-            pageStack.pop()
+            pageStack.pop() // This needs to be removed as part of BMO#12433
         }
         rejectButtonText: "No"
     }
