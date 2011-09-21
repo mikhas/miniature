@@ -89,7 +89,7 @@ Page {
 
             SelectionDialog {
                 id: timeDialog
-                titleText: "Time"
+                titleText: qsTr("Time")
                 model:  ListModel { // Is there a convenient number picker component available somewhere?
                     ListElement { name: "*" } // Any time is good
                     ListElement { name: "0" }
@@ -126,7 +126,7 @@ Page {
 
             SelectionDialog {
                 id: incrementDialog
-                titleText: "Increment"
+                titleText: qsTr("Increment")
                 model:  ListModel { // Is there a convenient number picker component available somewhere?
                     ListElement { name: "*" } // Any increment is good
                     ListElement { name: "0" }
@@ -157,7 +157,7 @@ Page {
 
             SelectionDialog {
                 id: ratedDialog
-                titleText: "Type of match"
+                titleText: qsTr("Type of match")
                 model:  ListModel { // FIXME guest users can only play Unrated, button inactive
                     ListElement { name: "Any" } // Any option is good
                     ListElement { name: "Unrated" }
@@ -480,7 +480,7 @@ Page {
 
                 Text {
                     id: newplayerInfo
-                    text: "++++" + " " + localSide.id // FIXME rating must be changed for a variable.
+                    text: localSide.rating + " " + localSide.id
                     color: "black"
                     font.pointSize: 16
                     font.weight: Font.DemiBold
@@ -544,7 +544,7 @@ Page {
 
         Text {
             id: userInfo
-            text: localSide.rating + " " + localSide.id // FIXME rating must be changed for variable.
+            text: localSide.rating + " " + localSide.id
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
@@ -577,7 +577,7 @@ Page {
 
                 QueryDialog { // New seek dialog
                     id: newSeekDialog
-                    titleText: "New seek"
+                    titleText: qsTr("New seek")
                     message: (
                                  "Standard" + " " +
                                  timeDialog.model.get(timeDialog.selectedIndex).name + " " +
@@ -585,7 +585,7 @@ Page {
                                  ratedDialog.model.get(ratedDialog.selectedIndex).name + "\n" +
                                  localSide.id
                                  )
-                    acceptButtonText: "Yes"
+                    acceptButtonText: qsTr("Yes")
                     onAccepted: {
                         miniature.seek(timeDialog.model.get(timeDialog.selectedIndex).name,
                                        incrementDialog.model.get(incrementDialog.selectedIndex).name,
@@ -595,7 +595,7 @@ Page {
                         seekListWindow.anchors.bottom = newgameArea.top
                         // We are supporting one seek at a time at this point. If the user sends a new seek the old one is cancelled.
                     }
-                    rejectButtonText: "No"
+                    rejectButtonText: qsTr("No")
                     visualParent: dialogWrapper
                 }
             }

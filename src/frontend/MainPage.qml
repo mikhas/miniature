@@ -84,7 +84,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Text {
         id: poormansHeader
-        text: "Miniature"
+        //: only to be translated in non-Latin writing languages requiring it
+        text: qsTr("Miniature")
         font.family: "Nokia Pure Headline"
         font.pointSize: 28
         color: "white"
@@ -97,7 +98,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Text {
         id: poormansHeaderVersion
-        text: "0.4"
+        //: only to be translated in non-Latin writing languages requiring it
+        text: qsTr("0.4")
         font.family: "Nokia Pure Headline"
         font.pointSize: 28
         color: "white"
@@ -111,7 +113,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: anonymousButton
-        text: "Join as guest"
+        text: qsTr("Join as guest")
         anchors.top: headerBackground.bottom
         anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
@@ -126,7 +128,6 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Rectangle {
         id: loginErrorBkg
         color: "transparent"
-        // opacity: 0.5
         radius: 10
         anchors {
             top: idForm.top
@@ -148,7 +149,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Text {
         id: loginError
-        text:  "Wrong"
+        text:  qsTr("Wrong")
         font.pointSize: 20
         color: "transparent"
         anchors {
@@ -167,7 +168,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     // Login form
     TextField {
         id: idForm
-        placeholderText: "username"
+        placeholderText: qsTr("username")
         inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
         anchors.top:  anonymousButton.bottom
         anchors.topMargin: 70
@@ -180,7 +181,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     TextField {
         id: idPassword
-        placeholderText: "password"
+        placeholderText: qsTr("password")
         echoMode: TextInput.Password
         anchors.top:  idForm.bottom
         anchors.topMargin: 5
@@ -195,7 +196,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: loginButton
-        text: "Log in"
+        text: qsTr("Log in")
         anchors.top:  idPassword.bottom
         anchors.topMargin: 10
         anchors.left: anonymousButton.left
@@ -209,7 +210,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: registerButton
-        text: "Register online"
+        text: qsTr("Register online")
         anchors.top:  loginButton.bottom
         anchors.topMargin: 70
         anchors.left: anonymousButton.left
@@ -219,8 +220,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button { // Toggle between testing mode and real mode - to be commented in releases
         id: testingButton
-        text:  checked ? "TESTING MODE ON"
-                       : "TESTING MODE OFF"
+        text:  checked ? qsTr("TESTING MODE ON")
+                       : qsTr("TESTING MODE OFF")
         checkable: true
         checked: miniature.mode == Miniature.TestFicsMode
         opacity: 0.8
@@ -266,10 +267,10 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             anchors.top: board.bottom
             anchors.topMargin: 30
             color: "white"
-            text: "Miniature is free software developed openly by volunteers and distributed with the GPLv2 license. " +
-                  "We welcome your feedback and contributions!\n\n" +
-                  "Special thanks to Colin M.L. Burnett for his free chess set used by Wikipedia.\n\n" +
-                  "(C) 2011 Michael Hasselmann & Quim Gil"
+            text: qsTr("Miniature is free software developed openly by volunteers and distributed with the GPLv2 license. ") +
+                  qsTr("We welcome your feedback and contributions!\n\n") +
+                  qsTr("Special thanks to Colin M.L. Burnett for his free chess set used by Wikipedia.\n\n") +
+                  qsTr("(C) 2011 Michael Hasselmann & Quim Gil")
             font.pointSize: 16
             horizontalAlignment: Text.AlignHCenter
             clip: true
@@ -315,7 +316,8 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Button {
         id: aboutButton
         checkable: true
-        text: "i"
+        //: Translations must have just one character. In case of doubt just leave the original "i".
+        text: qsTr("i")
         width: 50
         anchors {
             top: registerButton.bottom

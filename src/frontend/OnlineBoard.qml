@@ -256,14 +256,13 @@ Page {
             Keys.onReturnPressed:  {
                 miniature.sendMessage(chatField.text)
                 chatBkg.state = ""
-                // chatField.text = ""
-                // chatField.focus = true
             }
         }
 
         Button {
             id: chatButton
-            text: "Chat"
+            //: Translations shuldn't be longer than "Chat" otherwise they make the button too big.
+            text: qsTr("Chat")
             width: 100
             anchors.right: parent.right
             anchors.rightMargin: 10
@@ -456,7 +455,7 @@ Page {
                 Menu {
                     id: exitMenu
                     MenuLayout {
-                        MenuItem {text: "Resign"; onClicked: resignDialog.open() }
+                        MenuItem {text: qsTr("Resign"); onClicked: resignDialog.open() }
                     }
                 }
             }
@@ -488,28 +487,28 @@ Page {
         onGameEnded: {
             // Defining the result string to be used as title
             if (result == Miniature.ResultWhiteWins) {
-            if (localSide.color == "#ffffff") gameResolutions.winnerIs = "You win!"
+                if (localSide.color == "#ffffff") gameResolutions.winnerIs = qsTr("You win!")
             }
             if (result == Miniature.ResultBlackWins) {
-            if (localSide.color == "#000000") gameResolutions.winnerIs = "You win!"
+                if (localSide.color == "#000000") gameResolutions.winnerIs = qsTr("You win!")
             }
-            if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = "Draw" }
-            if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = "Game adjourned" }
-            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = "What happened?" }
+            if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = qsTr("Draw") }
+            if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = qsTr("Game adjourned") }
+            if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = qsTr("What happened?") }
 
             // Defining the reason string to be used as description
-            gameResolutions.description = "Game ended, reason unknown."
+            gameResolutions.description = qsTr("Game ended, reason unknown")
 
             if (reason == Miniature.ReasonCheckmated) {
-                gameResolutions.description = "Checkmate"
-            } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + "accepts draw."
+                gameResolutions.description = qsTr("Checkmate")
+            } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + qsTr("accepts draw")
             } else {
-                gameResolutions.description = remoteSide.id + " vanished"
+                gameResolutions.description = remoteSide.id + qsTr(" vanished")
             }
 
             // Defining the ratings strings to be used in the description
 
-            if (gameRated() == "unrated") { gameResolutions.newRatings = "No ratings adjustment done" }
+            if (gameRated() == "unrated") { gameResolutions.newRatings = qsTr("No ratings adjustment done") }
             else gameResolutions.newRatings = localSide.id + ": " + localSide.rating + " > " + "FIXME\n" +
             remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
 
@@ -530,20 +529,20 @@ Page {
 
     QueryDialog { // Confirm resign
         id: resignDialog
-        titleText: "Resign?"
-        acceptButtonText: "Yes"
+        titleText: qsTr("Resign?")
+        acceptButtonText: qsTr("Yes")
         visualParent: dialogWindow
         onAccepted: {
             miniature.resign()
             pageStack.pop() // This needs to be removed as part of BMO#12433
         }
-        rejectButtonText: "No"
+        rejectButtonText: qsTr("No")
     }
 
     QueryDialog { // Propose draw
         id: proposedrawDialog
         visualParent: dialogWindow
-        titleText: "Propose a draw?"
+        titleText: qsTr("Propose a draw?")
         message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
         acceptButtonText: "Yes"
         onAccepted: {
@@ -556,8 +555,8 @@ Page {
     QueryDialog { // Request adjourn
         id: requestadjournDialog
         visualParent: dialogWindow
-        titleText: "Request to adjourn?"
-        message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
+        titleText: qsTr("Request to adjourn?")
+        message:  remoteSide.id + qsTr(" needs to be accept it, otherwise the game continues.")
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send an adjourn request command
@@ -569,8 +568,8 @@ Page {
     QueryDialog { // Accept draw?
         id: acceptdrawDialog
         visualParent: dialogWindow
-        titleText: "Is this a draw?"
-        message:  "$OPPONENT is proposing to end this game with a draw." // FIXME real variable for $OPPONENT
+        titleText: qsTr("Is this a draw?")
+        message:  remoteSide.od + qsTr(" is proposing to end this game with a draw.")
         acceptButtonText: "Accept"
         onAccepted: {
             // FIXME instructions to send an accept draw command
@@ -582,26 +581,26 @@ Page {
     QueryDialog { // Accept adjourn?
         id: acceptadjournDialog
         visualParent: dialogWindow
-        titleText: "See you later?"
-        message:  "$OPPONENT is requesting to adjourn this game." // FIXME real variable for $OPPONENT
-        acceptButtonText: "Accept"
+        titleText: qsTr("See you later?")
+        message:  remoteSide.id + qsTr(" is requesting to adjourn this game.")
+        acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send an accept draw command
             // FIXME: if $OPPONENT requests to adjourn while a request already exists, this dialog shouldn't show up again.
         }
-        rejectButtonText: "Ignore"
+        rejectButtonText: "No"
     }
 
     QueryDialog { // Connection lost
         id: connectionlostDialog
         visualParent: dialogWindow
-        titleText: "Lost connection"
-        message:  "You have lost the connection to the server." // FIXME real variables
-        acceptButtonText: "Log in again"
+        titleText: qsTr("Connection lost")
+        message:  qsTr("Miniature can't reach the chess server.")
+        acceptButtonText: qsTr("Log in again")
         onAccepted: {
             // FIXME with the stored values, can we attempt to re-login and resume a game automatically?
         }
-        rejectButtonText: "Close app"
+        rejectButtonText: qsTr("Close app")
         onRejected: {
             // FIXME how to close the app?
         }
@@ -613,10 +612,10 @@ Page {
         titleText: gameResolutions.winnerIs
         message:  gameResolutions.description + "\n\n" + gameResolutions.newRatings
 
-        acceptButtonText: "Rematch"
+        acceptButtonText: qsTr("Rematch")
         onAccepted: { // FIXME match functiona needs to be implemented
         }
-        rejectButtonText: "Seek games"
+        rejectButtonText: qsTr("Seek games")
         onRejected: {
             pageStack.pop()
         }

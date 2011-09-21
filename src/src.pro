@@ -141,4 +141,8 @@ OTHER_FILES += \
     frontend/black/knight.png \
     frontend/black/king.png \
     frontend/black/rook.png \
-    frontend/miniatureMedium.png
+    frontend/miniatureMedium.png \
+    frontend/miniature_es.ts \
+    frontend/miniature_es.qm
+
+TRANSLATIONS = frontend/miniature_es.ts
