@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
+<TS version="2.0">
 <context>
     <name>MainPage</name>
     <message>
         <location filename="MainPage.qml" line="88"/>
         <source>Miniature</source>
         <extracomment>only to be translated in non-Latin writing languages requiring it</extracomment>
-        <translation>Miniature</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="102"/>
         <source>0.4</source>
         <extracomment>only to be translated in non-Latin writing languages requiring it</extracomment>
-        <translation>0.4</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="116"/>
         <source>Join as guest</source>
-        <translation>Jugador anónimo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="152"/>
         <source>Wrong</source>
-        <translation>Incorrecto</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="171"/>
         <source>username</source>
-        <translation>usuario</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="184"/>
         <source>password</source>
-        <translation>contraseña</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="199"/>
         <source>Log in</source>
-        <translation>Entrar</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="213"/>
         <source>Register online</source>
-        <translation>Registrar usuario</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="223"/>
@@ -58,32 +58,32 @@
     <message>
         <location filename="MainPage.qml" line="270"/>
         <source>Miniature is free software developed openly by volunteers and distributed with the GPLv2 license. </source>
-        <translation>Miniature es software libre desarrollado públicamente por voluntarios bajo la licencia GPLv2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="271"/>
         <source>We welcome your feedback and contributions!
 
 </source>
-        <translation>¡Tus comentarios y contribuciones son bienvenidas!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="272"/>
         <source>Special thanks to Colin M.L. Burnett for his free chess set used by Wikipedia.
 
 </source>
-        <translation>Un especial agradecimiento para Colin M.L. Burnett por su juego de piezas usado en Wikipedia.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="273"/>
         <source>(C) 2011 Michael Hasselmann &amp; Quim Gil</source>
-        <translation>(C) 2011 Michael Hasselmann &amp; Quim Gil</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="MainPage.qml" line="320"/>
         <source>i</source>
         <extracomment>Translations must have just one character. In case of doubt just leave the original &quot;i&quot;.</extracomment>
-        <translation>i</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

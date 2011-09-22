@@ -146,3 +146,4 @@ OTHER_FILES += \
     frontend/miniature.en.qm \
     frontend/miniature.es.ts \
     frontend/miniature.en.ts \
+    frontend/miniature.ts
