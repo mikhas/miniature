@@ -20,7 +20,9 @@
         <file>black/bishop.png</file>
         <file>miniatureBIG.png</file>
         <file>miniatureMedium.png</file>
-        <file>miniature_es.ts</file>
-        <file>miniature_es.qm</file>
+        <file>miniature.es.qm</file>
+        <file>miniature.en.qm</file>
+        <file>miniature.es.ts</file>
+        <file>miniature.en.ts</file>
     </qresource>
 </RCC>

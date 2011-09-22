@@ -18,6 +18,9 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QTranslator>
+#include <QLocale>
+
 #include "run.h"
 
 #include <QtCore>
@@ -26,6 +29,12 @@
 Q_DECL_EXPORT int main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
+
+    QString locale = QLocale::system().name();
+    QTranslator translator;
+    if (translator.load("miniature." + locale, ":/"))
+        app.installTranslator(&translator);
+
     Game::run(QUrl("qrc:/main.qml"), &app);
     return app.exec();
 }

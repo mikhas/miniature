@@ -142,7 +142,7 @@ OTHER_FILES += \
     frontend/black/king.png \
     frontend/black/rook.png \
     frontend/miniatureMedium.png \
-    frontend/miniature_es.ts \
-    frontend/miniature_es.qm
-
-TRANSLATIONS = frontend/miniature_es.ts
+    frontend/miniature.es.qm \
+    frontend/miniature.en.qm \
+    frontend/miniature.es.ts \
+    frontend/miniature.en.ts \
