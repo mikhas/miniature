@@ -501,9 +501,12 @@ Page {
 
             if (reason == Miniature.ReasonCheckmated) {
                 gameResolutions.description = qsTr("Checkmate")
-            } else if (reason == Miniature.ReasonDrawAccepted) { gameResolutions.description = remoteSide.id + qsTr("accepts draw")
+            } else if (reason == Miniature.ReasonDrawAccepted) {
+                //: %1 is the opponent's name
+                gameResolutions.description = qsTr("%1 accepts draw").arg(remoteSide.id)
             } else {
-                gameResolutions.description = remoteSide.id + qsTr(" vanished")
+                //: %1 is the opponent's name
+                gameResolutions.description = qsTr("%1 vanished").arg(remoteSide.id)
             }
 
             // Defining the ratings strings to be used in the description
@@ -543,7 +546,8 @@ Page {
         id: proposedrawDialog
         visualParent: dialogWindow
         titleText: qsTr("Propose a draw?")
-        message:  "Needs to be accepted by $OPPONENT, otherwise the game continues." // FIXME real variable for $OPPONENT
+        //: %1 is the opponent's name
+        message: qsTr("Needs to be accepted by %1, otherwise the game continues.").arg(remoteSide.id) // FIXME real variable for $OPPONENT
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send a draw request command
@@ -556,7 +560,8 @@ Page {
         id: requestadjournDialog
         visualParent: dialogWindow
         titleText: qsTr("Request to adjourn?")
-        message:  remoteSide.id + qsTr(" needs to be accept it, otherwise the game continues.")
+        //: %1 is the opponent's name
+        message: qsTr("%1 needs to be accept it, otherwise the game continues.").arg(remoteSide.id)
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send an adjourn request command
@@ -569,7 +574,8 @@ Page {
         id: acceptdrawDialog
         visualParent: dialogWindow
         titleText: qsTr("Is this a draw?")
-        message:  remoteSide.od + qsTr(" is proposing to end this game with a draw.")
+        //: %1 is the opponent's name
+        message: qsTr("%1 is proposing to end this game with a draw.").arg(remoteSide.id)
         acceptButtonText: "Accept"
         onAccepted: {
             // FIXME instructions to send an accept draw command
@@ -582,7 +588,8 @@ Page {
         id: acceptadjournDialog
         visualParent: dialogWindow
         titleText: qsTr("See you later?")
-        message:  remoteSide.id + qsTr(" is requesting to adjourn this game.")
+        //: %1 is the opponent's name
+        message: qsTr("%1 is requesting to adjourn this game.").arg(remoteSide.id)
         acceptButtonText: "Yes"
         onAccepted: {
             // FIXME instructions to send an accept draw command
