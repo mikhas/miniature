@@ -454,8 +454,27 @@ Page {
 
                 Menu {
                     id: exitMenu
+                    property string queryTitle: ""
+                    property string queryMessage: ""
                     MenuLayout {
-                        MenuItem {text: qsTr("Resign"); onClicked: resignDialog.open() }
+                        MenuItem {text: qsTr("Abort"); onClicked: { // FIXME only visible when it's possible
+                                exitMenu.queryTitle = qsTr("Abort?")
+                                        endQueryDialog.open() }
+                        }
+                        MenuItem {text: qsTr("Resign"); onClicked: {
+                                exitMenu.queryTitle = qsTr("Resign?")
+                                        endQueryDialog.open() }
+                        }
+                        MenuItem {text: qsTr("Draw"); onClicked: {
+                                exitMenu.queryTitle = qsTr("Propose a draw?")
+                                        exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                                        endQueryDialog.open() }
+                        }
+                        MenuItem {text: qsTr("Adjourn"); onClicked: {
+                                exitMenu.queryTitle = qsTr("Request to adjourn?")
+                                        exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                                        endQueryDialog.open() }
+                        }
                     }
                 }
             }
@@ -494,6 +513,7 @@ Page {
             }
             if (result == Miniature.ResultDraw) { gameResolutions.winnerIs = qsTr("Draw") }
             if (result == Miniature.ResultAdjourned) { gameResolutions.winnerIs = qsTr("Game adjourned") }
+            // if (result == Miniature.ResultAborted) { gameResolutions.winnerIs = qsTr("Game aborted") }
             if (result == Miniature.ResultUnknown) { gameResolutions.winnerIs = qsTr("What happened?") }
 
             // Defining the reason string to be used as description
@@ -531,43 +551,18 @@ Page {
     }
 
     QueryDialog { // Confirm resign
-        id: resignDialog
-        titleText: qsTr("Resign?")
+        id: endQueryDialog
+        titleText: exitMenu.queryTitle
         acceptButtonText: qsTr("Yes")
         visualParent: dialogWindow
         onAccepted: {
-            miniature.resign()
+            if (exitMenu.queryTitle == qsTr("Abort?")) miniature.abort() // FIXME function missing
+            if (exitMenu.queryTitle == qsTr("Resign?")) miniature.resign()
+            if (exitMenu.queryTitle == qsTr("Draw?")) miniature.draw() // FIXME function missing
+            if (exitMenu.queryTitle == qsTr("Adjourn?")) miniature.adjourn() // FIXME function missing
             pageStack.pop() // This needs to be removed as part of BMO#12433
         }
         rejectButtonText: qsTr("No")
-    }
-
-    QueryDialog { // Propose draw
-        id: proposedrawDialog
-        visualParent: dialogWindow
-        titleText: qsTr("Propose a draw?")
-        //: %1 is the opponent's name
-        message: qsTr("Needs to be accepted by %1, otherwise the game continues.").arg(remoteSide.id) // FIXME real variable for $OPPONENT
-        acceptButtonText: "Yes"
-        onAccepted: {
-            // FIXME instructions to send a draw request command
-            // mikas: if a user proposes again a draw, he will just see the FICS message in the chat/console.
-        }
-        rejectButtonText: "No"
-    }
-
-    QueryDialog { // Request adjourn
-        id: requestadjournDialog
-        visualParent: dialogWindow
-        titleText: qsTr("Request to adjourn?")
-        //: %1 is the opponent's name
-        message: qsTr("%1 needs to be accept it, otherwise the game continues.").arg(remoteSide.id)
-        acceptButtonText: "Yes"
-        onAccepted: {
-            // FIXME instructions to send an adjourn request command
-            // mikas: if a user requests to adjournagain, he will just see the FICS message in the chat/console.
-        }
-        rejectButtonText: "No"
     }
 
     QueryDialog { // Accept draw?
