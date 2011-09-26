@@ -36,6 +36,7 @@ Page {
             newgameArea.visible = false
             newSpinner.visible = false
             newSpinner.running = false
+            newSeekDialog.close()
             loadScreen("OnlineBoard.qml")
         }
         onSeekCancelled: {

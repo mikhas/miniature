@@ -474,10 +474,6 @@ Page {
         property string queryTitle: ""
         property string queryMessage: ""
         MenuLayout {
-            MenuItem {text: qsTr("Abort"); onClicked: { // FIXME only visible when it's possible
-                    exitMenu.queryTitle = qsTr("Abort?")
-                            endQueryDialog.open() }
-            }
             MenuItem {text: qsTr("Resign"); onClicked: {
                     exitMenu.queryTitle = qsTr("Resign?")
                             endQueryDialog.open() }
@@ -490,6 +486,10 @@ Page {
             MenuItem {text: qsTr("Adjourn"); onClicked: {
                     exitMenu.queryTitle = qsTr("Request to adjourn?")
                             exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                            endQueryDialog.open() }
+            }
+            MenuItem {text: qsTr("Abort"); onClicked: {
+                    exitMenu.queryTitle = qsTr("Abort?")
                             endQueryDialog.open() }
             }
         }
