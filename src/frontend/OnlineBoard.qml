@@ -451,32 +451,6 @@ Page {
                 onClicked: {
                     exitMenu.open()
                 }
-
-                Menu {
-                    id: exitMenu
-                    property string queryTitle: ""
-                    property string queryMessage: ""
-                    MenuLayout {
-                        MenuItem {text: qsTr("Abort"); onClicked: { // FIXME only visible when it's possible
-                                exitMenu.queryTitle = qsTr("Abort?")
-                                        endQueryDialog.open() }
-                        }
-                        MenuItem {text: qsTr("Resign"); onClicked: {
-                                exitMenu.queryTitle = qsTr("Resign?")
-                                        endQueryDialog.open() }
-                        }
-                        MenuItem {text: qsTr("Draw"); onClicked: {
-                                exitMenu.queryTitle = qsTr("Propose a draw?")
-                                        exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-                                        endQueryDialog.open() }
-                        }
-                        MenuItem {text: qsTr("Adjourn"); onClicked: {
-                                exitMenu.queryTitle = qsTr("Request to adjourn?")
-                                        exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-                                        endQueryDialog.open() }
-                        }
-                    }
-                }
             }
 
             ToolIcon {
@@ -492,6 +466,32 @@ Page {
             //            ToolIcon { // FIXME Settings page pending
             //                iconId: "toolbar-view-menu"
             //            }
+        }
+    }
+
+    Menu {
+        id: exitMenu
+        property string queryTitle: ""
+        property string queryMessage: ""
+        MenuLayout {
+            MenuItem {text: qsTr("Abort"); onClicked: { // FIXME only visible when it's possible
+                    exitMenu.queryTitle = qsTr("Abort?")
+                            endQueryDialog.open() }
+            }
+            MenuItem {text: qsTr("Resign"); onClicked: {
+                    exitMenu.queryTitle = qsTr("Resign?")
+                            endQueryDialog.open() }
+            }
+            MenuItem {text: qsTr("Draw"); onClicked: {
+                    exitMenu.queryTitle = qsTr("Propose a draw?")
+                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                            endQueryDialog.open() }
+            }
+            MenuItem {text: qsTr("Adjourn"); onClicked: {
+                    exitMenu.queryTitle = qsTr("Request to adjourn?")
+                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                            endQueryDialog.open() }
+            }
         }
     }
 
