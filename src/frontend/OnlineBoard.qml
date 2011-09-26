@@ -498,6 +498,32 @@ Page {
     // Signals and their dialogs
 
     Connections {
+        id: opponentProposals
+        target: miniature
+        property string resolution
+        property string description
+        onRequestReceived: {
+            if (proposal == Miniature.ProposedDraw) {
+                opponentProposals.resolution = qsTr("Is this a draw?")
+                //: %1 is the opponent's name
+                opponentProposals.description = qsTr("%1 is proposing to end this game with a draw.").arg(remoteSide.id)
+            }
+            if (proposal == Miniature.ProposedAdjourn) {
+                opponentProposals.resolution = qsTr("Continue another day?")
+                //: %1 is the opponent's name
+                opponentProposals.description = qsTr("%1 is requesting to adjourn this game.").arg(remoteSide.id)
+            }
+            if (proposal == Miniature.ProposedDraw) {
+                opponentProposals.resolution = qsTr("Scrap this game?")
+                //: %1 is the opponent's name
+                opponentProposals.description = qsTr("%1 is proposing to abort this game.").arg(remoteSide.id)
+            }
+
+            requestsDialog.open()
+        }
+    }
+
+    Connections {
         id: gameResolutions
         target: miniature
         property string winnerIs: "You lose..."
@@ -550,47 +576,33 @@ Page {
         anchors.bottom: parent.bottom
     }
 
-    QueryDialog { // Confirm resign
+    QueryDialog { // Confirmation dialog for end game options selected by the local player
         id: endQueryDialog
         titleText: exitMenu.queryTitle
         acceptButtonText: qsTr("Yes")
         visualParent: dialogWindow
         onAccepted: {
-            if (exitMenu.queryTitle == qsTr("Abort?")) miniature.abort() // FIXME function missing
             if (exitMenu.queryTitle == qsTr("Resign?")) miniature.resign()
             if (exitMenu.queryTitle == qsTr("Draw?")) miniature.draw() // FIXME function missing
             if (exitMenu.queryTitle == qsTr("Adjourn?")) miniature.adjourn() // FIXME function missing
+            if (exitMenu.queryTitle == qsTr("Abort?")) miniature.abort() // FIXME function missing
             pageStack.pop() // This needs to be removed as part of BMO#12433
         }
         rejectButtonText: qsTr("No")
     }
 
-    QueryDialog { // Accept draw?
-        id: acceptdrawDialog
+    QueryDialog { // Confirmation dialog for end game options proposed by the remote player
+        id: requestsDialog
         visualParent: dialogWindow
-        titleText: qsTr("Is this a draw?")
-        //: %1 is the opponent's name
-        message: qsTr("%1 is proposing to end this game with a draw.").arg(remoteSide.id)
+        titleText: opponentProposals.resolution
+        message: opponentProposals.description
         acceptButtonText: "Accept"
         onAccepted: {
-            // FIXME instructions to send an accept draw command
-            // FIXME: if $OPPONENT requests a draw while a request already exists, this dialog shouldn't show up again.
+            if (opponentProposals.resolution == qsTr("Is this a draw?")) miniature.acceptDraw()
+            if (opponentProposals.resolution == qsTr("Continue another day?")) miniature.acceptAdjourn()
+            if (opponentProposals.resolution == qsTr("Scrap this game?")) miniature.acceptAbort()
         }
         rejectButtonText: "Ignore"
-    }
-
-    QueryDialog { // Accept adjourn?
-        id: acceptadjournDialog
-        visualParent: dialogWindow
-        titleText: qsTr("See you later?")
-        //: %1 is the opponent's name
-        message: qsTr("%1 is requesting to adjourn this game.").arg(remoteSide.id)
-        acceptButtonText: "Yes"
-        onAccepted: {
-            // FIXME instructions to send an accept draw command
-            // FIXME: if $OPPONENT requests to adjourn while a request already exists, this dialog shouldn't show up again.
-        }
-        rejectButtonText: "No"
     }
 
     QueryDialog { // Connection lost
@@ -615,7 +627,7 @@ Page {
         message:  gameResolutions.description + "\n\n" + gameResolutions.newRatings
 
         acceptButtonText: qsTr("Rematch")
-        onAccepted: { // FIXME match functiona needs to be implemented
+        onAccepted: { // FIXME match functionality needs to be implemented
         }
         rejectButtonText: qsTr("Seek games")
         onRejected: {
