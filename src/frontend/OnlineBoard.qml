@@ -131,6 +131,7 @@ Page {
     Rectangle {
         id: chatBkg
         property bool expanded: false
+        property string opponentDeclines: qsTr("FICS: %1 has declined your request.").arg(remoteSide.id)
         color: "black"
         opacity: 0.8
         anchors.top: headerBackground.bottom

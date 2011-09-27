@@ -316,7 +316,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Button {
         id: aboutButton
         checkable: true
-        //: Translations must have just one character. In case of doubt just leave the original "i".
+        //: Stands for "information". Translations must have just one character. In case of doubt just leave the original "i".
         text: qsTr("i")
         width: 50
         anchors {
