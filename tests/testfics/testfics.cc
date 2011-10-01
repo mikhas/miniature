@@ -20,11 +20,14 @@
 
 #include "testutils.h"
 #include "frontend/miniature.h"
+#include "frontend/sideelement.h"
 #include "fics/engine.h"
 #include "game.h"
 #include "position.h"
 #include "registry.h"
 #include "commands.h"
+#include "utils/scenario.h"
+#include "utils/scenarioloader.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -211,7 +214,42 @@ private:
         QCOMPARE(game->position().movedPiece().origin(), toSquare("e1"));
         QCOMPARE(game->position().movedPiece().target(), toSquare("c1"));
     }
+
+    Q_SLOT void testLogin()
+    {
+        Dispatcher dispatcher;
+        Registry *registry = new Registry(&dispatcher);
+        dispatcher.resetRegistry(registry);
+
+        Fics::Engine *fics = new Fics::Engine(&dispatcher);
+        fics->setChannelEnabled(false);
+        dispatcher.setBackend(fics);
+
+        DummyFrontend frontend(&dispatcher);
+        dispatcher.setFrontend(&frontend);
+        acceptAllMessages(fics);
+
+        TestUtils::ScenarioLoader sl;
+        TestUtils::Scenario sc = sl.load(fics, "fics-login");
+
+        QSignalSpy logged_in(&frontend, SIGNAL(loginSucceeded()));
+        frontend.login("guest", "");
+
+        // Stops at login prompt:
+        sc.play();
+
+        // Waits for login confirmation:
+        sc.play();
+
+        // Plays rest of scenario
+        sc.play();
+
+        TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
+        QCOMPARE(logged_in.count(), 1);
+        QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
+    }
 };
+
 
 } // namespace Game
 

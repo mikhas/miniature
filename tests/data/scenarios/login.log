@@ -1,0 +1,90 @@
+             _       __     __                             __      
+            | |     / /__  / /________  ____ ___  ___     / /_____ 
+            | | /| / / _ \/ / ___/ __ \/ __ `__ \/ _ \   / __/ __ \
+            | |/ |/ /  __/ / /__/ /_/ / / / / / /  __/  / /_/ /_/ /
+            |__/|__/\___/_/\___/\____/_/ /_/ /_/\___/   \__/\____/ 
+       ^^__                  _____________________                 _  _  _ 
+      /  - \_               / ____/  _/ ____/ ___/   _            | || || |
+    <|    __<              / /_   / // /    \__ \   (_)           |_______|
+    <|    \               / __/ _/ // /___ ___/ /  _              \__ ___ /
+    <|     \             /_/   /___/\____//____/  (_)              |___|_|
+    <|______\                                                      |_|___|
+     _|____|_        ======================================        |___|_|
+    (________)         freechess.org  ----  69.36.243.188         (_______)
+    /________\       ======================================       /_______\ 
+                       (Login screen designed by Alefith)
+
+   ****** Welcome to the Free Internet Chess Server at freechess.org ******
+
+Webpage: http://www.freechess.org
+Head admin : Chessty   Complaints to : complaints@freechess.org
+Server location: freechess.org   Server version : 1.25.17
+
+      If you are not a registered player, enter guest or a unique ID.
+             (If your return key does not work, use cntrl-J)
+
+login: 
+
+Logging you in as "GuestNFYR"; you may use this name to play unrated games.
+(After logging in, do "help register" for more info on how to register.)
+
+Press return to enter the server as "GuestNFYR":
+
+
+
+**** Starting FICS session as GuestNFYR(U) ****
+------------------------------------------------------------------------------
+                         *** Message Of The Day ***
+
+
+Today's Scheduled Events:
+    0430: The Daily 5 0
+    0600: Saturday Chess Marathon #/4
+    0830: Saturday SOS SUICIDE tournament
+    0930: Saturday's Scheduled 20 5
+    1400: Chesslecture.com Prize Tournament
+    1900: The Nightly 5 0 
+
+To join a scheduled tournament, join channel 49 (+channel 49)
+And be there for the scheduled start.
+
+For a complete tournament schedule, type "td help schedule"
+Regular tournaments are run all day, "td set tourneyinfo on" to see them.
+
+All times are server times.
+To check the current server time, use "date".
+==============================================================================
+FICS web page: http://www.freechess.org   - add a link to FICS from your page
+==============================================================================
+
+
+Newcomers:
+  type 'help intro_basics' for some basic server commands and files.
+  type 'help chan_4' to learn how to ask for help on the help channel.
+  type 'help register' to learn how to get a registered account.
+  type 'help interfaces' for information on getting a graphical interface.
+  type 'showadmins' to see which admins (FICS administrators) are logged on.
+  type 'set shout 1' to see shouts (only registered users may shout).
+  type 'set seek 0' if receiving ads for matches bothers you.
+  type 'set open 0' if you do not want to be challenged to a chess match.
+  type 'set silence 1' if you wish to have quiet play.
+  type 'getgame' to get a blitz chess game.
+
+Special channels for guests:
+  type 'tell 4 <message>' if you need help
+  type 'tell 53 <message>' to chat with other users
+
+  A quick guide is available on our web page: http://www.freechess.org
+   as are facilities to register, connect via a java interface or download
+   interfaces, so that you get a graphical board and can use the mouse.
+
+NOTE:  Guests with foul or abusive names may be 'nuked' without warning!!!
+
+fics% 
+ROBOadmin(*)(TD) tells you: Welcome to FICS - the Free Internet Chess Server. 
+\   Please visit our homepage at http://www.freechess.org. From there you can 
+\   register or download a graphical interface. You can get help by asking a 
+\   question in channel 4 - use "tell 4 My question is...". Or you can get 
+\   help from one of our service representives; these are marked (SR) and can 
+\   be seen with "showsrs"
+fics% 
