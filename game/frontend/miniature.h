@@ -36,6 +36,7 @@ namespace Game { namespace Frontend {
 class AvailableSeeks;
 class MessageLog;
 class MiniaturePrivate;
+class SideElement;
 
 //! This class communicates with the engine, handles the active game state
 //! (together with the engine) and exports objects and properties to the
@@ -200,6 +201,10 @@ public:
     //! Updates the UI facing side element from remote_side.
     //! @param remote_side the update for remote side.
     void updateRemoteSide(const Side &remote_side);
+
+    //! Test API
+    SideElement * localSide();
+    SideElement * remoteSide();
 
 private:    
     void sendCommand(AbstractCommand *command);

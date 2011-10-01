@@ -452,6 +452,18 @@ void Miniature::updateRemoteSide(const Side &remote_side)
     updateSideElement(&d->remote_side, remote_side, d->remote_side.color());
 }
 
+SideElement * Miniature::localSide()
+{
+    Q_D(Miniature);
+    return &d->local_side;
+}
+
+SideElement * Miniature::remoteSide()
+{
+    Q_D(Miniature);
+    return &d->remote_side;
+}
+
 void Miniature::sendCommand(AbstractCommand *command)
 {
     Q_D(Miniature);
