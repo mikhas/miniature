@@ -24,11 +24,13 @@ Server location: freechess.org   Server version : 1.25.17
              (If your return key does not work, use cntrl-J)
 
 login: 
+WAIT_FOR_INPUT
 
 Logging you in as "GuestNFYR"; you may use this name to play unrated games.
 (After logging in, do "help register" for more info on how to register.)
 
 Press return to enter the server as "GuestNFYR":
+WAIT_FOR_INPUT
 
 
 

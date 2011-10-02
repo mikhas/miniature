@@ -37,16 +37,9 @@ private:
     uint m_count;
 
 public:
-    enum PlayMode {
-        PauseAtNewlines,
-        SkipNewlines
-    };
-
     explicit Scenario(Game::AbstractEngine *engine);
 
-    //! Skip comments and by default, pauses at each newline, continue with another call
-    //! play.
-    void play(PlayMode mode = PauseAtNewlines);
+    void play();
     void setData(const QVector<QByteArray> &data);
 };
 

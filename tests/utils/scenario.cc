@@ -30,8 +30,7 @@ Scenario::Scenario(Game::AbstractEngine *engine)
     , m_count(0)
 {}
 
-
-void Scenario::play(PlayMode mode)
+void Scenario::play()
 {
     if (not m_engine) {
         return;
@@ -44,7 +43,8 @@ void Scenario::play(PlayMode mode)
             continue;
         }
 
-        if (token == QByteArray("\n") && mode == PauseAtNewlines) {
+        if (token == QByteArray("WAIT_FOR_INPUT")) {
+            ++m_count;
             return;
         }
 
