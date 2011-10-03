@@ -563,6 +563,7 @@ Engine::Engine(Dispatcher *dispatcher,
     , m_password()
     , m_filter(None)
     , m_enabled(false)
+    , m_channel_enabled(true)
     , m_logged_in(false)
     , m_past_welcome_screen(false)
     , m_login_count(0)
@@ -612,6 +613,10 @@ void Engine::login(const QString &username,
     m_extra_delimiter.append('%');
 
     m_filter |= LoginRequest;
+
+    if (not m_channel_enabled) {
+        return;
+    }
 
     if (m_channel.state() != QAbstractSocket::ConnectedState) {
         m_login_count = 0;
@@ -863,6 +868,11 @@ void Engine::setMessageFilter(const MessageFilterFlags &flags)
 {
     m_enabled = true;
     m_filter = flags;
+}
+
+void Engine::setChannelEnabled(bool enabled)
+{
+    m_channel_enabled = enabled;
 }
 
 void Engine::onReadyRead()

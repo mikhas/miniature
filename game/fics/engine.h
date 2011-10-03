@@ -61,6 +61,7 @@ private:
     QString m_password; // FIXME: Change to QBA.
     MessageFilterFlags m_filter;
     bool m_enabled;
+    bool m_channel_enabled;
     bool m_logged_in;
     bool m_past_welcome_screen;
     uint m_login_count;
@@ -92,6 +93,7 @@ public:
 
     //! Test API
     virtual void setMessageFilter(const MessageFilterFlags &flags = MessageFilterFlags(InGame));
+    virtual void setChannelEnabled(bool enabled);
 
 private:
     Q_SLOT void onReadyRead();
