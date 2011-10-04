@@ -50,6 +50,7 @@ public:
     void play(const QByteArray &response = QByteArray());
     void setData(const QVector<QByteArray> &data);
     Result result() const;
+    bool finished() const;
 };
 
 } // namespace TestUtils

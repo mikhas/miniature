@@ -90,3 +90,5 @@ ROBOadmin(*)(TD) tells you: Welcome to FICS - the Free Internet Chess Server.
 \   help from one of our service representives; these are marked (SR) and can 
 \   be seen with "showsrs"
 fics% 
+WAIT_FOR_INPUT set style 12
+WAIT_FOR_INPUT set seek 1

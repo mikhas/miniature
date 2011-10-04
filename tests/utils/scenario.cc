@@ -79,4 +79,9 @@ Scenario::Result Scenario::result() const
     return m_result;
 }
 
+bool Scenario::finished() const
+{
+    return (m_count + 1 == m_data.size() || m_result == Failed);
+}
+
 } // namespace Miniature

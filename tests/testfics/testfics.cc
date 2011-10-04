@@ -100,6 +100,39 @@ class DummyRegistry
     {}
 };
 
+class Testee
+    : public Fics::Engine
+{
+private:
+    QByteArray m_response;
+
+public:
+    explicit Testee(Dispatcher *dispatcher,
+                    QObject *parent = 0)
+        : Fics::Engine(dispatcher, parent)
+    {}
+
+    QByteArray response()
+    {
+        QByteArray result = m_response;
+        m_response.clear();
+
+        // As I haven't figured out a nice way yet to represent newlines from
+        // a *response* in the scenario data, I need to get rid of the ending
+        // newlines, *unless* the response was a single newline:
+        if (result != QByteArray("\n")) {
+            result = result.trimmed();
+        }
+
+        return result;
+    }
+
+    virtual void writeToChannel(const QByteArray &data)
+    {
+        m_response.append(data);
+    }
+};
+
 class TestFics
     : public QObject
 {
@@ -221,28 +254,23 @@ private:
         Registry *registry = new Registry(&dispatcher);
         dispatcher.resetRegistry(registry);
 
-        Fics::Engine *fics = new Fics::Engine(&dispatcher);
-        fics->setChannelEnabled(false);
-        dispatcher.setBackend(fics);
+        Testee *testee = new Testee(&dispatcher);
+        testee->setChannelEnabled(false);
+        dispatcher.setBackend(testee);
 
         DummyFrontend frontend(&dispatcher);
         dispatcher.setFrontend(&frontend);
-        acceptAllMessages(fics);
+        acceptAllMessages(testee);
 
         TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(fics, "fics-login");
+        TestUtils::Scenario sc = sl.load(testee, "fics-login");
 
         QSignalSpy logged_in(&frontend, SIGNAL(loginSucceeded()));
         frontend.login("guest", "");
 
-        // Stops at login prompt:
-        sc.play();
-
-        // Waits for login confirmation:
-        sc.play("guest");
-
-        // Plays rest of scenario
-        sc.play("\n");
+        while (not sc.finished()) {
+            sc.play(testee->response());
+        }
 
         TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
