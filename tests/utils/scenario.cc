@@ -22,17 +22,29 @@
 
 #include <abstractengine.h>
 
+namespace {
+    const QByteArray wait_for_input("WAIT_FOR_INPUT");
+    const QByteArray wait_for_newline("WAIT_FOR_NEWLINE");
+}
+
 namespace TestUtils {
 
 Scenario::Scenario(Game::AbstractEngine *engine)
     : m_engine(engine)
     , m_data()
+    , m_expected_response()
     , m_count(0)
+    , m_result(Passed)
 {}
 
-void Scenario::play()
+void Scenario::play(const QByteArray &response)
 {
     if (not m_engine) {
+        return;
+    }
+
+    if (response != m_expected_response) {
+        m_result = Failed;
         return;
     }
 
@@ -43,7 +55,12 @@ void Scenario::play()
             continue;
         }
 
-        if (token == QByteArray("WAIT_FOR_INPUT")) {
+        if (token.startsWith(wait_for_input)) {
+            m_expected_response = token.mid(wait_for_input.length() + 1);
+            ++m_count;
+            return;
+        } else if (token.startsWith(wait_for_newline)) {
+            m_expected_response = QByteArray("\n");
             ++m_count;
             return;
         }
@@ -55,6 +72,11 @@ void Scenario::play()
 void Scenario::setData(const QVector<QByteArray> &data)
 {
     m_data = data;
+}
+
+Scenario::Result Scenario::result() const
+{
+    return m_result;
 }
 
 } // namespace Miniature

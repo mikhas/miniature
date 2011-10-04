@@ -239,12 +239,13 @@ private:
         sc.play();
 
         // Waits for login confirmation:
-        sc.play();
+        sc.play("guest");
 
         // Plays rest of scenario
-        sc.play();
+        sc.play("\n");
 
         TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
+        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
         QCOMPARE(logged_in.count(), 1);
         QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
     }

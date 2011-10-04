@@ -31,16 +31,25 @@ namespace TestUtils {
 
 class Scenario
 {
+public:
+    enum Result {
+        Passed,
+        Failed
+    };
+
 private:
     Game::AbstractEngine *m_engine;
     QVector<QByteArray> m_data;
-    uint m_count;
+    QByteArray m_expected_response;
+    int m_count;
+    Result m_result;
 
 public:
     explicit Scenario(Game::AbstractEngine *engine);
 
-    void play();
+    void play(const QByteArray &response = QByteArray());
     void setData(const QVector<QByteArray> &data);
+    Result result() const;
 };
 
 } // namespace TestUtils
