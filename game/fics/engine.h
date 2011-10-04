@@ -94,6 +94,9 @@ public:
     //! Test API
     virtual void setMessageFilter(const MessageFilterFlags &flags = MessageFilterFlags(InGame));
     virtual void setChannelEnabled(bool enabled);
+    //! For testing, this method can be overriden to intercept what would have
+    //! otherwise been sent to the server.
+    virtual void writeToChannel(const QByteArray &data);
 
 private:
     Q_SLOT void onReadyRead();

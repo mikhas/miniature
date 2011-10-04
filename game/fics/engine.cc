@@ -666,14 +666,14 @@ void Engine::seek(uint time,
                        .arg(increment)
                        .arg(r)
                        .arg(fromColor(color)));
-    m_channel.write(cmd.toLatin1());
+    writeToChannel(cmd.toLatin1());
 }
 
 void Engine::play(uint advertisement_id)
 {
     m_current_advertisment_id = advertisement_id;
     m_filter |= PlayRequest;
-    m_channel.write(play_command.arg(advertisement_id).toLatin1());
+    writeToChannel(play_command.arg(advertisement_id).toLatin1());
 }
 
 void Engine::endGame(Reason reason)
@@ -681,7 +681,7 @@ void Engine::endGame(Reason reason)
     switch (reason) {
     case ReasonUnknown:
     case ReasonSurrendered:
-        m_channel.write("resign\n");
+        writeToChannel("resign\n");
 
         m_current_game = GameInfo();
         m_filter |= WaitingForSeeks;
@@ -695,8 +695,8 @@ void Engine::endGame(Reason reason)
 
 void Engine::movePiece(const MovedPiece &moved_piece)
 {
-    m_channel.write(moveNotation(moved_piece).toLatin1());
-    m_channel.write("\n");
+    writeToChannel(moveNotation(moved_piece).toLatin1());
+    writeToChannel("\n");
 }
 
 void Engine::processToken(const QByteArray &token)
@@ -859,9 +859,9 @@ void Engine::sendMessage(const QByteArray &,
         return;
     }
 
-    m_channel.write("say ");
-    m_channel.write(message);
-    m_channel.write("\n");
+    writeToChannel("say ");
+    writeToChannel(message);
+    writeToChannel("\n");
 }
 
 void Engine::setMessageFilter(const MessageFilterFlags &flags)
@@ -873,6 +873,11 @@ void Engine::setMessageFilter(const MessageFilterFlags &flags)
 void Engine::setChannelEnabled(bool enabled)
 {
     m_channel_enabled = enabled;
+}
+
+void Engine::writeToChannel(const QByteArray &data)
+{
+    m_channel.write(data);
 }
 
 void Engine::onReadyRead()
@@ -906,8 +911,8 @@ void Engine::processLogin(const QByteArray &line)
     } else if (line.startsWith(password_prompt)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();
-        m_channel.write(m_password.toLatin1());
-        m_channel.write("\n");
+        writeToChannel(m_password.toLatin1());
+        writeToChannel("\n");
     } else if (match_confirm_login.exactMatch(line)) {
         m_login_abort_timer.stop();
 
@@ -923,7 +928,7 @@ void Engine::processLogin(const QByteArray &line)
             m_password.clear();
 
             // Confirm guest login:
-            m_channel.write("\n");
+            writeToChannel("\n");
         }
     } else if (line.startsWith(fics_prompt)) {
         finalizeLogin();
@@ -954,15 +959,15 @@ void Engine::reconnect()
 
 void Engine::configureFics()
 {
-    m_channel.write("set style 12\n");
-    m_channel.write("set seek 1\n");
+    writeToChannel("set style 12\n");
+    writeToChannel("set seek 1\n");
 }
 
 void Engine::sendLogin()
 {
     m_login_abort_timer.start();
-    m_channel.write(m_username.toLatin1());
-    m_channel.write("\n");
+    writeToChannel(m_username.toLatin1());
+    writeToChannel("\n");
 }
 
 void Engine::finalizeLogin()
