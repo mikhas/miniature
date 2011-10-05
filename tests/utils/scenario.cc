@@ -48,7 +48,14 @@ void Scenario::play(const QByteArray &response)
     }
 
     for (; m_count < m_data.size(); ++m_count) {
-        const QByteArray &token(m_data.at(m_count));
+        QByteArray token(m_data.at(m_count));
+
+        // Colons are usually token separators, next to newlines. Separators
+        // are removed from token, as that's what at least the FICS engine
+        // expects:
+        if (token.endsWith(":")) {
+            token = token.mid(0, token.size() - 1);
+        }
 
         if (not token.isEmpty() && token.at(0) == '#') {
             continue;
