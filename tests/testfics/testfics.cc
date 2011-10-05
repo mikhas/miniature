@@ -117,13 +117,6 @@ public:
         QByteArray result = m_response;
         m_response.clear();
 
-        // As I haven't figured out a nice way yet to represent newlines from
-        // a *response* in the scenario data, I need to get rid of the ending
-        // newlines, *unless* the response was a single newline:
-        if (result != QByteArray("\n")) {
-            result = result.trimmed();
-        }
-
         return result;
     }
 

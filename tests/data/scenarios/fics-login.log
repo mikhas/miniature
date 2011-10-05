@@ -24,13 +24,13 @@ Server location: freechess.org   Server version : 1.25.17
              (If your return key does not work, use cntrl-J)
 
 login
-WAIT_FOR_INPUT guest
+WAIT_FOR_INPUT guest\n
 
 Logging you in as "GuestNFYR"; you may use this name to play unrated games.
 (After logging in, do "help register" for more info on how to register.)
 
 Press return to enter the server as "GuestNFYR"
-WAIT_FOR_NEWLINE
+WAIT_FOR_INPUT \n
 
 
 
@@ -90,5 +90,5 @@ ROBOadmin(*)(TD) tells you: Welcome to FICS - the Free Internet Chess Server.
 \   help from one of our service representives; these are marked (SR) and can 
 \   be seen with "showsrs"
 fics% 
-WAIT_FOR_INPUT set style 12
-WAIT_FOR_INPUT set seek 1
+WAIT_FOR_INPUT set style 12\n
+WAIT_FOR_INPUT set seek 1\n

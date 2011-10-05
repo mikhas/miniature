@@ -24,7 +24,6 @@
 
 namespace {
     const QByteArray wait_for_input("WAIT_FOR_INPUT");
-    const QByteArray wait_for_newline("WAIT_FOR_NEWLINE");
 }
 
 namespace TestUtils {
@@ -43,7 +42,7 @@ void Scenario::play(const QByteArray &response)
         return;
     }
 
-    if (response != m_expected_response) {
+    if (response != m_expected_response.replace("\\n", "\n")) {
         m_result = Failed;
         return;
     }
@@ -57,10 +56,6 @@ void Scenario::play(const QByteArray &response)
 
         if (token.startsWith(wait_for_input)) {
             m_expected_response = token.mid(wait_for_input.length() + 1);
-            ++m_count;
-            return;
-        } else if (token.startsWith(wait_for_newline)) {
-            m_expected_response = QByteArray("\n");
             ++m_count;
             return;
         }
