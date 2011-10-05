@@ -47,6 +47,14 @@ void Scenario::play(const QByteArray &response)
         return;
     }
 
+    // Clear expected response and return after receiving valid response.
+    // In order to play more scenario data, response/expected response both
+    // need to be empty (until next WAIT_FOR_INPUT situation is encountered).
+    if (not response.isEmpty()) {
+        m_expected_response.clear();
+        return;
+    }
+
     for (; m_count < m_data.size(); ++m_count) {
         QByteArray token(m_data.at(m_count));
 

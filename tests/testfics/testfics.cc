@@ -105,11 +105,14 @@ class Testee
 {
 private:
     QByteArray m_response;
+    bool m_debug_output_enabled;
 
 public:
     explicit Testee(Dispatcher *dispatcher,
                     QObject *parent = 0)
         : Fics::Engine(dispatcher, parent)
+        , m_response()
+        , m_debug_output_enabled(false)
     {}
 
     QByteArray response()
@@ -117,12 +120,25 @@ public:
         QByteArray result = m_response;
         m_response.clear();
 
+        if (m_debug_output_enabled) {
+            qDebug() << __PRETTY_FUNCTION__ << result;
+        }
+
         return result;
     }
 
     virtual void writeToChannel(const QByteArray &data)
     {
+        if (m_debug_output_enabled) {
+            qDebug() << __PRETTY_FUNCTION__ << data;
+        }
+
         m_response.append(data);
+    }
+
+    void enableDebugOutput(bool enable)
+    {
+        m_debug_output_enabled = enable;
     }
 };
 
@@ -256,7 +272,7 @@ private:
         TestUtils::ScenarioLoader sl;
         TestUtils::Scenario sc = sl.load(&testee, "fics-login");
 
-        QSignalSpy logged_in(&frontend, SIGNAL(loginSucceeded()));
+        QSignalSpy login_succeeded(&frontend, SIGNAL(loginSucceeded()));
         frontend.login("guest", "");
 
         // Enter the scenario's feedback loop:
@@ -265,9 +281,52 @@ private:
         }
 
         TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
+        QVERIFY(sc.finished());
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
-        QCOMPARE(logged_in.count(), 1);
+        QCOMPARE(login_succeeded.count(), 1);
         QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
+    }
+
+    Q_SLOT void testRegisteredLogin()
+    {
+        Dispatcher dispatcher;
+        Testee testee(&dispatcher);
+        Frontend::Miniature frontend(&dispatcher);
+
+        dispatcher.setBackend(&testee);
+        dispatcher.setFrontend(&frontend);
+
+        // Prevents engine from connecting to FICS:
+        testee.setChannelEnabled(false);
+
+        TestUtils::ScenarioLoader sl;
+        TestUtils::Scenario sc = sl.load(&testee, "fics-registered-login");
+
+        QSignalSpy login_succeeded(&frontend, SIGNAL(loginSucceeded()));
+        QSignalSpy login_failed(&frontend, SIGNAL(loginFailed()));
+
+        frontend.login("MiniatureTest", "wrongpw");
+
+        const int max_loop_count = 10;
+        const int failed_login_index = 4;
+
+        // Enter the scenario's feedback loop:
+        for (int i = 0; i < max_loop_count && not sc.finished(); ++i) {
+            sc.play(testee.response());
+
+            if (i == failed_login_index) {
+                // We want to see whether we can recover from a failed login:
+                frontend.login("MiniatureTest", "TestMiniature");
+            }
+        }
+
+        TestUtils::waitForSignal(&frontend, SIGNAL(loginFailed()));
+        TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
+        QVERIFY(sc.finished());
+        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
+        QCOMPARE(login_failed.count(), 1);
+        QCOMPARE(login_succeeded.count(), 1);
+        QCOMPARE(frontend.localSide()->id(), QString("MiniatureTest"));
     }
 };
 

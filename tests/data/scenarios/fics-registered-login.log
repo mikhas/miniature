@@ -1,0 +1,96 @@
+             _       __     __                             __      
+            | |     / /__  / /________  ____ ___  ___     / /_____ 
+            | | /| / / _ \/ / ___/ __ \/ __ `__ \/ _ \   / __/ __ \
+            | |/ |/ /  __/ / /__/ /_/ / / / / / /  __/  / /_/ /_/ /
+            |__/|__/\___/_/\___/\____/_/ /_/ /_/\___/   \__/\____/ 
+       ^^__                  _____________________                 _  _  _ 
+      /  - \_               / ____/  _/ ____/ ___/   _            | || || |
+    <|    __<              / /_   / // /    \__ \   (_)           |_______|
+    <|    \               / __/ _/ // /___ ___/ /  _              \__ ___ /
+    <|     \             /_/   /___/\____//____/  (_)              |___|_|
+    <|______\                                                      |_|___|
+     _|____|_        ======================================        |___|_|
+    (________)         freechess.org  ----  69.36.243.188         (_______)
+    /________\       ======================================       /_______\ 
+                       (Login screen designed by Alefith)
+
+   ****** Welcome to the Free Internet Chess Server at freechess.org ******
+
+Webpage: http://www.freechess.org
+Head admin : Chessty   Complaints to : complaints@freechess.org
+Server location: freechess.org   Server version : 1.25.17
+
+      If you are not a registered player, enter guest or a unique ID.
+             (If your return key does not work, use cntrl-J)
+
+login:
+WAIT_FOR_INPUT MiniatureTest\n
+
+"MiniatureTest" is a registered name.  If it is yours, type the password.
+If not, just hit return to try another name.
+
+password:
+WAIT_FOR_INPUT wrongpw\n
+
+**** Invalid password! ****
+
+If you cannot remember your password, please log in with "g" and ask for help
+in channel 4. Type "tell 4 I've forgotten my password". If that is not
+possible, please email: support@freechess.org
+
+
+      If you are not a registered player, enter guest or a unique ID.
+             (If your return key does not work, use cntrl-J)
+
+login:
+WAIT_FOR_INPUT MiniatureTest\n
+
+"MiniatureTest" is a registered name.  If it is yours, type the password.
+If not, just hit return to try another name.
+
+password:
+WAIT_FOR_INPUT TestMiniature\n
+
+**** Starting FICS session as MiniatureTest ****
+------------------------------------------------------------------------------
+                         *** Message Of The Day ***
+
+
+Today's Scheduled Events:
+    0430: The Daily 5 0
+    1315: Wednesday Blitz
+    1315: CBW
+    1900: The Nightly
+
+
+To join a scheduled tournament, join channel 49 (+channel 49)
+And be there for the scheduled start.
+
+For a complete tournament schedule, type "td help schedule"
+Regular tournaments are run all day, "td set tourneyinfo on" to see them.
+
+All times are server times.
+To check the current server time, use "date".
+==============================================================================
+FICS web page: http://www.freechess.org   - add a link to FICS from your page
+==============================================================================
+
+Index of new news items:
+1439 (Thu, Jan  6) saraajogadora(*)
+1440 (Wed, Jan 12) RelayInfo - New account for the Current Relay Schedule.
+1441 (Wed, Feb  2) blkmagic(TM) and philk(TM) announce FICS STCGroup
+1443 (Mon, Feb 21) Thief 1.24 released
+1444 (Mon, Mar  7) FICS username and password security
+1447 (Sun, Jun 19) Mamer's default variables applies for every user
+1454 (Tue, Aug 16) 2011 STC Championship
+1456 (Tue, Sep 27) Adjudication procedure
+1457 (Wed, Sep 28) FICS Lightning Championships 2011
+1458 (Sat, Oct  1) xboard 4.5.3 released
+("news <n>" will display item number 'n')
+
+
+You have 2 messages (0 unread).
+Use "messages u" to view unread messages and "clearmessages *" to clear all.
+fics% 
+WAIT_FOR_INPUT set style 12\n
+WAIT_FOR_INPUT set seek 1\n
