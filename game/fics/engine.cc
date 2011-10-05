@@ -614,18 +614,17 @@ void Engine::login(const QString &username,
 
     m_filter |= LoginRequest;
 
-    if (not m_channel_enabled) {
-        return;
-    }
-
-    if (m_channel.state() != QAbstractSocket::ConnectedState) {
-        m_login_count = 0;
-        m_buffer.clear();
-        m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
-    } else if (0 == strcmp(m_last_token.data(), login_prompt)) {
+    if (0 == strcmp(m_last_token.data(), login_prompt)) {
         // A previous login attempt must have failed and FICS is showing us a
         // login prompt already:
         sendLogin();
+    } else if (m_channel.state() != QAbstractSocket::ConnectedState) {
+        m_login_count = 0;
+        m_buffer.clear();
+
+        if (m_channel_enabled) {
+            m_channel.connectToHost("freechess.org", 5000, QIODevice::ReadWrite);
+        }
     }
 }
 
@@ -699,15 +698,17 @@ void Engine::movePiece(const MovedPiece &moved_piece)
     writeToChannel("\n");
 }
 
+// Do not return early from this method, toggle tokenProcessed flag instead:
 void Engine::processToken(const QByteArray &token)
 {
+    bool tokenProcessed = false;
+
     if (m_filter & LoginRequest) {
         processLogin(token);
-        // There's no point in trying anything else at this point:
-        return;
-    }
 
-    bool tokenProcessed = false;
+        // There's no point in trying anything else at this point:
+        tokenProcessed = true;
+    }
 
     if (not tokenProcessed
         && (m_filter & WaitingForWrappedChatMessage)) {
@@ -850,6 +851,9 @@ void Engine::processToken(const QByteArray &token)
             tokenProcessed = true;
         }
     }
+
+    // Last token *needs* to be stored here, as we can only use this method in test:
+    m_last_token = token;
 }
 
 void Engine::sendMessage(const QByteArray &,
@@ -889,7 +893,6 @@ void Engine::onReadyRead()
         if (m_enabled && not token.isEmpty()) {
             qDebug() << "FICS:" << token;
             processToken(token);
-            m_last_token = token;
         }
     } while (next_newline_pos != -1);
 }
