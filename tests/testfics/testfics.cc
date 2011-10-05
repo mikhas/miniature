@@ -244,25 +244,24 @@ private:
     Q_SLOT void testLogin()
     {
         Dispatcher dispatcher;
-        Registry *registry = new Registry(&dispatcher);
-        dispatcher.resetRegistry(registry);
+        Testee testee(&dispatcher);
+        Frontend::Miniature frontend(&dispatcher);
 
-        Testee *testee = new Testee(&dispatcher);
-        testee->setChannelEnabled(false);
-        dispatcher.setBackend(testee);
-
-        DummyFrontend frontend(&dispatcher);
+        dispatcher.setBackend(&testee);
         dispatcher.setFrontend(&frontend);
-        acceptAllMessages(testee);
+
+        // Prevents engine from connecting to FICS:
+        testee.setChannelEnabled(false);
 
         TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(testee, "fics-login");
+        TestUtils::Scenario sc = sl.load(&testee, "fics-login");
 
         QSignalSpy logged_in(&frontend, SIGNAL(loginSucceeded()));
         frontend.login("guest", "");
 
+        // Enter the scenario's feedback loop:
         while (not sc.finished()) {
-            sc.play(testee->response());
+            sc.play(testee.response());
         }
 
         TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
