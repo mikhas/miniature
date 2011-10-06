@@ -12,6 +12,12 @@ enable-gui {
     DEFINES += MINIATURE_GUI_ENABLED
 }
 
+enable-coverage {
+    LIBS += -lgcov
+    QMAKE_CXXFLAGS += -g -fprofile-arcs -ftest-coverage -O0
+    QMAKE_LDFLAGS += -g -fprofile-arcs -ftest-coverage  -O0
+}
+
 INCLUDEPATH += \
     $${GAME_DIR} \
 
