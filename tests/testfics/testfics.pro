@@ -8,9 +8,6 @@ TARGET=testfics
 DEFINES += \
     MINIATURE_LIB_PATH=\\\"$${PWD}/$${GAME_DIR}\\\" \
     MINIATURE_BIN=\\\"$${PWD}/$${SRC_DIR}/miniature\\\" \
-    MINIATURE_FICS_SESSION_LOG=\\\"$${PWD}/$${TESTS_DIR}/data/fics-session.log\\\" \
-    MINIATURE_FICS_PLAY_LOG=\\\"$${PWD}/$${TESTS_DIR}/data/fics-play.log\\\" \
-    MINIATURE_FICS_COMMANDS_LOG=\\\"$${PWD}/$${TESTS_DIR}/data/fics-commands.log\\\" \
     TEST_SCENARIOS_DIR=\\\"$${PWD}/$${TESTS_DIR}/data/scenarios\\\" \
 
 HEADERS += \
