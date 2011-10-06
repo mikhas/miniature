@@ -33,72 +33,7 @@
 #include <QtGui>
 #include <QtTest>
 
-namespace Game { namespace {
-    void acceptAllMessages(Fics::Engine *fics) {
-        fics->setMessageFilter(Fics::Engine::MessageFilterFlags(Fics::Engine::WaitingForGames
-                                                                | Fics::Engine::WaitingForSeeks
-                                                                | Fics::Engine::InGame
-                                                                | Fics::Engine::PlayRequest));
-    }
-
-    bool loadIntoCache(const QString &fileName,
-                       QVector<QByteArray> *cache)
-    {
-        QFile f(fileName);
-
-        if(not cache || not f.open(QIODevice::ReadOnly)) {
-            return false;
-        }
-
-        QByteArray line = f.readLine();
-        while (not line.isNull()) {
-            cache->append(line.trimmed());
-            line = f.readLine();
-        }
-
-        return (not cache->isEmpty());
-    }
-} // namespace
-
-class DummyFrontend
-    : public Frontend::Miniature
-{
-public:
-    QVector<Record> m_received_records;
-    QVector<Seek> m_received_seeks;
-    uint m_game_id;
-    QWeakPointer<Game> m_game;
-
-    explicit DummyFrontend(Dispatcher *dispatcher,
-                           QObject *parent = 0)
-        : Miniature::Miniature(dispatcher, parent)
-        , m_received_records()
-        , m_received_seeks()
-        , m_game_id(0)
-    {}
-
-    virtual ~DummyFrontend()
-    {}
-
-    virtual void handleRecord(const Record &r)
-    {
-        m_received_records.append(r);
-    }
-
-    virtual void handleSeek(const Seek &s)
-    {
-        m_received_seeks.append(s);
-    }
-};
-
-class DummyRegistry
-    : public Registry
-{
-    explicit DummyRegistry(Dispatcher *dispatcher,
-                           QObject *parent = 0)
-        : Registry(dispatcher, parent)
-    {}
-};
+namespace Game {
 
 class Testee
     : public Fics::Engine
@@ -141,6 +76,102 @@ public:
         m_debug_output_enabled = enable;
     }
 };
+
+class DummyFrontend
+    : public Frontend::Miniature
+{
+public:
+    QVector<Record> m_received_records;
+    QVector<Seek> m_received_seeks;
+    uint m_game_id;
+    QWeakPointer<Game> m_game;
+
+    explicit DummyFrontend(Dispatcher *dispatcher,
+                           QObject *parent = 0)
+        : Miniature::Miniature(dispatcher, parent)
+        , m_received_records()
+        , m_received_seeks()
+        , m_game_id(0)
+    {}
+
+    virtual ~DummyFrontend()
+    {}
+
+    virtual void handleRecord(const Record &r)
+    {
+        m_received_records.append(r);
+    }
+
+    virtual void handleSeek(const Seek &s)
+    {
+        m_received_seeks.append(s);
+    }
+};
+
+class DummyRegistry
+    : public Registry
+{
+    explicit DummyRegistry(Dispatcher *dispatcher,
+                           QObject *parent = 0)
+        : Registry(dispatcher, parent)
+    {}
+};
+
+namespace {
+    void acceptAllMessages(Fics::Engine *fics) {
+        fics->setMessageFilter(Fics::Engine::MessageFilterFlags(Fics::Engine::WaitingForGames
+                                                                | Fics::Engine::WaitingForSeeks
+                                                                | Fics::Engine::InGame
+                                                                | Fics::Engine::PlayRequest));
+    }
+
+    bool loadIntoCache(const QString &fileName,
+                       QVector<QByteArray> *cache)
+    {
+        QFile f(fileName);
+
+        if(not cache || not f.open(QIODevice::ReadOnly)) {
+            return false;
+        }
+
+        QByteArray line = f.readLine();
+        while (not line.isNull()) {
+            cache->append(line.trimmed());
+            line = f.readLine();
+        }
+
+        return (not cache->isEmpty());
+    }
+
+    bool playLoginScenario(Frontend::Miniature *frontend,
+                           Testee *engine)
+    {
+        if (not frontend || not engine) {
+            return false;
+        }
+
+        TestUtils::ScenarioLoader sl;
+        TestUtils::Scenario sc = sl.load(engine, "fics-login");
+
+        QSignalSpy login_succeeded(frontend, SIGNAL(loginSucceeded()));
+        frontend->login("guest", "");
+
+        // Enter the scenario's feedback loop:
+        while (not sc.finished()) {
+            sc.play(engine->response());
+        }
+
+        // Clear last response, by quering it:
+        (void) engine->response();
+
+        return (login_succeeded.count() == 1
+                && sc.finished()
+                && sc.result() == TestUtils::Scenario::Passed);
+
+    }
+} // namespace
+
+
 
 class TestFics
     : public QObject
@@ -269,21 +300,7 @@ private:
         // Prevents engine from connecting to FICS:
         testee.setChannelEnabled(false);
 
-        TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(&testee, "fics-login");
-
-        QSignalSpy login_succeeded(&frontend, SIGNAL(loginSucceeded()));
-        frontend.login("guest", "");
-
-        // Enter the scenario's feedback loop:
-        while (not sc.finished()) {
-            sc.play(testee.response());
-        }
-
-        TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
-        QVERIFY(sc.finished());
-        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
-        QCOMPARE(login_succeeded.count(), 1);
+        QVERIFY(playLoginScenario(&frontend, &testee));
         QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
     }
 
@@ -327,6 +344,78 @@ private:
         QCOMPARE(login_failed.count(), 1);
         QCOMPARE(login_succeeded.count(), 1);
         QCOMPARE(frontend.localSide()->id(), QString("MiniatureTest"));
+    }
+
+    Q_SLOT void testGame()
+    {
+        Dispatcher dispatcher;
+        Testee testee(&dispatcher);
+        Frontend::Miniature frontend(&dispatcher);
+
+        dispatcher.setBackend(&testee);
+        dispatcher.setFrontend(&frontend);
+
+        // Prevents engine from connecting to FICS:
+        testee.setChannelEnabled(false);
+
+        // Brings FICS engine into a ready state:
+        QVERIFY(playLoginScenario(&frontend, &testee));
+
+        testee.enableDebugOutput(true);
+        TestUtils::ScenarioLoader sl;
+        TestUtils::Scenario sc = sl.load(&testee, "fics-game");
+
+        QSignalSpy game_started(&frontend, SIGNAL(gameStarted()));
+        QSignalSpy game_ended(&frontend, SIGNAL(gameEnded(int,int)));
+
+        sc.play();
+
+        frontend.play(11);
+        sc.play(testee.response());
+        sc.play();
+
+        QCOMPARE(frontend.activeGame()->id(), 414u);
+        QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
+        QCOMPARE(frontend.remoteSide()->id(), QString("testonetwo"));
+
+        QVERIFY(frontend.localSide()->active());
+
+        // 1. g2-g4
+        frontend.selectSquare(54);
+        frontend.selectSquare(38);
+        frontend.confirmMove();
+        sc.play(testee.response());
+        sc.play();
+
+        QVERIFY(frontend.localSide()->active());
+
+        // Illegal move: 2. f2-f6
+        frontend.selectSquare(53);
+        frontend.selectSquare(21);
+        frontend.confirmMove();
+        sc.play(testee.response());
+        sc.play();
+
+        QVERIFY(frontend.localSide()->active());
+
+        // 2. f2-f4
+        frontend.selectSquare(53);
+        frontend.selectSquare(37);
+        frontend.confirmMove();
+        sc.play(testee.response());
+        sc.play();
+
+        QVERIFY(sc.finished());
+        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
+        QCOMPARE(game_started.count(), 1);
+        QCOMPARE(game_ended.count(), 1);
+
+        const QList<QVariant> &signal_args(game_ended.takeFirst());
+        QCOMPARE(signal_args.at(0).toInt(),
+                 static_cast<int>(ResultBlackWins));
+        QCOMPARE(signal_args.at(1).toInt(),
+                 static_cast<int>(ReasonCheckmated));
+
     }
 };
 

@@ -1,0 +1,27 @@
+fics%
+WAIT_FOR_INPUT play 11\n
+
+Creating: GuestNFYR (++++) testonetwo (++++) unrated standard 999 999
+{Game 414 (GuestNFYR vs. testonetwo) Creating unrated standard match.}
+
+<12> rnbqkbnr pppppppp -------- -------- -------- -------- PPPPPPPP RNBQKBNR W -1 1 1 1 1 0 414 GuestNFYR testonetwo 1 999 999 39 39 36000 36000 1 none (0:00) none 0 0 0
+fics%
+WAIT_FOR_INPUT g2g4\n
+<12> rnbqkbnr pppppppp -------- -------- ------P- -------- PPPPPP-P RNBQKBNR B 6 1 1 1 1 0 414 GuestNFYR testonetwo -1 999 999 39 39 36000 36000 1 P/g2-g4 (0:00) g4 0 0 0
+
+fics% 
+<12> rnbqkbnr pppp-ppp -------- ----p--- ------P- -------- PPPPPP-P RNBQKBNR W 4 1 1 1 1 0 414 GuestNFYR testonetwo 1 999 999 39 39 36000 36000 2 P/e7-e5 (0:00) e5 0 1 0
+fics% 
+WAIT_FOR_INPUT f2f6\n
+fics% Illegal move (f2f6).
+fics%
+WAIT_FOR_INPUT f2f4\n
+
+<12> rnbqkbnr pppp-ppp -------- ----p--- -----PP- -------- PPPPP--P RNBQKBNR B 5 1 1 1 1 0 414 GuestNFYR testonetwo -1 999 999 39 39 36000 36000 2 P/f2-f4 (0:38) f4 0 1 0
+fics% 
+<12> rnb-kbnr pppp-ppp -------- ----p--- -----PPq -------- PPPPP--P RNBQKBNR W -1 1 1 1 1 1 414 GuestNFYR testonetwo 1 999 999 39 39 36000 36000 3 Q/d8-h4 (0:13) Qh4# 0 1 0
+fics% 
+{Game 414 (GuestNFYR vs. testonetwo) GuestNFYR checkmated} 0-1
+
+No ratings adjustment done.
+fics% 
