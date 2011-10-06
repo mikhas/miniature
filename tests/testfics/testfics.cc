@@ -93,7 +93,8 @@ namespace {
 
         // Enter the scenario's feedback loop:
         while (not sc.finished()) {
-            sc.play(engine->response());
+            sc.play();
+            sc.respond(engine->response());
         }
 
         // Clear last response, by quering it:
@@ -159,16 +160,18 @@ private:
         frontend.login("MiniatureTest", "wrongpw");
 
         const int max_loop_count = 10;
-        const int failed_login_index = 4;
+        const int failed_login_index = 2;
 
         // Enter the scenario's feedback loop:
         for (int i = 0; i < max_loop_count && not sc.finished(); ++i) {
-            sc.play(testee.response());
+            sc.play();
 
             if (i == failed_login_index) {
                 // We want to see whether we can recover from a failed login:
                 frontend.login("MiniatureTest", "TestMiniature");
             }
+
+            sc.respond(testee.response());
         }
 
         TestUtils::waitForSignal(&frontend, SIGNAL(loginFailed()));
@@ -205,7 +208,7 @@ private:
         sc.play();
 
         frontend.play(11);
-        sc.play(testee.response());
+        sc.respond(testee.response());
         sc.play();
 
         QCOMPARE(frontend.activeGame()->id(), 414u);
@@ -218,7 +221,7 @@ private:
         frontend.selectSquare(54);
         frontend.selectSquare(38);
         frontend.confirmMove();
-        sc.play(testee.response());
+        sc.respond(testee.response());
         sc.play();
 
         QVERIFY(frontend.localSide()->active());
@@ -227,7 +230,7 @@ private:
         frontend.selectSquare(53);
         frontend.selectSquare(21);
         frontend.confirmMove();
-        sc.play(testee.response());
+        sc.respond(testee.response());
         sc.play();
 
         QVERIFY(frontend.localSide()->active());
@@ -236,7 +239,7 @@ private:
         frontend.selectSquare(53);
         frontend.selectSquare(37);
         frontend.confirmMove();
-        sc.play(testee.response());
+        sc.respond(testee.response());
         sc.play();
 
         QVERIFY(sc.finished());

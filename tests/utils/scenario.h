@@ -29,6 +29,17 @@ namespace Game {
 
 namespace TestUtils {
 
+//! Plays pre-canned data in order to be processed by a given Miniature engine.
+//! Continues to feed data to engine until it encounters a WAIT_FOR_INPUT
+//! token in data stream. Before a scenario can be continued (through another
+//! call to play), the right response must be given to respond.
+//! If the response is wrong, the current scenario will be considered as having
+//! failed.
+//! finished will return true if a scenario has either failed or was completed,
+//! which makes it suitable as the loop invariant, whereas result returns
+//! whether the scenario has passed.
+//! finished == true and result == Passed means a scenario was completed
+//! successfully.
 class Scenario
 {
 public:
@@ -47,7 +58,8 @@ private:
 public:
     explicit Scenario(Game::AbstractEngine *engine);
 
-    void play(const QByteArray &response = QByteArray());
+    void play();
+    void respond(const QByteArray &response);
     void setData(const QVector<QByteArray> &data);
     Result result() const;
     bool finished() const;

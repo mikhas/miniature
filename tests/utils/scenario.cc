@@ -36,22 +36,9 @@ Scenario::Scenario(Game::AbstractEngine *engine)
     , m_result(Passed)
 {}
 
-void Scenario::play(const QByteArray &response)
+void Scenario::play()
 {
-    if (not m_engine) {
-        return;
-    }
-
-    if (response != m_expected_response.replace("\\n", "\n")) {
-        m_result = Failed;
-        return;
-    }
-
-    // Compute expected response and return after receiving valid response.
-    // In order to play more scenario data, response/expected response both
-    // need to be empty (until next WAIT_FOR_INPUT situation is encountered).
-    if (not response.isEmpty()) {
-        m_expected_response = computeNextExpectedResponse(m_count + 1);
+    if (not m_engine || not m_expected_response.isEmpty()) {
         return;
     }
 
@@ -76,6 +63,22 @@ void Scenario::play(const QByteArray &response)
         }
 
         m_engine->processToken(token);
+    }
+}
+
+void Scenario::respond(const QByteArray &response)
+{
+    if (response != m_expected_response.replace("\\n", "\n")) {
+        m_result = Failed;
+        return;
+    }
+
+    // Compute expected response and return after receiving valid response.
+    // In order to play more scenario data, response/expected response both
+    // need to be empty (until next WAIT_FOR_INPUT situation is encountered).
+    if (not response.isEmpty()) {
+        m_expected_response = computeNextExpectedResponse(m_count + 1);
+        return;
     }
 }
 
