@@ -47,11 +47,11 @@ void Scenario::play(const QByteArray &response)
         return;
     }
 
-    // Clear expected response and return after receiving valid response.
+    // Compute expected response and return after receiving valid response.
     // In order to play more scenario data, response/expected response both
     // need to be empty (until next WAIT_FOR_INPUT situation is encountered).
     if (not response.isEmpty()) {
-        m_expected_response.clear();
+        m_expected_response = computeNextExpectedResponse(m_count + 1);
         return;
     }
 
@@ -70,7 +70,7 @@ void Scenario::play(const QByteArray &response)
         }
 
         if (token.startsWith(wait_for_input)) {
-            m_expected_response = token.mid(wait_for_input.length() + 1);
+            m_expected_response = computeNextExpectedResponse(m_count);
             ++m_count;
             return;
         }
@@ -91,7 +91,20 @@ Scenario::Result Scenario::result() const
 
 bool Scenario::finished() const
 {
-    return (m_count + 1 == m_data.size() || m_result == Failed);
+    return (m_count == m_data.size() || m_result == Failed);
+}
+
+QByteArray Scenario::computeNextExpectedResponse(int index)
+{
+    if (index < m_data.size()) {
+        const QByteArray &token(m_data.at(index));
+
+        if (token.startsWith(wait_for_input)) {
+            return token.mid(wait_for_input.length() + 1);
+        }
+    }
+
+    return QByteArray();
 }
 
 } // namespace Miniature

@@ -51,6 +51,9 @@ public:
     void setData(const QVector<QByteArray> &data);
     Result result() const;
     bool finished() const;
+
+private:
+    QByteArray computeNextExpectedResponse(int index);
 };
 
 } // namespace TestUtils
