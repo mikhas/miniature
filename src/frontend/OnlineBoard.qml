@@ -548,10 +548,15 @@ Page {
 
             if (reason == Miniature.ReasonCheckmated) {
                 gameResolutions.description = qsTr("Checkmate")
-            } else if (reason == Miniature.ReasonDrawAccepted) {
+            }
+            if (reason == Miniature.ReasonDrawAccepted) {
                 //: %1 is the opponent's name
                 gameResolutions.description = qsTr("%1 accepts draw").arg(remoteSide.id)
-            } else {
+            }
+            if (reason == Miniature.ReasonTimeForfeit) {
+                gameResolutions.description = qsTr("Out of time!").arg(remoteSide.id)
+            }
+            else {
                 //: %1 is the opponent's name
                 gameResolutions.description = qsTr("%1 vanished").arg(remoteSide.id)
             }
