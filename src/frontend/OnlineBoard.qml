@@ -554,7 +554,7 @@ Page {
                 gameResolutions.description = qsTr("%1 accepts draw").arg(remoteSide.id)
             }
             if (reason == Miniature.ReasonTimeForfeit) {
-                gameResolutions.description = qsTr("Out of time!").arg(remoteSide.id)
+                gameResolutions.description = qsTr("Out of time!")
             }
             else {
                 //: %1 is the opponent's name
