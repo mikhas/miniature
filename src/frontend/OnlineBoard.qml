@@ -484,15 +484,15 @@ Page {
                             exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
                             endQueryDialog.open() }
             }
-            MenuItem {text: qsTr("Adjourn"); onClicked: {
-                    exitMenu.queryTitle = qsTr("Request to adjourn?")
-                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-                            endQueryDialog.open() }
-            }
-            MenuItem {text: qsTr("Abort"); onClicked: {
-                    exitMenu.queryTitle = qsTr("Abort?")
-                            endQueryDialog.open() }
-            }
+//            MenuItem {text: qsTr("Adjourn"); onClicked: { // Out of scope in 0.5 - commenting
+//                    exitMenu.queryTitle = qsTr("Request to adjourn?")
+//                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+//                            endQueryDialog.open() }
+//            }
+//            MenuItem {text: qsTr("Abort"); onClicked: { // Out of scope in 0.5 - commenting
+//                    exitMenu.queryTitle = qsTr("Abort?")
+//                            endQueryDialog.open() }
+//            }
         }
     }
 
@@ -514,7 +514,7 @@ Page {
                 //: %1 is the opponent's name
                 opponentProposals.description = qsTr("%1 is requesting to adjourn this game.").arg(remoteSide.id)
             }
-            if (proposal == Miniature.ProposedDraw) {
+            if (proposal == Miniature.ProposedAbort) {
                 opponentProposals.resolution = qsTr("Scrap this game?")
                 //: %1 is the opponent's name
                 opponentProposals.description = qsTr("%1 is proposing to abort this game.").arg(remoteSide.id)
