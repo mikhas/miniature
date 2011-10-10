@@ -17,3 +17,4 @@ tests/testfics/testfics
 tests/testposition/testposition
 src/qrc_frontend.cpp
 qtc_packaging/
+*.gcov
