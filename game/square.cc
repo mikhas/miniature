@@ -100,4 +100,10 @@ Square toSquare(const QByteArray &data)
     return Square(f, r);
 }
 
+int fromSquare(const Square &square)
+{
+    return (static_cast<int>(square.file)
+            + (static_cast<int>(square.rank) * static_cast<int>(FileCount)));
+}
+
 } // namespace Game

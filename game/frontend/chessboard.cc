@@ -147,20 +147,24 @@ int ChessBoard::rowCount(const QModelIndex &parent) const
 QVariant ChessBoard::data(const QModelIndex &index,
                           int role) const
 {
-    int row(adjustedIndex(index.row()));
-    const Piece &p(m_position.pieceAt(toSquare(row)));
+    const int row = adjustedIndex(index.row());
+    const Piece &piece = m_position.pieceAt(toSquare(row));
+    const MovedPiece &moved_piece = m_position.movedPiece();
+    const int last_move_origin = adjustedIndex(fromSquare(moved_piece.origin()));
+    const int last_move_target = adjustedIndex(fromSquare(moved_piece.target()));
 
     switch(role) {
-    case RolePiece: return fromPiece(p);
-    case RolePieceImage: return imageFromPiece(p);
-    case RolePieceColor: return fromColor(p.color());
+    case RolePiece: return fromPiece(piece);
+    case RolePieceImage: return imageFromPiece(piece);
+    case RolePieceColor: return fromColor(piece.color());
     case RoleSquareColor: {
         QColor square_color(Qt::transparent);
-        if (m_marked_move.origin == row) {
+        if (m_marked_move.origin == row || last_move_origin == row) {
             square_color = QColor("cornflowerblue");
-        } else if (m_marked_move.target == row) {
+        } else if (m_marked_move.target == row || last_move_target == row) {
             square_color = QColor("olivedrab");
         }
+
         return square_color;
     }
     }
