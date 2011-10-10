@@ -156,6 +156,19 @@ Page {
                 onRowsInserted: chatLog.positionViewAtEnd()
             }
 
+            Text {
+                id: chatInstructions
+                color: "lightgrey"
+                font.pointSize: 16
+                text: qsTr("Tap to chat")
+                anchors {
+                    top: parent.top
+                    topMargin: 30
+                    left: parent.left
+                }
+                visible: chatLog.count == 0
+            }
+
             delegate: Text {
                 color: "white"
                 font.pointSize: 16
