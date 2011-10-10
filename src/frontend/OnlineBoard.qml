@@ -443,14 +443,16 @@ Page {
     // Toolbar at the bottom of the page
     ToolBar {
         id: boardToolbar
+        property bool gameEnded: false
         anchors.bottom: parent.bottom
         tools: ToolBarLayout {
 
             ToolIcon { // Stops the game, can lead to draw,
                 id: backIcon
-                iconId: "toolbar-back";
+                iconId: "toolbar-back"
                 onClicked: {
-                    exitMenu.open()
+                    if (boardToolbar.gameEnded == true) pageStack.pop()
+                    else exitMenu.open()
                 }
             }
 
@@ -475,15 +477,26 @@ Page {
         property string queryTitle: ""
         property string queryMessage: ""
         MenuLayout {
-            MenuItem {text: qsTr("Resign"); onClicked: {
+            MenuItem {
+                id: menuResign
+                text: qsTr("Resign")
+                visible: true
+                onClicked: {
                     exitMenu.queryTitle = qsTr("Resign?")
-                            endQueryDialog.open() }
+                            endQueryDialog.open()
+                }
             }
-            MenuItem {text: qsTr("Draw"); onClicked: {
+            MenuItem {
+                id: menuDraw
+                text: qsTr("Draw")
+                visible: true
+                onClicked: {
                     exitMenu.queryTitle = qsTr("Propose a draw?")
                             exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-                            endQueryDialog.open() }
+                            endQueryDialog.open()
+                }
             }
+
 //            MenuItem {text: qsTr("Adjourn"); onClicked: { // Out of scope in 0.5 - commenting
 //                    exitMenu.queryTitle = qsTr("Request to adjourn?")
 //                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
@@ -531,6 +544,8 @@ Page {
         property string description
         property string newRatings
         onGameEnded: {
+            boardToolbar.gameEnded = true
+
             // Defining the result string to be used as title
             if (result == Miniature.ResultWhiteWins) {
                 if (localSide.color == "#ffffff") gameResolutions.winnerIs = qsTr("You win!")
@@ -632,12 +647,13 @@ Page {
         titleText: gameResolutions.winnerIs
         message:  gameResolutions.description + "\n\n" + gameResolutions.newRatings
 
-        acceptButtonText: qsTr("Rematch")
-        onAccepted: { // FIXME match functionality needs to be implemented
-        }
-        rejectButtonText: qsTr("Seek games")
-        onRejected: {
+//        acceptButtonText: qsTr("Rematch") // Out of scope in 0.5
+//        onAccepted: { // FIXME match functionality needs to be implemented
+//        }
+        acceptButtonText: qsTr("Seek games")
+        onAccepted:  {
             pageStack.pop()
         }
+        rejectButtonText: qsTr("Show board")
     }
 }
