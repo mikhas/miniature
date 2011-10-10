@@ -367,8 +367,8 @@ Page {
     GridView {
         id: chessboardGrid
         anchors.fill: imageBoard // Just for you to know: this doesn't work in landscape.
-        cellWidth: 60 // FIXME better not hardcoded
-        cellHeight: 60 // FIXME better not hardcoded
+        cellWidth: parent.width / 8
+        cellHeight: parent.width / 8
         interactive: false
         model: chessBoard
         delegate: chessboardGridDelegate
@@ -378,8 +378,8 @@ Page {
             id: chessboardGridDelegate
             Rectangle {
                 id: squareDelegate
-                width: 60 // FIXME better not hardcoded
-                height: 60 // FIXME better not hardcoded
+                width: parent.width / 8
+                height: parent.width / 8
                 color: squareColor
                 SequentialAnimation on color {
                     id: wrongTapAnimation
@@ -390,8 +390,8 @@ Page {
 
                 Image {
                     source: pieceImage
-                    width: 60 // FIXME better not hardcoded
-                    height: 60 // FIXME better not hardcoded
+                    width: parent.width
+                    height: parent.width
                 }
 
                 MouseArea {
