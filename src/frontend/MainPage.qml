@@ -321,7 +321,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         width: 50
         anchors {
             top: registerButton.bottom
-            topMargin: 110
+            topMargin: 70
             horizontalCenter: parent.horizontalCenter
         }
         onClicked: {
