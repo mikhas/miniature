@@ -68,7 +68,12 @@ void Scenario::play()
 
 void Scenario::respond(const QByteArray &response)
 {
-    if (response != m_expected_response.replace("\\n", "\n")) {
+    QByteArray r = response;
+    r.replace("\n", "\\n");
+
+    if (r != m_expected_response) {
+        qWarning() << "Wrong response. Got:" << r
+                   << "expected:" << m_expected_response;
         m_result = Failed;
         return;
     }
