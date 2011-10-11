@@ -248,11 +248,14 @@ void Miniature::seek(uint time,
     } break;
 
     case TestFicsMode: {
+        const GameInfo &gi = dummyGameInfo();
 
-        Command::CreateGame cg(TargetRegistry, dummyGameInfo(),  LocalSideIsWhite);
+        Command::CreateGame cg(TargetRegistry, gi, LocalSideIsWhite);
         sendCommand(&cg);
 
         Command::Move m(TargetFrontend, 999u, createStartPosition());
+        m.setWhite(gi.white);
+        m.setBlack(gi.black);
         sendCommand(&m);
     } break;
     }
@@ -277,10 +280,14 @@ void Miniature::play(uint id)
     } break;
 
     case TestFicsMode: {
-        Command::CreateGame cg(TargetRegistry, dummyGameInfo(), LocalSideIsWhite);
+        const GameInfo &gi = dummyGameInfo();
+
+        Command::CreateGame cg(TargetRegistry, gi, LocalSideIsWhite);
         sendCommand(&cg);
 
         Command::Move m(TargetFrontend, 999u, createStartPosition());
+        m.setWhite(gi.white);
+        m.setBlack(gi.black);
         sendCommand(&m);
     } break;
     }
