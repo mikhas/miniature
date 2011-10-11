@@ -254,6 +254,93 @@ private:
                  static_cast<int>(ReasonCheckmated));
 
     }
+
+    Q_SLOT void testCastling()
+    {
+        Dispatcher dispatcher;
+        Testee testee(&dispatcher);
+        Frontend::Miniature frontend(&dispatcher);
+
+        dispatcher.setBackend(&testee);
+        dispatcher.setFrontend(&frontend);
+
+        // Prevents engine from connecting to FICS:
+        testee.setChannelEnabled(false);
+
+        // Brings FICS engine into a ready state:
+        QVERIFY(playLoginScenario(&frontend, &testee));
+
+        testee.enableDebugOutput(true);
+        TestUtils::ScenarioLoader sl;
+        TestUtils::Scenario sc = sl.load(&testee, "fics-castling");
+
+        sc.play();
+        frontend.seek(12, 12, "unrated", "auto");
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // Nf3
+        frontend.selectSquare(62);
+        frontend.selectSquare(45);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // g3
+        frontend.selectSquare(54);
+        frontend.selectSquare(46);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // Bg2
+        frontend.selectSquare(61);
+        frontend.selectSquare(54);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // O-O
+        frontend.selectSquare(60);
+        frontend.selectSquare(62);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // Sc3
+        frontend.selectSquare(57);
+        frontend.selectSquare(42);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        // d3
+        frontend.selectSquare(51);
+        frontend.selectSquare(43);
+        frontend.confirmMove();
+
+        sc.respond(testee.response());
+        sc.play();
+
+        const Piece white_king(Piece::King, ColorWhite, toSquare("g1"));
+        const Piece white_rook(Piece::Rook, ColorWhite, toSquare("f1"));
+        const Piece black_king(Piece::King, ColorBlack, toSquare("c8"));
+        const Piece black_rook(Piece::Rook, ColorBlack, toSquare("d8"));
+
+        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("g1")), white_king);
+        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("f1")), white_rook);
+        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("c8")), black_king);
+        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("d8")), black_rook);
+
+        QVERIFY(sc.finished());
+        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
+    }
 };
 
 
