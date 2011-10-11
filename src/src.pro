@@ -121,6 +121,10 @@ CONFIG += qdeclarative-boostable
 QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
 QMAKE_LFLAGS += -pie -rdynamic
 
+# enable mobility
+CONFIG += mobility
+MOBILITY += systeminfo
+
 OTHER_FILES += \
     frontend/MainPage.qml \
     frontend/SeekGame.qml \

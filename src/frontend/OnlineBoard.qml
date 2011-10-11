@@ -21,20 +21,26 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
 import org.maemo.miniature 1.0
+import QtMobility.systeminfo 1.1
 
 Page {
 
+    ScreenSaver {
+        id: screenSaver
+        Component.onCompleted: { screenSaver.setScreenSaverDelayed(true) }
+    }
+
     // Taken from http://codeaid.net/javascript/convert-seconds-to-hours-minutes-and-seconds-%28javascript%29
     function formatTime(secs) {
-            var hr = Math.floor(secs / 3600);
-            var min = Math.floor((secs - (hr * 3600))/60);
-            var sec = secs - (hr * 3600) - (min * 60);
+        var hr = Math.floor(secs / 3600);
+        var min = Math.floor((secs - (hr * 3600))/60);
+        var sec = secs - (hr * 3600) - (min * 60);
 
-            if (hr < 10) {hr = "0" + hr; }
-            if (min < 10) {min = "0" + min;}
-            if (sec < 10) {sec = "0" + sec;}
-            if (hr) {hr = "00";}
-            return hr + ':' + min + ':' + sec;
+        if (hr < 10) {hr = "0" + hr; }
+        if (min < 10) {min = "0" + min;}
+        if (sec < 10) {sec = "0" + sec;}
+        if (hr) {hr = "00";}
+        return hr + ':' + min + ':' + sec;
     }
 
     id: ficsBoard
@@ -496,7 +502,7 @@ Page {
                 visible: true
                 onClicked: {
                     exitMenu.queryTitle = qsTr("Resign?")
-                            endQueryDialog.open()
+                    endQueryDialog.open()
                 }
             }
             MenuItem {
@@ -505,20 +511,20 @@ Page {
                 visible: true
                 onClicked: {
                     exitMenu.queryTitle = qsTr("Propose a draw?")
-                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-                            endQueryDialog.open()
+                    exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+                    endQueryDialog.open()
                 }
             }
 
-//            MenuItem {text: qsTr("Adjourn"); onClicked: { // Out of scope in 0.5 - commenting
-//                    exitMenu.queryTitle = qsTr("Request to adjourn?")
-//                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
-//                            endQueryDialog.open() }
-//            }
-//            MenuItem {text: qsTr("Abort"); onClicked: { // Out of scope in 0.5 - commenting
-//                    exitMenu.queryTitle = qsTr("Abort?")
-//                            endQueryDialog.open() }
-//            }
+            //            MenuItem {text: qsTr("Adjourn"); onClicked: { // Out of scope in 0.5 - commenting
+            //                    exitMenu.queryTitle = qsTr("Request to adjourn?")
+            //                            exitMenu.queryMessage = qsTr("%1 must accept it, otherwise the game continues").arg(remoteSide.id)
+            //                            endQueryDialog.open() }
+            //            }
+            //            MenuItem {text: qsTr("Abort"); onClicked: { // Out of scope in 0.5 - commenting
+            //                    exitMenu.queryTitle = qsTr("Abort?")
+            //                            endQueryDialog.open() }
+            //            }
         }
     }
 
@@ -593,7 +599,7 @@ Page {
 
             if (gameRated() == "unrated") { gameResolutions.newRatings = qsTr("No ratings adjustment done") }
             else gameResolutions.newRatings = localSide.id + ": " + localSide.rating + " > " + "FIXME\n" +
-            remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
+                 remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
 
             gameoverDialog.open()
 
@@ -660,9 +666,9 @@ Page {
         titleText: gameResolutions.winnerIs
         message:  gameResolutions.description + "\n\n" + gameResolutions.newRatings
 
-//        acceptButtonText: qsTr("Rematch") // Out of scope in 0.5
-//        onAccepted: { // FIXME match functionality needs to be implemented
-//        }
+        //        acceptButtonText: qsTr("Rematch") // Out of scope in 0.5
+        //        onAccepted: { // FIXME match functionality needs to be implemented
+        //        }
         acceptButtonText: qsTr("Seek games")
         onAccepted:  {
             pageStack.pop()
