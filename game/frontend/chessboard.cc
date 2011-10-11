@@ -150,8 +150,8 @@ QVariant ChessBoard::data(const QModelIndex &index,
     const int row = adjustedIndex(index.row());
     const Piece &piece = m_position.pieceAt(toSquare(row));
     const MovedPiece &moved_piece = m_position.movedPiece();
-    const int last_move_origin = adjustedIndex(fromSquare(moved_piece.origin()));
-    const int last_move_target = adjustedIndex(fromSquare(moved_piece.target()));
+    const int last_move_origin = fromSquare(moved_piece.origin());
+    const int last_move_target = fromSquare(moved_piece.target());
 
     switch(role) {
     case RolePiece: return fromPiece(piece);
