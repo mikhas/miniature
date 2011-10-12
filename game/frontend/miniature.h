@@ -52,6 +52,7 @@ class Miniature
     Q_ENUMS(Rating)
     Q_ENUMS(Result)
     Q_ENUMS(Reason)
+    Q_ENUMS(SquareStyle)
 
     Q_PROPERTY(Mode mode READ mode
                          WRITE setMode
@@ -98,6 +99,13 @@ public:
         ReasonCheckmated = ::Game::ReasonCheckmated,
         ReasonDrawAccpeted = ::Game::ReasonDrawAccpeted,
         ReasonAdjourned = ::Game::ReasonAdjourned
+    };
+
+    enum SquareStyle {
+        MoveOrigin,
+        MoveTarget,
+        LastOrigin,
+        LastTarget
     };
 
     explicit Miniature(Dispatcher *dispatcher,

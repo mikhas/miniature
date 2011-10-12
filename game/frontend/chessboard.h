@@ -35,6 +35,7 @@ class ChessBoard
 {
     Q_OBJECT
     Q_DISABLE_COPY(ChessBoard)
+    Q_ENUMS(Orientation)
 
 public:
     enum Orientation {
@@ -60,7 +61,7 @@ public:
         RolePiece = Qt::UserRole + 1,
         RolePieceImage,
         RolePieceColor,
-        RoleSquareColor
+        RoleSquareStyle
     };
 
     explicit ChessBoard(QObject *parent = 0);

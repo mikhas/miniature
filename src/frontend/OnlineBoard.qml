@@ -43,6 +43,17 @@ Page {
         return hr + ':' + min + ':' + sec;
     }
 
+    function squareColor(style) {
+        switch(style) {
+        case Miniature.MoveOrigin: return "olivedrab";
+        case Miniature.MoveTarget: return "cornflowerblue";
+        case Miniature.LastOrigin: return "olivedrab";
+        case Miniature.LastTarget: return "cornflowerblue";
+        }
+
+        return "transparent";
+    }
+
     id: ficsBoard
     orientationLock: PageOrientation.LockPortrait
 
@@ -386,7 +397,7 @@ Page {
                 id: squareDelegate
                 width: parent.width / 8
                 height: parent.width / 8
-                color: squareColor
+                color: squareColor(squareStyle)
                 SequentialAnimation on color {
                     id: wrongTapAnimation
                     running: false

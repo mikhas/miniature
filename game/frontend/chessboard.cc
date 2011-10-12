@@ -102,7 +102,7 @@ ChessBoard::ChessBoard(QObject *parent)
     roles[RolePiece] = "piece";
     roles[RolePieceImage] = "pieceImage";
     roles[RolePieceColor] = "pieceColor";
-    roles[RoleSquareColor] = "squareColor";
+    roles[RoleSquareStyle] = "squareStyle";
     setRoleNames(roles);
 }
 
@@ -157,16 +157,16 @@ QVariant ChessBoard::data(const QModelIndex &index,
     case RolePiece: return fromPiece(piece);
     case RolePieceImage: return imageFromPiece(piece);
     case RolePieceColor: return fromColor(piece.color());
-    case RoleSquareColor: {
-        QColor square_color(Qt::transparent);
-        if (m_marked_move.origin == row || last_move_origin == row) {
-            square_color = QColor("cornflowerblue");
-        } else if (m_marked_move.target == row || last_move_target == row) {
-            square_color = QColor("olivedrab");
+    case RoleSquareStyle:
+        if (m_marked_move.origin == row) {
+            return Miniature::MoveOrigin;
+        } else if (m_marked_move.target == row) {
+            return Miniature::MoveTarget;
+        } else if (last_move_origin == row) {
+            return Miniature::LastOrigin;
+        } else if (last_move_target == row) {
+            return Miniature::LastTarget;
         }
-
-        return square_color;
-    }
     }
 
     return QVariant();
