@@ -85,7 +85,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Text {
         id: poormansHeader
         //: only to be translated in non-Latin writing languages requiring it
-        text: qsTr("Miniature")
+        text: "Miniature"
         font.family: "Nokia Pure Headline"
         font.pointSize: 28
         color: "white"
@@ -99,7 +99,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     Text {
         id: poormansHeaderVersion
         //: only to be translated in non-Latin writing languages requiring it
-        text: qsTr("0.4")
+        text: "0.5"
         font.family: "Nokia Pure Headline"
         font.pointSize: 28
         color: "white"
@@ -274,7 +274,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             font.pointSize: 16
             horizontalAlignment: Text.AlignHCenter
             clip: true
-            lineHeight: 1.5
+            lineHeight: 1.2
             wrapMode: Text.Wrap
         }
 
