@@ -47,6 +47,13 @@ Page {
         switch(style) {
         case Miniature.MoveOrigin: return "olivedrab";
         case Miniature.MoveTarget: return "cornflowerblue";
+        }
+
+        return "transparent";
+    }
+
+    function borderColor(style) {
+        switch(style) {
         case Miniature.LastOrigin: return "olivedrab";
         case Miniature.LastTarget: return "cornflowerblue";
         }
@@ -341,16 +348,6 @@ Page {
             anchors.right: opponentZone.right
             anchors.rightMargin: 30
         }
-
-        Rectangle {
-            id: remoteMoves
-            color: "cornflowerblue"
-            width: parent.width
-            height: 5
-            anchors.bottom: parent.bottom
-            z: 50
-            visible: remoteSide.active
-        }
     }
 
     // The board
@@ -365,7 +362,7 @@ Page {
         // 2 rectangles purely decorative to make the board edges look nicer
         Rectangle {
             id: remoteCorners
-            color: remoteSide.active ? "cornflowerblue" : remoteSide.color
+            color: remoteSide.color
             width: parent.width
             height:  50
             anchors.top: parent.top
@@ -373,7 +370,7 @@ Page {
         }
         Rectangle {
             id: localCorners
-            color: localSide.active ? "cornflowerblue" : localSide.color
+            color: localSide.color
             width: parent.width
             height:  50
             anchors.bottom: parent.bottom
@@ -398,6 +395,8 @@ Page {
                 width: parent.width / 8
                 height: parent.width / 8
                 color: squareColor(squareStyle)
+                border.color: borderColor(squareStyle)
+                border.width: 3
                 SequentialAnimation on color {
                     id: wrongTapAnimation
                     running: false
@@ -456,16 +455,6 @@ Page {
             anchors.verticalCenterOffset: 3
             anchors.right: userZone.right
             anchors.rightMargin: 30
-        }
-
-        Rectangle {
-            id: localMoves
-            color: "cornflowerblue"
-            width: parent.width
-            height: 5
-            anchors.top: parent.top
-            z: 50
-            visible: localSide.active
         }
     }
 
