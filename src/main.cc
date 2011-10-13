@@ -32,7 +32,7 @@ Q_DECL_EXPORT int main(int argc, char ** argv)
 
     QString locale = QLocale::system().name();
     QTranslator translator;
-    if (translator.load("miniature." + locale, ":/"))
+    if (translator.load("miniature_miniaturets_" + locale, ":/"))
         app.installTranslator(&translator);
 
     Game::run(QUrl("qrc:/main.qml"), &app);

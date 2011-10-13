@@ -125,8 +125,6 @@ QMAKE_LFLAGS += -pie -rdynamic
 CONFIG += mobility
 MOBILITY += systeminfo
 
-TRANSLATIONS = miniature.en.ts
-
 OTHER_FILES += \
     frontend/MainPage.qml \
     frontend/SeekGame.qml \
@@ -152,4 +150,17 @@ OTHER_FILES += \
     frontend/miniature.en.qm \
     frontend/miniature.es.ts \
     frontend/miniature.en.ts \
-    frontend/miniature.ts
+    frontend/miniature.ts \
+    frontend/miniature_miniaturets_en_US.qm \
+    frontend/miniature_miniaturets_en_US.ts \
+    frontend/miniature_miniaturets_es.ts \
+    frontend/miniature_miniaturets_es.qm \
+    frontend/miniature_miniaturets_de.qm \
+    frontend/miniature_miniaturets_de.ts
+
+
+
+
+
+
+

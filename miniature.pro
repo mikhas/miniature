@@ -15,3 +15,6 @@ CONFIG += ordered qt
 SUBDIRS += \
     src \
 
+TRANSLATIONS = src/frontend/miniature_miniaturets_en_US.ts \
+               src/frontend/miniature_miniaturets_es.ts \
+               src/frontend/miniature_miniaturets_de.ts

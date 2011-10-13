@@ -24,5 +24,10 @@
         <file>miniature.en.qm</file>
         <file>miniature.es.ts</file>
         <file>miniature.en.ts</file>
+        <file>miniature_miniaturets_en_US.ts</file>
+        <file>miniature_miniaturets_en_US.qm</file>
+        <file>miniature_miniaturets_es.ts</file>
+        <file>miniature_miniaturets_es.qm</file>
+        <file>miniature_miniaturets_de.qm</file>
     </qresource>
 </RCC>
