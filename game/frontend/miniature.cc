@@ -150,6 +150,10 @@ Miniature::Miniature(Dispatcher *dispatcher,
     d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
     d->ui.rootContext()->setContextProperty("remoteSide", &d->remote_side);
     d->ui.rootContext()->setContextProperty("activeGame", &d->game_element);
+
+    connect(d->ui.engine(), SIGNAL(quit()),
+            qApp,           SLOT(quit()),
+            Qt::UniqueConnection);
 #endif
 
     d->command_line.setFlags(all_commands);
