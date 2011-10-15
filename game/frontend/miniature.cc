@@ -109,7 +109,7 @@ public:
     SideElement remote_side;
     GameElement game_element;
 #ifdef MINIATURE_GUI_ENABLED
-    QDeclarativeView ui;
+    QDeclarativeView *ui;
 #endif
 
     explicit MiniaturePrivate(Dispatcher *new_dispatcher)
@@ -126,7 +126,9 @@ public:
         , remote_side()
         , game_element()
 #ifdef MINIATURE_GUI_ENABLED
-        , ui()
+        // We have to leak this instance, because Qt silently steals ownership
+        // of the top-level widget. Screw you, Qt.
+        , ui(new QDeclarativeView)
 #endif
     {}
 };
@@ -143,15 +145,15 @@ Miniature::Miniature(Dispatcher *dispatcher,
                                          "Enables access to Miniature enums.");
     qmlRegisterType<SideElement>("org.maemo.miniature", 1, 0, "SideElement");
 
-    d->ui.rootContext()->setContextProperty("availableSeeks", &d->available_seeks);
-    d->ui.rootContext()->setContextProperty("messageLog", &d->message_log);
-    d->ui.rootContext()->setContextProperty("chessBoard", &d->chess_board);
-    d->ui.rootContext()->setContextProperty("miniature", this);
-    d->ui.rootContext()->setContextProperty("localSide", &d->local_side);
-    d->ui.rootContext()->setContextProperty("remoteSide", &d->remote_side);
-    d->ui.rootContext()->setContextProperty("activeGame", &d->game_element);
+    d->ui->rootContext()->setContextProperty("availableSeeks", &d->available_seeks);
+    d->ui->rootContext()->setContextProperty("messageLog", &d->message_log);
+    d->ui->rootContext()->setContextProperty("chessBoard", &d->chess_board);
+    d->ui->rootContext()->setContextProperty("miniature", this);
+    d->ui->rootContext()->setContextProperty("localSide", &d->local_side);
+    d->ui->rootContext()->setContextProperty("remoteSide", &d->remote_side);
+    d->ui->rootContext()->setContextProperty("activeGame", &d->game_element);
 
-    connect(d->ui.engine(), SIGNAL(quit()),
+    connect(d->ui->engine(), SIGNAL(quit()),
             qApp,           SLOT(quit()),
             Qt::UniqueConnection);
 #endif
@@ -172,15 +174,15 @@ void Miniature::show(const QUrl &ui)
 #ifndef MINIATURE_GUI_ENABLED
     Q_UNUSED(ui)
 #else
-    if (d->ui.source() != ui) {
-        d->ui.setSource(ui);
+    if (d->ui->source() != ui) {
+        d->ui->setSource(ui);
         QFont font;
         // FIXME: Read font family from a QML property instead.
         font.setFamily("Nokia Pure Text");
         qApp->setFont(font);
     }
 
-    d->ui.showFullScreen();
+    d->ui->showFullScreen();
 #endif
 
     d->line_reader.init(new DirectInputDevice);
