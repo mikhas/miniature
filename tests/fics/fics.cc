@@ -33,7 +33,7 @@
 #include <QtGui>
 #include <QtTest>
 
-namespace Game {
+namespace Game { namespace Test {
 
 class Testee
     : public Fics::Engine
@@ -77,6 +77,49 @@ public:
     }
 };
 
+class Setup
+{
+private:
+    Dispatcher m_dispatcher;
+    Testee m_testee;
+    Frontend::Miniature m_frontend;
+    TestUtils::ScenarioLoader m_loader;
+
+public:
+    explicit Setup()
+        : m_dispatcher()
+        , m_testee(&m_dispatcher)
+        , m_frontend(&m_dispatcher)
+        , m_loader()
+    {
+        m_dispatcher.setBackend(&m_testee);
+        m_dispatcher.setFrontend(&m_frontend);
+
+        // Prevents engine from connecting to FICS:
+        m_testee.setChannelEnabled(false);
+    }
+
+    TestUtils::Scenario loadScenario(const QString &name)
+    {
+        return m_loader.load(&m_testee, name);
+    }
+
+    Dispatcher * dispatcher()
+    {
+        return &m_dispatcher;
+    }
+
+    Testee * testee()
+    {
+        return &m_testee;
+    }
+
+    Frontend::Miniature * frontend()
+    {
+        return &m_frontend;
+    }
+};
+
 namespace {
     bool playLoginScenario(Frontend::Miniature *frontend,
                            Testee *engine)
@@ -108,8 +151,6 @@ namespace {
 } // namespace
 
 
-namespace Test {
-
 class Fics
     : public QObject
 {
@@ -126,39 +167,21 @@ private:
 
     Q_SLOT void testLogin()
     {
-        Dispatcher dispatcher;
-        Testee testee(&dispatcher);
-        Frontend::Miniature frontend(&dispatcher);
+        Setup s;
 
-        dispatcher.setBackend(&testee);
-        dispatcher.setFrontend(&frontend);
-
-        // Prevents engine from connecting to FICS:
-        testee.setChannelEnabled(false);
-
-        QVERIFY(playLoginScenario(&frontend, &testee));
-        QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
+        QVERIFY(playLoginScenario(s.frontend(), s.testee()));
+        QCOMPARE(s.frontend()->localSide()->id(), QString("GuestNFYR"));
     }
 
     Q_SLOT void testRegisteredLogin()
     {
-        Dispatcher dispatcher;
-        Testee testee(&dispatcher);
-        Frontend::Miniature frontend(&dispatcher);
+        Setup s;
+        TestUtils::Scenario sc = s.loadScenario("fics-registered-login");
 
-        dispatcher.setBackend(&testee);
-        dispatcher.setFrontend(&frontend);
+        QSignalSpy login_succeeded(s.frontend(), SIGNAL(loginSucceeded()));
+        QSignalSpy login_failed(s.frontend(), SIGNAL(loginFailed()));
 
-        // Prevents engine from connecting to FICS:
-        testee.setChannelEnabled(false);
-
-        TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(&testee, "fics-registered-login");
-
-        QSignalSpy login_succeeded(&frontend, SIGNAL(loginSucceeded()));
-        QSignalSpy login_failed(&frontend, SIGNAL(loginFailed()));
-
-        frontend.login("MiniatureTest", "wrongpw");
+        s.frontend()->login("MiniatureTest", "wrongpw");
 
         const int max_loop_count = 10;
         const int failed_login_index = 2;
@@ -169,78 +192,69 @@ private:
 
             if (i == failed_login_index) {
                 // We want to see whether we can recover from a failed login:
-                frontend.login("MiniatureTest", "TestMiniature");
+                s.frontend()->login("MiniatureTest", "TestMiniature");
             }
 
-            sc.respond(testee.response());
+            sc.respond(s.testee()->response());
         }
 
-        TestUtils::waitForSignal(&frontend, SIGNAL(loginFailed()));
-        TestUtils::waitForSignal(&frontend, SIGNAL(loginSucceeded()));
+        TestUtils::waitForSignal(s.frontend(), SIGNAL(loginFailed()));
+        TestUtils::waitForSignal(s.frontend(), SIGNAL(loginSucceeded()));
         QVERIFY(sc.finished());
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
         QCOMPARE(login_failed.count(), 1);
         QCOMPARE(login_succeeded.count(), 1);
-        QCOMPARE(frontend.localSide()->id(), QString("MiniatureTest"));
+        QCOMPARE(s.frontend()->localSide()->id(), QString("MiniatureTest"));
     }
 
     Q_SLOT void testGame()
     {
-        Dispatcher dispatcher;
-        Testee testee(&dispatcher);
-        Frontend::Miniature frontend(&dispatcher);
-
-        dispatcher.setBackend(&testee);
-        dispatcher.setFrontend(&frontend);
-
-        // Prevents engine from connecting to FICS:
-        testee.setChannelEnabled(false);
+        Setup s;
 
         // Brings FICS engine into a ready state:
-        QVERIFY(playLoginScenario(&frontend, &testee));
+        QVERIFY(playLoginScenario(s.frontend(), s.testee()));
 
-        testee.enableDebugOutput(true);
-        TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(&testee, "fics-game");
+        s.testee()->enableDebugOutput(true);
+        TestUtils::Scenario sc = s.loadScenario("fics-game");
 
-        QSignalSpy game_started(&frontend, SIGNAL(gameStarted()));
-        QSignalSpy game_ended(&frontend, SIGNAL(gameEnded(int,int)));
+        QSignalSpy game_started(s.frontend(), SIGNAL(gameStarted()));
+        QSignalSpy game_ended(s.frontend(), SIGNAL(gameEnded(int,int)));
 
         sc.play();
 
-        frontend.play(11);
-        sc.respond(testee.response());
+        s.frontend()->play(11);
+        sc.respond(s.testee()->response());
         sc.play();
 
-        QCOMPARE(frontend.activeGame()->id(), 414u);
-        QCOMPARE(frontend.localSide()->id(), QString("GuestNFYR"));
-        QCOMPARE(frontend.remoteSide()->id(), QString("testonetwo"));
+        QCOMPARE(s.frontend()->activeGame()->id(), 414u);
+        QCOMPARE(s.frontend()->localSide()->id(), QString("GuestNFYR"));
+        QCOMPARE(s.frontend()->remoteSide()->id(), QString("testonetwo"));
 
-        QVERIFY(frontend.localSide()->active());
+        QVERIFY(s.frontend()->localSide()->active());
 
         // 1. g2-g4
-        frontend.selectSquare(54);
-        frontend.selectSquare(38);
-        frontend.confirmMove();
-        sc.respond(testee.response());
+        s.frontend()->selectSquare(54);
+        s.frontend()->selectSquare(38);
+        s.frontend()->confirmMove();
+        sc.respond(s.testee()->response());
         sc.play();
 
-        QVERIFY(frontend.localSide()->active());
+        QVERIFY(s.frontend()->localSide()->active());
 
         // Illegal move: 2. f2-f6
-        frontend.selectSquare(53);
-        frontend.selectSquare(21);
-        frontend.confirmMove();
-        sc.respond(testee.response());
+        s.frontend()->selectSquare(53);
+        s.frontend()->selectSquare(21);
+        s.frontend()->confirmMove();
+        sc.respond(s.testee()->response());
         sc.play();
 
-        QVERIFY(frontend.localSide()->active());
+        QVERIFY(s.frontend()->localSide()->active());
 
         // 2. f2-f4
-        frontend.selectSquare(53);
-        frontend.selectSquare(37);
-        frontend.confirmMove();
-        sc.respond(testee.response());
+        s.frontend()->selectSquare(53);
+        s.frontend()->selectSquare(37);
+        s.frontend()->confirmMove();
+        sc.respond(s.testee()->response());
         sc.play();
 
         QVERIFY(sc.finished());
@@ -253,80 +267,70 @@ private:
                  static_cast<int>(ResultBlackWins));
         QCOMPARE(signal_args.at(1).toInt(),
                  static_cast<int>(ReasonCheckmated));
-
     }
 
     Q_SLOT void testCastling()
     {
-        Dispatcher dispatcher;
-        Testee testee(&dispatcher);
-        Frontend::Miniature frontend(&dispatcher);
-
-        dispatcher.setBackend(&testee);
-        dispatcher.setFrontend(&frontend);
-
-        // Prevents engine from connecting to FICS:
-        testee.setChannelEnabled(false);
+        Setup s;
 
         // Brings FICS engine into a ready state:
-        QVERIFY(playLoginScenario(&frontend, &testee));
+        QVERIFY(playLoginScenario(s.frontend(), s.testee()));
 
-        testee.enableDebugOutput(true);
-        TestUtils::ScenarioLoader sl;
-        TestUtils::Scenario sc = sl.load(&testee, "fics-castling");
+        s.testee()->enableDebugOutput(true);
+        TestUtils::Scenario sc = s.loadScenario("fics-castling");
 
         sc.play();
-        frontend.seek(12, 12, "unrated", "auto");
+        s.frontend()->seek(12, 12, "unrated", "auto");
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // Nf3
-        frontend.selectSquare(62);
-        frontend.selectSquare(45);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(62);
+        s.frontend()->selectSquare(45);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // g3
-        frontend.selectSquare(54);
-        frontend.selectSquare(46);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(54);
+        s.frontend()->selectSquare(46);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // Bg2
-        frontend.selectSquare(61);
-        frontend.selectSquare(54);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(61);
+        s.frontend()->selectSquare(54);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // O-O
-        frontend.selectSquare(60);
-        frontend.selectSquare(62);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(60);
+        s.frontend()->selectSquare(62);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // Sc3
-        frontend.selectSquare(57);
-        frontend.selectSquare(42);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(57);
+        s.frontend()->selectSquare(42);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         // d3
-        frontend.selectSquare(51);
-        frontend.selectSquare(43);
-        frontend.confirmMove();
+        s.frontend()->selectSquare(51);
+        s.frontend()->selectSquare(43);
+        s.frontend()->confirmMove();
 
-        sc.respond(testee.response());
+        sc.respond(s.testee()->response());
         sc.play();
 
         const Piece white_king(Piece::King, ColorWhite, toSquare("g1"));
@@ -334,10 +338,10 @@ private:
         const Piece black_king(Piece::King, ColorBlack, toSquare("c8"));
         const Piece black_rook(Piece::Rook, ColorBlack, toSquare("d8"));
 
-        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("g1")), white_king);
-        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("f1")), white_rook);
-        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("c8")), black_king);
-        QCOMPARE(frontend.activeGame()->position().pieceAt(toSquare("d8")), black_rook);
+        QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("g1")), white_king);
+        QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("f1")), white_rook);
+        QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("c8")), black_king);
+        QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("d8")), black_rook);
 
         QVERIFY(sc.finished());
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
