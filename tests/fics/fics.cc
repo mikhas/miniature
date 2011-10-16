@@ -148,6 +148,25 @@ namespace {
                 && sc.result() == TestUtils::Scenario::Passed);
 
     }
+
+    void execMove(Setup *setup,
+                  TestUtils::Scenario *scenario,
+                  const QByteArray &origin,
+                  const QByteArray &target)
+    {
+        if (not setup || not scenario) {
+            return;
+        }
+
+        // First convert string to square, then to an int (because that's how
+        // the frontend selects squares).
+        setup->frontend()->selectSquare(fromSquare(toSquare(origin)));
+        setup->frontend()->selectSquare(fromSquare(toSquare(target)));
+        setup->frontend()->confirmMove();
+
+        scenario->respond(setup->testee()->response());
+        scenario->play();
+    }
 } // namespace
 
 
@@ -232,30 +251,13 @@ private:
 
         QVERIFY(s.frontend()->localSide()->active());
 
-        // 1. g2-g4
-        s.frontend()->selectSquare(54);
-        s.frontend()->selectSquare(38);
-        s.frontend()->confirmMove();
-        sc.respond(s.testee()->response());
-        sc.play();
-
+        execMove(&s, &sc, "g2", "g4"); // 1. g4
         QVERIFY(s.frontend()->localSide()->active());
 
-        // Illegal move: 2. f2-f6
-        s.frontend()->selectSquare(53);
-        s.frontend()->selectSquare(21);
-        s.frontend()->confirmMove();
-        sc.respond(s.testee()->response());
-        sc.play();
-
+        execMove(&s, &sc, "f2", "f6"); // 2. f6 (illegal move)
         QVERIFY(s.frontend()->localSide()->active());
 
-        // 2. f2-f4
-        s.frontend()->selectSquare(53);
-        s.frontend()->selectSquare(37);
-        s.frontend()->confirmMove();
-        sc.respond(s.testee()->response());
-        sc.play();
+        execMove(&s, &sc, "f2", "f4"); // 2. f4
 
         QVERIFY(sc.finished());
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
@@ -285,53 +287,12 @@ private:
         sc.respond(s.testee()->response());
         sc.play();
 
-        // Nf3
-        s.frontend()->selectSquare(62);
-        s.frontend()->selectSquare(45);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
-
-        // g3
-        s.frontend()->selectSquare(54);
-        s.frontend()->selectSquare(46);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
-
-        // Bg2
-        s.frontend()->selectSquare(61);
-        s.frontend()->selectSquare(54);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
-
-        // O-O
-        s.frontend()->selectSquare(60);
-        s.frontend()->selectSquare(62);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
-
-        // Sc3
-        s.frontend()->selectSquare(57);
-        s.frontend()->selectSquare(42);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
-
-        // d3
-        s.frontend()->selectSquare(51);
-        s.frontend()->selectSquare(43);
-        s.frontend()->confirmMove();
-
-        sc.respond(s.testee()->response());
-        sc.play();
+        execMove(&s, &sc, "g1", "f3"); // 1. Nf3
+        execMove(&s, &sc, "g2", "g3"); // 2.  g3
+        execMove(&s, &sc, "f1", "g2"); // 3. Bg2
+        execMove(&s, &sc, "e1", "g1"); // 4. O-O
+        execMove(&s, &sc, "b1", "c3"); // 5. Nc3
+        execMove(&s, &sc, "d2", "d3"); // 6.  d3
 
         const Piece white_king(Piece::King, ColorWhite, toSquare("g1"));
         const Piece white_rook(Piece::Rook, ColorWhite, toSquare("f1"));
