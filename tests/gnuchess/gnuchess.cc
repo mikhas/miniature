@@ -36,7 +36,9 @@ using Game::MovedPiece;
 Q_DECLARE_METATYPE(Position)
 Q_DECLARE_METATYPE(MovedPiece)
 
-class TestGnuChess
+namespace Test {
+
+class GnuChess
     : public QObject
 {
     Q_OBJECT
@@ -49,7 +51,7 @@ private:
     {
         qRegisterMetaType<Position>();
         qRegisterMetaType<MovedPiece>();
-        m_app.reset(TestUtils::createApp("testgnuchess"));
+        m_app.reset(TestUtils::createApp("gnuchess"));
     }
 
     Q_SLOT void testShortMatch()
@@ -62,5 +64,7 @@ private:
     {}
 };
 
-QTEST_APPLESS_MAIN(TestGnuChess)
-#include ".moc/testgnuchess.moc"
+} // namespace Test
+
+QTEST_APPLESS_MAIN(Test::GnuChess)
+#include ".moc/gnuchess.moc"

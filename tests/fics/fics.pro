@@ -3,7 +3,7 @@ TESTS_DIR_PREFIX = ..
 include(../config.pri)
 
 TEMPLATE=app
-TARGET=testfics
+TARGET=fics
 
 DEFINES += \
     MINIATURE_LIB_PATH=\\\"$${PWD}/$${GAME_DIR}\\\" \
@@ -18,7 +18,7 @@ HEADERS += \
 SOURCES += \
     $${TESTS_DIR_PREFIX}/utils/scenario.cc \
     $${TESTS_DIR_PREFIX}/utils/scenarioloader.cc \
-    testfics.cc \
+    fics.cc \
 
 LIBS += \
     -L$${GAME_DIR} \

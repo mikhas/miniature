@@ -26,7 +26,9 @@
 
 using namespace Game;
 
-class TestPosition
+namespace Test {
+
+class Position
     : public QObject
 {
     Q_OBJECT
@@ -36,12 +38,12 @@ private:
 
     Q_SLOT void initTestCase()
     {
-        m_app.reset(TestUtils::createApp("testposition"));
+        m_app.reset(TestUtils::createApp("position"));
     }
 
     Q_SLOT void testStartPosition()
     {
-        const Position pos(createStartPosition());
+        const ::Game::Position pos(createStartPosition());
         const Piece none;
 
         // Invalid access:
@@ -93,24 +95,24 @@ private:
 
         QTest::newRow("white castles short")
                 << true << "e1" << "g1" << "f1"
-                << (Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+                << (::Game::Position::CanBlackCastleShort | ::Game::Position::CanBlackCastleLong);
 
         QTest::newRow("white castles long")
                 << true << "e1" << "c1" << "d1"
-                << (Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+                << (::Game::Position::CanBlackCastleShort | ::Game::Position::CanBlackCastleLong);
 
         QTest::newRow("black castles short")
                 << false << "e8" << "g8" << "f8"
-                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong);
+                << (::Game::Position::CanWhiteCastleShort | ::Game::Position::CanWhiteCastleLong);
         QTest::newRow("black castles long")
                 << false << "e8" << "c8" << "d8"
-                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong);
+                << (::Game::Position::CanWhiteCastleShort | ::Game::Position::CanWhiteCastleLong);
 
 
         QTest::newRow("invalid castling")
                 << false << "e8" << "c6" << "a8"
-                << (Position::CanWhiteCastleShort | Position::CanWhiteCastleLong
-                    | Position::CanBlackCastleShort | Position::CanBlackCastleLong);
+                << (::Game::Position::CanWhiteCastleShort | ::Game::Position::CanWhiteCastleLong
+                    | ::Game::Position::CanBlackCastleShort | ::Game::Position::CanBlackCastleLong);
 
 
     }
@@ -123,7 +125,7 @@ private:
         QFETCH(QString, expectedRookSquare);
         QFETCH(int, expectedFlags);
 
-        Position pos;
+        ::Game::Position pos;
 
         Piece wk(Piece::King, ColorWhite, toSquare("e1"));
         pos.addPiece(wk);
@@ -145,5 +147,7 @@ private:
     }
 };
 
-QTEST_APPLESS_MAIN(TestPosition)
-#include ".moc/testposition.moc"
+} // namespace Game
+
+QTEST_APPLESS_MAIN(Test::Position)
+#include ".moc/position.moc"

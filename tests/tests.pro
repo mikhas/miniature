@@ -6,8 +6,8 @@ TEMPLATE = subdirs
 CONFIG += ordered qt
 
 SUBDIRS = \
-    testgame \
-    testgnuchess \
-    testfics \
-    testlocalparser \
-    testposition \
+    game \
+    gnuchess \
+    fics \
+    localparser \
+    position \

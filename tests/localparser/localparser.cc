@@ -33,7 +33,9 @@ using Game::CommandLine;
 
 Q_DECLARE_METATYPE(QVector<int>)
 
-class TestInputDevice
+namespace Test {
+
+class InputDevice
     : public QIODevice
 {
 private:
@@ -103,7 +105,7 @@ namespace {
     }
 }
 
-class TestLocalParser
+class LocalParser
     : public QObject
 {
     Q_OBJECT
@@ -113,7 +115,7 @@ private:
 
     Q_SLOT void initTestCase()
     {
-        m_app.reset(TestUtils::createApp("testcommandparser"));
+        m_app.reset(TestUtils::createApp("localparser"));
     }
 
     Q_SLOT void testMultiParsing_data()
@@ -156,7 +158,7 @@ private:
         const QVector<int> emptyCounters(4, 0);
 
         Game::LineReader tokenizer;
-        QIODevice *device = new TestInputDevice;
+        QIODevice *device = new InputDevice;
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
@@ -192,7 +194,7 @@ private:
         const int TimeOut(20);
 
         Game::LineReader tokenizer;
-        QIODevice *device = new TestInputDevice;
+        QIODevice *device = new InputDevice;
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
@@ -215,7 +217,7 @@ private:
         const int TimeOut(20);
 
         Game::LineReader tokenizer;
-        QIODevice *device = new TestInputDevice;
+        QIODevice *device = new InputDevice;
         tokenizer.init(device);
         device->open(QIODevice::ReadWrite);
 
@@ -236,5 +238,7 @@ private:
     }
 };
 
-QTEST_APPLESS_MAIN(TestLocalParser)
-#include ".moc/testlocalparser.moc"
+} // namespace Test
+
+QTEST_APPLESS_MAIN(Test::LocalParser)
+#include ".moc/localparser.moc"

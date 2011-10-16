@@ -53,7 +53,9 @@ GameInfo dummyGameInfo()
     return gi;
 }
 
-class TestGame
+
+namespace Test {
+class Game
     : public QObject
 {
     Q_OBJECT
@@ -63,7 +65,7 @@ private:
 
     Q_SLOT void initTestCase()
     {
-        m_app.reset(TestUtils::createApp("testgame"));
+        m_app.reset(TestUtils::createApp("game"));
     }
 
     Q_SLOT void testLocalGame()
@@ -127,5 +129,7 @@ private:
     }
 };
 
-QTEST_APPLESS_MAIN(TestGame)
-#include ".moc/testgame.moc"
+} // namespace Test
+
+QTEST_APPLESS_MAIN(Test::Game)
+#include ".moc/game.moc"

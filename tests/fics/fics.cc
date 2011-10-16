@@ -108,8 +108,9 @@ namespace {
 } // namespace
 
 
+namespace Test {
 
-class TestFics
+class Fics
     : public QObject
 {
     Q_OBJECT
@@ -120,7 +121,7 @@ private:
 
     Q_SLOT void initTestCase()
     {
-        m_app.reset(TestUtils::createApp("testfics"));
+        m_app.reset(TestUtils::createApp("fics"));
     }
 
     Q_SLOT void testLogin()
@@ -344,7 +345,7 @@ private:
 };
 
 
-} // namespace Game
+}} // namespace Test, Game
 
-QTEST_APPLESS_MAIN(Game::TestFics)
-#include ".moc/testfics.moc"
+QTEST_APPLESS_MAIN(Game::Test::Fics)
+#include ".moc/fics.moc"
