@@ -92,4 +92,4 @@ Index of new news items:
 You have 2 messages (0 unread).
 Use "messages u" to view unread messages and "clearmessages *" to clear all.
 fics% 
-WAIT_FOR_INPUT set style 12\nset seek 1\n
+WAIT_FOR_INPUT set style 12\nset seek 1\nset autoflag 1\n
