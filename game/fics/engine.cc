@@ -23,6 +23,8 @@
 #include "linereader.h"
 #include "position.h"
 
+#define CAP_RATING_BRACKETS "\\(\\s*([0-9+]+)\\)"
+
 namespace {
     struct GameUpdate
             : public Game::RecordSeekBase
@@ -109,8 +111,8 @@ namespace {
 
     // Matches: "Creating: ignoreme (++++) dontjoin (++++) unrated standard 999 999"
     const QRegExp match_creating_game("\\s*Creating:"
-                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)"
-                                      "\\s+(\\w+)\\s+\\(([0-9+]+)\\)"
+                                      "\\s+(\\w+)\\s+" CAP_RATING_BRACKETS
+                                      "\\s+(\\w+)\\s+" CAP_RATING_BRACKETS
                                       "\\s+(\\w+)\\s+(\\w+)\\s+(\\d+)\\s+(\\d+)");
 
     // Matches: "{Game 414 (GuestKSHN vs. testonetwo) Creating unrated standard match.}"
@@ -118,7 +120,8 @@ namespace {
                                     "\\s+Creating\\s+(\\w+)\\s+(\\w+)\\s+match\\.\\}");
 
     // Matches: "GuestGZBJ (++++) seeking 15 12 unrated standard [white] m f ("play 160" to respond)"
-    const QRegExp match_seek("\\s*(\\w+)\\s+\\(([0-9+]+)\\)\\s+seeking\\s+(\\d+)\\s+(\\d+)"
+    const QRegExp match_seek("\\s*(\\w+)\\s+" CAP_RATING_BRACKETS
+                             "\\s+seeking\\s+(\\d+)\\s+(\\d+)"
                              "\\s+(\\w+)\\s+(\\w+)\\s+(\\[(\\w+)\\])?\\s*(m|a)?\\s*(f)?"
                              "\\s*(\\[(\\d+)\\-(\\d+)\\])?\\s*\\(\"play\\s+(\\d+)\" to respond\\)");
 

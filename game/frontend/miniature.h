@@ -213,6 +213,7 @@ public:
     //! Test API
     SideElement * localSide();
     SideElement * remoteSide();
+    AvailableSeeks * availableSeeks();
 
 private:    
     void sendCommand(AbstractCommand *command);

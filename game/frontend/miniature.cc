@@ -477,6 +477,12 @@ SideElement * Miniature::remoteSide()
     return &d->remote_side;
 }
 
+AvailableSeeks * Miniature::availableSeeks()
+{
+    Q_D(Miniature);
+    return &d->available_seeks;
+}
+
 void Miniature::sendCommand(AbstractCommand *command)
 {
     Q_D(Miniature);

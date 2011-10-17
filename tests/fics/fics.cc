@@ -21,6 +21,7 @@
 #include "testutils.h"
 #include "frontend/miniature.h"
 #include "frontend/sideelement.h"
+#include "frontend/availableseeks.h"
 #include "fics/engine.h"
 #include "game.h"
 #include "position.h"
@@ -167,6 +168,26 @@ namespace {
         scenario->respond(setup->testee()->response());
         scenario->play();
     }
+
+    ::Game::Seek createSeek(uint id,
+                            uint time,
+                            uint increment,
+                            const QByteArray &player_name,
+                            uint rating,
+                            bool is_rated,
+                            ::Game::Color color)
+    {
+        Seek s;
+        s.id = id;
+        s.time = time;
+        s.increment = increment;
+        s.player_name = player_name;
+        s.rating = rating;
+        s.is_rated = is_rated;
+        s.color = color;
+
+        return s;
+    }
 } // namespace
 
 
@@ -303,6 +324,73 @@ private:
         QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("f1")), white_rook);
         QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("c8")), black_king);
         QCOMPARE(s.frontend()->activeGame()->position().pieceAt(toSquare("d8")), black_rook);
+
+        QVERIFY(sc.finished());
+        QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
+    }
+
+    Q_SLOT void testSeeks()
+    {
+        struct ExpectedSeek
+        {
+            int row;
+            Seek seek;
+        };
+
+        QHash<int, Seek> expected;
+        expected.insert(0, createSeek(118u, 10u, 10u, QByteArray("GuestRSTH"), 0u, false, ColorBlack));
+        expected.insert(5, createSeek(121u, 3u, 0u, QByteArray("speedyf"), 1300u, true, ColorWhite));
+        expected.insert(8, createSeek(105u, 10u, 0u, QByteArray("GuestGTTK"), 0u, false, ColorNone));
+        expected.insert(37, createSeek(18u, 10u, 0u, QByteArray("skvr"), 785u, false, ColorNone));
+
+        Setup s;
+
+        // Brings FICS engine into a ready state:
+        QVERIFY(playLoginScenario(s.frontend(), s.testee()));
+
+        s.testee()->enableDebugOutput(true);
+        TestUtils::Scenario sc = s.loadScenario("fics-seeks");
+
+        sc.play();
+
+        Frontend::AvailableSeeks *av = s.frontend()->availableSeeks();
+        QCOMPARE(av->rowCount(), 39);
+
+        int matched_seeks = 0;
+        for (int row = 0; row < av->rowCount(); ++row) {
+            if (expected.contains(row)) {
+                ++matched_seeks;
+
+                const Seek &seek(expected.value(row));
+                const QModelIndex &idx(av->index(row, 0));
+
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleId).toUInt(),
+                         seek.id);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleTime).toUInt(),
+                         seek.time);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleIncrement).toUInt(),
+                         seek.increment);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RolePlayerName).toByteArray(),
+                         seek.player_name);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleRating).toUInt(),
+                         seek.rating);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleIsRated).toBool(),
+                         seek.is_rated);
+                QCOMPARE(av->data(idx, Frontend::AvailableSeeks::RoleColor).toString(),
+                         Frontend::fromColor(seek.color));
+            }
+        }
+
+        QCOMPARE(expected.count(), matched_seeks);
+
+        s.frontend()->play(18u);
+        sc.respond(s.testee()->response());
+
+        sc.play();
+
+        Game *g = s.frontend()->activeGame();
+        QVERIFY(g);
+        QCOMPARE(g->id(), 262u);
 
         QVERIFY(sc.finished());
         QCOMPARE(sc.result(), TestUtils::Scenario::Passed);
