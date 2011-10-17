@@ -33,6 +33,9 @@
 #endif
 
 namespace Game { namespace Frontend { namespace {
+    const char * const settings_login_username("login/username");
+    const char * const settings_login_password("login/password");
+
     const ParserCommandFlags all_commands(CommandPlay | CommandQuit | CommandLogin
                                     | CommandSeek | CommandJoin | CommandObserve
                                     | CommandMove);
@@ -91,6 +94,12 @@ namespace Game { namespace Frontend { namespace {
 
         return gi;
     }
+
+    struct LoginInfo
+    {
+        QString username;
+        QString password;
+    };
 }
 
 class MiniaturePrivate
@@ -108,6 +117,7 @@ public:
     SideElement local_side;
     SideElement remote_side;
     GameElement game_element;
+    LoginInfo login_info;
 #ifdef MINIATURE_GUI_ENABLED
     QDeclarativeView *ui;
 #endif
@@ -125,6 +135,7 @@ public:
         , local_side()
         , remote_side()
         , game_element()
+        , login_info()
 #ifdef MINIATURE_GUI_ENABLED
         // We have to leak this instance, because Qt silently steals ownership
         // of the top-level widget. Screw you, Qt.
@@ -162,6 +173,9 @@ Miniature::Miniature(Dispatcher *dispatcher,
     connect(&d->line_reader, SIGNAL(tokenFound(QByteArray)),
             &d->command_line, SLOT(processToken(QByteArray)),
             Qt::UniqueConnection);
+
+    connect(this, SIGNAL(loginSucceeded()),
+            this, SLOT(onLoginSucceeded()));
 }
 
 Miniature::~Miniature()
@@ -224,9 +238,13 @@ Miniature::Mode Miniature::mode() const
 void Miniature::login(const QString &username,
                       const QString &password)
 {
-    qDebug() << __PRETTY_FUNCTION__;
+    Q_D(Miniature);
+
     Command::Login login(TargetEngine, username, password);
     sendCommand(&login);
+
+    d->login_info.username = username;
+    d->login_info.password = password;
 }
 
 void Miniature::logout()
@@ -236,6 +254,18 @@ void Miniature::logout()
 
     Command::Logout logout(TargetEngine);
     sendCommand(&logout);
+}
+
+QString Miniature::storedUsername() const
+{
+    const QSettings s;
+    return s.value(settings_login_username).toString();
+}
+
+QString Miniature::storedPassword() const
+{
+    const QSettings s;
+    return s.value(settings_login_password).toString();
 }
 
 void Miniature::seek(uint time,
@@ -505,6 +535,25 @@ void Miniature::onPositionChanged(const Position &position)
         d->local_side.setActive(is_local_side_active);
         d->remote_side.setActive(not is_local_side_active);
     }
+}
+
+void Miniature::onLoginSucceeded()
+{
+    Q_D(const Miniature);
+    const bool was_guest_login(d->login_info.username == "guest");
+
+    if (was_guest_login) {
+        return;
+    }
+
+    // Now we know it was a successful login through a registered account:
+    QSettings s;
+    s.setValue(settings_login_username, d->login_info.username);
+    s.setValue(settings_login_password, d->login_info.password);
+
+    // Not *entirely* correct to always emit those signals:
+    emit storedUsernameChanged(d->login_info.username);
+    emit storedPasswordChanged(d->login_info.password);
 }
 
 }} // namespace Game, Frontend

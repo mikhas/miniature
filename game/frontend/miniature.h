@@ -61,6 +61,12 @@ class Miniature
     Q_PROPERTY(bool validMove READ validMove
                               NOTIFY validMoveChanged)
 
+    Q_PROPERTY(QString storedUsername READ storedUsername
+                                      NOTIFY storedUsernameChanged)
+
+    Q_PROPERTY(QString storedPassword READ storedPassword
+                                      NOTIFY storedPasswordChanged)
+
 private:
     const QScopedPointer<MiniaturePrivate> d_ptr;
 
@@ -127,6 +133,14 @@ public:
     Q_INVOKABLE void logout();
     Q_SIGNAL void loginSucceeded();
     Q_SIGNAL void loginFailed();
+
+    //! Retrieve username from last successful (registered) login.
+    Q_INVOKABLE QString storedUsername() const;
+    Q_SIGNAL void storedUsernameChanged(const QString &username);
+
+    //! Retrieve password from last successful (registered) login.
+    Q_INVOKABLE QString storedPassword() const;
+    Q_SIGNAL void storedPasswordChanged(const QString &password);
 
     //! Sends out a game offer.
     //! @param time initial time.
@@ -218,6 +232,7 @@ public:
 private:    
     void sendCommand(AbstractCommand *command);
     Q_SLOT void onPositionChanged(const Position &position);
+    Q_SLOT void onLoginSucceeded();
 };
 
 }} // namespace Game, Frontend

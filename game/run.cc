@@ -22,11 +22,19 @@
 #include "dispatcher.h"
 #include "frontend/miniature.h"
 
-namespace Game {
+namespace Game { namespace {
+    const char * const orga_name("Miniature Chess");
+    const char * const orga_domain("miniature-chess.org");
+    const char * const app_name("Miniature");
+}
 
 void run(const QUrl &url,
          QObject *parent)
 {
+    QCoreApplication::setOrganizationName(orga_name);
+    QCoreApplication::setOrganizationDomain(orga_domain);
+    QCoreApplication::setApplicationName(app_name);
+
     Dispatcher *dispatcher = createDispatcher(parent);
     Frontend::Miniature *frontend = new Frontend::Miniature(dispatcher, parent);
     dispatcher->setFrontend(frontend);

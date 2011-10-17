@@ -168,6 +168,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
     // Login form
     TextField {
         id: idForm
+        text: miniature.storedUsername
         placeholderText: qsTr("username")
         inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
         anchors.top:  anonymousButton.bottom
@@ -181,6 +182,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     TextField {
         id: idPassword
+        text: miniature.storedPassword
         placeholderText: qsTr("password")
         echoMode: TextInput.Password
         anchors.top:  idForm.bottom
