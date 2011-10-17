@@ -967,6 +967,7 @@ void Engine::configureFics()
 {
     writeToChannel("set style 12\n");
     writeToChannel("set seek 1\n");
+    writeToChannel("set autoflag 1\n");
 }
 
 void Engine::sendLogin()
