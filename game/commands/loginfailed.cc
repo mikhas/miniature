@@ -33,7 +33,6 @@ LoginFailed::~LoginFailed()
 void LoginFailed::exec(Dispatcher *,
                        Frontend::Miniature *target)
 {
-    qDebug() << __PRETTY_FUNCTION__ << __LINE__;
     if (not target) {
         return;
     }
