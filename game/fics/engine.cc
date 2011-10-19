@@ -743,8 +743,8 @@ void Engine::processToken(const QByteArray &token)
         } else  if (parseGameCreated(token, &m_current_game)
             && m_current_game.valid) {
             Command::CreateGame cg(TargetRegistry, m_current_game,
-                                   (m_current_game.white.name == m_username ? LocalSideIsWhite
-                                                                            : LocalSideIsBlack));
+                                   (m_current_game.white.name.toLower() == m_username.toLower() ? LocalSideIsWhite
+                                                                                                : LocalSideIsBlack));
             sendCommand(&cg);
 
             Command::Move m(TargetFrontend, m_current_game.id, createStartPosition());
