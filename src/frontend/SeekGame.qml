@@ -164,7 +164,7 @@ Page {
                     ListElement { name: "unrated" }
                     ListElement { name: "rated" }
                 }
-                selectedIndex: 1 // Better 2 for registered users
+                selectedIndex: 0 // Better 1 for registered users
                 visualParent: dialogWrapper
             }
         }
@@ -545,7 +545,7 @@ Page {
 
         Text {
             id: userInfo
-            text: (localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id
+            text: localSide.id // Rating removed since it might give wrong value before playing - see BMO#12469
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
