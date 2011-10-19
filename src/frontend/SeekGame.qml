@@ -160,9 +160,9 @@ Page {
                 id: ratedDialog
                 titleText: qsTr("Type of match")
                 model:  ListModel { // FIXME guest users can only play Unrated, button inactive
-                    ListElement { name: "Any" } // Any option is good
-                    ListElement { name: "Unrated" }
-                    ListElement { name: "Rated" }
+                    // ListElement { name: "any" } // Any option is good - commented until we have seek search in place
+                    ListElement { name: "unrated" }
+                    ListElement { name: "rated" }
                 }
                 selectedIndex: 1 // Better 2 for registered users
                 visualParent: dialogWrapper
@@ -294,7 +294,7 @@ Page {
 
                         Text {
                             id: opponentInfo
-                            text: model.rating + " " + model.playerName
+                            text: ( model.rating == "0" ? "++++" : model.rating ) + " " + model.playerName
                             color: model.color == "black" ? "white"
                                                           : "black"
                             font.pointSize: 16
@@ -481,7 +481,7 @@ Page {
 
                 Text {
                     id: newplayerInfo
-                    text: localSide.rating + " " + localSide.id
+                    text: (localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id
                     color: "black"
                     font.pointSize: 16
                     font.weight: Font.DemiBold
@@ -545,7 +545,7 @@ Page {
 
         Text {
             id: userInfo
-            text: localSide.rating + " " + localSide.id
+            text: (localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id
             font.pointSize: 16
             font.weight: Font.DemiBold
             anchors.verticalCenter: userZone.verticalCenter
