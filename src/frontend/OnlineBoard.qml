@@ -328,7 +328,7 @@ Page {
 
         Text {
             id: opponentInfo
-            text: ( remoteSide.rating == "0" ? "++++" : remoteSide.rating ) + " " + remoteSide.id // FIXME must be changed for rating variable.
+            text: ( remoteSide.rating == "0" ? "++++" : remoteSide.rating ) + " " + remoteSide.id
             color: localSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
@@ -434,7 +434,7 @@ Page {
 
         Text {
             id: userInfo
-            text: ( localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id // FIXME rating must be changed for variables.
+            text: ( localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id
             color: remoteSide.color
             font.pointSize: 16
             font.weight: Font.DemiBold
@@ -598,8 +598,9 @@ Page {
             // Defining the ratings strings to be used in the description
 
             if (gameRated() == "unrated") { gameResolutions.newRatings = qsTr("No ratings adjustment done") }
-            else gameResolutions.newRatings = localSide.id + ": " + localSide.rating + " > " + "FIXME\n" +
-                 remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
+// Commented since we are not showing this in 0.5 yet.
+//            else gameResolutions.newRatings = localSide.id + ": " + localSide.rating + " > " + "FIXME\n" +
+//                 remoteSide.id + ": " + remoteSide.rating + " > " + "FIXME" // We need a values for new ratings
 
             gameoverDialog.open()
 
