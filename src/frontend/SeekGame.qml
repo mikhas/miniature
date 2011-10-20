@@ -481,7 +481,7 @@ Page {
 
                 Text {
                     id: newplayerInfo
-                    text: (localSide.rating == "0" ? "++++" : localSide.rating ) + " " + localSide.id
+                    text: localSide.id  // Rating removed since it might give wrong value before playing - see BMO#12469
                     color: "black"
                     font.pointSize: 16
                     font.weight: Font.DemiBold
