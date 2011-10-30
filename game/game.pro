@@ -46,10 +46,10 @@ SOURCES += \
     abstractengine.cc \
     side.cc
 
-target.path = /usr/lib
+target.path = $${PREFIX}/usr/lib
 
 headers.files = $${HEADERS}
-headers.path = /usr/include/miniature
+headers.path = $${PREFIX}/usr/include/miniature
 
 prf.files = ../miniature-game.prf
 prf.path = $$[QT_INSTALL_DATA]/mkspecs/features

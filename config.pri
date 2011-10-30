@@ -9,7 +9,6 @@ SRC_DIR = $${DIR_PREFIX}/src
 TESTS_DIR = $${DIR_PREFIX}/tests
 
 isEmpty(PREFIX) {
-    PREFIX = /usr
     maemo5 {
         PREFIX = /opt
     }

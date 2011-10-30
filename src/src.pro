@@ -97,7 +97,7 @@ LIBS += \
 
 }
 
-target.path = $${PREFIX}/games
+target.path = $${PREFIX}/usr/games
 target.depends += \
     $${IN_PWD}/frontend/frontend.qrc \
     $${IN_PWD}/frontend/MainPage.qml \
@@ -162,11 +162,5 @@ OTHER_FILES += \
     frontend/miniature_miniaturets_es.ts \
     frontend/miniature_miniaturets_es.qm \
     frontend/miniature_miniaturets_de.qm \
-    frontend/miniature_miniaturets_de.ts
-
-
-
-
-
-
+    frontend/miniature_miniaturets_de.ts \
 
