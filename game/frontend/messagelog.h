@@ -64,6 +64,9 @@ public:
     virtual QVariant data(const QModelIndex &index,
                           int role) const;
     //! \reimp_end
+
+private:
+    bool isValidIndex(int index) const;
 };
 
 }} // namespace Game, Frontend

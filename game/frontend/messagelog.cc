@@ -76,6 +76,10 @@ void MessageLog::append(const QByteArray &player_name,
 
 void MessageLog::removeAll()
 {
+    if (m_log.isEmpty()) {
+        return; // Nothing to do!
+    }
+
     beginRemoveRows(QModelIndex(), 0, m_log.count() - 1);
     m_log.clear();
     endRemoveRows();
@@ -83,6 +87,10 @@ void MessageLog::removeAll()
 
 void MessageLog::remove(int row)
 {
+    if (not isValidIndex(row)) {
+        return; // Nothing to do!
+    }
+
     beginRemoveRows(QModelIndex(), row, row);
     m_log.remove(row);
     endRemoveRows();
@@ -130,6 +138,13 @@ QVariant MessageLog::data(const QModelIndex &index,
     default:
         return QVariant();
     }
+}
+
+bool MessageLog::isValidIndex(int index) const
+{
+    return (not m_log.isEmpty()
+            && not (index < 0)
+            && not (index > m_log.size() - 1));
 }
 
 }} // namespace Game, Frontend
