@@ -9,9 +9,7 @@ SRC_DIR = $${DIR_PREFIX}/src
 TESTS_DIR = $${DIR_PREFIX}/tests
 
 isEmpty(PREFIX) {
-    maemo5 {
-        PREFIX = /opt
-    }
+    PREFIX = /opt
 }
 
 enable-gui {
