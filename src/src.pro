@@ -126,6 +126,9 @@ INSTALLS += \
 CONFIG += qdeclarative-boostable
 QMAKE_CXXFLAGS += -fPIC -fvisibility=hidden -fvisibility-inlines-hidden
 QMAKE_LFLAGS += -pie -rdynamic
+!isEmpty(PREFIX) {
+    QMAKE_RPATHDIR += $${PREFIX}/usr/lib
+}
 
 # enable mobility
 CONFIG += mobility
