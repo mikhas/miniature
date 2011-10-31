@@ -587,6 +587,7 @@ Engine::Engine(QObject *parent)
     , m_channel_enabled(true)
     , m_logged_in(false)
     , m_past_welcome_screen(false)
+    , m_game_resolution_pending(false)
     , m_login_count(0)
     , m_login_abort_timer()
     , m_extra_delimiter()
@@ -711,6 +712,36 @@ void Engine::endGame(Reason reason)
     default:
         break;
     }
+}
+
+void Engine::proposeGameResolution(Resolution resolution)
+{
+
+    switch(resolution) {
+    case ResolutionDraw:
+        m_game_resolution_pending = true;
+        writeData("draw\n");
+        break;
+
+    case ResolutionAdjourn:
+        m_game_resolution_pending = true;
+        writeData("adjourn\n");
+        break;
+
+    case ResolutionAbort:
+        m_game_resolution_pending = true;
+        writeData("abort\n");
+        break;
+    }
+}
+
+void Engine::acceptGameResolution(Resolution)
+{
+    if (not m_game_resolution_pending) {
+        return;
+    }
+
+    writeData("accept\n");
 }
 
 void Engine::movePiece(const MovedPiece &moved_piece)

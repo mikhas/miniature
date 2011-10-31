@@ -63,6 +63,7 @@ private:
     bool m_channel_enabled;
     bool m_logged_in;
     bool m_past_welcome_screen;
+    bool m_game_resolution_pending;
     uint m_login_count;
     QTimer m_login_abort_timer; // TODO: make this a general watchdog over the FICS connection.
     QVector<char> m_extra_delimiter;
@@ -83,6 +84,8 @@ public:
                       Color color);
     virtual void play(uint advertisement_id);
     virtual void endGame(Reason reason);
+    virtual void proposeGameResolution(Resolution resolution);
+    virtual void acceptGameResolution(Resolution resolution);
     virtual void movePiece(const MovedPiece &moved_piece);
     virtual void readData(const QByteArray &token);
     virtual void writeData(const QByteArray &data);

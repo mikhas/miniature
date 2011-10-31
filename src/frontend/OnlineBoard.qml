@@ -621,11 +621,16 @@ Page {
         acceptButtonText: qsTr("Yes")
         visualParent: dialogWindow
         onAccepted: {
-            if (exitMenu.queryTitle == qsTr("Resign?")) miniature.resign()
-            if (exitMenu.queryTitle == qsTr("Draw?")) miniature.draw() // FIXME function missing
-            if (exitMenu.queryTitle == qsTr("Adjourn?")) miniature.adjourn() // FIXME function missing
-            if (exitMenu.queryTitle == qsTr("Abort?")) miniature.abort() // FIXME function missing
-            pageStack.pop() // This needs to be removed as part of BMO#12433
+            if (exitMenu.queryTitle == qsTr("Resign?")) {
+                miniature.resign()
+                pageStack.pop()
+            } else if (exitMenu.queryTitle == qsTr("Propose a draw?")) {
+                miniature.proposeGameResolution(Miniature.GameResolutionDraw);
+            } else if (exitMenu.queryTitle == qsTr("Request to adjourn?")) {
+                miniature.proposeGameResolution(Miniature.GameResolutionAdjourn);
+            } else if (exitMenu.queryTitle == qsTr("Abort?")) {
+                miniature.proposeGameResolution(Miniature.GameResolutionAbort);
+            }
         }
         rejectButtonText: qsTr("No")
     }

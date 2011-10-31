@@ -41,6 +41,13 @@ void GameResolution::exec(Dispatcher *,
     if (not target) {
         return;
     }
+
+    switch(m_activity) {
+    case Accepted: target->acceptGameResolution(m_resolution);
+        break;
+    case Proposed: target->proposeGameResolution(m_resolution);
+        break;
+    }
 }
 
 void GameResolution::exec(Dispatcher *,

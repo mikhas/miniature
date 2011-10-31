@@ -343,12 +343,18 @@ void Miniature::resign()
 
 void Miniature::proposeGameResolution(int resolution)
 {
-    Q_UNUSED(resolution)
+    Command::GameResolution grc(TargetEngine,
+                                Command::GameResolution::Proposed,
+                                static_cast<Resolution>(resolution));
+    sendCommand(&grc);
 }
 
 void Miniature::acceptGameResolution(int resolution)
 {
-    Q_UNUSED(resolution)
+    Command::GameResolution grc(TargetEngine,
+                                Command::GameResolution::Accepted,
+                                static_cast<Resolution>(resolution));
+    sendCommand(&grc);
 }
 
 void Miniature::toggleGameAdvertisementHighlighting(uint id)

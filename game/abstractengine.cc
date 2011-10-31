@@ -56,6 +56,12 @@ void AbstractEngine::play(uint)
 void AbstractEngine::endGame(Reason)
 {}
 
+void AbstractEngine::proposeGameResolution(Resolution)
+{}
+
+void AbstractEngine::acceptGameResolution(Resolution)
+{}
+
 void AbstractEngine::movePiece(const MovedPiece &)
 {}
 

@@ -143,6 +143,14 @@ public:
     //! @param reason why/how the game was ended.
     virtual void endGame(Reason reason);
 
+    //! Proposes a game resolution. Send to the engine.
+    //! @param resolution the proposed game resolution.
+    virtual void proposeGameResolution(Resolution resolution);
+
+    //! Accepts a game resolution. Send to the engine.
+    //! @param resolution the accepted game resolution.
+    virtual void acceptGameResolution(Resolution resolution);
+
     //! Move piece. Send to the engine.
     //! @param moved_piece the moved piece.
     virtual void movePiece(const MovedPiece &moved_piece);
