@@ -18,19 +18,43 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GAMERESOLUTION_H
+#define GAMERESOLUTION_H
+
 #include "abstractcommand.h"
-#include "commands/login.h"
-#include "commands/logout.h"
-#include "commands/loginfailed.h"
-#include "commands/advertisement.h"
-#include "commands/play.h"
-#include "commands/move.h"
-#include "commands/creategame.h"
-#include "commands/activategame.h"
-#include "commands/destroygame.h"
-#include "commands/seek.h"
-#include "commands/invalidmove.h"
-#include "commands/invalidseek.h"
-#include "commands/gameended.h"
-#include "commands/message.h"
-#include "commands/gameresolution.h"
+#include "namespace.h"
+
+#include <QtCore>
+
+namespace Game { namespace Command {
+
+//! Used to propose and accept game resolutions.
+class GameResolution
+    : public AbstractCommand
+{
+public:
+    enum Activity {
+        Accepted,
+        Proposed
+    };
+
+private:
+    Activity m_activity;
+    Resolution m_resolution;
+
+public:
+    //! \reimp
+    explicit GameResolution(Target target,
+                            Activity activity,
+                            Resolution resolution);
+    virtual ~GameResolution();
+    virtual void exec(Dispatcher *dispatcher,
+                      AbstractEngine *target);
+    virtual void exec(Dispatcher *dispatcher,
+                      Frontend::Miniature *target);
+    //! \reimp_end
+};
+
+}} // namespace Command, Game
+
+#endif // GAMERESOLUTION_H
