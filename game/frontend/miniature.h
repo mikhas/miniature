@@ -18,8 +18,8 @@
  * along with Miniature. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FRONTEND_H
-#define FRONTEND_H
+#ifndef FRONTEND_MINIATURE_H
+#define FRONTEND_MINIATURE_H
 
 #include "dispatcher.h"
 #include "commandline.h"
@@ -38,9 +38,26 @@ class MessageLog;
 class MiniaturePrivate;
 class SideElement;
 
-//! This class communicates with the engine, handles the active game state
-//! (together with the engine) and exports objects and properties to the
-//! graphical frontend, our QML UI.
+//! \brief Represents an additional layer between QML UI and backend.
+//!
+//! The frontend facing API is the sum of Qt properties, signals, slots and
+//! Q_INVOKABLE methods of this class. The remaining API is used by the C++
+//! backend.
+//! When compiled with qmake CONFIG+=enable-gui, the following root contexts
+//! are available:
+//! - miniature: An instance of this class.
+//! - availableSeeks: An instance of AvailableSeeks. Shows all available seeks
+//!   through an abstract list model.
+//! - messageLog: An instance of MessageLog. Shows all messages during a game
+//!   though an abstract list model.
+//! - chessBoard: An instance of ChessBoard. Provides images and square styles
+//!   for the board grid.
+//! - localSide: An instance of SideElement. Exports all properties of the
+//!   local player (shown data only valid during a game).
+//! - remoteSide: An instance of SideElement. Exports all properties of the
+//!   remote player (shown data only valid during a game).
+//! - activeGame: An instance of GameElement. Exports all properties of the
+//!   active game (shown data only valid during a game).
 class Miniature
     : public QObject
 {
@@ -128,32 +145,59 @@ public:
         LastTarget
     };
 
+    //! C'tor
+    //! @param dispatcher the Dispatcher instance, used to communicate with
+    //!        other Miniature components.
+    //! @param parent the owner of this instance (optional).
     explicit Miniature(Dispatcher *dispatcher,
                        QObject *parent = 0);
+
+    //! D'tor
     virtual ~Miniature();
+
+    //! Loads and shows QML UI from the given QUrl.
+    //! @param ui the QUrl to the QML UI.
     virtual void show(const QUrl &ui);
-    virtual void showBoard();
 
-    virtual void handleRecord(const Record &r);
-    virtual void handleSeek(const Seek &s);
+    //! Handles a new seek and appends it to list of available seeks.
+    //! @param seek the new seek.
+    virtual void handleSeek(const Seek &seek);
 
-    //! Mode property
+    //! Mode property.
+    //! @param mode which mode to use for Miniature (test, FICS, ...).
     Q_INVOKABLE void setMode(Mode mode);
     Q_INVOKABLE Mode mode() const;
     Q_SIGNAL void modeChanged(Mode mode);
 
+    //! Logs in to backend.
+    //! @param username the username. If using FICS, then "guest" can be used
+    //!        to login as guest (no password needed).
+    //! @param password the password for the registered username. Leave empty
+    //!        for "guest" login to FICS.
     Q_INVOKABLE void login(const QString &username,
                            const QString &password);
+
+    //! Logs out from backend.
     Q_INVOKABLE void logout();
+
+    //! Emitted when login was successful.
     Q_SIGNAL void loginSucceeded();
+
+    //! Emitted when login failed (timeout, wrong password, ...).
     Q_SIGNAL void loginFailed();
 
-    //! Retrieve username from last successful (registered) login.
+    //! Retrieves username from last successful (registered) login.
     Q_INVOKABLE QString storedUsername() const;
+
+    //! Emitted when stored username changed.
+    //! @param username the changed username.
     Q_SIGNAL void storedUsernameChanged(const QString &username);
 
-    //! Retrieve password from last successful (registered) login.
+    //! Retrieves password from last successful (registered) login.
     Q_INVOKABLE QString storedPassword() const;
+
+    //! Emitted when stored password changed.
+    //! @param password the changed password.
     Q_SIGNAL void storedPasswordChanged(const QString &password);
 
     //! Sends out a game offer.
@@ -217,6 +261,7 @@ public:
     Q_INVOKABLE void sendMessage(const QString &message);
 
     //! Emitted when invalid move was submitted to engine.
+    //! @param move the invalid move.
     Q_SIGNAL void invalidMove(const QString &move);
 
     //! Emitted when both sides accepted game and it was started.
@@ -226,6 +271,8 @@ public:
     Q_SIGNAL void seekCancelled();
 
     //! Emitted when the active game was ended.
+    //! @param result the result, maps to Miniature::Result enum.
+    //! @param reason the reason, maps to Miniature::Reason enum.
     Q_SIGNAL void gameEnded(int result,
                             int reason);
 
@@ -244,6 +291,7 @@ public:
     Frontend::MessageLog * messageLog() const;
 
     //! Sets username.
+    //! @param username the new username.
     void setUsername(const QString &username);
 
     //! Updates the UI facing side element from local_side.
@@ -267,4 +315,4 @@ private:
 
 }} // namespace Game, Frontend
 
-#endif // FRONTEND_H
+#endif // FRONTEND_MINIATURE_H

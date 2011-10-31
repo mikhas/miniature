@@ -210,16 +210,10 @@ void Miniature::show(const QUrl &ui)
     out << "Welcome to Miniature!\n";
 }
 
-void Miniature::showBoard()
-{}
-
-void Miniature::handleRecord(const Record &)
-{}
-
-void Miniature::handleSeek(const Seek &s)
+void Miniature::handleSeek(const Seek &seek)
 {
     Q_D(Miniature);
-    d->available_seeks.append(s);
+    d->available_seeks.append(seek);
 }
 
 void Miniature::setMode(Mode mode)

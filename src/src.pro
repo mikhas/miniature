@@ -33,7 +33,6 @@ LIBS += \
         $${GAME_DIR}/commands/logout.h \
         $${GAME_DIR}/commands/loginfailed.h \
         $${GAME_DIR}/commands/advertisement.h \
-        $${GAME_DIR}/commands/record.h \
         $${GAME_DIR}/commands/play.h \
         $${GAME_DIR}/commands/move.h \
         $${GAME_DIR}/commands/creategame.h \
@@ -69,7 +68,6 @@ LIBS += \
         $${GAME_DIR}/commands/logout.cc \
         $${GAME_DIR}/commands/loginfailed.cc \
         $${GAME_DIR}/commands/advertisement.cc \
-        $${GAME_DIR}/commands/record.cc \
         $${GAME_DIR}/commands/play.cc \
         $${GAME_DIR}/commands/move.cc \
         $${GAME_DIR}/commands/creategame.cc \

@@ -23,7 +23,6 @@
 #include "commands/logout.h"
 #include "commands/loginfailed.h"
 #include "commands/advertisement.h"
-#include "commands/record.h"
 #include "commands/play.h"
 #include "commands/move.h"
 #include "commands/creategame.h"

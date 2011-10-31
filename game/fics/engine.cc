@@ -862,17 +862,6 @@ void Engine::readData(const QByteArray &token)
         }
     }
 
-    if (not tokenProcessed
-        && (m_filter & WaitingForGames)) {
-        const Record &r(parseRecord(token));
-        if (r.valid) {
-            Command::Record rc(TargetFrontend, r);
-            sendCommand(&rc);
-
-            tokenProcessed = true;
-        }
-    }
-
     // Last token *needs* to be stored here, as we can only use this method in test:
     m_last_token = token;
 }
