@@ -173,7 +173,7 @@ Miniature::Miniature(Dispatcher *dispatcher,
 
     d->command_line.setFlags(all_commands);
     connect(&d->line_reader, SIGNAL(tokenFound(QByteArray)),
-            &d->command_line, SLOT(processToken(QByteArray)),
+            &d->command_line, SLOT(readData(QByteArray)),
             Qt::UniqueConnection);
 
     connect(this, SIGNAL(loginSucceeded()),

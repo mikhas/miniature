@@ -99,7 +99,7 @@ void CommandLine::setEnabled(bool enable)
     d->enabled = enable;
 }
 
-void CommandLine::processToken(const QByteArray &token)
+void CommandLine::readData(const QByteArray &token)
 {
     Q_D(CommandLine);
     if (not d->enabled) {
@@ -139,6 +139,9 @@ void CommandLine::processToken(const QByteArray &token)
         sendCommand(&login);
     }
 }
+
+void CommandLine::writeData(const QByteArray &)
+{} // TBD
 
 void CommandLine::sendCommand(AbstractCommand *command)
 {

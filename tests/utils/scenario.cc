@@ -62,7 +62,7 @@ void Scenario::play()
             return;
         }
 
-        m_engine->processToken(token);
+        m_engine->readData(token);
     }
 }
 

@@ -101,7 +101,7 @@ namespace {
         command_line->setEnabled(true);
 
         QObject::connect(tokenizer,    SIGNAL(tokenFound(QByteArray)),
-                         command_line, SLOT(processToken(QByteArray)));
+                         command_line, SLOT(readData(QByteArray)));
     }
 }
 

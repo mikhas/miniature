@@ -76,20 +76,16 @@ struct GameInfo {
     GameInfo();
 };
 
-class AbstractEngine;
-typedef QSharedPointer<AbstractEngine> SharedEngine;
-
-//! Can retrieve input from command line or graphical user interface and
-//! translate input into proper commands.
+//! \brief An interface that represents the communication between Miniature
+//! and a chess engine, usually via the engine's text stream interface.
 //!
-//! For streamed input, it makes sense to use a tokenizer. Simply
-//! connect a tokenizer's tokenFound signal to the processToken slot.
-//! For each instance, the range of accepted commands can be specified through
-//! setFlags. If two instances accept the same command - say, while reading
-//! from the same tokenizer - then both instances may emit a commandFound,
-//! should the command be found in the common input stream.
-//! To retrieve commands, clients hook up to the commandFound signal.
-//! A graphical user interface can inject commands through processToken.
+//! The communication is bidirectional, with readData being the
+//! engine-to-Miniature direction and writeData being the Miniature-to-engine
+//! direction. Instead of forcing Miniature to send raw text requests, a set
+//! of covenience methods provides Miniature a type-safe interface to send
+//! requests to an engine. Engines can use the Dispatcher to send commands to
+//! other Miniature components. Engines are strictly separated from each other,
+//! that is, no direct communication between engine instances is assumed.
 class AbstractEngine
     : public QObject
 {
@@ -103,27 +99,29 @@ public:
 
     virtual ~AbstractEngine() = 0;
 
-    //! Enables command parsing. Initializes input device backend for tokenizer
-    //! if required.
+    //! Enables data processing. Disabled engines might not read nor write data
+    //! from/to the engine's text stream interface.
     //! @param enable whether to enable command parsing.
     virtual void setEnabled(bool enable) = 0;
 
-    //! Processes a token. Graphical user interface may want to call this
-    //! method directly.
-    //! @param token the token to be processed. If the token could be
-    //!              translated into a command, commandFound will be emitted.
-    Q_SLOT virtual void processToken(const QByteArray &token) = 0;
+    //! Reads data from an engine, using its text stream interface.
+    //! @param data the data to be read.
+    Q_SLOT virtual void readData(const QByteArray &data) = 0;
 
-    //! Login to remote server.
+    //! Writes data to an engine, using its text stream interface.
+    //! @param data the data to be written.
+    Q_SLOT virtual void writeData(const QByteArray &data) = 0;
+
+    //! Login to engine, for example a remote server.
     //! @param username the username of the account.
     //! @param password the password of the account.
     virtual void login(const QString &username,
                        const QString &password);
 
-    //! Logs out from remote server.
+    //! Logs out from engine, for example a remote server.
     virtual void logout();
 
-    //! Sends out a game offer.
+    //! Sends a game offer to the engine.
     //! @param time initial time.
     //! @param increment time increment for each turn.
     //! @param rating whether the game is rated.
@@ -133,21 +131,22 @@ public:
                       Rating rating,
                       Color color);
 
-    //! Play a game.
+    //! Play a game by sending a response to a previous game offer to the
+    //! engine.
     //! @param advertisement_id the play request was the response to a previous
     //!        game advertisement; this is the ad's id (optional).
     virtual void play(uint advertisement_id = 0);
 
-    //! Ends a game.
+    //! Ends a game. Send to the engine.
     //! @param reason why/how the game was ended.
     virtual void endGame(Reason reason);
 
-    //! Move piece.
+    //! Move piece. Send to the engine.
     //! @param moved_piece the moved piece.
     virtual void movePiece(const MovedPiece &moved_piece);
 
-    //! Sends a message from player to current opponent.
-    //! @param player_name the player name.
+    //! Sends player's message to current opponent to the engine.
+    //! @param player_name the sender of the message.
     //! @param message the message.
     virtual void sendMessage(const QByteArray &player_name,
                              const QByteArray &message);

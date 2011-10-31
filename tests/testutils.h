@@ -79,7 +79,7 @@ public:
     virtual void setEnabled(bool)
     {}
 
-    virtual void processToken(const QByteArray &)
+    virtual void readData(const QByteArray &)
     {}
 
     virtual void login(const QString &,

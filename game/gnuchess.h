@@ -49,7 +49,7 @@ public:
     virtual void setEnabled(bool enable);
     virtual void play(uint advertisement_id);
     virtual void movePiece(const MovedPiece &moved_piece);
-    virtual void processToken(const QByteArray &token);
+    virtual void readData(const QByteArray &token);
     //! \reimp_end
 
     virtual void runInBackground();

@@ -83,7 +83,7 @@ void GnuChess::movePiece(const MovedPiece &moved_piece)
     m_proc.write("\n");
 }
 
-void GnuChess::processToken(const QByteArray &token)
+void GnuChess::readData(const QByteArray &token)
 {
     bool valid = match_move.exactMatch(token);
     if (valid) {
@@ -106,7 +106,7 @@ void GnuChess::runInForeground()
 void GnuChess::onReadyRead()
 {
     while (m_proc.canReadLine()) {
-        processToken(m_proc.readLine());
+        readData(m_proc.readLine());
     }
 }
 

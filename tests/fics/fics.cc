@@ -63,7 +63,7 @@ public:
         return result;
     }
 
-    virtual void writeToChannel(const QByteArray &data)
+    virtual void writeData(const QByteArray &data)
     {
         if (m_debug_output_enabled) {
             qDebug() << __PRETTY_FUNCTION__ << data;

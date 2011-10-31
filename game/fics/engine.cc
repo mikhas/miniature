@@ -688,14 +688,14 @@ void Engine::seek(uint time,
                        .arg(increment)
                        .arg(r)
                        .arg(fromColor(color)));
-    writeToChannel(cmd.toLatin1());
+    writeData(cmd.toLatin1());
 }
 
 void Engine::play(uint advertisement_id)
 {
     m_current_advertisment_id = advertisement_id;
     m_filter |= PlayRequest;
-    writeToChannel(play_command.arg(advertisement_id).toLatin1());
+    writeData(play_command.arg(advertisement_id).toLatin1());
 }
 
 void Engine::endGame(Reason reason)
@@ -703,7 +703,7 @@ void Engine::endGame(Reason reason)
     switch (reason) {
     case ReasonUnknown:
     case ReasonSurrendered:
-        writeToChannel("resign\n");
+        writeData("resign\n");
 
         m_current_game = GameInfo();
         m_filter |= WaitingForSeeks;
@@ -717,12 +717,12 @@ void Engine::endGame(Reason reason)
 
 void Engine::movePiece(const MovedPiece &moved_piece)
 {
-    writeToChannel(moveNotation(moved_piece).toLatin1());
-    writeToChannel("\n");
+    writeData(moveNotation(moved_piece).toLatin1());
+    writeData("\n");
 }
 
 // Do not return early from this method, toggle tokenProcessed flag instead:
-void Engine::processToken(const QByteArray &token)
+void Engine::readData(const QByteArray &token)
 {
     bool tokenProcessed = false;
 
@@ -886,9 +886,9 @@ void Engine::sendMessage(const QByteArray &,
         return;
     }
 
-    writeToChannel("say ");
-    writeToChannel(message);
-    writeToChannel("\n");
+    writeData("say ");
+    writeData(message);
+    writeData("\n");
 }
 
 void Engine::setMessageFilter(const MessageFilterFlags &flags)
@@ -902,7 +902,7 @@ void Engine::setChannelEnabled(bool enabled)
     m_channel_enabled = enabled;
 }
 
-void Engine::writeToChannel(const QByteArray &data)
+void Engine::writeData(const QByteArray &data)
 {
     m_channel.write(data);
 }
@@ -915,7 +915,7 @@ void Engine::onReadyRead()
         const QByteArray &token(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
         if (m_enabled && not token.isEmpty()) {
             qDebug() << "FICS:" << token;
-            processToken(token);
+            readData(token);
         }
     } while (next_newline_pos != -1);
 }
@@ -937,8 +937,8 @@ void Engine::processLogin(const QByteArray &line)
     } else if (line.startsWith(password_prompt)) {
         m_login_abort_timer.stop();
         m_login_abort_timer.start();
-        writeToChannel(m_password.toLatin1());
-        writeToChannel("\n");
+        writeData(m_password.toLatin1());
+        writeData("\n");
     } else if (match_confirm_login.exactMatch(line)) {
         m_login_abort_timer.stop();
 
@@ -954,7 +954,7 @@ void Engine::processLogin(const QByteArray &line)
             m_password.clear();
 
             // Confirm guest login:
-            writeToChannel("\n");
+            writeData("\n");
         }
     } else if (line.startsWith(fics_prompt)) {
         finalizeLogin();
@@ -985,16 +985,16 @@ void Engine::reconnect()
 
 void Engine::configureFics()
 {
-    writeToChannel("set style 12\n");
-    writeToChannel("set seek 1\n");
-    writeToChannel("set autoflag 1\n");
+    writeData("set style 12\n");
+    writeData("set seek 1\n");
+    writeData("set autoflag 1\n");
 }
 
 void Engine::sendLogin()
 {
     m_login_abort_timer.start();
-    writeToChannel(m_username.toLatin1());
-    writeToChannel("\n");
+    writeData(m_username.toLatin1());
+    writeData("\n");
 }
 
 void Engine::finalizeLogin()

@@ -41,7 +41,7 @@ AbstractEngine::~AbstractEngine()
 {}
 
 void AbstractEngine::login(const QString &,
-                         const QString &)
+                           const QString &)
 {}
 
 void AbstractEngine::logout()

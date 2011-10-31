@@ -86,7 +86,8 @@ public:
     virtual void play(uint advertisement_id);
     virtual void endGame(Reason reason);
     virtual void movePiece(const MovedPiece &moved_piece);
-    virtual void processToken(const QByteArray &token);
+    virtual void readData(const QByteArray &token);
+    virtual void writeData(const QByteArray &data);
     virtual void sendMessage(const QByteArray &player_name,
                              const QByteArray &message);
     //! \reimp_end
@@ -94,9 +95,6 @@ public:
     //! Test API
     virtual void setMessageFilter(const MessageFilterFlags &flags = MessageFilterFlags(InGame));
     virtual void setChannelEnabled(bool enabled);
-    //! For testing, this method can be overriden to intercept what would have
-    //! otherwise been sent to the server.
-    virtual void writeToChannel(const QByteArray &data);
 
 private:
     Q_SLOT void onReadyRead();
