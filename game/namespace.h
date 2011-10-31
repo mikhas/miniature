@@ -57,7 +57,7 @@ enum File
 enum Mode {
     ModeNone = 0x0,
     ModeBlitz = 0x1,
-    ModeLightening = 0x2,
+    ModeLightning = 0x2,
     ModeUntimed = 0x4,
     ModeExamined = 0x8,
     ModeStandard = 0x10,

@@ -37,6 +37,9 @@ Page {
             newSpinner.visible = false
             newSpinner.running = false
             newSeekDialog.close()
+            miniature.setAutoConfirmMoveEnabled(
+                miniature.gameMode() == "lightning"
+                || miniature.gameMode() == "blitz");
             loadScreen("OnlineBoard.qml")
         }
         onSeekCancelled: {

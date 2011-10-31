@@ -112,6 +112,7 @@ public:
     mutable MessageLog message_log;
     ChessBoard chess_board;
     bool valid_move;
+    bool auto_confirm_move_enabled;
     Miniature::Mode mode;
     WeakGame game;
     SideElement local_side;
@@ -130,6 +131,7 @@ public:
         , message_log()
         , chess_board()
         , valid_move(false)
+        , auto_confirm_move_enabled(false)
         , mode(Miniature::FicsMode)
         , game()
         , local_side()
@@ -371,6 +373,12 @@ bool Miniature::selectSquare(int target)
         d->valid_move = d->chess_board.isValidMove();
         if (d->valid_move != was_valid) {
             emit validMoveChanged(d->valid_move);
+
+            if (d->auto_confirm_move_enabled
+                && d->valid_move
+                && not was_valid ) {
+                confirmMove();
+            }
         }
     }
 
@@ -421,6 +429,22 @@ void Miniature::confirmMove()
     emit validMoveChanged(false);
 }
 
+void Miniature::setAutoConfirmMoveEnabled(bool enable)
+{
+    Q_D(Miniature);
+
+    if (d->auto_confirm_move_enabled != enable) {
+        d->auto_confirm_move_enabled = enable;
+        emit autoConfirmMoveEnabledChanged(d->auto_confirm_move_enabled);
+    }
+}
+
+bool Miniature::autoConfirmMoveEnabled() const
+{
+    Q_D(const Miniature);
+    return d->auto_confirm_move_enabled;
+}
+
 void Miniature::sendMessage(const QString &message)
 {
     Q_D(Miniature);
@@ -432,6 +456,23 @@ void Miniature::sendMessage(const QString &message)
     d->message_log.append(pn, m);
     Command::Message msg(TargetEngine, pn, m);
     sendCommand(&msg);
+}
+
+QString Miniature::gameMode() const
+{
+    Q_D(const Miniature);
+    if (Game *g = d->game.data()) {
+        switch(g->mode()) {
+        case ModeLightning: return "lightning";
+        case ModeBlitz: return "blitz";
+        case ModeStandard: return "standard";
+
+        default:
+            break;
+        }
+    }
+
+    return "none";
 }
 
 void Miniature::setActiveGame(Game *game)

@@ -49,6 +49,7 @@ class Miniature
     Q_DECLARE_PRIVATE(Miniature)
 
     Q_ENUMS(Mode)
+    Q_ENUMS(GameMode)
     Q_ENUMS(Rating)
     Q_ENUMS(Result)
     Q_ENUMS(Reason)
@@ -60,6 +61,10 @@ class Miniature
 
     Q_PROPERTY(bool validMove READ validMove
                               NOTIFY validMoveChanged)
+
+    Q_PROPERTY(bool autoConfirmMoveEnabled READ autoConfirmMoveEnabled
+                                           WRITE setAutoConfirmMoveEnabled
+                                           NOTIFY autoConfirmMoveEnabledChanged)
 
     Q_PROPERTY(QString storedUsername READ storedUsername
                                       NOTIFY storedUsernameChanged)
@@ -74,6 +79,13 @@ public:
     enum Mode {
         TestFicsMode,
         FicsMode
+    };
+
+    enum GameMode {
+        GameModeNone = ::Game::ModeNone,
+        GameModeBlitz = ::Game::ModeBlitz,
+        GameModeLightning = ::Game::ModeLightning,
+        GameModeStandard = ::Game::ModeStandard
     };
 
     enum Color {
@@ -186,7 +198,19 @@ public:
     Q_SIGNAL void validMoveChanged(bool valid);
 
     //! Confirms current move.
+    //! \sa setAutoConfirmMoveEnabled
     Q_INVOKABLE void confirmMove();
+
+    //! Whether moves are executed as soon as they become 'valid' or whether
+    //! moves need to be confirmed first. Off by default, that is, moves
+    //! require confirmation.
+    //! \sa confirmMove
+    //! @param enable the flag to enable/disable this option.
+    Q_INVOKABLE void setAutoConfirmMoveEnabled(bool enable);
+
+    //! Whether auto-confirmation of moves is enabled.
+    Q_INVOKABLE bool autoConfirmMoveEnabled() const;
+    Q_SIGNAL void autoConfirmMoveEnabledChanged(bool enabled);
 
     //! Sends a message from player to current opponent.
     //! @param message the message.
@@ -204,6 +228,10 @@ public:
     //! Emitted when the active game was ended.
     Q_SIGNAL void gameEnded(int result,
                             int reason);
+
+    //! Returns game mode.
+    // TODO: Why is QML not capable of handling an enum as retval? Feels lame to have to fall back to strings here.
+    Q_INVOKABLE QString gameMode() const;
 
     //! Sets the active game.
     //! @param game the game.

@@ -64,6 +64,7 @@ public:
     Side remote; //!< Side of the remote player.
     Game::GameState state; //!< The game's state.
     LocalSideColor local_color; //!< Color of local side.
+    Mode mode; //!< The game mode.
     uint time; //!< Initial time.
     uint time_increment; //! < Time increment for each move.
     uint rating; //! < Game rating
@@ -79,6 +80,7 @@ public:
         , remote(new_remote)
         , state(Game::Idle)
         , local_color(LocalSideIsWhite)
+        , mode(ModeNone)
         , time(0)
         , time_increment(0)
         , rating(0)
@@ -168,6 +170,18 @@ Side Game::activeSide() const
     }
 
     return Side();
+}
+
+void Game::setMode(Mode mode)
+{
+    Q_D(Game);
+    d->mode = mode;
+}
+
+Mode Game::mode() const
+{
+    Q_D(const Game);
+    return d->mode;
 }
 
 void Game::setTime(uint time)

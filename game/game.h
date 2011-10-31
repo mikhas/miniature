@@ -115,6 +115,12 @@ public:
     //! Returns active side.
     Side activeSide() const;
 
+    //! Sets game mode.
+    void setMode(Mode mode);
+
+    //! Returns game mode.
+    Mode mode() const;
+
     //! Sets initial time.
     void setTime(uint time);
 

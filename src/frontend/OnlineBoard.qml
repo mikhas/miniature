@@ -478,7 +478,7 @@ Page {
             ToolIcon {
                 id: confirmButton
                 iconId: "toolbar-add"
-                visible: miniature.validMove
+                visible: !miniature.autoConfirmMoveEnabled && miniature.validMove
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     miniature.confirmMove()

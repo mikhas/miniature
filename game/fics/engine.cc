@@ -269,6 +269,17 @@ namespace {
         result->rating = (re.cap(5) == "rated" ? Game::RatingEnabled
                                                : Game::RatingDisabled);
 
+        const QString &mode = re.cap(6);
+        if (mode == "lightning") {
+            result->mode = Game::ModeLightning;
+        } else if (mode == "blitz") {
+            result->mode = Game::ModeBlitz;
+        } else if (mode == "standard") {
+            result->mode = Game::ModeStandard;
+        } else {
+            result->mode = Game::ModeNone; // Unknown game mode.
+        }
+
         result->time = re.cap(7).toUInt(&converted) * 60; // reported in minutes here
         result->valid = result->valid && converted;
 

@@ -50,6 +50,7 @@ void CreateGame::exec(Dispatcher *dispatcher,
                                                          : m_game_info.black.name));
 
     game->setLocalSideColor(m_color);
+    game->setMode(m_game_info.mode);
     game->setTime(m_game_info.time);
     game->setTimeIncrement(m_game_info.time_increment);
     game->setRating(m_game_info.rating);
