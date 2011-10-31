@@ -117,6 +117,12 @@ enum Reason {
     ReasonAdjourned
 };
 
+enum Resolution {
+    ResolutionDraw,
+    ResolutionAdjourn,
+    ResolutionAbort
+};
+
 } // namespace Game
 
 Q_DECLARE_METATYPE(Game::Rank)

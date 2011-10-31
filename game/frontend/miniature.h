@@ -70,6 +70,7 @@ class Miniature
     Q_ENUMS(Rating)
     Q_ENUMS(Result)
     Q_ENUMS(Reason)
+    Q_ENUMS(GameResolution)
     Q_ENUMS(SquareStyle)
 
     Q_PROPERTY(Mode mode READ mode
@@ -136,6 +137,12 @@ public:
         ReasonCheckmated = ::Game::ReasonCheckmated,
         ReasonDrawAccpeted = ::Game::ReasonDrawAccpeted,
         ReasonAdjourned = ::Game::ReasonAdjourned
+    };
+
+    enum GameResolution {
+        GameResolutionDraw = ::Game::ResolutionDraw,
+        GameResolutionAdjourn = ::Game::ResolutionAdjourn,
+        GameResolutionAbort = ::Game::ResolutionAbort
     };
 
     enum SquareStyle {
@@ -227,6 +234,26 @@ public:
 
     //! Resign from active game.
     Q_INVOKABLE void resign();
+
+    //! Propose a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the proposed game resolution.
+    Q_INVOKABLE void proposeGameResolution(int resolution);
+
+    //! Emitted when opponent proposes a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the proposed game resolution.
+    Q_SIGNAL void gameResolutionProposed(int resolution);
+
+    //! Accept a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the accepted game resolution.
+    Q_INVOKABLE void acceptGameResolution(int resolution);
+
+    //! Emitted when opponent accepts a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the proposed game resolution.
+    Q_SIGNAL void gameResolutionAccepted(int resolution);
 
     //! Toggles whether a game advertisement is highlighted. Only one ad can be
     //! highlighted at a time.

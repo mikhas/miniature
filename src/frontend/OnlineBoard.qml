@@ -535,18 +535,16 @@ Page {
         target: miniature
         property string resolution
         property string description
-        onRequestReceived: {
-            if (proposal == Miniature.ProposedDraw) {
+        onGameResolutionProposed: {
+            if (resolution == Miniature.GameResolutionDraw) {
                 opponentProposals.resolution = qsTr("Is this a draw?")
                 //: %1 is the opponent's name
                 opponentProposals.description = qsTr("%1 is proposing to end this game with a draw.").arg(remoteSide.id)
-            }
-            if (proposal == Miniature.ProposedAdjourn) {
+            } else if (resolution == Miniature.GameResolutionAdjourn) {
                 opponentProposals.resolution = qsTr("Continue another day?")
                 //: %1 is the opponent's name
                 opponentProposals.description = qsTr("%1 is requesting to adjourn this game.").arg(remoteSide.id)
-            }
-            if (proposal == Miniature.ProposedAbort) {
+            } else if (resolution == Miniature.GameResolutionAbort) {
                 opponentProposals.resolution = qsTr("Scrap this game?")
                 //: %1 is the opponent's name
                 opponentProposals.description = qsTr("%1 is proposing to abort this game.").arg(remoteSide.id)
@@ -639,9 +637,13 @@ Page {
         message: opponentProposals.description
         acceptButtonText: "Accept"
         onAccepted: {
-            if (opponentProposals.resolution == qsTr("Is this a draw?")) miniature.acceptDraw()
-            if (opponentProposals.resolution == qsTr("Continue another day?")) miniature.acceptAdjourn()
-            if (opponentProposals.resolution == qsTr("Scrap this game?")) miniature.acceptAbort()
+            if (opponentProposals.resolution == qsTr("Is this a draw?")) {
+                miniature.acceptGameResolution(Miniature.GameResolutionDraw)
+            } else if (opponentProposals.resolution == qsTr("Continue another day?")) {
+                miniature.acceptGameResolution(Miniature.GameResolutionAdjourn)
+            } else if (opponentProposals.resolution == qsTr("Scrap this game?")) {
+                miniature.acceptGameResolution(Miniature.GameResolutionAbort)
+            }
         }
         rejectButtonText: "Ignore"
     }

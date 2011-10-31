@@ -341,6 +341,16 @@ void Miniature::resign()
     }
 }
 
+void Miniature::proposeGameResolution(int resolution)
+{
+    Q_UNUSED(resolution)
+}
+
+void Miniature::acceptGameResolution(int resolution)
+{
+    Q_UNUSED(resolution)
+}
+
 void Miniature::toggleGameAdvertisementHighlighting(uint id)
 {
     Q_D(Miniature);
