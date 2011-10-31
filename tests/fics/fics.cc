@@ -46,10 +46,12 @@ private:
 public:
     explicit Testee(Dispatcher *dispatcher,
                     QObject *parent = 0)
-        : Fics::Engine(dispatcher, parent)
+        : Fics::Engine(parent)
         , m_response()
         , m_debug_output_enabled(false)
-    {}
+    {
+        Fics::Engine::setDispatcher(dispatcher);
+    }
 
     QByteArray response()
     {

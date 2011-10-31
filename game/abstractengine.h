@@ -76,6 +76,7 @@ struct GameInfo {
     GameInfo();
 };
 
+class Dispatcher;
 //! \brief An interface that represents the communication between Miniature
 //! and a chess engine, usually via the engine's text stream interface.
 //!
@@ -97,12 +98,13 @@ public:
     //! @param parent the owner of this instance (optional).
     explicit AbstractEngine(QObject *parent = 0);
 
+    //! D'tor
     virtual ~AbstractEngine() = 0;
 
-    //! Enables data processing. Disabled engines might not read nor write data
-    //! from/to the engine's text stream interface.
-    //! @param enable whether to enable command parsing.
-    virtual void setEnabled(bool enable) = 0;
+    //! Sets the Dispatcher for this engine. Without dispatcher, an engine
+    //! is considered to be disabled, that is, it might not read nor write
+    //! data from/to its text stream interface.
+    virtual void setDispatcher(Dispatcher *dispatcher) = 0;
 
     //! Reads data from an engine, using its text stream interface.
     //! @param data the data to be read.

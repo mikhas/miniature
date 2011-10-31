@@ -27,15 +27,18 @@
 
 namespace Game {
 
-Registry::Registry(Dispatcher *dispatcher,
-                   QObject *parent)
+Registry::Registry(QObject *parent)
     : QObject(parent)
-    , m_dispatcher(dispatcher)
     , m_games()
 {}
 
 Registry::~Registry()
 {}
+
+void Registry::setDispatcher(Dispatcher *dispatcher)
+{
+    m_dispatcher = WeakDispatcher(dispatcher);
+}
 
 void Registry::registerGame(Game *game)
 {

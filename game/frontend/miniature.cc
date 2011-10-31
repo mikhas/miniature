@@ -125,7 +125,7 @@ public:
 
     explicit MiniaturePrivate(Dispatcher *new_dispatcher)
         : dispatcher(new_dispatcher)
-        , command_line(new_dispatcher)
+        , command_line()
         , line_reader()
         , available_seeks()
         , message_log()
@@ -143,7 +143,9 @@ public:
         // of the top-level widget. Screw you, Qt.
         , ui(new QDeclarativeView)
 #endif
-    {}
+    {
+       command_line.setDispatcher(new_dispatcher);
+    }
 };
 
 Miniature::Miniature(Dispatcher *dispatcher,

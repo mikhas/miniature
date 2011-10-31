@@ -163,17 +163,20 @@ private:
         device->open(QIODevice::ReadWrite);
 
         CountingDispatcher c0;
-        Game::CommandLine l0(&c0);
+        Game::CommandLine l0;
+        l0.setDispatcher(&c0);
         setupLink(&l0, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandPlay | Game::CommandQuit));
 
         CountingDispatcher c1;
-        Game::CommandLine l1(&c1);
+        Game::CommandLine l1;
+        l1.setDispatcher(&c1);
         setupLink(&l1, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandMove | Game::CommandQuit));
 
         CountingDispatcher c2;
-        Game::CommandLine l2(&c2);
+        Game::CommandLine l2;
+        l2.setDispatcher(&c2);
         setupLink(&l2, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandNone));
 
@@ -199,7 +202,8 @@ private:
         device->open(QIODevice::ReadWrite);
 
         CountingDispatcher counter;
-        Game::CommandLine link(&counter);
+        Game::CommandLine link;
+        link.setDispatcher(&counter);
         setupLink(&link, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandMove));
 
@@ -222,7 +226,8 @@ private:
         device->open(QIODevice::ReadWrite);
 
         CountingDispatcher counter;
-        Game::CommandLine link(&counter);
+        Game::CommandLine link;
+        link.setDispatcher(&counter);
         setupLink(&link, &tokenizer,
                   Game::ParserCommandFlags(Game::CommandQuit));
 

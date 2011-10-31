@@ -38,11 +38,16 @@ private:
 
 public:
     //! C'tor
-    //! @param dispatcher the command dispatcher.
     //! @param parent the (optional) owner of this instance.
-    explicit Registry(Dispatcher *dispatcher,
-                      QObject *parent = 0);
+    explicit Registry(QObject *parent = 0);
+
+    //! D'tor
     virtual ~Registry();
+
+    //! Sets the Dispatcher for this instance. A dispatcher instance is
+    //! required to make the Registry fully operational.
+    //! @param dispatcher the dispatcher instance.
+    void setDispatcher(Dispatcher *dispatcher);
 
     //! Registers a newly created game.
     //! @param game the game instance to register.

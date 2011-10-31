@@ -575,17 +575,15 @@ namespace {
 
 namespace Game { namespace Fics {
 
-Engine::Engine(Dispatcher *dispatcher,
-               QObject *parent)
+Engine::Engine(QObject *parent)
     : AbstractEngine(parent)
-    , m_dispatcher(dispatcher)
+    , m_dispatcher()
     , m_channel()
     , m_buffer()
     , m_last_token()
     , m_username()
     , m_password()
     , m_filter(None)
-    , m_enabled(false)
     , m_channel_enabled(true)
     , m_logged_in(false)
     , m_past_welcome_screen(false)
@@ -615,9 +613,9 @@ Engine::Engine(Dispatcher *dispatcher,
 Engine::~Engine()
 {}
 
-void Engine::setEnabled(bool enable)
+void Engine::setDispatcher(Dispatcher *dispatcher)
 {
-    m_enabled = enable;
+    m_dispatcher = WeakDispatcher(dispatcher);
 }
 
 void Engine::login(const QString &username,
@@ -893,7 +891,6 @@ void Engine::sendMessage(const QByteArray &,
 
 void Engine::setMessageFilter(const MessageFilterFlags &flags)
 {
-    m_enabled = true;
     m_filter = flags;
 }
 
@@ -909,11 +906,13 @@ void Engine::writeData(const QByteArray &data)
 
 void Engine::onReadyRead()
 {
-    int next_newline_pos = -1;
     const bool enable_echo = false;
+    const bool has_dispatcher = not m_dispatcher.isNull();
+    int next_newline_pos = -1;
+
     do {
         const QByteArray &token(scanLine(&next_newline_pos, &m_channel, &m_buffer, enable_echo, m_extra_delimiter));
-        if (m_enabled && not token.isEmpty()) {
+        if (has_dispatcher && not token.isEmpty()) {
             qDebug() << "FICS:" << token;
             readData(token);
         }

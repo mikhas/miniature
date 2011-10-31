@@ -61,9 +61,9 @@ private:
 
 public:
     //! \reimp
-    explicit CommandLine(Dispatcher *dispatcher,
-                         QObject *parent = 0);
+    explicit CommandLine(QObject *parent = 0);
     virtual ~CommandLine();
+    virtual void setDispatcher(Dispatcher *dispatcher);
     virtual void setEnabled(bool enable);
     virtual void readData(const QByteArray &token);
     virtual void writeData(const QByteArray &data);

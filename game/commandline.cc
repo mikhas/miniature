@@ -49,9 +49,9 @@ public:
     ParserCommandFlags flags;
     bool enabled;
 
-    explicit CommandLinePrivate(Dispatcher *new_dispatcher)
-        : dispatcher(new_dispatcher)
-        , registry(new_dispatcher)
+    explicit CommandLinePrivate()
+        : dispatcher()
+        , registry()
         , flags(CommandNone)
         , enabled(false)
     {}
@@ -78,14 +78,20 @@ public:
     }
 };
 
-CommandLine::CommandLine(Dispatcher *dispatcher,
-                         QObject *parent)
+CommandLine::CommandLine(QObject *parent)
     : AbstractEngine(parent)
-    , d_ptr(new CommandLinePrivate(dispatcher))
+    , d_ptr(new CommandLinePrivate)
 {}
 
 CommandLine::~CommandLine()
 {}
+
+void CommandLine::setDispatcher(Dispatcher *dispatcher)
+{
+    Q_D(CommandLine);
+    d->dispatcher = WeakDispatcher(dispatcher);
+    d->registry.setDispatcher(dispatcher);
+}
 
 void CommandLine::setFlags(ParserCommandFlags flags)
 {

@@ -32,9 +32,10 @@ namespace Game {
 Dispatcher *createDispatcher(QObject *owner)
 {
     Dispatcher *dispatcher = new Dispatcher(owner);
+    Fics::Engine *engine = new Fics::Engine(owner);
 
     // Use FICS backend, by default:
-    dispatcher->setBackend(new Fics::Engine(dispatcher, owner));
+    dispatcher->setBackend(engine);
 
     return dispatcher;
 }
@@ -52,8 +53,10 @@ public:
     explicit DispatcherPrivate(Dispatcher *q)
         : active_frontend()
         , active_backend()
-        , registry(new Registry(q))
-    {}
+        , registry(new Registry)
+    {
+        registry->setDispatcher(q);
+    }
 };
 
 Dispatcher::Dispatcher(QObject *parent)
@@ -112,14 +115,21 @@ void Dispatcher::setBackend(AbstractEngine *backend)
 {
     Q_D(Dispatcher);
 
-    if (AbstractEngine *old = d->active_backend.data()) {
-        old->setEnabled(false);
+    AbstractEngine *const old = d->active_backend.data();
+    if (old == backend) {
+        return; // Nothing to do!
+    }
+
+    if (old) {
+        // Effectively disables old backend:
+        old->setDispatcher(0);
     }
 
     d->active_backend = QWeakPointer<AbstractEngine>(backend);
 
     if (backend) {
-        backend->setEnabled(true);
+        // Effectively enables new backend:
+        backend->setDispatcher(this);
     }
 }
 

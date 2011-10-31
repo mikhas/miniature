@@ -60,7 +60,6 @@ private:
     QString m_username; // FIXME: Change to QBA.
     QString m_password; // FIXME: Change to QBA.
     MessageFilterFlags m_filter;
-    bool m_enabled;
     bool m_channel_enabled;
     bool m_logged_in;
     bool m_past_welcome_screen;
@@ -72,10 +71,9 @@ private:
 
 public:
     //! \reimp
-    explicit Engine(Dispatcher *dispatcher,
-                    QObject *parent = 0);
+    explicit Engine(QObject *parent = 0);
     virtual ~Engine();
-    virtual void setEnabled(bool enable);
+    virtual void setDispatcher(Dispatcher *dispatcher);
     virtual void login(const QString &username,
                        const QString &password);
     virtual void logout();
