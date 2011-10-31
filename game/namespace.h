@@ -107,6 +107,8 @@ enum Result {
 enum Reason {
     ReasonUnknown,
     ReasonForfeitByDisconnect,
+    ReasonForfeitOnTime,
+    ReasonDrawnOnTime,
     ReasonAbortedByDisconnect,
     ReasonAdjournedByDisconnect,
     ReasonSurrendered,

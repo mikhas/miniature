@@ -481,8 +481,17 @@ namespace {
             result.player_name = match_adjourned_by_disconnect.cap(2).toLatin1();
         } else if(match_game_ended.exactMatch(token)) {
             result.valid = true;
-            result.reason = match_game_ended.cap(3) == "checkmated" ? Game::ReasonCheckmated
-                                                                    : Game::ReasonUnknown;
+
+            const QString &desc = match_game_ended.cap(3);
+            if (desc == "checkmated") {
+                result.reason = Game::ReasonCheckmated;
+            } else if (desc.endsWith("forfeits on time")) {
+                result.reason = Game::ReasonForfeitOnTime;
+            } else if (desc.endsWith("Game drawn because both players ran out of time")) {
+                result.reason = Game::ReasonDrawnOnTime;
+            } else {
+                result.reason = Game::ReasonUnknown;
+            }
 
             bool converted = false;
             result.id = match_game_ended.cap(1).toUInt(&converted);

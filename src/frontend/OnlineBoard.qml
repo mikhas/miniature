@@ -582,15 +582,15 @@ Page {
 
             if (reason == Miniature.ReasonCheckmated) {
                 gameResolutions.description = qsTr("Checkmate")
-            }
-            if (reason == Miniature.ReasonDrawAccepted) {
+            } else if (reason == Miniature.ReasonDrawAccepted) {
                 //: %1 is the opponent's name
                 gameResolutions.description = qsTr("%1 accepts draw").arg(remoteSide.id)
-            }
-            if (reason == Miniature.ReasonTimeForfeit) {
+            } else if (reason == Miniature.ReasonForfeitOnTime
+                       || reason == Miniature.ReasonDrawnOnTime) {
+                // FIXME: More descriptive message for drawn-on-time case,
+                // to be added after string freeze.
                 gameResolutions.description = qsTr("Out of time!")
-            }
-            else {
+            } else {
                 //: %1 is the opponent's name
                 gameResolutions.description = qsTr("%1 vanished").arg(remoteSide.id)
             }

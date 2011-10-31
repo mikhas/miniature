@@ -99,6 +99,8 @@ public:
     enum Reason {
         ReasonUnknown = ::Game::ReasonUnknown,
         ReasonForfeitByDisconnect = ::Game::ReasonForfeitByDisconnect,
+        ReasonForfeitOnTime = ::Game::ReasonForfeitOnTime,
+        ReasonDrawnOnTime = ::Game::ReasonForfeitOnTime,
         ReasonAbortedByDisconnect = ::Game::ReasonAbortedByDisconnect,
         ReasonAdjournedByDisconnect = ::Game::ReasonAdjournedByDisconnect,
         ReasonSurrendered = ::Game::ReasonSurrendered,
