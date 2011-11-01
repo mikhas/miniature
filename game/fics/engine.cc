@@ -500,7 +500,7 @@ namespace {
             result.valid = true;
 
             const QString &desc = match_game_ended.cap(3);
-            if (desc == "checkmated") {
+            if (desc.endsWith("checkmated")) {
                 result.reason = Game::ReasonCheckmated;
             } else if (desc.endsWith("forfeits on time")) {
                 result.reason = Game::ReasonForfeitOnTime;
