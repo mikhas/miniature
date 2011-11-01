@@ -50,6 +50,7 @@ void MessageLog::append(const QByteArray &player_name,
 
     // Check whether previous message was from same player:
     if (prev_msg.player_name == player_name) {
+        prev_msg.data.append(' '); // Acts as separator.
         prev_msg.data.append(message);
         const QModelIndex &changed(index(m_log.size() - 1, 0));
         emit dataChanged(changed, changed);
