@@ -20,14 +20,25 @@
         <file>black/bishop.png</file>
         <file>miniatureBIG.png</file>
         <file>miniatureMedium.png</file>
-        <file>miniature.es.qm</file>
-        <file>miniature.en.qm</file>
-        <file>miniature.es.ts</file>
-        <file>miniature.en.ts</file>
-        <file>miniature_miniaturets_en_US.ts</file>
         <file>miniature_miniaturets_en_US.qm</file>
-        <file>miniature_miniaturets_es.ts</file>
         <file>miniature_miniaturets_es.qm</file>
         <file>miniature_miniaturets_de.qm</file>
+        <file>miniature_miniaturets_en_GB.qm</file>
+        <file>miniature_miniaturets_fi.qm</file>
+        <file>miniature_miniaturets_fr.qm</file>
+        <file>miniature_miniaturets_da_DK.qm</file>
+        <file>miniature_miniaturets_zh_TW.qm</file>
+        <file>miniature_miniaturets_it.qm</file>
+        <file>miniature_miniaturets_ja.qm</file>
+        <file>miniature_miniaturets_ro.qm</file>
+        <file>miniature_miniaturets_ru.qm</file>
+        <file>miniature_miniaturets_sv.qm</file>
+        <file>miniature_miniaturets_zh_CN.qm</file>
+        <file>miniature_miniaturets_zh_HK.qm</file>
+        <file>miniature_miniaturets_pl.qm</file>
+        <file>miniature_miniaturets_nb.qm</file>
+        <file>miniature_miniaturets_ne_NP.qm</file>
+        <file>miniature_miniaturets_nl.qm</file>
+        <file>miniature_miniaturets_pt.qm</file>
     </qresource>
 </RCC>

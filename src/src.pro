@@ -155,15 +155,33 @@ OTHER_FILES += \
     frontend/black/king.png \
     frontend/black/rook.png \
     frontend/miniatureMedium.png \
-    frontend/miniature.es.qm \
-    frontend/miniature.en.qm \
-    frontend/miniature.es.ts \
-    frontend/miniature.en.ts \
-    frontend/miniature.ts \
     frontend/miniature_miniaturets_en_US.qm \
-    frontend/miniature_miniaturets_en_US.ts \
-    frontend/miniature_miniaturets_es.ts \
     frontend/miniature_miniaturets_es.qm \
     frontend/miniature_miniaturets_de.qm \
-    frontend/miniature_miniaturets_de.ts \
+    frontend/miniature_miniaturets_pt.qm \
+    frontend/miniature_miniaturets_nl.qm \
+    frontend/miniature_miniaturets_ne_NP.qm \
+    frontend/miniature_miniaturets_nb.qm \
+    frontend/miniature_miniaturets_pl.qm \
+    frontend/miniature_miniaturets_zh_HK.qm \
+    frontend/miniature_miniaturets_zh_CN.qm \
+    frontend/miniature_miniaturets_sv.qm \
+    frontend/miniature_miniaturets_ru.qm \
+    frontend/miniature_miniaturets_ro.qm \
+    frontend/miniature_miniaturets_ja.qm \
+    frontend/miniature_miniaturets_it.qm \
+    frontend/miniature_miniaturets_zh_TW.qm \
+    frontend/miniature_miniaturets_da_DK.qm \
+    frontend/miniature_miniaturets_fr.qm \
+    frontend/miniature_miniaturets_fi.qm \
+    frontend/miniature_miniaturets_en_GB.qm
+
+
+
+
+
+
+
+
+
 
