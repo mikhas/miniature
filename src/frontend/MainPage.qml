@@ -220,21 +220,21 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         onClicked: { Qt.openUrlExternally("http://www.freechess.org/cgi-bin/Register/FICS_register.cgi") }
     }
 
-    Button { // Toggle between testing mode and real mode - to be commented in releases
-        id: testingButton
-        text:  checked ? qsTr("TESTING MODE ON")
-                       : qsTr("TESTING MODE OFF")
-        checkable: true
-        checked: miniature.mode == Miniature.TestFicsMode
-        opacity: 0.8
-        anchors.top: aboutButton.bottom
-        anchors.topMargin: 40
-        anchors.horizontalCenter: parent.horizontalCenter
-        onClicked: {
-            miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
-                                                    : Miniature.FicsMode)
-        }
-    }
+//    Button { // Toggle between testing mode and real mode - to be commented in releases
+//        id: testingButton
+//        text:  checked ? qsTr("TESTING MODE ON")
+//                       : qsTr("TESTING MODE OFF")
+//        checkable: true
+//        checked: miniature.mode == Miniature.TestFicsMode
+//        opacity: 0.8
+//        anchors.top: aboutButton.bottom
+//        anchors.topMargin: 40
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        onClicked: {
+//            miniature.setMode(testingButton.checked ? Miniature.TestFicsMode
+//                                                    : Miniature.FicsMode)
+//        }
+//    }
 
     Rectangle {
         id: aboutMiniature
@@ -276,7 +276,7 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
             font.pointSize: 16
             horizontalAlignment: Text.AlignHCenter
             clip: true
-            lineHeight: 1.2
+            // lineHeight: 1.2 // commented to keep compatibility with Maemo
             wrapMode: Text.Wrap
         }
 
