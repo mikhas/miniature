@@ -255,6 +255,16 @@ public:
     //! @param resolution the proposed game resolution.
     Q_SIGNAL void gameResolutionAccepted(int resolution);
 
+    //! Reject a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the rejected game resolution.
+    Q_INVOKABLE void rejectGameResolution(int resolution);
+
+    //! Emitted when opponent rejects a game resolution. Resolution maps to
+    //! Miniature::GameResolution enum.
+    //! @param resolution the rejected game resolution.
+    Q_SIGNAL void gameResolutionRejected(int resolution);
+
     //! Toggles whether a game advertisement is highlighted. Only one ad can be
     //! highlighted at a time.
     //! @param id the game advertisement id

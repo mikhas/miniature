@@ -135,7 +135,13 @@ namespace {
     const QRegExp match_declines_match_offer("\\s*(\\w+)\\s+declines the match offer.");
 
     // Matches "testPLEASEIGNORE, whom you were challenging, has departed."
-    const QRegExp match_has_departed("\\s*(\\w+)\\,\\s+whom you were challenging, has departed.");
+    const QRegExp match_has_departed("\\s*(\\w+),\\s+whom you were challenging, has departed.");
+
+    // Matches "GuestBVNP offers you a draw."
+    const QRegExp match_draw_proposed("\\s*(\\w+)\\s+offers you a draw.");
+
+    // Matches "testPleaseIgnore declines the draw request."
+    const QRegExp match_draw_rejected("\\s*(\\w+)\\s+declines the draw request.");
 
     // Matches "MiniatureTest[448] says: hi" and "GuestXYZ(U)[123] says: hi"
     const QRegExp match_chat_message("\\s*(\\w+)(\\(U\\))?\\[(\\d+)\\]\\s+says:\\s+(.*)");
@@ -741,7 +747,18 @@ void Engine::acceptGameResolution(Resolution)
         return;
     }
 
+    m_game_resolution_pending = false;
     writeData("accept\n");
+}
+
+void Engine::rejectGameResolution(Resolution)
+{
+    if (not m_game_resolution_pending) {
+        return;
+    }
+
+    m_game_resolution_pending = false;
+    writeData("decline\n");
 }
 
 void Engine::movePiece(const MovedPiece &moved_piece)
@@ -876,6 +893,18 @@ void Engine::readData(const QByteArray &token)
 
                             tokenProcessed = true;
                         }
+                    } else if (match_draw_proposed.exactMatch(token)) {
+                        m_game_resolution_pending = true;
+                        Command::GameResolution grc(TargetFrontend,
+                                                    Command::GameResolution::Proposed,
+                                                    ResolutionDraw);
+                        sendCommand(&grc);
+                    } else if (match_draw_rejected.exactMatch(token)) {
+                        m_game_resolution_pending = false;
+                        Command::GameResolution grc(TargetFrontend,
+                                                    Command::GameResolution::Rejected,
+                                                    ResolutionDraw);
+                        sendCommand(&grc);
                     }
                 }
             }

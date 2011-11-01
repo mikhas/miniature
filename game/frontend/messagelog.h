@@ -48,8 +48,8 @@ public:
     explicit MessageLog(QObject *parent = 0);
     virtual ~MessageLog();
 
-    virtual void append(const QByteArray &player_name,
-                        const QByteArray &message);
+    Q_INVOKABLE virtual void append(const QByteArray &player_name,
+                                    const QByteArray &message);
 
     Q_INVOKABLE virtual void removeAll();
     Q_INVOKABLE virtual void remove(int row);

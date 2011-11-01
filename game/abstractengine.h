@@ -151,6 +151,10 @@ public:
     //! @param resolution the accepted game resolution.
     virtual void acceptGameResolution(Resolution resolution);
 
+    //! Rejects a game resolution. Send to the engine.
+    //! @param resolution the rejected game resolution.
+    virtual void rejectGameResolution(Resolution resolution);
+
     //! Move piece. Send to the engine.
     //! @param moved_piece the moved piece.
     virtual void movePiece(const MovedPiece &moved_piece);

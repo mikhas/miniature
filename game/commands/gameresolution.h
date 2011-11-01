@@ -34,8 +34,9 @@ class GameResolution
 {
 public:
     enum Activity {
+        Proposed,
         Accepted,
-        Proposed
+        Rejected
     };
 
 private:

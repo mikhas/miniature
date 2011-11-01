@@ -180,6 +180,23 @@ Page {
                 onRowsInserted: chatLog.positionViewAtEnd()
             }
 
+            Connections {
+                target: miniature
+                onGameResolutionRejected: {
+                    // FIXME: mark as translatable string after 0.5 is released.
+                    if (resolution == Miniature.GameResolutionDraw) {
+                        messageLog.append("Server",
+                                          remoteSide.id +" rejects your draw offer.")
+                    } else if (resolution == Miniature.GameResolutionAdjourn) {
+                        messageLog.append("Server",
+                                          remoteSide.id + " does not want to adjourn the game.")
+                    } else if (resolution == Miniature.GameResolutionAbort) {
+                        messageLog.append("Server",
+                                          remoteSide.id + " refuses to abort the game.")
+                    }
+                }
+            }
+
             Text {
                 id: chatInstructions
                 color: "lightgrey"
@@ -640,6 +657,7 @@ Page {
         visualParent: dialogWindow
         titleText: opponentProposals.resolution
         message: opponentProposals.description
+
         acceptButtonText: "Accept"
         onAccepted: {
             if (opponentProposals.resolution == qsTr("Is this a draw?")) {
@@ -650,7 +668,17 @@ Page {
                 miniature.acceptGameResolution(Miniature.GameResolutionAbort)
             }
         }
+
         rejectButtonText: "Ignore"
+        onRejected: {
+            if (opponentProposals.resolution == qsTr("Is this a draw?")) {
+                miniature.rejectGameResolution(Miniature.GameResolutionDraw)
+            } else if (opponentProposals.resolution == qsTr("Continue another day?")) {
+                miniature.rejectGameResolution(Miniature.GameResolutionAdjourn)
+            } else if (opponentProposals.resolution == qsTr("Scrap this game?")) {
+                miniature.rejectGameResolution(Miniature.GameResolutionAbort)
+            }
+        }
     }
 
     QueryDialog { // Connection lost

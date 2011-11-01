@@ -62,6 +62,9 @@ void AbstractEngine::proposeGameResolution(Resolution)
 void AbstractEngine::acceptGameResolution(Resolution)
 {}
 
+void AbstractEngine::rejectGameResolution(Resolution)
+{}
+
 void AbstractEngine::movePiece(const MovedPiece &)
 {}
 

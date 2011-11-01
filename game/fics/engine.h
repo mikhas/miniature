@@ -86,6 +86,7 @@ public:
     virtual void endGame(Reason reason);
     virtual void proposeGameResolution(Resolution resolution);
     virtual void acceptGameResolution(Resolution resolution);
+    virtual void rejectGameResolution(Resolution resolution);
     virtual void movePiece(const MovedPiece &moved_piece);
     virtual void readData(const QByteArray &token);
     virtual void writeData(const QByteArray &data);

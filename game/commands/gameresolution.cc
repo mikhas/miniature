@@ -43,10 +43,16 @@ void GameResolution::exec(Dispatcher *,
     }
 
     switch(m_activity) {
-    case Accepted: target->acceptGameResolution(m_resolution);
+    case Proposed:
+        target->proposeGameResolution(m_resolution);
         break;
-    case Proposed: target->proposeGameResolution(m_resolution);
+
+    case Accepted:
+        target->acceptGameResolution(m_resolution);
         break;
+
+    case Rejected:
+        target->rejectGameResolution(m_resolution);
     }
 }
 
@@ -58,9 +64,16 @@ void GameResolution::exec(Dispatcher *,
     }
 
     switch(m_activity) {
-    case Accepted: emit target->gameResolutionAccepted(m_resolution);
+    case Proposed:
+        emit target->gameResolutionProposed(m_resolution);
         break;
-    case Proposed: emit target->gameResolutionProposed(m_resolution);
+
+    case Accepted:
+        emit target->gameResolutionAccepted(m_resolution);
+        break;
+
+    case Rejected:
+        emit target->gameResolutionRejected(m_resolution);
         break;
     }
 }
