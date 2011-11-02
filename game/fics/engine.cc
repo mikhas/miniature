@@ -160,6 +160,19 @@ namespace {
         return "";
     }
 
+    ::Game::Result toGameResult(const QString &token)
+    {
+        if (token == "1-0") {
+            return Game::ResultWhiteWins;
+        } else if (token == "1/2-1/2") {
+            return Game::ResultDraw;
+        } else if (token == "0-1") {
+            return Game::ResultBlackWins;
+        }
+
+        return ::Game::ResultUnknown;
+    }
+
     bool parseRating(uint *rating,
                      const QString &captured)
     {
@@ -467,17 +480,7 @@ namespace {
             result.id = match_forfeit_by_disconnect.cap(1).toUInt(&converted);
             result.valid = result.valid && converted;
             result.player_name = match_forfeit_by_disconnect.cap(2).toLatin1();
-
-            const QString &r(match_forfeit_by_disconnect.cap(3));
-            if (r == "1-0") {
-                result.result = Game::ResultWhiteWins;
-            } else if (r == "1/2-1/2") {
-                result.result = Game::ResultDraw;
-            } else if (r == "0-1") {
-                result.result = Game::ResultBlackWins;
-            } else {
-                result.valid = false;
-            }
+            result.result = toGameResult(match_forfeit_by_disconnect.cap(3));
         } else if (match_aborted_by_disconnect.exactMatch(token)) {
             result.valid = true;
             result.reason = Game::ReasonAbortedByDisconnect;
@@ -514,20 +517,14 @@ namespace {
             result.id = match_game_ended.cap(1).toUInt(&converted);
             result.valid = result.valid && converted;
             result.player_name = match_game_ended.cap(2).toLatin1();
-
-            const QString &r(match_game_ended.cap(5));
-            if (r == "1-0") {
-                result.result = Game::ResultWhiteWins;
-            } else if (r == "1/2-1/2") {
-                result.result = Game::ResultDraw;
-            } else if (r == "0-1") {
-                result.result = Game::ResultBlackWins;
-            }
+            result.result = toGameResult(match_game_ended.cap(5));
         } else {
             result.valid = false;
             result.reason = Game::ReasonUnknown;
             result.id = 0; // invalid
         }
+
+        result.valid = (result.result != ::Game::ResultUnknown);
 
         return result;
     }
