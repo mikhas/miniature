@@ -92,7 +92,7 @@ namespace {
     // Matches: '{Game 328 (GuestNDFD vs. pleaseIgnoreMe) GuestNDFD checkmated} 0-1'
     // TODO: should also match draws.
     const QRegExp match_game_ended("\\s*\\{Game\\s+(\\d+)\\s+\\(\\w+\\s+vs\\.\\s+\\w+\\)"
-                                   "\\s+(\\w+)\\s+(.*)\\}(\\s+(.*))?");
+                                   "\\s+(.*)\\}(\\s+(.*))?");
     
     // Matches: 'Illegal move (Qd2).'
     const QRegExp match_illegal_move("fics% Illegal move\\s+\\(([^)]*)\\)\\.");
@@ -470,7 +470,9 @@ namespace {
     GameEnded parseGameEnded(const QByteArray &token)
     {
         GameEnded result;
+        result.valid = false;
         result.reason = Game::ReasonUnknown;
+        result.result = Game::ResultUnknown;
 
         if (match_forfeit_by_disconnect.exactMatch(token)) {
             result.valid = true;
@@ -481,6 +483,7 @@ namespace {
             result.valid = result.valid && converted;
             result.player_name = match_forfeit_by_disconnect.cap(2).toLatin1();
             result.result = toGameResult(match_forfeit_by_disconnect.cap(3));
+            result.valid = result.valid && (result.result != ::Game::ResultUnknown);
         } else if (match_aborted_by_disconnect.exactMatch(token)) {
             result.valid = true;
             result.reason = Game::ReasonAbortedByDisconnect;
@@ -502,13 +505,15 @@ namespace {
         } else if(match_game_ended.exactMatch(token)) {
             result.valid = true;
 
-            const QString &desc = match_game_ended.cap(3);
+            const QString &desc = match_game_ended.cap(2);
             if (desc.endsWith("checkmated")) {
                 result.reason = Game::ReasonCheckmated;
             } else if (desc.endsWith("forfeits on time")) {
                 result.reason = Game::ReasonForfeitOnTime;
-            } else if (desc.endsWith("Game drawn because both players ran out of time")) {
+            } else if (desc == "Game drawn because both players ran out of time") {
                 result.reason = Game::ReasonDrawnOnTime;
+            } else if (desc == "Game drawn by mutual agreement") {
+                result.reason = Game::ReasonDrawAccpeted;
             } else {
                 result.reason = Game::ReasonUnknown;
             }
@@ -517,14 +522,13 @@ namespace {
             result.id = match_game_ended.cap(1).toUInt(&converted);
             result.valid = result.valid && converted;
             result.player_name = match_game_ended.cap(2).toLatin1();
-            result.result = toGameResult(match_game_ended.cap(5));
+            result.result = toGameResult(match_game_ended.cap(4));
+            result.valid = result.valid && (result.result != ::Game::ResultUnknown);
         } else {
             result.valid = false;
             result.reason = Game::ReasonUnknown;
             result.id = 0; // invalid
         }
-
-        result.valid = (result.result != ::Game::ResultUnknown);
 
         return result;
     }

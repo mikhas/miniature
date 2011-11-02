@@ -135,7 +135,7 @@ public:
         ReasonAdjournedByDisconnect = ::Game::ReasonAdjournedByDisconnect,
         ReasonSurrendered = ::Game::ReasonSurrendered,
         ReasonCheckmated = ::Game::ReasonCheckmated,
-        ReasonDrawAccpeted = ::Game::ReasonDrawAccpeted,
+        ReasonDrawAccepted = ::Game::ReasonDrawAccpeted,
         ReasonAdjourned = ::Game::ReasonAdjourned
     };
 
