@@ -21,7 +21,6 @@ SOURCES += \
     $${COMMANDS_DIR}/login.cc \
     $${COMMANDS_DIR}/logout.cc \
     $${COMMANDS_DIR}/loginfailed.cc \
-    $${COMMANDS_DIR}/record.cc \
     $${COMMANDS_DIR}/advertisement.cc \
     $${COMMANDS_DIR}/play.cc \
     $${COMMANDS_DIR}/move.cc \
