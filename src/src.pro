@@ -114,7 +114,7 @@ maemo5 {
 icon.files = $${TARGET}-n9.png
 icon.path = /usr/share/themes/base/meegotouch/icons/
 maemo5 {
-    icon.path = /usr/share/icons/hicolor/64x64/apps
+    icon.path = /usr/share/icons/hicolor/64x64/apps/
 }
 
 INSTALLS += \
