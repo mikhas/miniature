@@ -19,12 +19,12 @@
  */
 
 import QtQuick 1.1
-import com.nokia.meego 1.0
+import Sailfish.Silica 1.0
 import org.maemo.miniature 1.0
 
 Page { // FIXME how to make the height fixed so the virtual keyboard doesn't push it up?
     id: ficsLogin
-    orientationLock: PageOrientation.LockPortrait
+    //orientationLock: PageOrientation.LockPortrait
 
     // Generic app window style
 
@@ -71,15 +71,15 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         anchors.top: parent.top
         z: 25
 
-        BusyIndicator {
-            id: busyLogin
-            anchors.right: parent.right
-            anchors.rightMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            // FIXME ideally this should be color white but I can't find the way to go away from default grey
-            visible: false
-            running: false
-        }
+//        BusyIndicator {
+//            id: busyLogin
+//            anchors.right: parent.right
+//            anchors.rightMargin: 10
+//            anchors.verticalCenter: parent.verticalCenter
+//            // FIXME ideally this should be color white but I can't find the way to go away from default grey
+//            visible: false
+//            running: false
+//        }
     }
 
     Text {
@@ -317,7 +317,6 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
 
     Button {
         id: aboutButton
-        checkable: true
         //: Stands for "information". Translations must have just one character. In case of doubt just leave the original "i".
         text: qsTr("i")
         width: 50
@@ -335,5 +334,3 @@ Page { // FIXME how to make the height fixed so the virtual keyboard doesn't pus
         }
     }
 }
-
-
