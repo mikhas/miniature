@@ -8,10 +8,6 @@ GAME_DIR = $${DIR_PREFIX}/game
 SRC_DIR = $${DIR_PREFIX}/src
 TESTS_DIR = $${DIR_PREFIX}/tests
 
-isEmpty(PREFIX) {
-    PREFIX = /opt
-}
-
 enable-gui {
     DEFINES += MINIATURE_GUI_ENABLED
 }

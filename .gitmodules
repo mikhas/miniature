@@ -1,3 +1,0 @@
-[submodule "debian"]
-	path = debian
-	url = git@gitorious.org:miniature/packaging.git
